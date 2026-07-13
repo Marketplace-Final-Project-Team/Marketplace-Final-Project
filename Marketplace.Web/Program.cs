@@ -1,6 +1,9 @@
+using CloudinaryDotNet;
 using Marketplace.DAL.Data;
-using Marketplace.DAL.Repositories;
+using Marketplace.BLL.Services;
+using Marketplace.BLL.Interfaces;
 using Marketplace.Domain.Entities;
+using Marketplace.DAL.Repositories;
 using Marketplace.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +27,15 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+var cloudinaryAccount = new Account(
+    builder.Configuration["Cloudinary:CloudName"],
+    builder.Configuration["Cloudinary:ApiKey"],
+    builder.Configuration["Cloudinary:ApiSecret"]
+);
+
+builder.Services.AddSingleton(new Cloudinary(cloudinaryAccount));
+
+builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
 var app = builder.Build();
