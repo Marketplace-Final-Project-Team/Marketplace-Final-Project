@@ -1,0 +1,39 @@
+@model Marketplace.Web.Models.Products.ProductDetailsViewModel
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<h1>@Model.Name</h1>
+<span class="badge bg-secondary">@Model.Status</span>
+
+@if (!string.IsNullOrEmpty(Model.MainImageUrl))
+{
+    <div class="my-3"><img src="@Model.MainImageUrl" style="max-width:300px;" /></div>
+}
+
+<dl class="row">
+    <dt class="col-sm-2">Категорія</dt>
+    <dd class="col-sm-10">@Model.CategoryName</dd>
+    <dt class="col-sm-2">Опис</dt>
+    <dd class="col-sm-10">@Model.Description</dd>
+    <dt class="col-sm-2">Ціна</dt>
+    <dd class="col-sm-10">@Model.Price.ToString("0.00")</dd>
+    <dt class="col-sm-2">Кількість</dt>
+    <dd class="col-sm-10">@Model.Quantity</dd>
+</dl>
+
+@if (Model.AdditionalImageUrls.Any())
+{
+    <h5>Додаткові фото</h5>
+    <div class="d-flex gap-2 flex-wrap">
+        @foreach (var url in Model.AdditionalImageUrls)
+        {
+            <img src="@url" style="width:100px;height:100px;object-fit:cover;" />
+        }
+    </div>
+}
+
+<div class="mt-3">
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Редагувати</a>
+    <a asp-action="Index" class="btn btn-secondary">Назад до списку</a>
+</div>

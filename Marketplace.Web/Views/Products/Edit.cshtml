@@ -1,0 +1,70 @@
+@model Marketplace.Web.Models.Products.ProductEditViewModel
+@{
+    ViewData["Title"] = "Редагування товару";
+}
+
+<h1>Редагування товару</h1>
+
+<div class="alert alert-info">
+    Після збереження зміни товар знову буде відправлено на модерацію.
+</div>
+
+<form asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CategoryId" class="form-label">Категорія</label>
+        <select asp-for="CategoryId" asp-items="Model.Categories" class="form-select"></select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Price" class="form-label"></label>
+        <input asp-for="Price" class="form-control" />
+        <span asp-validation-for="Price" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Quantity" class="form-label"></label>
+        <input asp-for="Quantity" class="form-control" />
+        <span asp-validation-for="Quantity" class="text-danger"></span>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ExistingMainImageUrl))
+    {
+        <div class="mb-3">
+            <label class="form-label">Поточне головне фото</label><br />
+            <img src="@Model.ExistingMainImageUrl" style="width:120px;height:120px;object-fit:cover;" />
+        </div>
+    }
+
+    <div class="mb-3">
+        <label asp-for="MainImage" class="form-label">Замінити головне фото</label>
+        <input asp-for="MainImage" type="file" class="form-control" accept="image/*" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="AdditionalImages" class="form-label">Додати ще фото</label>
+        <input asp-for="AdditionalImages" type="file" class="form-control" accept="image/*" multiple />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Зберегти</button>
+    <a asp-action="Index" class="btn btn-secondary">Скасувати</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

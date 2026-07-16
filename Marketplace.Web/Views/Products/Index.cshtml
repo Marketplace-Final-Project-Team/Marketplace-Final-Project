@@ -1,0 +1,50 @@
+@model IEnumerable<Marketplace.Web.Models.Products.ProductListItemViewModel>
+
+@{
+    ViewData["Title"] = "Мої товари";
+}
+
+<h1>Мої товари</h1>
+
+<p><a asp-action="Create" class="btn btn-primary">+ Додати товар</a></p>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Фото</th><th>Назва</th><th>Категорія</th>
+            <th>Ціна</th><th>Кількість</th><th>Статус</th><th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @if (!string.IsNullOrEmpty(item.MainImageUrl))
+                {
+                    <img src="@item.MainImageUrl" alt="@item.Name" style="width:60px;height:60px;object-fit:cover;" />
+                }
+            </td>
+            <td>@item.Name</td>
+            <td>@item.CategoryName</td>
+            <td>@item.Price.ToString("0.00")</td>
+            <td>@item.Quantity</td>
+            <td>
+                <span class="badge bg-@(item.Status == "Active" ? "success" : item.Status == "Pending" ? "warning" : "danger")">
+                    @item.Status
+                </span>
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Деталі</a>
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Редагувати</a>
+                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Видалити</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
