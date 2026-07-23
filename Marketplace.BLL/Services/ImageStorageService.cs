@@ -25,20 +25,27 @@ namespace Marketplace.BLL.Services
             if (!AllowedExtensions.Contains(extension)) return null;
 
             if (file.Length > MaxFileSizeBytes) return null;
-
-            await using var stream = file.OpenReadStream();
-
-            var uploadParams = new ImageUploadParams
+            
+            try
             {
-                File = new FileDescription(file.FileName, stream),
-                UseFilename = true,
-                UniqueFilename = true,
-            };
-        
-            var result = await _cloudinary.UploadAsync(uploadParams);
+                await using var stream = file.OpenReadStream();
 
-            if (result.Error != null) return null;
-            return result.SecureUrl.ToString();
+                var uploadParams = new ImageUploadParams
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    UseFilename = true,
+                    UniqueFilename = true,
+                };
+
+                var result = await _cloudinary.UploadAsync(uploadParams);
+
+                if (result.Error != null) return null;
+                return result.SecureUrl.ToString();
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }
