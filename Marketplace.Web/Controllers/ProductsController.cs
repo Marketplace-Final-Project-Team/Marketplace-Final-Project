@@ -1,10 +1,6 @@
-using System.Security.Claims;
 using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
-using Marketplace.Domain.Entities;
-using Marketplace.Domain.Interfaces;
 using Marketplace.Web.Models.Products;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -14,7 +10,7 @@ namespace Marketplace.Web.Controllers
     {
         private readonly IProductService _productService;
 
-        // ВРЕМЕННО ID 
+        // ВРЕМЕННО
         private static readonly Guid TempBusinessId = Guid.Parse("99999999-9999-9999-9999-999999999999");
         private static readonly Guid TempCategoryId = Guid.Parse("11111111-1111-1111-1111-111111111111");
 
@@ -69,7 +65,6 @@ namespace Marketplace.Web.Controllers
         {
             var model = new ProductCreateViewModel
             {
-                // Заглушка
                 Categories = new List<SelectListItem>
                 {
                     new SelectListItem { Value = TempCategoryId.ToString(), Text = "Тестовая категория" }
@@ -94,8 +89,9 @@ namespace Marketplace.Web.Controllers
 
             var dto = new ProductCreateDto
             {
-                BusinessId = TempBusinessId, 
-                CategoryId = TempCategoryId, 
+                //!!!!!! заменить на business.Id после подключения авторизации!!!!!!!!!!!
+                BusinessId = TempBusinessId,
+                CategoryId = TempCategoryId,
                 Name = model.Name,
                 Description = model.Description,
                 Price = model.Price,
@@ -123,7 +119,7 @@ namespace Marketplace.Web.Controllers
                 Description = product.Description,
                 Price = product.Price,
                 Quantity = product.Quantity,
-                CategoryId = TempCategoryId,
+                CategoryId = product.CategoryId,
                 ExistingMainImageUrl = product.MainImageUrl,
                 Categories = new List<SelectListItem>
                 {
@@ -153,7 +149,7 @@ namespace Marketplace.Web.Controllers
             var dto = new ProductEditDto
             {
                 Id = model.Id,
-                CategoryId = TempCategoryId,
+                CategoryId = model.CategoryId,
                 Name = model.Name,
                 Description = model.Description,
                 Price = model.Price,
@@ -184,7 +180,7 @@ namespace Marketplace.Web.Controllers
                 Quantity = product.Quantity,
                 MainImageUrl = product.MainImageUrl,
                 Status = product.Status.ToString(),
-                CategoryName = "Тестовая категория"
+                CategoryName = product.Category?.Name ?? "Тестовая категория"
             };
 
             return View(model);
