@@ -10,19 +10,43 @@ namespace Marketplace.Web.Controllers
     {
         private readonly IProductService _productService;
 
-        // ВРЕМЕННО
-        private static readonly Guid TempBusinessId = Guid.Parse("99999999-9999-9999-9999-999999999999");
-        private static readonly Guid TempCategoryId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        private readonly IGenericRepository<Business> _businessRepository;
+        private readonly IGenericRepository<Category> _categoryRepository;
 
-        public ProductsController(IProductService productService)
+        public ProductsController(
+            IProductService productService,
+            IGenericRepository<Business> businessRepository,
+            IGenericRepository<Category> categoryRepository)
         {
             _productService = productService;
+            _businessRepository = businessRepository;
+            _categoryRepository = categoryRepository;
         }
-
-        // GET: /Products
-        public async Task<IActionResult> Index()
+        // GET: /Products?businessId={id}
+        public async Task<IActionResult> Index(Guid? businessId)
         {
-            var products = await _productService.GetByBusinessAsync(TempBusinessId);
+            var businesses = await _businessAccessService.GetAccessibleBusinessesAsync(CurrentUserId, BusinessPermissions.ProductCrud);
+            if (businesses.Count == 0)
+            {
+                TempData["Error"] = "У вас поки немає доступу до жодного бізнесу. Власник має створити бізнес; менеджер/аналітик отримує доступ від власника.";
+                return View(new List<ProductListItemViewModel>());
+            }
+
+            var selectedBusinessId = businessId ?? businesses[0].Id;
+
+            var hasAccess = await _businessAccessService.HasAccessAsync(selectedBusinessId, CurrentUserId, BusinessPermissions.ProductCrud);
+            if (!hasAccess)
+                return Forbid();
+
+            var products = await _productService.GetByBusinessAsync(selectedBusinessId);
+
+            ViewBag.Businesses = businesses.Select(b => new SelectListItem
+            {
+                Value = b.Id.ToString(),
+                Text = b.StoreName,
+                Selected = b.Id == selectedBusinessId
+            });
+            ViewBag.SelectedBusinessId = selectedBusinessId;
 
             var model = products.Select(p => new ProductListItemViewModel
             {
@@ -32,7 +56,7 @@ namespace Marketplace.Web.Controllers
                 Quantity = p.Quantity,
                 MainImageUrl = p.MainImageUrl,
                 Status = p.Status.ToString(),
-                CategoryName = p.Category?.Name ?? "Тестовая категория"
+                CategoryName = p.Category?.Name ?? string.Empty
             }).ToList();
 
             return View(model);

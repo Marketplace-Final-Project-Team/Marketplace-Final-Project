@@ -113,6 +113,10 @@ namespace Marketplace.DAL.Data
                 .WithMany(u => u.Addresses)
                 .HasForeignKey(a => a.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Product>().Navigation(p => p.Category).AutoInclude();
+            builder.Entity<Product>().Navigation(p => p.Images).AutoInclude();
+            builder.Entity<Product>().Navigation(p => p.Business).AutoInclude();
         }
 
         public override int SaveChanges()

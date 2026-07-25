@@ -5,6 +5,9 @@ namespace Marketplace.Web.Models.Products
 {
     public class ProductCreateViewModel
     {
+        [Required(ErrorMessage = "Оберіть бізнес")]
+        public Guid BusinessId { get; set; }
+
         [Required(ErrorMessage = "Вкажіть назву товару")]
         [StringLength(200)]
         public string Name { get; set; } = string.Empty;
@@ -25,7 +28,7 @@ namespace Marketplace.Web.Models.Products
 
         public IFormFile? MainImage { get; set; }
         public List<IFormFile>? AdditionalImages { get; set; }
-
+        public IEnumerable<SelectListItem> Businesses { get; set; } = new List<SelectListItem>();
         public IEnumerable<SelectListItem> Categories { get; set; } = new List<SelectListItem>();
     }
 }
