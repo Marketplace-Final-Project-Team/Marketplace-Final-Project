@@ -1,0 +1,40 @@
+﻿@model Marketplace.Web.Models.SignInViewModel
+
+@{
+    ViewData["Title"] = "SignIn";
+}
+
+<div class="container d-flex justify-content-center" style="min-height: 70vh;">
+    <div class="col-md-5 col-lg-4 mt-5">
+        <h2 class="mb-4 text-center">Вхід до акаунту</h2>
+
+        <form asp-controller="Auth" asp-action="SignIn" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">Емейл:</label>
+                <input asp-for="Email" class="form-control" placeholder="Введіть свій емейл..." />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label">Пароль:</label>
+                <input asp-for="Password" class="form-control" placeholder="Введіть свій пароль..." />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 mt-2">Увійти</button>
+
+            <p class="text-center mt-3 mb-0">
+                Немає акаунту?
+                <a asp-controller="Auth" asp-action="SignUp">Зареєструватись</a>
+            </p>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

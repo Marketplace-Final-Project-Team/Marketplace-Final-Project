@@ -16,11 +16,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-//builder.Services.AddDbContext<AppDbContext>(options =>
-//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-////////////////ТЕст///////////////////////////
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseInMemoryDatabase("MarketplaceTestDb"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+////////////////Тeст///////////////////////////
+//builder.Services.AddDbContext<AppDbContext>(options =>
+//    options.UseInMemoryDatabase("MarketplaceTestDb"));
 ///////////////////////////////////////////
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>
@@ -44,6 +44,8 @@ builder.Services.AddSingleton(new Cloudinary(cloudinaryAccount));
 
 builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IBusinessService, BusinessService>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
 var app = builder.Build();
@@ -77,7 +79,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=Auth}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 

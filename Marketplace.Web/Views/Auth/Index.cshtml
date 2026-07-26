@@ -1,0 +1,15 @@
+﻿@{
+    ViewData["Title"] = "Authorization";
+}
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="text-center">
+        <h1 class="mb-4">Ласкаво просимо до Marketplace</h1>
+        <p class="text-muted mb-4">Увійдіть у свій акаунт або зареєструйтесь, щоб продовжити</p>
+
+        <div class="d-flex gap-3 justify-content-center">
+            <a asp-controller="Auth" asp-action="SignIn" class="btn btn-primary btn-lg px-4">Увійти</a>
+            <a asp-controller="Auth" asp-action="SignUp" class="btn btn-outline-primary btn-lg px-4">Зареєструватись</a>
+        </div>
+    </div>
+</div>
