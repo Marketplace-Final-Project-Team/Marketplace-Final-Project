@@ -12,12 +12,14 @@ namespace Marketplace.BLL.Services
     {
         private readonly IGenericRepository<Cart> _cartRepository;
         private readonly ICartItemRepository _cartItemRepository;  
+        private readonly IGenericRepository<Product> _productRepository;
         private readonly AppDbContext _context;
 
-        public CartService(IGenericRepository<Cart> cartRepository, ICartItemRepository cartItemRepository, AppDbContext context)
+        public CartService(IGenericRepository<Cart> cartRepository, ICartItemRepository cartItemRepository, IGenericRepository<Product> productRepository, AppDbContext context)
         {
             _cartRepository = cartRepository;
             _cartItemRepository = cartItemRepository;
+            _productRepository = productRepository;
             _context = context;
         }
 
@@ -36,6 +38,13 @@ namespace Marketplace.BLL.Services
 
         public async Task<ServiceResult> AddToCart(string userId, Guid productId)
         {
+            var product = await _productRepository.FirstOrDefaultAsync(p => p.Id == productId);
+
+            if (product == null || product.Quantity <= 0)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Товар не знайдено." };
+            }
+
             var cart = await _cartRepository.FirstOrDefaultAsync(c => c.UserId == userId);
 
             if (cart == null) 
@@ -50,7 +59,7 @@ namespace Marketplace.BLL.Services
             if(item == null)
             {
                 item = new CartItem { CartId = cart.Id, ProductId = productId, Quantity = 1 };
-                await _cartItemRepository.AddAsync(item);
+                await _cartItemRepository.AddAsync(item);    
                 await _context.SaveChangesAsync();
             }
             else
@@ -63,11 +72,18 @@ namespace Marketplace.BLL.Services
 
         public async Task<ServiceResult> RemoveFromCart(string userId, Guid productId)
         {
+            var product = await _productRepository.FirstOrDefaultAsync(p => p.Id == productId);
+
+            if (product == null)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Товар не знайдено." };
+            }
+
             var item = await _cartItemRepository.FirstOrDefaultAsync(ci => ci.Cart.UserId == userId && ci.ProductId == productId);
 
             if (item == null)
             {
-                return new ServiceResult { Succeeded = false, Message = "Item not found in cart." };
+                return new ServiceResult { Succeeded = false, Message = "Товар не знайдено у кошику." };
             }
 
             await Remove(item);
@@ -77,11 +93,18 @@ namespace Marketplace.BLL.Services
 
         public async Task<ServiceResult> IncreaseQuantity(string userId, Guid productId)
         {
+            var product = await _productRepository.FirstOrDefaultAsync(p => p.Id == productId);
+
+            if (product == null || product.Quantity <= 0)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Товар не знайдено." };
+            }
+
             var item = await _cartItemRepository.FirstOrDefaultAsync(ci => ci.Cart.UserId == userId && ci.ProductId == productId);
 
             if (item == null)
             {
-                return new ServiceResult { Succeeded = false, Message = "Item not found in cart." };
+                return new ServiceResult { Succeeded = false, Message = "Товар не знайдено у кошику." };
             }
 
             await ChangeQuantity(item, 1);
@@ -91,11 +114,18 @@ namespace Marketplace.BLL.Services
 
         public async Task<ServiceResult> DecreaseQuantity(string userId, Guid productId)
         {
+            var product = await _productRepository.FirstOrDefaultAsync(p => p.Id == productId);
+
+            if (product == null)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Товар не знайдено." };
+            }
+
             var item = await _cartItemRepository.FirstOrDefaultAsync(ci => ci.Cart.UserId == userId && ci.ProductId == productId);
 
             if (item == null)
             {
-                return new ServiceResult { Succeeded = false, Message = "Item not found in cart." };
+                return new ServiceResult { Succeeded = false, Message = "Товар не знайдено у кошику." };
             }
 
             if (item.Quantity <= 1)
@@ -113,13 +143,18 @@ namespace Marketplace.BLL.Services
         private async Task ChangeQuantity(CartItem item, int temp)
         {
             item.Quantity += temp;
+
             _cartItemRepository.Update(item);
+
             await _context.SaveChangesAsync();
         }
 
         private async Task Remove(CartItem item)
         {
+            var quantity = item.Quantity;
+
             _cartItemRepository.Remove(item);
+
             await _context.SaveChangesAsync();
         }
     }

@@ -9,8 +9,8 @@ namespace Marketplace.Domain.Entities
         public Guid ProductId { get; set; }
         public Product Product { get; set; } = null!;
 
-        public string ProductName { get; set; } = string.Empty;    // "знімок" назви на момент купівлі
-        public decimal UnitPrice { get; set; }                     // ціна на момент купівлі, НЕ поточна ціна товару
+        public string ProductName { get; set; } = string.Empty;   
+        public decimal UnitPrice { get; set; }                     
         public int Quantity { get; set; }
 
         public Guid OrderId { get; set; }
