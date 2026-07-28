@@ -1,0 +1,27 @@
+@page
+@model Marketplace.Web.Pages.IndexModel
+@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Акаунт готовий";
+}
+
+<section class="auth-card auth-card--success" aria-labelledby="welcome-title">
+    <span class="success-mark" aria-hidden="true">✓</span>
+    <p class="auth-kicker">Авторизація працює</p>
+    <h2 id="welcome-title">Вітаємо, @Model.DisplayName!</h2>
+    <p class="success-copy">
+        Ви успішно увійшли до Marketplace. Наступним кроком тут з’явиться
+        головна сторінка покупця з каталогом, пошуком і персональними добірками.
+    </p>
+
+    <div class="success-meta">
+        <span>Поточний акаунт</span>
+        <strong>@Model.Email</strong>
+    </div>
+
+    <form method="post" asp-page="/Account/Logout">
+        <button class="button button--secondary" type="submit">
+            Вийти з акаунта
+        </button>
+    </form>
+</section>

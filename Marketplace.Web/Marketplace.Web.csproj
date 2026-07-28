@@ -20,4 +20,9 @@
     <ProjectReference Include="..\Marketplace.Domain\Marketplace.Domain.csproj" />
   </ItemGroup>
 
+  <!-- Keep the partially merged develop controller for later backend integration. -->
+  <ItemGroup>
+    <Compile Remove="Controllers\ProductsController.cs" />
+  </ItemGroup>
+
 </Project>

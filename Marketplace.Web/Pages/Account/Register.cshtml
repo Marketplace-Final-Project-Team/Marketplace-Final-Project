@@ -1,0 +1,107 @@
+@page "/register"
+@model Marketplace.Web.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Реєстрація";
+}
+
+<section class="auth-card" aria-labelledby="register-title">
+    <div class="auth-card__header">
+        <p class="auth-kicker">Новий акаунт</p>
+        <h2 id="register-title">Приєднуйтесь до Marketplace</h2>
+        <p>Створіть один акаунт для покупок і майбутнього кабінету продавця.</p>
+    </div>
+
+    <form method="post" class="auth-form">
+        <input type="hidden" asp-for="ReturnUrl" />
+        <div asp-validation-summary="ModelOnly" class="form-alert" role="alert"></div>
+
+        <div class="field">
+            <label asp-for="Input.Username">Ім’я користувача</label>
+            <div class="field-control">
+                <span class="field-icon" aria-hidden="true">◉</span>
+                <input asp-for="Input.Username"
+                       autocomplete="username"
+                       placeholder="Наприклад, oleksii"
+                       autofocus />
+            </div>
+            <span asp-validation-for="Input.Username" class="field-error"></span>
+        </div>
+
+        <div class="field">
+            <label asp-for="Input.Email">Електронна пошта</label>
+            <div class="field-control">
+                <span class="field-icon" aria-hidden="true">@@</span>
+                <input asp-for="Input.Email"
+                       autocomplete="email"
+                       inputmode="email"
+                       placeholder="name@example.com" />
+            </div>
+            <span asp-validation-for="Input.Email" class="field-error"></span>
+        </div>
+
+        <div class="field">
+            <div class="field-label-row">
+                <label asp-for="Input.Password">Пароль</label>
+                <span class="field-hint">8+ символів</span>
+            </div>
+            <div class="field-control">
+                <span class="field-icon" aria-hidden="true">●</span>
+                <input asp-for="Input.Password"
+                       autocomplete="new-password"
+                       placeholder="Створіть надійний пароль"
+                       data-password-input />
+                <button class="password-toggle"
+                        type="button"
+                        data-password-toggle
+                        aria-label="Показати пароль"
+                        aria-pressed="false">
+                    Показати
+                </button>
+            </div>
+            <span asp-validation-for="Input.Password" class="field-error"></span>
+            <p class="password-rule">
+                Велика й мала літера, цифра та спеціальний символ.
+            </p>
+        </div>
+
+        <div class="field">
+            <label asp-for="Input.ConfirmPassword">Повторіть пароль</label>
+            <div class="field-control">
+                <span class="field-icon" aria-hidden="true">●</span>
+                <input asp-for="Input.ConfirmPassword"
+                       autocomplete="new-password"
+                       placeholder="Введіть пароль ще раз"
+                       data-password-input />
+                <button class="password-toggle"
+                        type="button"
+                        data-password-toggle
+                        aria-label="Показати пароль"
+                        aria-pressed="false">
+                    Показати
+                </button>
+            </div>
+            <span asp-validation-for="Input.ConfirmPassword" class="field-error"></span>
+        </div>
+
+        <label class="checkbox checkbox--top">
+            <input asp-for="Input.AcceptTerms" />
+            <span>Я приймаю правила користування та політику конфіденційності</span>
+        </label>
+        <span asp-validation-for="Input.AcceptTerms" class="field-error"></span>
+
+        <button class="button button--primary" type="submit">
+            Створити акаунт
+            <span aria-hidden="true">→</span>
+        </button>
+    </form>
+
+    <div class="auth-divider"><span>вже зареєстровані?</span></div>
+
+    <p class="auth-switch">
+        <a asp-page="/Account/Login" asp-route-returnUrl="@Model.ReturnUrl">Увійти до наявного акаунта</a>
+    </p>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
