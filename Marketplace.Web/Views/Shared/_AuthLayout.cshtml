@@ -12,7 +12,10 @@
 
     <div class="auth-shell">
         <section class="auth-showcase" aria-label="Про Marketplace">
-            <a class="brand" asp-page="/Index" aria-label="Marketplace — на головну">
+            <a class="brand"
+               asp-controller="Home"
+               asp-action="Index"
+               aria-label="Marketplace — на головну">
                 <span class="brand__mark" aria-hidden="true">M</span>
                 <span class="brand__name">marketplace</span>
             </a>

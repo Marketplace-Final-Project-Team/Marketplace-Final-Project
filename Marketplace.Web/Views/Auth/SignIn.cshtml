@@ -1,5 +1,4 @@
-@page "/login"
-@model Marketplace.Web.Pages.Account.LoginModel
+@model Marketplace.Web.Models.SignInViewModel
 @{
     ViewData["Title"] = "Вхід";
 }
@@ -11,31 +10,31 @@
         <p>Продовжуйте покупки, перевіряйте замовлення або керуйте магазином.</p>
     </div>
 
-    <form method="post" class="auth-form">
+    <form asp-controller="Auth" asp-action="SignIn" method="post" class="auth-form">
         <input type="hidden" asp-for="ReturnUrl" />
         <div asp-validation-summary="ModelOnly" class="form-alert" role="alert"></div>
 
         <div class="field">
-            <label asp-for="Input.Email">Електронна пошта</label>
+            <label asp-for="Email">Електронна пошта</label>
             <div class="field-control">
                 <span class="field-icon" aria-hidden="true">@@</span>
-                <input asp-for="Input.Email"
+                <input asp-for="Email"
                        autocomplete="email"
                        inputmode="email"
                        placeholder="name@example.com"
                        autofocus />
             </div>
-            <span asp-validation-for="Input.Email" class="field-error"></span>
+            <span asp-validation-for="Email" class="field-error"></span>
         </div>
 
         <div class="field">
             <div class="field-label-row">
-                <label asp-for="Input.Password">Пароль</label>
+                <label asp-for="Password">Пароль</label>
                 <span class="field-hint">Мінімум 8 символів</span>
             </div>
             <div class="field-control">
                 <span class="field-icon" aria-hidden="true">●</span>
-                <input asp-for="Input.Password"
+                <input asp-for="Password"
                        autocomplete="current-password"
                        placeholder="Введіть пароль"
                        data-password-input />
@@ -47,11 +46,11 @@
                     Показати
                 </button>
             </div>
-            <span asp-validation-for="Input.Password" class="field-error"></span>
+            <span asp-validation-for="Password" class="field-error"></span>
         </div>
 
         <label class="checkbox">
-            <input asp-for="Input.RememberMe" />
+            <input asp-for="RememberMe" />
             <span>Залишатися в системі</span>
         </label>
 
@@ -65,7 +64,9 @@
 
     <p class="auth-switch">
         Ще не маєте акаунта?
-        <a asp-page="/Account/Register" asp-route-returnUrl="@Model.ReturnUrl">Створити акаунт</a>
+        <a asp-controller="Auth"
+           asp-action="SignUp"
+           asp-route-returnUrl="@Model.ReturnUrl">Створити акаунт</a>
     </p>
 
     <p class="auth-note">
