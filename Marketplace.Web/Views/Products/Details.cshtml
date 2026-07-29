@@ -1,39 +1,83 @@
 @model Marketplace.Web.Models.Products.ProductDetailsViewModel
+
 @{
     ViewData["Title"] = Model.Name;
+    var statusClass = Model.Status.ToLowerInvariant();
+    var statusLabel = Model.Status switch
+    {
+        "Active" => "Активний",
+        "Pending" => "На модерації",
+        "Banned" => "Заблокований",
+        _ => Model.Status
+    };
 }
 
-<h1>@Model.Name</h1>
-<span class="badge bg-secondary">@Model.Status</span>
-
-@if (!string.IsNullOrEmpty(Model.MainImageUrl))
-{
-    <div class="my-3"><img src="@Model.MainImageUrl" style="max-width:300px;" /></div>
+@section Styles {
+    <link rel="stylesheet" href="~/css/products.css" asp-append-version="true" />
 }
 
-<dl class="row">
-    <dt class="col-sm-2">Категорія</dt>
-    <dd class="col-sm-10">@Model.CategoryName</dd>
-    <dt class="col-sm-2">Опис</dt>
-    <dd class="col-sm-10">@Model.Description</dd>
-    <dt class="col-sm-2">Ціна</dt>
-    <dd class="col-sm-10">@Model.Price.ToString("0.00")</dd>
-    <dt class="col-sm-2">Кількість</dt>
-    <dd class="col-sm-10">@Model.Quantity</dd>
-</dl>
+<div class="products-page">
+    <a asp-action="Index" class="products-back">← Назад до товарів</a>
+    <header class="products-heading">
+        <div>
+            <div class="products-eyebrow">Картка товару</div>
+            <h1 class="products-title">@Model.Name</h1>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Редагувати</a>
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Видалити</a>
+        </div>
+    </header>
 
-@if (Model.AdditionalImageUrls.Any())
-{
-    <h5>Додаткові фото</h5>
-    <div class="d-flex gap-2 flex-wrap">
-        @foreach (var url in Model.AdditionalImageUrls)
-        {
-            <img src="@url" style="width:100px;height:100px;object-fit:cover;" />
-        }
+    <div class="products-panel product-details-grid">
+        <div class="product-detail-media">
+            @if (!string.IsNullOrWhiteSpace(Model.MainImageUrl))
+            {
+                <img src="@Model.MainImageUrl" alt="@Model.Name" />
+            }
+            else
+            {
+                <div class="product-detail-placeholder">
+                    <span aria-hidden="true">□</span>
+                    Фото ще не додано
+                </div>
+            }
+        </div>
+
+        <div class="product-detail-content">
+            <span class="product-status product-status--@statusClass">@statusLabel</span>
+            <div class="product-detail-price">@Model.Price.ToString("N2") ₴</div>
+            <p>@(string.IsNullOrWhiteSpace(Model.Description) ? "Опис не додано." : Model.Description)</p>
+
+            <div class="product-meta">
+                <div class="product-meta__row">
+                    <span class="product-meta__label">Категорія</span>
+                    <strong>@Model.CategoryName</strong>
+                </div>
+                <div class="product-meta__row">
+                    <span class="product-meta__label">Кількість</span>
+                    <strong>@Model.Quantity шт.</strong>
+                </div>
+                <div class="product-meta__row">
+                    <span class="product-meta__label">ID</span>
+                    <span class="small text-break">@Model.Id</span>
+                </div>
+            </div>
+        </div>
     </div>
-}
 
-<div class="mt-3">
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Редагувати</a>
-    <a asp-action="Index" class="btn btn-secondary">Назад до списку</a>
+    @if (Model.AdditionalImageUrls.Any())
+    {
+        <section class="products-panel mt-3">
+            <div class="product-form-section">
+                <h2 class="mb-0">Додаткові фото</h2>
+            </div>
+            <div class="product-gallery">
+                @foreach (var url in Model.AdditionalImageUrls)
+                {
+                    <img src="@url" alt="Додаткове фото товару @Model.Name" />
+                }
+            </div>
+        </section>
+    }
 </div>
