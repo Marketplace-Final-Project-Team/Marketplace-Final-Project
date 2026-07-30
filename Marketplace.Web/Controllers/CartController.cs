@@ -1,83 +1,84 @@
-﻿using Marketplace.BLL.Interfaces;
-using Marketplace.DAL.Interfaces;
+using Marketplace.BLL.Interfaces;
 using Marketplace.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Marketplace.Web.Controllers
+namespace Marketplace.Web.Controllers;
+
+[Authorize]
+public class CartController : Controller
 {
-    [Authorize]
-    public class CartController : Controller
+    private readonly ICartService _cartService;
+    private readonly UserManager<User> _userManager;
+
+    public CartController(ICartService cartService, UserManager<User> userManager)
     {
-        private readonly ICartService _cartService;
-        private readonly UserManager<User> _userManager;
+        _cartService = cartService;
+        _userManager = userManager;
+    }
 
-        public CartController(ICartService cartService, UserManager<User> userManager) 
+    [HttpGet]
+    public async Task<IActionResult> Index()
+    {
+        var items = await _cartService.GetCartItems(GetUserId());
+        return View(items);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Add(Guid productId, string? returnUrl = null)
+    {
+        var result = await _cartService.AddToCart(GetUserId(), productId);
+        SetResultMessage(result.Succeeded, result.Message, "Товар додано до кошика.");
+
+        return !string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl)
+            ? LocalRedirect(returnUrl)
+            : RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Remove(Guid productId)
+    {
+        var result = await _cartService.RemoveFromCart(GetUserId(), productId);
+        SetResultMessage(result.Succeeded, result.Message, "Товар видалено з кошика.");
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> IncreaseQuantity(Guid productId)
+    {
+        var result = await _cartService.IncreaseQuantity(GetUserId(), productId);
+        SetResultMessage(result.Succeeded, result.Message);
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DecreaseQuantity(Guid productId)
+    {
+        var result = await _cartService.DecreaseQuantity(GetUserId(), productId);
+        SetResultMessage(result.Succeeded, result.Message);
+        return RedirectToAction(nameof(Index));
+    }
+
+    private string GetUserId()
+    {
+        return _userManager.GetUserId(User)
+            ?? throw new InvalidOperationException("Авторизованого користувача не знайдено.");
+    }
+
+    private void SetResultMessage(bool succeeded, string errorMessage, string? successMessage = null)
+    {
+        if (succeeded && !string.IsNullOrWhiteSpace(successMessage))
         {
-            _cartService = cartService;
-            _userManager = userManager;
+            TempData["Success"] = successMessage;
         }
-
-        [HttpGet]
-        public async Task<IActionResult> Index()
+        else if (!succeeded)
         {
-            var userId = _userManager.GetUserId(User);
-
-            var items = await _cartService.GetCartItems(userId!);
-
-            return View(items);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add(Guid productId) 
-        {
-            var userId = _userManager.GetUserId(User);
-            
-            await _cartService.AddToCart(userId!, productId);
-
-            var referer = Request.Headers["Referer"].ToString();
-
-            if(!string.IsNullOrEmpty(referer)) 
-            {
-                return Redirect(referer);
-            }
-
-            return RedirectToAction("Index", "Home");
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Remove(Guid productId)
-        {
-            var userId = _userManager.GetUserId(User);
-
-            await _cartService.RemoveFromCart(userId!, productId);
-
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> IncreaseQuantity(Guid productId)
-        {
-            var userId = _userManager.GetUserId(User);
-
-            await _cartService.IncreaseQuantity(userId!, productId);
-
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DecreaseQuantity(Guid productId)
-        {
-            var userId = _userManager.GetUserId(User);
-
-            await _cartService.DecreaseQuantity(userId!, productId);
-
-            return RedirectToAction("Index");
+            TempData["Error"] = errorMessage;
         }
     }
 }

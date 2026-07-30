@@ -1,0 +1,94 @@
+@model IReadOnlyList<Marketplace.BLL.DTOs.CartItemDto>
+
+@{
+    ViewData["Title"] = "Кошик";
+    var total = Model.Sum(item => item.LineTotal);
+    var units = Model.Sum(item => item.Quantity);
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+}
+
+<div class="shop-page">
+    <header class="shop-header">
+        <div>
+            <div class="shop-kicker">Покупки</div>
+            <h1 class="shop-title">Кошик</h1>
+            <p class="shop-subtitle">Перевірте товари та кількість перед оформленням замовлення.</p>
+        </div>
+        <a asp-controller="Catalog" asp-action="Index" class="btn btn-outline-primary">Продовжити покупки</a>
+    </header>
+
+    @if (TempData["Success"] is string success)
+    {
+        <div class="alert alert-success" role="alert">@success</div>
+    }
+    @if (TempData["Error"] is string error)
+    {
+        <div class="alert alert-warning" role="alert">@error</div>
+    }
+
+    @if (Model.Count == 0)
+    {
+        <section class="shop-empty">
+            <div class="shop-empty__icon" aria-hidden="true">□</div>
+            <h2>Кошик порожній</h2>
+            <p>Додайте кілька товарів із каталогу, щоб оформити замовлення.</p>
+            <a asp-controller="Catalog" asp-action="Index" class="btn btn-primary">Перейти до каталогу</a>
+        </section>
+    }
+    else
+    {
+        <div class="cart-layout">
+            <div class="cart-list">
+                @foreach (var item in Model)
+                {
+                    <article class="cart-item">
+                        @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                        {
+                            <img class="cart-item__media" src="@item.ImageUrl" alt="@item.ProductName" />
+                        }
+                        else
+                        {
+                            <div class="cart-item__media" aria-hidden="true">@item.ProductName[..1].ToUpperInvariant()</div>
+                        }
+
+                        <div>
+                            <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.ProductId" class="cart-item__name">@item.ProductName</a>
+                            <div class="cart-item__unit">@item.Price.ToString("N2") ₴ за одиницю · доступно @item.StockQuantity</div>
+
+                            <div class="quantity-control" aria-label="Кількість товару">
+                                <form asp-action="DecreaseQuantity" method="post">
+                                    <input type="hidden" name="productId" value="@item.ProductId" />
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="Зменшити кількість">−</button>
+                                </form>
+                                <span class="quantity-control__value">@item.Quantity</span>
+                                <form asp-action="IncreaseQuantity" method="post">
+                                    <input type="hidden" name="productId" value="@item.ProductId" />
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="Збільшити кількість">+</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="cart-item__price">
+                            <strong>@item.LineTotal.ToString("N2") ₴</strong>
+                            <form asp-action="Remove" method="post">
+                                <input type="hidden" name="productId" value="@item.ProductId" />
+                                <button type="submit" class="cart-remove">Видалити</button>
+                            </form>
+                        </div>
+                    </article>
+                }
+            </div>
+
+            <aside class="shop-panel summary-card">
+                <h2>Разом</h2>
+                <div class="summary-row"><span>Товарів</span><strong>@units шт.</strong></div>
+                <div class="summary-row"><span>Доставка</span><strong>Безкоштовно</strong></div>
+                <div class="summary-total"><span>До сплати</span><span>@total.ToString("N2") ₴</span></div>
+                <a asp-controller="Order" asp-action="Create" class="btn btn-primary">Оформити замовлення</a>
+            </aside>
+        </div>
+    }
+</div>

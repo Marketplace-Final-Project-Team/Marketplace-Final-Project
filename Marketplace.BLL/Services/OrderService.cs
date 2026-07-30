@@ -6,6 +6,7 @@ using Marketplace.DAL.Interfaces;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
 using Marketplace.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Marketplace.BLL.Services
 {
@@ -47,6 +48,15 @@ namespace Marketplace.BLL.Services
 
             foreach (var cartItem in cartItems)
             {
+                if (cartItem.Product.Status != ProductStatus.Active)
+                {
+                    return new ServiceResult
+                    {
+                        Succeeded = false,
+                        Message = $"Товар «{cartItem.Product.Name}» більше недоступний."
+                    };
+                }
+
                 if(cartItem.Product.Quantity < cartItem.Quantity)
                 {
                     return new ServiceResult { Succeeded = false, Message = "Недостатньо товару на складі." };
@@ -82,7 +92,12 @@ namespace Marketplace.BLL.Services
 
             await _context.SaveChangesAsync();
 
-            return new ServiceResult { Succeeded = true, Message = string.Empty };
+            return new ServiceResult
+            {
+                Succeeded = true,
+                Message = string.Empty,
+                EntityId = order.Id
+            };
         }
 
         public async Task<ServiceResult> ChangeOrderStatus(Guid orderId, OrderStatus status)
@@ -99,6 +114,26 @@ namespace Marketplace.BLL.Services
             await _context.SaveChangesAsync();
 
             return new ServiceResult { Succeeded = true, Message = string.Empty };
+        }
+
+        public async Task<IReadOnlyList<Order>> GetUserOrders(string userId)
+        {
+            return await _context.Orders
+                .AsNoTracking()
+                .Where(order => order.UserId == userId)
+                .Include(order => order.Items)
+                .OrderByDescending(order => order.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<Order?> GetUserOrder(string userId, Guid orderId)
+        {
+            return await _context.Orders
+                .AsNoTracking()
+                .Where(order => order.UserId == userId && order.Id == orderId)
+                .Include(order => order.Items)
+                .ThenInclude(item => item.Product)
+                .FirstOrDefaultAsync();
         }
     }
 }
