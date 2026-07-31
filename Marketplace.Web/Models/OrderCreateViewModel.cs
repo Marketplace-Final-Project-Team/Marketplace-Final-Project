@@ -6,5 +6,8 @@ namespace Marketplace.Web.Models
     {
         [Required]
         public Guid AddressId { get; set; }
+        public string SuccessUrl { get; set; }
+        public string CancelUrl { get; set; }
+        
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Marketplace.BLL.Common;
+using Marketplace.BLL.Configs;
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
@@ -6,50 +7,55 @@ using Marketplace.DAL.Interfaces;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
 using Marketplace.Domain.Interfaces;
+using Microsoft.Extensions.Options;
 
 namespace Marketplace.BLL.Services
 {
-    public class OrderService: IOrderService
+    public class OrderService : IOrderService
     {
         private readonly IGenericRepository<Order> _orerRepository;
         private readonly ICartItemRepository _cartItemRepository;
         private readonly IGenericRepository<Address> _addressRepository;
         private readonly IGenericRepository<Product> _productRepository;
         private readonly AppDbContext _context;
+        private readonly IPaymentService _paymentService;
+        public readonly IOptions<LiqPayOptions> _options;
 
 
-        public OrderService(IGenericRepository<Order> orerRepository, ICartItemRepository cartItemRepository, IGenericRepository<Address> addressRepository, IGenericRepository<Product> productRepository, AppDbContext context)
+        public OrderService(IGenericRepository<Order> orerRepository, ICartItemRepository cartItemRepository, IGenericRepository<Address> addressRepository, IGenericRepository<Product> productRepository, AppDbContext context, IPaymentService paymentService, IOptions<LiqPayOptions> options)
         {
             _orerRepository = orerRepository;
             _cartItemRepository = cartItemRepository;
             _addressRepository = addressRepository;
             _productRepository = productRepository;
+            _paymentService = paymentService;
             _context = context;
+            _options = options;
         }
 
-        public async Task<ServiceResult> CreateOrder(string userId, OrderCreateDto dto) 
+        public async Task<OrderResultDto> CreateOrder(string userId, OrderCreateDto dto)
         {
             var cartItems = await _cartItemRepository.GetCartItemsByUserIdAsync(userId);
 
             if (cartItems == null || !cartItems.Any())
             {
-                return new ServiceResult { Succeeded = false, Message = "Кошик пустий." };
+                return new OrderResultDto { Succeeded = false, Message = "Кошик пустий." };
             }
 
             var address = await _addressRepository.FirstOrDefaultAsync(a => a.Id == dto.AddressId && a.UserId == userId);
 
             if (address == null)
             {
-                return new ServiceResult { Succeeded = false, Message = "Адреса не знайдена." };
+                return new OrderResultDto { Succeeded = false, Message = "Адреса не знайдена." };
             }
 
             var orderItems = new List<OrderItem>();
 
             foreach (var cartItem in cartItems)
             {
-                if(cartItem.Product.Quantity < cartItem.Quantity)
+                if (cartItem.Product.Quantity < cartItem.Quantity)
                 {
-                    return new ServiceResult { Succeeded = false, Message = "Недостатньо товару на складі." };
+                    return new OrderResultDto { Succeeded = false, Message = "Недостатньо товару на складі." };
                 }
 
                 var orderItem = new OrderItem
@@ -75,6 +81,7 @@ namespace Marketplace.BLL.Services
                 ShippingCountry = address.Country,
                 ShippingCity = address.City,
                 ShippingStreet = address.Street,
+                Status = OrderStatus.Pending
             };
 
             await _orerRepository.AddAsync(order);
@@ -82,8 +89,24 @@ namespace Marketplace.BLL.Services
 
             await _context.SaveChangesAsync();
 
-            return new ServiceResult { Succeeded = true, Message = string.Empty };
+            var paymentData = await _paymentService.CreatePaymentAsync(
+            orderId: order.Id.ToString(),
+            amount: order.TotalAmount,
+            description: $"Оплата замовлення #{order.Id}",
+            successUrl: dto.SuccessUrl,
+            cancelUrl: dto.CancelUrl
+            
+            );
+
+            return new OrderResultDto
+            {
+                Succeeded = true,
+                Message = string.Empty,
+                OrderId = order.Id.ToString(),
+                PaymentData = paymentData
+            };
         }
+        
 
         public async Task<ServiceResult> ChangeOrderStatus(Guid orderId, OrderStatus status)
         {
@@ -99,6 +122,11 @@ namespace Marketplace.BLL.Services
             await _context.SaveChangesAsync();
 
             return new ServiceResult { Succeeded = true, Message = string.Empty };
+        }
+
+        public async Task<Order?> GetOrderByIdAsync(Guid orderId)
+        {
+            return await _orerRepository.FirstOrDefaultAsync(o => o.Id == orderId);
         }
     }
 }

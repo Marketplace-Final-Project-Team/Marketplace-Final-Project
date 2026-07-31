@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Marketplace.DAL.Interfaces;
+using Marketplace.BLL.Configs;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,6 +53,16 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
+
+
+// LiqPay configuration
+
+builder.Services.Configure<LiqPayOptions>(builder.Configuration.GetSection("LiqPay"));
+builder.Services.AddScoped<IPaymentService, LiqPayPaymentService>();
+
+// Delivery API configuration
+builder.Services.Configure<DeliveryApiOptions>(builder.Configuration.GetSection("DeliveryApi"));
+builder.Services.AddScoped<IDeliveryProviderService, DeliveryProviderService>();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

@@ -40,16 +40,17 @@ namespace Marketplace.Web.Controllers
 
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-            var result = await _orderService.CreateOrder(userId!, new OrderCreateDto { AddressId = model.AddressId });
+            var result = await _orderService.CreateOrder(userId!, new OrderCreateDto { AddressId = model.AddressId, SuccessUrl = model.SuccessUrl, CancelUrl = model.CancelUrl });
 
             if (result.Succeeded)
             {
-                return RedirectToAction("Index");
+                return View("Payment", result.PaymentData);
             }
 
             ModelState.AddModelError("", result.Message);
             return View(model);
         }
+        
 
         [HttpPost]
         [ValidateAntiForgeryToken]
