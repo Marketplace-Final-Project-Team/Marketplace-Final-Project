@@ -1,15 +1,16 @@
 using CloudinaryDotNet;
-using Marketplace.DAL.Data;
-using Marketplace.BLL.Services;
+using Marketplace.BLL.Common;
 using Marketplace.BLL.Interfaces;
-using Marketplace.Domain.Entities;
+using Marketplace.BLL.Services;
+using Marketplace.DAL.Data;
+using Marketplace.DAL.Interfaces;
 using Marketplace.DAL.Repositories;
+using Marketplace.Domain.Entities;
 using Marketplace.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
-using Microsoft.AspNetCore.Localization;
-using Marketplace.DAL.Interfaces;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,15 +50,20 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IBusinessService, BusinessService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
 
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<IEmailSender, EmailSender>();
+
+
 var app = builder.Build();
-if (app.Environment.IsDevelopment())
-{
-    await Marketplace.Web.Seed.DbSeeder.SeedAsync(app.Services);
-}
+//if (app.Environment.IsDevelopment())
+//{
+//    await Marketplace.Web.Seed.DbSeeder.SeedAsync(app.Services);
+//}
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
