@@ -1,11 +1,12 @@
 ﻿using System.Linq.Expressions;
 using Marketplace.DAL.Data;
+using Marketplace.Domain.Common;
 using Marketplace.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marketplace.DAL.Repositories
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : class
+    public class GenericRepository<T> : IGenericRepository<T> where T : class, IEntity
     {
         protected readonly AppDbContext _context;
         protected readonly DbSet<T> _dbSet;
@@ -18,7 +19,7 @@ namespace Marketplace.DAL.Repositories
 
         public async Task<T?> GetByIdAsync(Guid id)
         {
-            return await _dbSet.FindAsync(id);
+            return await _dbSet.FirstOrDefaultAsync(e => e.Id == id);
         }
 
         public async Task<IReadOnlyList<T>> GetAllAsync()

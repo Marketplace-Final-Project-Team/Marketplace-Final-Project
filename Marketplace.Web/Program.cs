@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using Marketplace.DAL.Seed;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -60,11 +61,13 @@ builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 
 var app = builder.Build();
-//if (app.Environment.IsDevelopment())
-//{
-//    await Marketplace.Web.Seed.DbSeeder.SeedAsync(app.Services);
-//}
-// Configure the HTTP request pipeline.
+
+
+using (var scope = app.Services.CreateScope())
+{
+    await DbSeeder.SeedAsync(scope.ServiceProvider);
+}
+
 if (!app.Environment.IsDevelopment())
 {
  
