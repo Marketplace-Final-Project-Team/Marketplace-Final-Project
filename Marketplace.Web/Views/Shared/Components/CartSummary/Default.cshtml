@@ -1,0 +1,9 @@
+@model int
+
+<a class="nav-link text-dark nav-cart-link"
+   asp-controller="Cart"
+   asp-action="Index"
+   aria-label="Кошик, товарів: @Model">
+    <span>Кошик</span>
+    <span class="nav-cart-count @(Model == 0 ? "is-empty" : null)">@Model</span>
+</a>

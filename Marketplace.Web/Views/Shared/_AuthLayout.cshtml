@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#111827" />
+    <title>@ViewData["Title"] — Marketplace</title>
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+</head>
+<body class="auth-page">
+    <a class="skip-link" href="#main-content">Перейти до форми</a>
+
+    <div class="auth-shell">
+        <section class="auth-showcase" aria-label="Про Marketplace">
+            <a class="brand"
+               asp-controller="Home"
+                asp-action="Index"
+               aria-label="Marketplace — на головну">
+                <span class="brand__mark" aria-hidden="true">M</span>
+                <span class="brand__name">MarketPlace</span>
+            </a>
+
+            <div class="showcase-copy">
+                <p class="eyebrow">Твій маркетплейс щодня</p>
+                <h1>Купуй простіше.<br />Продавай сміливіше.</h1>
+                <p class="showcase-copy__lead">
+                    Усе потрібне — від локальних брендів до улюблених товарів —
+                    в одному безпечному просторі.
+                </p>
+            </div>
+
+            <div class="showcase-preview" aria-hidden="true">
+                <div class="preview-search">
+                    <span class="preview-search__category">Усі категорії</span>
+                    <span class="preview-search__line"></span>
+                    <span class="preview-search__button">⌕</span>
+                </div>
+                <div class="preview-grid">
+                    <article class="preview-product preview-product--featured">
+                        <span class="preview-product__badge">Хіт</span>
+                        <span class="preview-product__image preview-product__image--orange">⌁</span>
+                        <span class="preview-product__name">Новинки сезону</span>
+                        <span class="preview-product__price">від 299 ₴</span>
+                    </article>
+                    <article class="preview-product">
+                        <span class="preview-product__image preview-product__image--blue">◇</span>
+                        <span class="preview-product__name">Для дому</span>
+                        <span class="preview-product__price">від 149 ₴</span>
+                    </article>
+                    <article class="preview-product">
+                        <span class="preview-product__image preview-product__image--mint">○</span>
+                        <span class="preview-product__name">Електроніка</span>
+                        <span class="preview-product__price">від 899 ₴</span>
+                    </article>
+                </div>
+            </div>
+
+            <ul class="trust-list" aria-label="Переваги Marketplace">
+                <li><span aria-hidden="true">✓</span> Захищені покупки</li>
+                <li><span aria-hidden="true">✓</span> Перевірені продавці</li>
+                <li><span aria-hidden="true">✓</span> Зручна доставка</li>
+            </ul>
+        </section>
+
+        <main id="main-content" class="auth-content">
+            <a class="auth-home-link"
+               asp-controller="Home"
+               asp-action="Index">
+                <span aria-hidden="true">←</span>
+                На головну
+            </a>
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/js/auth.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

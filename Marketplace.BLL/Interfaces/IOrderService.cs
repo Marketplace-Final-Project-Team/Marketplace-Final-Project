@@ -7,10 +7,13 @@ namespace Marketplace.BLL.Interfaces
 {
     public interface IOrderService
     {
-        public Task<OrderResultDto> CreateOrder(string userId, OrderCreateDto dto);
-        public Task<ServiceResult> ChangeOrderStatus(Guid orderId, OrderStatus status);
 
-        public Task<Order?> GetOrderByIdAsync(Guid orderId);
-        
+        Task<OrderResultDto> CreateOrder(string userId, OrderCreateDto dto);
+        Task<ServiceResult> ChangeOrderStatus(Guid orderId, OrderStatus status);
+
+        Task<Order?> GetOrderByIdAsync(Guid orderId);
+        Task<IReadOnlyList<Order>> GetUserOrders(string userId);
+        Task<Order?> GetUserOrder(string userId, Guid orderId);
+
     }
 }

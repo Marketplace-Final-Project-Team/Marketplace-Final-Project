@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Marketplace.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260716103502_InitialCreate")]
+    [Migration("20260730155053_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -399,6 +399,10 @@ namespace Marketplace.DAL.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
+
+                    b.Property<string>("AvatarUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()

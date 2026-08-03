@@ -1,8 +1,199 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model IReadOnlyList<Marketplace.Web.Models.CatalogProductViewModel>
+
+@{
+    ViewData["Title"] = "Головна";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@section Styles {
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+}
+
+<div class="home-page">
+    <section class="home-hero">
+        <div class="home-hero__content">
+            <div class="home-pill"><span></span> Покупки без зайвих кроків</div>
+            <h1>Усе потрібне — <em>в одному місці</em></h1>
+            <p>Знаходьте товари для роботи, дому й відпочинку. Порівнюйте пропозиції, додавайте до кошика та стежте за доставкою.</p>
+
+            <form asp-controller="Catalog" asp-action="Index" method="get" class="home-search" role="search">
+                <span aria-hidden="true">⌕</span>
+                <input name="search" placeholder="Що ви шукаєте?" aria-label="Пошук товарів" />
+                <button type="submit">Знайти</button>
+            </form>
+
+            <div class="home-hero__actions">
+                <a asp-controller="Catalog" asp-action="Index" class="home-button home-button--primary">Перейти до каталогу <span>→</span></a>
+                @if (User.Identity?.IsAuthenticated != true)
+                {
+                    <a asp-controller="Auth" asp-action="SignUp" class="home-button home-button--ghost">Створити акаунт</a>
+                }
+                else
+                {
+                    <a asp-controller="Order" asp-action="Index" class="home-button home-button--ghost">Мої замовлення</a>
+                }
+            </div>
+
+            <div class="home-hero__proof">
+                <div class="home-avatars" aria-hidden="true">
+                    <span>А</span><span>М</span><span>О</span>
+                </div>
+                <div><strong>Зручно для кожного</strong><small>від пошуку до доставки</small></div>
+            </div>
+        </div>
+
+        <div class="home-hero__visual" aria-label="Популярні пропозиції">
+            <div class="visual-orbit visual-orbit--one"></div>
+            <div class="visual-orbit visual-orbit--two"></div>
+
+            <div class="visual-main-card">
+                <div class="visual-main-card__top">
+                    <span class="visual-tag">Вибір тижня</span>
+                    <span class="visual-heart" aria-hidden="true">♡</span>
+                </div>
+                <div class="visual-product">
+                    <div class="visual-product__halo"></div>
+                    <div class="visual-product__shape" aria-hidden="true">
+                        <span></span>
+                    </div>
+                </div>
+                <div class="visual-main-card__copy">
+                    <small>Техніка для щоденних справ</small>
+                    <strong>Знижки до 30%</strong>
+                    <a asp-controller="Catalog" asp-action="Index">Переглянути пропозиції →</a>
+                </div>
+            </div>
+
+            <div class="visual-float-card visual-float-card--rating">
+                <span class="visual-float-card__icon">★</span>
+                <div><strong>4.9</strong><small>оцінка покупців</small></div>
+            </div>
+            <div class="visual-float-card visual-float-card--delivery">
+                <span class="visual-float-card__icon">✓</span>
+                <div><strong>Швидка доставка</strong><small>статус завжди під рукою</small></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="home-benefits" aria-label="Переваги маркетплейсу">
+        <div><span>✓</span><p><strong>Перевірені товари</strong><small>зрозумілий статус наявності</small></p></div>
+        <div><span>↺</span><p><strong>Просте повернення</strong><small>прозорий процес покупки</small></p></div>
+        <div><span>□</span><p><strong>Зручний кошик</strong><small>керуйте кількістю онлайн</small></p></div>
+        <div><span>→</span><p><strong>Контроль доставки</strong><small>від замовлення до отримання</small></p></div>
+    </section>
+
+    <section class="home-section">
+        <div class="home-section__heading">
+            <div>
+                <span class="home-section__kicker">Обирайте швидше</span>
+                <h2>Популярні категорії</h2>
+            </div>
+            <a asp-controller="Catalog" asp-action="Index">Увесь каталог →</a>
+        </div>
+
+        <div class="category-grid">
+            <a asp-controller="Catalog" asp-action="Index" class="category-card category-card--blue">
+                <span class="category-card__icon">⌁</span>
+                <strong>Електроніка</strong>
+                <small>Техніка та гаджети</small>
+            </a>
+            <a asp-controller="Catalog" asp-action="Index" class="category-card category-card--orange">
+                <span class="category-card__icon">⌂</span>
+                <strong>Для дому</strong>
+                <small>Комфорт щодня</small>
+            </a>
+            <a asp-controller="Catalog" asp-action="Index" class="category-card category-card--rose">
+                <span class="category-card__icon">◇</span>
+                <strong>Одяг</strong>
+                <small>Нові образи</small>
+            </a>
+            <a asp-controller="Catalog" asp-action="Index" class="category-card category-card--green">
+                <span class="category-card__icon">●</span>
+                <strong>Спорт</strong>
+                <small>Для активного життя</small>
+            </a>
+            <a asp-controller="Catalog" asp-action="Index" class="category-card category-card--violet">
+                <span class="category-card__icon">≡</span>
+                <strong>Книги</strong>
+                <small>Ідеї та історії</small>
+            </a>
+            <a asp-controller="Catalog" asp-action="Index" class="category-card category-card--yellow">
+                <span class="category-card__icon">✦</span>
+                <strong>Краса</strong>
+                <small>Турбота про себе</small>
+            </a>
+        </div>
+    </section>
+
+    @if (Model.Count > 0)
+    {
+        <section class="home-section home-featured">
+            <div class="home-section__heading">
+                <div>
+                    <span class="home-section__kicker">Варто переглянути</span>
+                    <h2>Популярне зараз</h2>
+                </div>
+                <a asp-controller="Catalog" asp-action="Index">Дивитися більше →</a>
+            </div>
+
+            <div class="home-products">
+                @for (var index = 0; index < Model.Count; index++)
+                {
+                    var product = Model[index];
+                    var colorClass = index % 3 == 0 ? "blue" : index % 3 == 1 ? "violet" : "orange";
+                    <article class="home-product">
+                        <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="home-product__media home-product__media--@colorClass">
+                            @if (!string.IsNullOrWhiteSpace(product.MainImageUrl))
+                            {
+                                <img src="@product.MainImageUrl" alt="@product.Name" />
+                            }
+                            else
+                            {
+                                <span>@product.Name[..1].ToUpperInvariant()</span>
+                            }
+                            <small>В наявності</small>
+                        </a>
+                        <div class="home-product__body">
+                            <div class="home-product__category">@product.CategoryName</div>
+                            <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="home-product__name">@product.Name</a>
+                            <div class="home-product__bottom">
+                                <strong>@product.Price.ToString("N2") ₴</strong>
+                                <form asp-controller="Cart" asp-action="Add" method="post">
+                                    <input type="hidden" name="productId" value="@product.Id" />
+                                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                    <button type="submit" aria-label="Додати @product.Name до кошика">+</button>
+                                </form>
+                            </div>
+                        </div>
+                    </article>
+                }
+            </div>
+        </section>
+    }
+
+    <section class="home-promo">
+        <div class="home-promo__content">
+            <span class="home-section__kicker">Для продавців</span>
+            <h2>Перетворіть ідею на власний магазин</h2>
+            <p>Додавайте товари, керуйте залишками та отримуйте замовлення в одному робочому просторі.</p>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a asp-controller="Business" asp-action="Create" class="home-button home-button--light">Створити бізнес →</a>
+            }
+            else
+            {
+                <a asp-controller="Auth" asp-action="SignUp" class="home-button home-button--light">Почати продавати →</a>
+            }
+        </div>
+        <div class="home-promo__dashboard" aria-hidden="true">
+            <div class="dashboard-top"><span></span><span></span><span></span></div>
+            <div class="dashboard-body">
+                <div class="dashboard-sidebar"></div>
+                <div class="dashboard-content">
+                    <span></span>
+                    <div class="dashboard-bars"><i></i><i></i><i></i><i></i><i></i></div>
+                    <div class="dashboard-lines"><i></i><i></i><i></i></div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>

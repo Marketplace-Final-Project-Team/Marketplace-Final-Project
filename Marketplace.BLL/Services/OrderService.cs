@@ -8,6 +8,7 @@ using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
 using Marketplace.Domain.Interfaces;
 using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
 
 namespace Marketplace.BLL.Services
 {
@@ -53,7 +54,18 @@ namespace Marketplace.BLL.Services
 
             foreach (var cartItem in cartItems)
             {
-                if (cartItem.Product.Quantity < cartItem.Quantity)
+
+                if (cartItem.Product.Status != ProductStatus.Active)
+                {
+                    return new OrderResultDto
+                    {
+                        Succeeded = false,
+                        Message = $"Товар «{cartItem.Product.Name}» більше недоступний."
+                    };
+                }
+
+                if(cartItem.Product.Quantity < cartItem.Quantity)
+
                 {
                     return new OrderResultDto { Succeeded = false, Message = "Недостатньо товару на складі." };
                 }
@@ -127,6 +139,25 @@ namespace Marketplace.BLL.Services
         public async Task<Order?> GetOrderByIdAsync(Guid orderId)
         {
             return await _orerRepository.FirstOrDefaultAsync(o => o.Id == orderId);
+        }
+        public async Task<IReadOnlyList<Order>> GetUserOrders(string userId)
+        {
+            return await _context.Orders
+                .AsNoTracking()
+                .Where(order => order.UserId == userId)
+                .Include(order => order.Items)
+                .OrderByDescending(order => order.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<Order?> GetUserOrder(string userId, Guid orderId)
+        {
+            return await _context.Orders
+                .AsNoTracking()
+                .Where(order => order.UserId == userId && order.Id == orderId)
+                .Include(order => order.Items)
+                .ThenInclude(item => item.Product)
+                .FirstOrDefaultAsync();
         }
     }
 }
