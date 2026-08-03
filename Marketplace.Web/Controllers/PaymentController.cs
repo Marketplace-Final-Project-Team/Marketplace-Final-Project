@@ -1,0 +1,97 @@
+﻿using Marketplace.BLL.Configs;
+using Marketplace.BLL.DTOs;
+using Marketplace.BLL.Interfaces;
+using Marketplace.BLL.Services;
+using Marketplace.Domain.Enums;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+
+namespace Marketplace.Web.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class PaymentController : Controller
+    {
+        private readonly LiqPayPaymentService _paymentService;
+        private readonly IOptions<LiqPayOptions> _options;
+        private readonly IOrderService _orderService;
+
+        public PaymentController(LiqPayPaymentService paymentService, IOptions<LiqPayOptions> options, IOrderService orderService)
+        {
+            _paymentService = paymentService;
+            _options = options;
+            _orderService = orderService;
+        }
+
+        [HttpPost("create")]
+        public async Task<IActionResult> CreatePayment([FromBody] PaymentRequest request)
+        {
+            var order = await _orderService.GetOrderByIdAsync(Guid.Parse(request.OrderId));
+
+            if (order == null) {
+                return NotFound("Order not found");
+            }
+
+            var paymentData = await _paymentService.CreatePaymentAsync(
+                orderId: order.Id.ToString(),
+                amount: order.TotalAmount,
+                description: $"Оплата замовлення #{order.Id}",
+                successUrl: request.SuccessUrl,
+                cancelUrl: request.CancelUrl
+            );
+
+            return Ok(paymentData);
+        }
+
+
+        [HttpPost("callback")]
+        public async Task<IActionResult> Callback([FromForm] string data, [FromForm] string signature)
+        {
+            
+            Console.WriteLine("=== CALLBACK RECEIVED ===");
+            Console.WriteLine($"Data: {data}");
+            Console.WriteLine($"Signature: {signature}");
+            var privateKey = _options.Value.PrivateKey;
+            var computedSignature = privateKey + data + privateKey;
+            byte[] inputBytes = Encoding.UTF8.GetBytes(computedSignature);
+
+            // Compute the hash in a single line
+            byte[] hashBytes = SHA1.HashData(inputBytes);
+            string base64signature = Convert.ToBase64String(hashBytes);
+
+            if (base64signature != signature)
+            {
+                return BadRequest("Invalid signature");
+            }
+
+            var json = Encoding.UTF8.GetString(Convert.FromBase64String(data));
+            var callbackData = JsonSerializer.Deserialize<LiqPayCallbackDto>(json);
+            if (callbackData == null)
+                return BadRequest("Invalid data");
+
+            if (callbackData?.status == "success")
+            {
+                var orderId = Guid.Parse(callbackData.order_id);
+                await _orderService.ChangeOrderStatus(orderId, OrderStatus.Confirmed);
+            }
+            Console.Write("CALLBACK 0-------");
+
+            return Ok();
+
+
+
+
+
+
+
+
+        }
+    }
+
+
+    
+
+}

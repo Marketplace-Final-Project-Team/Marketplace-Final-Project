@@ -5,8 +5,6 @@ namespace Marketplace.Domain.Entities
 {
     public class Business: BaseEntity
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
-
         public string OwnerId { get; set; } = string.Empty;
         public User Owner { get; set; } = null!;
 

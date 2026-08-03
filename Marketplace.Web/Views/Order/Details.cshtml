@@ -1,0 +1,89 @@
+@model Marketplace.Web.Models.OrderDetailsViewModel
+
+@{
+    ViewData["Title"] = "Деталі замовлення";
+}
+
+@functions {
+    private static string StatusLabel(Marketplace.Domain.Enums.OrderStatus status) => status switch
+    {
+        Marketplace.Domain.Enums.OrderStatus.Pending => "Очікує підтвердження",
+        Marketplace.Domain.Enums.OrderStatus.Confirmed => "Підтверджено",
+        Marketplace.Domain.Enums.OrderStatus.Shipped => "Відправлено",
+        Marketplace.Domain.Enums.OrderStatus.Delivered => "Доставлено",
+        Marketplace.Domain.Enums.OrderStatus.Canceled => "Скасовано",
+        _ => status.ToString()
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+}
+
+<div class="shop-page">
+    <a asp-action="Index" class="shop-back">← До всіх замовлень</a>
+    <header class="shop-header">
+        <div>
+            <div class="shop-kicker">Замовлення #@Model.Id.ToString()[..8].ToUpperInvariant()</div>
+            <h1 class="shop-title">Деталі замовлення</h1>
+            <p class="shop-subtitle">Створено @Model.CreatedAt.ToLocalTime().ToString("dd MMMM yyyy, HH:mm")</p>
+        </div>
+        <a asp-action="Delivery" asp-route-id="@Model.Id" class="btn btn-primary">Відстежити доставку</a>
+    </header>
+
+    @if (TempData["Success"] is string success)
+    {
+        <div class="alert alert-success" role="alert">@success</div>
+    }
+
+    <div class="order-details-layout">
+        <section class="shop-panel order-info">
+            <div class="d-flex justify-content-between align-items-center gap-3">
+                <h2 class="mb-0">Склад замовлення</h2>
+                <span class="order-status order-status--@Model.Status.ToString().ToLowerInvariant()">@StatusLabel(Model.Status)</span>
+            </div>
+            <div class="order-lines mt-4">
+                @foreach (var item in Model.Items)
+                {
+                    <div class="order-line">
+                        @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                        {
+                            <img class="order-line__media" src="@item.ImageUrl" alt="@item.ProductName" />
+                        }
+                        else
+                        {
+                            <div class="order-line__media" aria-hidden="true">@item.ProductName[..1].ToUpperInvariant()</div>
+                        }
+                        <div>
+                            <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.ProductId" class="order-line__name">@item.ProductName</a>
+                            <div class="order-line__meta">@item.Quantity шт. × @item.UnitPrice.ToString("N2") ₴</div>
+                        </div>
+                        <div class="order-line__total">@item.LineTotal.ToString("N2") ₴</div>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <aside class="shop-panel order-info">
+            <h2>Інформація</h2>
+            <dl>
+                <div class="order-info__row">
+                    <dt>Статус</dt>
+                    <dd>@StatusLabel(Model.Status)</dd>
+                </div>
+                <div class="order-info__row">
+                    <dt>Адреса</dt>
+                    <dd>@Model.ShippingCountry, @Model.ShippingCity,<br />@Model.ShippingStreet</dd>
+                </div>
+                <div class="order-info__row">
+                    <dt>Оплата</dt>
+                    <dd>При отриманні</dd>
+                </div>
+                <div class="order-info__row">
+                    <dt>Разом</dt>
+                    <dd>@Model.TotalAmount.ToString("N2") ₴</dd>
+                </div>
+            </dl>
+        </aside>
+    </div>
+</div>

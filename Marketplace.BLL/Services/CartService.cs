@@ -4,6 +4,7 @@ using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
 using Marketplace.DAL.Interfaces;
 using Marketplace.Domain.Entities;
+using Marketplace.Domain.Enums;
 using Marketplace.Domain.Interfaces;
 
 namespace Marketplace.BLL.Services
@@ -32,7 +33,8 @@ namespace Marketplace.BLL.Services
                 ProductName = ci.Product.Name,
                 ImageUrl = ci.Product.MainImageUrl,
                 Price = ci.Product.Price,
-                Quantity = ci.Quantity
+                Quantity = ci.Quantity,
+                StockQuantity = ci.Product.Quantity
             }).ToList();
         }
 
@@ -40,7 +42,7 @@ namespace Marketplace.BLL.Services
         {
             var product = await _productRepository.FirstOrDefaultAsync(p => p.Id == productId);
 
-            if (product == null || product.Quantity <= 0)
+            if (product == null || product.Status != ProductStatus.Active || product.Quantity <= 0)
             {
                 return new ServiceResult { Succeeded = false, Message = "Товар не знайдено." };
             }
@@ -64,6 +66,15 @@ namespace Marketplace.BLL.Services
             }
             else
             {
+                if (item.Quantity >= product.Quantity)
+                {
+                    return new ServiceResult
+                    {
+                        Succeeded = false,
+                        Message = "У кошику вже максимальна доступна кількість товару."
+                    };
+                }
+
                 await ChangeQuantity(item, 1);
             }
 
@@ -95,7 +106,7 @@ namespace Marketplace.BLL.Services
         {
             var product = await _productRepository.FirstOrDefaultAsync(p => p.Id == productId);
 
-            if (product == null || product.Quantity <= 0)
+            if (product == null || product.Status != ProductStatus.Active || product.Quantity <= 0)
             {
                 return new ServiceResult { Succeeded = false, Message = "Товар не знайдено." };
             }
@@ -105,6 +116,15 @@ namespace Marketplace.BLL.Services
             if (item == null)
             {
                 return new ServiceResult { Succeeded = false, Message = "Товар не знайдено у кошику." };
+            }
+
+            if (item.Quantity >= product.Quantity)
+            {
+                return new ServiceResult
+                {
+                    Succeeded = false,
+                    Message = "Більше одиниць цього товару немає на складі."
+                };
             }
 
             await ChangeQuantity(item, 1);

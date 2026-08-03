@@ -12,6 +12,9 @@ namespace Marketplace.Web.Seed
     {
         public static readonly Guid TempBusinessId = Guid.Parse("99999999-9999-9999-9999-999999999999");
         public static readonly Guid TempCategoryId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        public static readonly Guid HeadphonesId = Guid.Parse("22222222-2222-2222-2222-222222222222");
+        public static readonly Guid KeyboardId = Guid.Parse("33333333-3333-3333-3333-333333333333");
+        public static readonly Guid LampId = Guid.Parse("44444444-4444-4444-4444-444444444444");
 
         private const string TestUserEmail = "test-seller@marketplace.local";
         private const string TestUserPassword = "TestSeller123!"; 
@@ -64,6 +67,51 @@ namespace Marketplace.Web.Seed
                     Description = "Тестовий магазин для розробки",
                     Status = BusinessStatus.Active
                 });
+            }
+
+            var sampleProducts = new[]
+            {
+                new Product
+                {
+                    Id = HeadphonesId,
+                    BusinessId = TempBusinessId,
+                    CategoryId = TempCategoryId,
+                    Name = "Бездротові навушники AirSound",
+                    Description = "Легкі навушники з активним шумозаглушенням, чистим звуком і зарядом до 30 годин.",
+                    Price = 2499,
+                    Quantity = 12,
+                    Status = ProductStatus.Active
+                },
+                new Product
+                {
+                    Id = KeyboardId,
+                    BusinessId = TempBusinessId,
+                    CategoryId = TempCategoryId,
+                    Name = "Механічна клавіатура KeyPro",
+                    Description = "Компактна клавіатура з підсвічуванням, тихими перемикачами та підключенням через USB-C.",
+                    Price = 3199,
+                    Quantity = 8,
+                    Status = ProductStatus.Active
+                },
+                new Product
+                {
+                    Id = LampId,
+                    BusinessId = TempBusinessId,
+                    CategoryId = TempCategoryId,
+                    Name = "Настільна LED-лампа Flex",
+                    Description = "Регульована лампа для роботи й навчання з трьома режимами кольору та сенсорним керуванням.",
+                    Price = 1199,
+                    Quantity = 20,
+                    Status = ProductStatus.Active
+                }
+            };
+
+            foreach (var product in sampleProducts)
+            {
+                if (!await context.Products.AnyAsync(existing => existing.Id == product.Id))
+                {
+                    context.Products.Add(product);
+                }
             }
 
             await context.SaveChangesAsync();

@@ -23,6 +23,35 @@ namespace Marketplace.BLL.Services
             _context = context;
         }
 
+        public async Task<IReadOnlyList<Product>> GetCatalogAsync(string? search = null)
+        {
+            var products = await _productRepository.FindAsync(
+                product => product.Status == ProductStatus.Active && product.Quantity > 0);
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var normalizedSearch = search.Trim();
+                products = products
+                    .Where(product =>
+                        product.Name.Contains(normalizedSearch, StringComparison.OrdinalIgnoreCase)
+                        || product.Description.Contains(normalizedSearch, StringComparison.OrdinalIgnoreCase)
+                        || product.Category.Name.Contains(normalizedSearch, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            return products
+                .OrderByDescending(product => product.CreatedAt)
+                .ToList();
+        }
+
+        public async Task<Product?> GetCatalogProductAsync(Guid id)
+        {
+            return await _productRepository.FirstOrDefaultAsync(
+                product => product.Id == id
+                    && product.Status == ProductStatus.Active
+                    && product.Quantity > 0);
+        }
+
         public async Task<IReadOnlyList<Product>> GetByBusinessAsync(Guid businessId)
         {
             return await _productRepository.FindAsync(p => p.BusinessId == businessId);

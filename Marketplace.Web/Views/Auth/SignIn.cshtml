@@ -1,40 +1,55 @@
-﻿@model Marketplace.Web.Models.SignInViewModel
-
+@model Marketplace.Web.Models.SignInViewModel
 @{
-    ViewData["Title"] = "SignIn";
+    ViewData["Title"] = "Вхід";
 }
 
-<div class="container d-flex justify-content-center" style="min-height: 70vh;">
-    <div class="col-md-5 col-lg-4 mt-5">
-        <h2 class="mb-4 text-center">Вхід до акаунту</h2>
-
-        <form asp-controller="Auth" asp-action="SignIn" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-            <div class="mb-3">
-                <label asp-for="Email" class="form-label">Емейл:</label>
-                <input asp-for="Email" class="form-control" placeholder="Введіть свій емейл..." />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Password" class="form-label">Пароль:</label>
-                <input asp-for="Password" class="form-control" placeholder="Введіть свій пароль..." />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100 mt-2">Увійти</button>
-
-            <p class="text-center mt-3 mb-0">
-                Немає акаунту?
-                <a asp-controller="Auth" asp-action="SignUp">Зареєструватись</a>
-            </p>
-        </form>
+<section class="auth-card" aria-labelledby="login-title">
+    <div class="auth-card__header">
+        <p class="auth-kicker">З поверненням</p>
+        <h2 id="login-title">Увійдіть до акаунта</h2>
+        <p>Продовжуйте покупки, перевіряйте замовлення або керуйте магазином.</p>
     </div>
-</div>
+
+    <form asp-controller="Auth" asp-action="SignIn" method="post" class="auth-form">
+        <input type="hidden" asp-for="ReturnUrl" />
+        <div asp-validation-summary="ModelOnly" class="form-alert" role="alert"></div>
+        <div class="field">
+            <label asp-for="Email">Електронна пошта</label>
+            <div class="field-control">
+                <span class="field-icon" aria-hidden="true">@@</span>
+                <input asp-for="Email" autocomplete="email" inputmode="email" placeholder="name@example.com" autofocus />
+            </div>
+            <span asp-validation-for="Email" class="field-error"></span>
+        </div>
+        <div class="field">
+            <div class="field-label-row">
+                <label asp-for="Password">Пароль</label>
+                <a asp-action="ForgotPassword">Забули пароль?</a>
+            </div>
+            <div class="field-control">
+                <span class="field-icon" aria-hidden="true">●</span>
+                <input asp-for="Password" autocomplete="current-password" placeholder="Введіть пароль" data-password-input />
+                <button class="password-toggle" type="button" data-password-toggle aria-label="Показати пароль" aria-pressed="false">Показати</button>
+            </div>
+            <span asp-validation-for="Password" class="field-error"></span>
+        </div>
+        <label class="checkbox">
+            <input asp-for="RememberMe" />
+            <span>Залишатися в системі</span>
+        </label>
+        <button class="button button--primary" type="submit">Увійти <span aria-hidden="true">→</span></button>
+    </form>
+    <div class="auth-divider"><span>або</span></div>
+    <p class="auth-switch">
+        Ще не маєте акаунта?
+        <a asp-action="SignUp" asp-route-returnUrl="@Model.ReturnUrl">Створити акаунт</a>
+    </p>
+    <p class="auth-note">
+        Входячи, ви погоджуєтеся з правилами користування та
+        <a asp-controller="Home" asp-action="Privacy">політикою конфіденційності</a>.
+    </p>
+</section>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }
