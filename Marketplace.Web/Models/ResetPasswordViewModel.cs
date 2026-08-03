@@ -12,7 +12,7 @@ namespace Marketplace.Web.Models
 
         [Required(ErrorMessage = "Новий пароль обов'язковий")]
         [DataType(DataType.Password)]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$", 
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$",
             ErrorMessage = "Пароль має містити щонайменше 8 символів, велику й малу літеру, цифру та спецсимвол")]
         public string NewPassword { get; set; } = string.Empty;
 

@@ -12,7 +12,7 @@ namespace Marketplace.BLL.Services
         private readonly IGenericRepository<Category> _categoryRepository;
         private readonly AppDbContext _context;
 
-        public CategoryService(IGenericRepository<Category> categoryService, AppDbContext context) 
+        public CategoryService(IGenericRepository<Category> categoryService, AppDbContext context)
         {
             _categoryRepository = categoryService;
             _context = context;
@@ -31,17 +31,17 @@ namespace Marketplace.BLL.Services
             return new ServiceResult { Succeeded = true, Message = string.Empty };
         }
 
-        public async Task<IReadOnlyList<CategoryDto>> GetAllCategories() 
+        public async Task<IReadOnlyList<CategoryDto>> GetAllCategories()
         {
-            var categories = await _categoryRepository.GetAllAsync();   
+            var categories = await _categoryRepository.GetAllAsync();
 
             return categories.Select(c => new CategoryDto {
                 Id = c.Id,
                 Name = c.Name,
-            }).ToList(); 
+            }).ToList();
         }
 
-        public async Task<ServiceResult> UpdateCategory(string newCategoryName, Guid categoryId) 
+        public async Task<ServiceResult> UpdateCategory(string newCategoryName, Guid categoryId)
         {
             var category = await _categoryRepository.GetByIdAsync(categoryId);
 
@@ -50,7 +50,7 @@ namespace Marketplace.BLL.Services
                 return new ServiceResult { Succeeded = false, Message = "Категорії з таким айді не існує" };
             }
 
-            if (await _categoryRepository.ExistsAsync(c => c.Name.ToLower() == newCategoryName.ToLower() && c.Id != categoryId)) 
+            if (await _categoryRepository.ExistsAsync(c => c.Name.ToLower() == newCategoryName.ToLower() && c.Id != categoryId))
             {
                 return new ServiceResult { Succeeded = false, Message = "Така категорія вже існує" };
             }
@@ -62,7 +62,7 @@ namespace Marketplace.BLL.Services
             return new ServiceResult { Succeeded = true, Message = string.Empty };
         }
 
-        public async Task<ServiceResult> DeleteCategory(Guid categoryId) 
+        public async Task<ServiceResult> DeleteCategory(Guid categoryId)
         {
             var category = await _categoryRepository.GetByIdAsync(categoryId);
 

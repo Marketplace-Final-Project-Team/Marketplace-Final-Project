@@ -15,7 +15,14 @@ namespace Marketplace.DAL.Seed
             var userManager = services.GetRequiredService<UserManager<User>>();
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-            await context.Database.MigrateAsync();
+            if (context.Database.IsRelational())
+            {
+                await context.Database.MigrateAsync();
+            }
+            else
+            {
+                await context.Database.EnsureCreatedAsync();
+            }
 
             await CategoriesSeedAsync(context);
             await SeedAdminAsync(userManager, roleManager);
@@ -43,15 +50,15 @@ namespace Marketplace.DAL.Seed
             if (!await roleManager.RoleExistsAsync("Admin"))
             {
                 var roleResult = await roleManager.CreateAsync(new IdentityRole("Admin"));
-                
+
                 if (!roleResult.Succeeded)
                 {
                     throw new Exception($"Не вдалося створити роль Admin: " + string.Join(", ", roleResult.Errors.Select(e => e.Description)));
                 }
             }
-            
+
             var existingAdmin = await userManager.FindByNameAsync("admin");
-            
+
             if (existingAdmin == null)
             {
                 var admin = new User
@@ -62,8 +69,8 @@ namespace Marketplace.DAL.Seed
                 };
 
                 var createResult = await userManager.CreateAsync(admin, "Admin123!");
-                
-                if (!createResult.Succeeded) 
+
+                if (!createResult.Succeeded)
                 {
                     throw new Exception($"Не вдалося створити адміна: " + string.Join(", ", createResult.Errors.Select(e => e.Description)));
                 }
@@ -74,7 +81,7 @@ namespace Marketplace.DAL.Seed
             if (!await userManager.IsInRoleAsync(existingAdmin, "Admin"))
             {
                 var addToRoleResult = await userManager.AddToRoleAsync(existingAdmin, "Admin");
-                
+
                 if (!addToRoleResult.Succeeded)
                 {
                     throw new Exception($"Не вдалося додати роль адміну: " + string.Join(", ", addToRoleResult.Errors.Select(e => e.Description)));

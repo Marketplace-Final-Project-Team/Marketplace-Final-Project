@@ -4,23 +4,31 @@ namespace Marketplace.Web.Models
 {
     public class SignUpViewModel
     {
-        [Required(ErrorMessage = "Ім'я є обов'язковим")]
-        [StringLength(100, MinimumLength = 2, ErrorMessage = "Ім'я має бути від 2 до 30 символів")]
+        [Required(ErrorMessage = "Введіть ім’я користувача.")]
+        [StringLength(30, MinimumLength = 2, ErrorMessage = "Ім’я має містити від 2 до 30 символів.")]
+        [RegularExpression(
+            @"^[\p{L}\p{N}._-]+$",
+            ErrorMessage = "Використовуйте літери, цифри, крапку, дефіс або підкреслення.")]
         public string Username { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Емейл є обов'язковим")]
-        [EmailAddress]
+        [Required(ErrorMessage = "Введіть електронну пошту.")]
+        [EmailAddress(ErrorMessage = "Перевірте формат електронної пошти.")]
         public string Email { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Пароль є обов'язковим")]
+        [Required(ErrorMessage = "Створіть пароль.")]
         [DataType(DataType.Password)]
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{8,}$",
-            ErrorMessage = "Пароль має містити щонайменше 8 символів, велику й малу літеру, цифру та спецсимвол")]
+            ErrorMessage = "Пароль не відповідає вимогам безпеки.")]
         public string Password { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Підтвердження пароля є обов'язковим")]
+        [Required(ErrorMessage = "Повторіть пароль.")]
         [DataType(DataType.Password)]
-        [Compare("Password", ErrorMessage = "Паролі не співпадають")]
+        [Compare(nameof(Password), ErrorMessage = "Паролі не збігаються.")]
         public string ConfirmPassword { get; set; } = string.Empty;
+
+        [Range(typeof(bool), "true", "true", ErrorMessage = "Потрібно прийняти правила користування.")]
+        public bool AcceptTerms { get; set; }
+
+        public string? ReturnUrl { get; set; }
     }
 }

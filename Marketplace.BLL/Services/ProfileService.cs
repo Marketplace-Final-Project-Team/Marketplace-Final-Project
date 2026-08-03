@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Marketplace.BLL.Services
 {
-    public class ProfileService: IProfileService
+    public class ProfileService : IProfileService
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
@@ -24,25 +24,25 @@ namespace Marketplace.BLL.Services
         public async Task<ProfileDto?> GetProfile(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
-            
+
             if (user == null)
             {
                 return null;
             }
-            
+
             return new ProfileDto
             {
                 Username = user.UserName!,
                 Email = user.Email!,
                 Avatar = user.AvatarUrl
             };
-        }   
+        }
 
         public async Task<ServiceResult> UpdateProfile(UpdateProfileDto dto, string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
 
-            if(user == null) 
+            if (user == null)
             {
                 return new ServiceResult { Succeeded = false, Message = "Користувача не було знайдено" };
             }
@@ -51,13 +51,13 @@ namespace Marketplace.BLL.Services
             {
                 var avatarUrl = await _imageService.UploadImageAsync(dto.Avatar);
 
-                if(avatarUrl == null) 
+                if (avatarUrl == null)
                 {
                     return new ServiceResult { Succeeded = false, Message = "Не вдалося завантажити аватар" };
                 }
 
                 user.AvatarUrl = avatarUrl;
-                
+
             }
 
             var usernameResult = await _userManager.SetUserNameAsync(user, dto.Username);
@@ -73,7 +73,7 @@ namespace Marketplace.BLL.Services
         public async Task<ChangeEmailResult> ChangeEmail(ChangeEmailDto dto, string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
-            
+
             if (user == null)
             {
                 return new ChangeEmailResult { Succeeded = false, Message = "Користувача не було знайдено" };
@@ -130,14 +130,14 @@ namespace Marketplace.BLL.Services
         {
             var user = await _userManager.FindByIdAsync(userId);
 
-            if (user == null) 
+            if (user == null)
             {
                 return new ServiceResult { Succeeded = false, Message = "Користувача не було знайдено" };
             }
 
             var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
 
-            if(!result.Succeeded)
+            if (!result.Succeeded)
             {
                 return new ServiceResult { Succeeded = false, Message = "Не вдалося змінити пароль" };
             }

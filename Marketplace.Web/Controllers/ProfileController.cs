@@ -29,7 +29,7 @@ namespace Marketplace.Web.Controllers
 
             var profile = await _profileService.GetProfile(userId!);
 
-            if(profile == null)
+            if (profile == null)
             {
                 return NotFound();
             }
@@ -67,7 +67,7 @@ namespace Marketplace.Web.Controllers
             }
 
             var userId = _userManager.GetUserId(User);
-            
+
             var updateDto = new UpdateProfileDto
             {
                 Username = model.Username,
@@ -75,27 +75,27 @@ namespace Marketplace.Web.Controllers
             };
 
             var result = await _profileService.UpdateProfile(updateDto, userId!);
-            
+
             if (!result.Succeeded)
             {
                 ModelState.AddModelError(string.Empty, result.Message);
                 return View(model);
             }
-            
+
             return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public IActionResult ChangeEmail() 
+        public IActionResult ChangeEmail()
         {
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangeEmail(ChangeEmailViewModel model) 
+        public async Task<IActionResult> ChangeEmail(ChangeEmailViewModel model)
         {
-            if(!ModelState.IsValid) 
+            if (!ModelState.IsValid)
             {
                 return View(model);
             }
@@ -104,7 +104,7 @@ namespace Marketplace.Web.Controllers
 
             var result = await _profileService.ChangeEmail(new ChangeEmailDto { NewEmail = model.NewEmail, CurrentPassword = model.CurrentPassword }, userId!);
 
-            if (!result.Succeeded) 
+            if (!result.Succeeded)
             {
                 ModelState.AddModelError("", result.Message);
                 return View(model);
@@ -117,22 +117,22 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult ChangeEmailConfirmationSent() 
+        public IActionResult ChangeEmailConfirmationSent()
         {
             return View();
         }
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> ChangeEmailConfirmation(string userId, string newEmail, string token) 
+        public async Task<IActionResult> ChangeEmailConfirmation(string userId, string newEmail, string token)
         {
             var result = await _profileService.ConfirmChangeEmail(userId, newEmail, token);
 
-            if(result.Succeeded) 
+            if (result.Succeeded)
             {
                 ViewData["Message"] = "Емейл було успішно змінено!";
             }
-            else 
+            else
             {
                 ViewData["Message"] = result.Message;
             }
@@ -141,7 +141,7 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult ChangePassword() 
+        public IActionResult ChangePassword()
         {
             return View();
         }
@@ -150,21 +150,21 @@ namespace Marketplace.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
-            if(!ModelState.IsValid) 
+            if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
             var userId = _userManager.GetUserId(User);
 
-            var result = await _profileService.ChangePassword(new ChangePasswordDto 
+            var result = await _profileService.ChangePassword(new ChangePasswordDto
             {
                 CurrentPassword = model.CurrentPassword,
                 NewPassword = model.NewPassword,
                 ConfirmNewPassword = model.ConfirmNewPassword
             }, userId!);
 
-            if(!result.Succeeded) 
+            if (!result.Succeeded)
             {
                 ModelState.AddModelError("", result.Message);
                 return View(model);

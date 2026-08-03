@@ -78,7 +78,7 @@ namespace Marketplace.BLL.Services
         {
             var user = await _userManager.FindByEmailAsync(email);
 
-            if(user == null) 
+            if(user == null)
             {
                 return new ForgotPasswordResult
                 {
@@ -104,7 +104,7 @@ namespace Marketplace.BLL.Services
         {
             var user = await _userManager.FindByIdAsync(dto.UserId);
 
-            if (user == null) 
+            if (user == null)
             {
                 return new ServiceResult { Succeeded = false, Message = "Ви ще не маєте облікового запису." };
             }
