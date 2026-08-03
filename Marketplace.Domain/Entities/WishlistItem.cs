@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Marketplace.Domain.Common;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Marketplace.Domain.Entities
 {
-    public class WishlistItem
+    public class WishlistItem : IEntity
     {
         public Guid Id { get; set; }
         public Guid ProductId { get; set; }
