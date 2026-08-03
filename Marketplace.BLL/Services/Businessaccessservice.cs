@@ -1,4 +1,5 @@
 using Marketplace.BLL.Interfaces;
+using Marketplace.DAL.Interfaces;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
 using Marketplace.Domain.Interfaces;
@@ -8,11 +9,11 @@ namespace Marketplace.BLL.Services
     public class BusinessAccessService : IBusinessAccessService
     {
         private readonly IGenericRepository<BusinessMember> _memberRepository;
-        private readonly IGenericRepository<Business> _businessRepository;
+        private readonly IBusinessRepository _businessRepository;
 
         public BusinessAccessService(
             IGenericRepository<BusinessMember> memberRepository,
-            IGenericRepository<Business> businessRepository)
+            IBusinessRepository businessRepository)
         {
             _memberRepository = memberRepository;
             _businessRepository = businessRepository;

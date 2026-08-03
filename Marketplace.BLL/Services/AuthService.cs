@@ -3,7 +3,6 @@ using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace Marketplace.BLL.Services
 {

@@ -2,19 +2,19 @@
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
+using Marketplace.DAL.Interfaces;
 using Marketplace.DAL.Repositories;
 using Marketplace.Domain.Entities;
-using Marketplace.Domain.Interfaces;
 
 namespace Marketplace.BLL.Services
 {
     public class BusinessService: IBusinessService
     {
-        private readonly IGenericRepository<Business> _businessRepo;
+        private readonly IBusinessRepository _businessRepo;
         private readonly IImageStorageService _imageService;
         private readonly AppDbContext _context;
 
-        public BusinessService(IGenericRepository<Business> businessRepo, IImageStorageService imageService, AppDbContext context)
+        public BusinessService(IBusinessRepository businessRepo, IImageStorageService imageService, AppDbContext context)
         {
             _businessRepo = businessRepo;
             _imageService = imageService;
