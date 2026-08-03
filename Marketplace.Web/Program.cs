@@ -93,6 +93,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
+app.UseStatusCodePagesWithReExecute("/error/{0}");
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();

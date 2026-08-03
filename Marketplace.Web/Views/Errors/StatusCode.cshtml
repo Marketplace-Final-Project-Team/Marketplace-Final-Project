@@ -1,0 +1,25 @@
+@model int
+
+@{
+    ViewData["Title"] = "Помилка";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/errors.css" asp-append-version="true" />
+}
+
+<div class="error-page">
+    <section class="error-card">
+        <div class="error-visual" aria-hidden="true">
+            <span class="error-code">@Model</span>
+        </div>
+        <div class="error-copy">
+            <div class="error-kicker">Щось пішло не так</div>
+            <h1>Не вдалося відкрити сторінку</h1>
+            <p>Спробуйте повернутися на головну та повторити дію.</p>
+            <div class="error-actions">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary">На головну</a>
+            </div>
+        </div>
+    </section>
+</div>

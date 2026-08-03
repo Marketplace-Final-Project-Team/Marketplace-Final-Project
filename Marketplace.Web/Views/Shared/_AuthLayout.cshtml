@@ -14,10 +14,10 @@
         <section class="auth-showcase" aria-label="Про Marketplace">
             <a class="brand"
                asp-controller="Home"
-               asp-action="Index"
+                asp-action="Index"
                aria-label="Marketplace — на головну">
                 <span class="brand__mark" aria-hidden="true">M</span>
-                <span class="brand__name">marketplace</span>
+                <span class="brand__name">MarketPlace</span>
             </a>
 
             <div class="showcase-copy">
@@ -63,6 +63,12 @@
         </section>
 
         <main id="main-content" class="auth-content">
+            <a class="auth-home-link"
+               asp-controller="Home"
+               asp-action="Index">
+                <span aria-hidden="true">←</span>
+                На головну
+            </a>
             @RenderBody()
         </main>
     </div>

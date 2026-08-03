@@ -82,7 +82,10 @@
 
         <label class="checkbox checkbox--top">
             <input asp-for="AcceptTerms" />
-            <span>Я приймаю правила користування та політику конфіденційності</span>
+            <span>
+                Я приймаю правила користування та
+                <a asp-controller="Home" asp-action="Privacy">політику конфіденційності</a>
+            </span>
         </label>
         <span asp-validation-for="AcceptTerms" class="field-error"></span>
 
