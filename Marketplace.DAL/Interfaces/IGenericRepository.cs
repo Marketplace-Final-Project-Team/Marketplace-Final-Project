@@ -1,8 +1,9 @@
-﻿using System.Linq.Expressions;
+﻿using Marketplace.Domain.Common;
+using System.Linq.Expressions;
 
 namespace Marketplace.Domain.Interfaces
 {
-    public interface IGenericRepository<T> where T : class
+    public interface IGenericRepository<T> where T : class, IEntity
     {
         Task<T?> GetByIdAsync(Guid id);
         Task<IReadOnlyList<T>> GetAllAsync();

@@ -1,3 +1,5 @@
+using Marketplace.BLL.DTOs;
+using Marketplace.BLL.Interfaces;
 using Marketplace.Domain.Entities;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -8,21 +10,26 @@ namespace Marketplace.Web.Controllers;
 
 public class AuthController : Controller
 {
+    private readonly IAuthService _authService;
+    private readonly IEmailSender _emailSender;
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
 
-    public AuthController(UserManager<User> userManager, SignInManager<User> signInManager)
+    public AuthController(
+        IAuthService authService,
+        IEmailSender emailSender,
+        UserManager<User> userManager,
+        SignInManager<User> signInManager)
     {
+        _authService = authService;
+        _emailSender = emailSender;
         _userManager = userManager;
         _signInManager = signInManager;
     }
 
     [AllowAnonymous]
     [HttpGet]
-    public IActionResult Index()
-    {
-        return RedirectToAction(nameof(SignIn));
-    }
+    public IActionResult Index() => RedirectToAction(nameof(SignIn));
 
     [AllowAnonymous]
     [HttpGet("/login")]
@@ -33,11 +40,7 @@ public class AuthController : Controller
             return RedirectToAction("Index", "Home");
         }
 
-        ModelState.Clear();
-        return View(new SignInViewModel
-        {
-            ReturnUrl = NormalizeReturnUrl(returnUrl)
-        });
+        return View(new SignInViewModel { ReturnUrl = NormalizeReturnUrl(returnUrl) });
     }
 
     [AllowAnonymous]
@@ -54,9 +57,9 @@ public class AuthController : Controller
         }
 
         var user = await _userManager.FindByEmailAsync(model.Email.Trim());
-        if (user is null)
+        if (user is null || !user.EmailConfirmed)
         {
-            ModelState.AddModelError(string.Empty, "Неправильна електронна пошта або пароль.");
+            ModelState.AddModelError(string.Empty, "Неправильна електронна пошта або пароль, або email ще не підтверджено.");
             return View(model);
         }
 
@@ -73,9 +76,7 @@ public class AuthController : Controller
 
         if (result.IsLockedOut)
         {
-            ModelState.AddModelError(
-                string.Empty,
-                "Забагато невдалих спроб. Спробуйте ще раз через 10 хвилин.");
+            ModelState.AddModelError(string.Empty, "Забагато невдалих спроб. Спробуйте ще раз через 10 хвилин.");
             return View(model);
         }
 
@@ -92,11 +93,7 @@ public class AuthController : Controller
             return RedirectToAction("Index", "Home");
         }
 
-        ModelState.Clear();
-        return View(new SignUpViewModel
-        {
-            ReturnUrl = NormalizeReturnUrl(returnUrl)
-        });
+        return View(new SignUpViewModel { ReturnUrl = NormalizeReturnUrl(returnUrl) });
     }
 
     [AllowAnonymous]
@@ -112,26 +109,131 @@ public class AuthController : Controller
             return View(model);
         }
 
-        var user = new User
+        var result = await _authService.SignUp(new SignUpDto
         {
-            UserName = model.Username.Trim(),
-            Email = model.Email.Trim()
-        };
+            Username = model.Username.Trim(),
+            Email = model.Email.Trim(),
+            Password = model.Password
+        });
 
-        var result = await _userManager.CreateAsync(user, model.Password);
         if (!result.Succeeded)
         {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, TranslateIdentityError(error));
-            }
-
+            ModelState.AddModelError(string.Empty, result.Message);
             return View(model);
         }
 
-        await _signInManager.SignInAsync(user, isPersistent: false);
-        return LocalRedirect(model.ReturnUrl!);
+        var confirmationLink = Url.Action(
+            nameof(ConfirmEmail),
+            "Auth",
+            new { userId = result.UserId, token = result.Token },
+            Request.Scheme);
+
+        await _emailSender.SendEmailAsync(
+            model.Email.Trim(),
+            "Підтвердження email",
+            $"Підтвердьте email за посиланням: <a href='{confirmationLink}'>підтвердити</a>.");
+
+        return RedirectToAction(nameof(RegistrationSuccess));
     }
+
+    [AllowAnonymous]
+    [HttpGet]
+    public IActionResult RegistrationSuccess() => View();
+
+    [AllowAnonymous]
+    [HttpGet]
+    public async Task<IActionResult> ConfirmEmail(string? userId, string? token)
+    {
+        if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(token))
+        {
+            return BadRequest();
+        }
+
+        var result = await _authService.ConfirmEmail(userId, token);
+        ViewBag.Message = result.Succeeded
+            ? "Email успішно підтверджено! Тепер можна увійти."
+            : result.Message;
+        return View();
+    }
+
+    [AllowAnonymous]
+    [HttpGet]
+    public IActionResult ForgotPassword() => View();
+
+    [AllowAnonymous]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ForgotPassword(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            ModelState.AddModelError("Email", "Введіть електронну пошту.");
+            return View();
+        }
+
+        var result = await _authService.ForgotPassword(email.Trim());
+        if (result.AccountExists)
+        {
+            var resetLink = Url.Action(
+                nameof(ResetPassword),
+                "Auth",
+                new { userId = result.UserId, token = result.Token },
+                Request.Scheme);
+
+            await _emailSender.SendEmailAsync(
+                email.Trim(),
+                "Скидання пароля",
+                $"Щоб скинути пароль, перейдіть за посиланням: <a href='{resetLink}'>скинути пароль</a>.");
+        }
+
+        return RedirectToAction(nameof(ForgotPasswordConfirmation));
+    }
+
+    [AllowAnonymous]
+    [HttpGet]
+    public IActionResult ForgotPasswordConfirmation() => View();
+
+    [AllowAnonymous]
+    [HttpGet]
+    public IActionResult ResetPassword(string? userId, string? token)
+    {
+        if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(token))
+        {
+            return BadRequest();
+        }
+
+        return View(new ResetPasswordViewModel { UserId = userId, Token = token });
+    }
+
+    [AllowAnonymous]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        var result = await _authService.ResetPassword(new ResetPasswordDto
+        {
+            UserId = model.UserId,
+            Token = model.Token,
+            NewPassword = model.NewPassword
+        });
+
+        if (!result.Succeeded)
+        {
+            ModelState.AddModelError(string.Empty, result.Message);
+            return View(model);
+        }
+
+        return RedirectToAction(nameof(ResetPasswordConfirmation));
+    }
+
+    [AllowAnonymous]
+    [HttpGet]
+    public IActionResult ResetPasswordConfirmation() => View();
 
     [Authorize]
     [HttpPost("/logout")]
@@ -147,22 +249,5 @@ public class AuthController : Controller
         return !string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl)
             ? returnUrl
             : Url.Action("Index", "Home")!;
-    }
-
-    private static string TranslateIdentityError(IdentityError error)
-    {
-        return error.Code switch
-        {
-            "DuplicateEmail" => "Користувач із такою електронною поштою вже існує.",
-            "DuplicateUserName" => "Це ім’я користувача вже зайняте.",
-            "InvalidEmail" => "Введіть коректну електронну пошту.",
-            "InvalidUserName" => "Ім’я користувача містить недопустимі символи.",
-            "PasswordTooShort" => "Пароль має містити щонайменше 8 символів.",
-            "PasswordRequiresDigit" => "Додайте до пароля хоча б одну цифру.",
-            "PasswordRequiresLower" => "Додайте до пароля малу літеру.",
-            "PasswordRequiresUpper" => "Додайте до пароля велику літеру.",
-            "PasswordRequiresNonAlphanumeric" => "Додайте до пароля спеціальний символ.",
-            _ => error.Description
-        };
     }
 }

@@ -1,5 +1,6 @@
 using System.Globalization;
 using CloudinaryDotNet;
+using Marketplace.BLL.Common;
 using Marketplace.BLL.Interfaces;
 using Marketplace.BLL.Services;
 using Marketplace.DAL.Data;
@@ -63,10 +64,20 @@ builder.Services.AddScoped<IBusinessService, BusinessService>();
 builder.Services.AddScoped<IBusinessAccessService, BusinessAccessService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
 
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<IEmailSender, EmailSender>();
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    await Marketplace.DAL.Seed.DbSeeder.SeedAsync(scope.ServiceProvider);
+}
 
 if (app.Environment.IsDevelopment())
 {

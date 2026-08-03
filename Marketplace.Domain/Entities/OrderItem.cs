@@ -4,8 +4,6 @@ namespace Marketplace.Domain.Entities
 {
     public class OrderItem: BaseEntity
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
-
         public Guid ProductId { get; set; }
         public Product Product { get; set; } = null!;
 

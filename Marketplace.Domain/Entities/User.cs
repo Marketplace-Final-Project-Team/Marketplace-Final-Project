@@ -9,8 +9,9 @@ namespace Marketplace.Domain.Entities
         public UserStatus Status { get; set; } = UserStatus.Active;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
+        public string AvatarUrl { get; set; } = string.Empty;
         public bool IsDeleted { get; set; } = false;
-     
+
         public ICollection<Address> Addresses { get; set; } = new List<Address>();
     }
 }

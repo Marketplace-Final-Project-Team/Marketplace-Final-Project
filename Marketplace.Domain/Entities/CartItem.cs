@@ -4,8 +4,6 @@ namespace Marketplace.Domain.Entities
 {
     public class CartItem : BaseEntity
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
-
         public Guid CartId { get; set; }
         public Cart Cart { get; set; } = null!;
 
