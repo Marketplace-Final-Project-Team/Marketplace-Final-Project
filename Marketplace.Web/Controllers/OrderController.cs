@@ -100,12 +100,12 @@ public class OrderController : Controller
             IsDefault = true
         };
 
-        await _addressRepository.AddAsync(address);
-        await _context.SaveChangesAsync();
+            await _addressRepository.AddAsync(address);
+            await _context.SaveChangesAsync();
+            var result = await _orderService.CreateOrder(userId!, new OrderCreateDto { AddressId = address.Id, SuccessUrl = model.SuccessUrl, CancelUrl = model.CancelUrl });
 
-        var result = await _orderService.CreateOrder(
-            userId,
-            new OrderCreateDto { AddressId = address.Id });
+            
+            
 
         if (!result.Succeeded)
         {
@@ -114,9 +114,13 @@ public class OrderController : Controller
             ModelState.AddModelError(string.Empty, result.Message);
             return View(model);
         }
+        if (result.PaymentData != null)
+        {
+          return View("Payment", result.PaymentData);
+        }
 
         TempData["Success"] = "Замовлення успішно оформлено.";
-        return RedirectToAction(nameof(Details), new { id = result.EntityId });
+        return RedirectToAction(nameof(Details), new { id = result.OrderId });
     }
 
     [HttpPost]

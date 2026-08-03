@@ -10,6 +10,8 @@ using Marketplace.Domain.Entities;
 using Marketplace.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
+using Marketplace.DAL.Interfaces;
+using Marketplace.BLL.Configs;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -68,6 +70,16 @@ builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
+
+
+// LiqPay configuration
+
+builder.Services.Configure<LiqPayOptions>(builder.Configuration.GetSection("LiqPay"));
+builder.Services.AddScoped<IPaymentService, LiqPayPaymentService>();
+
+// Delivery API configuration
+builder.Services.Configure<DeliveryApiOptions>(builder.Configuration.GetSection("DeliveryApi"));
+builder.Services.AddScoped<IDeliveryProviderService, DeliveryProviderService>();
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<IEmailSender, EmailSender>();
