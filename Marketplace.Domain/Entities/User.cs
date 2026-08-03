@@ -10,7 +10,8 @@ namespace Marketplace.Domain.Entities
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         public bool IsDeleted { get; set; } = false;
-     
+        public ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
+
         public ICollection<Address> Addresses { get; set; } = new List<Address>();
     }
 }

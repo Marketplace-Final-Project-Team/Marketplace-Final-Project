@@ -3,6 +3,9 @@ using Marketplace.BLL.Interfaces;
 using Marketplace.Web.Models.Products;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Marketplace.Domain.Entities;
+using Marketplace.Domain.Interfaces;
+using Marketplace.BLL.Authorization;
 
 namespace Marketplace.Web.Controllers
 {
@@ -13,18 +16,24 @@ namespace Marketplace.Web.Controllers
         private readonly IGenericRepository<Business> _businessRepository;
         private readonly IGenericRepository<Category> _categoryRepository;
 
+        private readonly IBusinessAccessService _businessAccessService;
+
         public ProductsController(
             IProductService productService,
             IGenericRepository<Business> businessRepository,
-            IGenericRepository<Category> categoryRepository)
+            IGenericRepository<Category> categoryRepository,
+            IBusinessAccessService businessAccessService)
         {
             _productService = productService;
             _businessRepository = businessRepository;
             _categoryRepository = categoryRepository;
+            _businessAccessService = businessAccessService;
         }
         // GET: /Products?businessId={id}
         public async Task<IActionResult> Index(Guid? businessId)
         {
+            var CurrentUserId = User.Identity!.Name;
+
             var businesses = await _businessAccessService.GetAccessibleBusinessesAsync(CurrentUserId, BusinessPermissions.ProductCrud);
             if (businesses.Count == 0)
             {
@@ -87,6 +96,7 @@ namespace Marketplace.Web.Controllers
         // GET: /Products/Create
         public IActionResult Create()
         {
+            var TempCategoryId = Guid.NewGuid();
             var model = new ProductCreateViewModel
             {
                 Categories = new List<SelectListItem>
@@ -102,6 +112,9 @@ namespace Marketplace.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductCreateViewModel model)
         {
+            var TempBusinessId = Guid.NewGuid();
+            var TempCategoryId = Guid.NewGuid();
+
             if (!ModelState.IsValid)
             {
                 model.Categories = new List<SelectListItem>
@@ -110,6 +123,8 @@ namespace Marketplace.Web.Controllers
                 };
                 return View(model);
             }
+
+
 
             var dto = new ProductCreateDto
             {
@@ -133,6 +148,8 @@ namespace Marketplace.Web.Controllers
         // GET: /Products/Edit/{id}
         public async Task<IActionResult> Edit(Guid id)
         {
+            var TempCategoryId = Guid.NewGuid();
+
             var product = await _productService.GetByIdAsync(id);
             if (product == null) return NotFound();
 
@@ -159,6 +176,8 @@ namespace Marketplace.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, ProductEditViewModel model)
         {
+            var TempCategoryId = Guid.NewGuid();
+
             if (id != model.Id) return BadRequest();
 
             if (!ModelState.IsValid)
@@ -194,7 +213,6 @@ namespace Marketplace.Web.Controllers
         {
             var product = await _productService.GetByIdAsync(id);
             if (product == null) return NotFound();
-
             var model = new ProductDetailsViewModel
             {
                 Id = product.Id,
