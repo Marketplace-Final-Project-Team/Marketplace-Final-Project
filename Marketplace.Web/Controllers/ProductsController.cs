@@ -8,6 +8,9 @@ using Marketplace.Web.Models.Products;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Marketplace.Domain.Entities;
+using Marketplace.Domain.Interfaces;
+using Marketplace.BLL.Authorization;
 
 namespace Marketplace.Web.Controllers;
 

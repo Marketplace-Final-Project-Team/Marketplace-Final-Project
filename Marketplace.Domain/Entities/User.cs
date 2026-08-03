@@ -11,6 +11,7 @@ namespace Marketplace.Domain.Entities
         public DateTime? UpdatedAt { get; set; }
         public string AvatarUrl { get; set; } = string.Empty;
         public bool IsDeleted { get; set; } = false;
+        public ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
 
         public ICollection<Address> Addresses { get; set; } = new List<Address>();
     }
