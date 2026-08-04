@@ -10,7 +10,6 @@ using Marketplace.Domain.Entities;
 using Marketplace.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
-using Marketplace.DAL.Interfaces;
 using Marketplace.BLL.Configs;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,11 +19,11 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    if (builder.Environment.IsDevelopment())
-    {
-        options.UseInMemoryDatabase("MarketplaceFrontendDb");
-        return;
-    }
+    //if (builder.Environment.IsDevelopment())
+    //{
+    //    options.UseInMemoryDatabase("MarketplaceFrontendDb");
+    //    return;
+    //}
 
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
