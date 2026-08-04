@@ -48,7 +48,8 @@
                 <input asp-for="Password"
                        autocomplete="new-password"
                        placeholder="Створіть надійний пароль"
-                       data-password-input />
+                       data-password-input
+                       data-password-strength />
                 <button class="password-toggle"
                         type="button"
                         data-password-toggle
@@ -59,6 +60,13 @@
             </div>
             <span asp-validation-for="Password" class="field-error"></span>
             <p class="password-rule">Велика й мала літера, цифра та спеціальний символ.</p>
+            <div class="password-strength" data-password-strength-meter aria-live="polite">
+                <div class="password-strength__track" aria-hidden="true"><span></span></div>
+                <div class="password-strength__meta">
+                    <span>Надійність пароля</span>
+                    <strong data-password-strength-label>Не вказано</strong>
+                </div>
+            </div>
         </div>
 
         <div class="field">

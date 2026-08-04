@@ -56,6 +56,29 @@ body {
   margin: 0.25rem 0.35rem 0.25rem 0;
   max-width: 12rem;
   padding: 0.28rem 0.65rem 0.28rem 0.3rem;
+  text-decoration: none;
+  transition: border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+button.nav-user-chip {
+  cursor: pointer;
+}
+
+.nav-user-chip:hover,
+.nav-user-chip:focus-visible,
+.nav-user-chip[aria-expanded="true"] {
+  background: #eaf0ff;
+  border-color: #bdc9f4;
+}
+
+.nav-user-chip:focus-visible {
+  box-shadow: 0 0 0 0.2rem rgba(49, 87, 215, 0.16);
+  outline: 0;
+}
+
+.nav-user-chip.dropdown-toggle::after {
+  color: #667085;
+  margin-left: 0.05rem;
 }
 
 .nav-user-chip__avatar {
@@ -81,8 +104,41 @@ body {
   white-space: nowrap;
 }
 
-.nav-logout {
+.nav-user-menu {
+  border: 1px solid #e3e7ef;
+  border-radius: 0.8rem;
+  box-shadow: 0 0.75rem 2rem rgba(23, 32, 51, 0.13);
+  min-width: 12.5rem;
+  padding: 0.4rem;
+}
+
+.nav-user-menu .dropdown-item {
+  border-radius: 0.55rem;
   font-size: 0.86rem;
+  padding: 0.55rem 0.7rem;
+}
+
+.nav-user-menu__logout {
+  color: #b42318;
+}
+
+.profile-avatar {
+  border: 4px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0.4rem 1.4rem rgba(23, 32, 51, 0.14);
+  height: 11.25rem;
+  object-fit: cover;
+  width: 11.25rem;
+}
+
+.profile-avatar--fallback {
+  align-items: center;
+  background: linear-gradient(135deg, #3157d7, #6c83e6);
+  color: #fff;
+  display: inline-flex;
+  font-size: 3.5rem;
+  font-weight: 800;
+  justify-content: center;
 }
 
 @media (max-width: 575.98px) {
@@ -92,6 +148,16 @@ body {
 
   .nav-user-chip {
     margin: 0.45rem 0;
+  }
+
+  .nav-user-menu {
+    width: 100%;
+  }
+
+  .profile-avatar {
+    height: 8.5rem;
+    margin-bottom: 1.25rem;
+    width: 8.5rem;
   }
 }
 

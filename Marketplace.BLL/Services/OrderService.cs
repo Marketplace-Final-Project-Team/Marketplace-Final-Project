@@ -1,5 +1,6 @@
 ﻿using Marketplace.BLL.Common;
 using Marketplace.BLL.DTOs;
+using Marketplace.BLL.DTOs.Businesses;
 using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
 using Marketplace.DAL.Interfaces;
@@ -134,6 +135,39 @@ namespace Marketplace.BLL.Services
                 .Include(order => order.Items)
                 .ThenInclude(item => item.Product)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task<BusinessOrderSummaryDto> GetBusinessOrderSummary(Guid businessId)
+        {
+            var orderLines = await _context.OrderItems
+                .AsNoTracking()
+                .Where(item => item.Product.BusinessId == businessId)
+                .Select(item => new
+                {
+                    item.OrderId,
+                    item.Order.Status,
+                    item.Quantity,
+                    LineTotal = item.UnitPrice * item.Quantity
+                })
+                .ToListAsync();
+
+            var orders = orderLines
+                .GroupBy(line => line.OrderId)
+                .Select(group => group.First())
+                .ToList();
+
+            return new BusinessOrderSummaryDto
+            {
+                TotalOrders = orders.Count,
+                AwaitingProcessingOrders = orders.Count(order =>
+                    order.Status is OrderStatus.Pending or OrderStatus.Confirmed),
+                SoldItems = orderLines
+                    .Where(line => line.Status != OrderStatus.Canceled)
+                    .Sum(line => line.Quantity),
+                Revenue = orderLines
+                    .Where(line => line.Status != OrderStatus.Canceled)
+                    .Sum(line => line.LineTotal)
+            };
         }
     }
 }

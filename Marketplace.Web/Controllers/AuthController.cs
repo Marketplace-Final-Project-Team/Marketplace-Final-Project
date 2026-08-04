@@ -150,6 +150,7 @@ public class AuthController : Controller
         }
 
         var result = await _authService.ConfirmEmail(userId, token);
+        ViewBag.Succeeded = result.Succeeded;
         ViewBag.Message = result.Succeeded
             ? "Email успішно підтверджено! Тепер можна увійти."
             : result.Message;
