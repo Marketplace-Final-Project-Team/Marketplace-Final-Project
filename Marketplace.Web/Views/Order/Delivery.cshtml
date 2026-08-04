@@ -1,0 +1,63 @@
+@model Marketplace.Web.Models.OrderDetailsViewModel
+
+@{
+    ViewData["Title"] = "Доставка замовлення";
+    var currentStep = Model.Status switch
+    {
+        Marketplace.Domain.Enums.OrderStatus.Pending => 0,
+        Marketplace.Domain.Enums.OrderStatus.Confirmed => 1,
+        Marketplace.Domain.Enums.OrderStatus.Shipped => 2,
+        Marketplace.Domain.Enums.OrderStatus.Delivered => 3,
+        _ => -1
+    };
+    var steps = new[]
+    {
+        ("Замовлення створено", "Ми отримали ваше замовлення."),
+        ("Замовлення підтверджено", "Продавець готує товари до відправлення."),
+        ("Передано в доставку", "Посилка вже прямує до вас."),
+        ("Доставлено", "Замовлення успішно отримано.")
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+}
+
+<div class="shop-page">
+    <a asp-action="Details" asp-route-id="@Model.Id" class="shop-back">← До замовлення</a>
+    <header class="shop-header">
+        <div>
+            <div class="shop-kicker">Замовлення #@Model.Id.ToString()[..8].ToUpperInvariant()</div>
+            <h1 class="shop-title">Доставка товару</h1>
+            <p class="shop-subtitle">Статус і маршрут доставки вашого замовлення.</p>
+        </div>
+    </header>
+
+    <section class="shop-panel delivery-card">
+        @if (Model.Status == Marketplace.Domain.Enums.OrderStatus.Canceled)
+        {
+            <div class="alert alert-danger mb-0">Замовлення скасовано. Доставка не виконується.</div>
+        }
+        else
+        {
+            <div class="delivery-address">
+                <div class="text-secondary small mb-1">Адреса доставки</div>
+                <strong>@Model.ShippingCountry, @Model.ShippingCity, @Model.ShippingStreet</strong>
+            </div>
+
+            <div class="delivery-timeline">
+                @for (var index = 0; index < steps.Length; index++)
+                {
+                    var cssClass = index < currentStep ? "is-complete" : index == currentStep ? "is-current" : string.Empty;
+                    <div class="delivery-step @cssClass">
+                        <div class="delivery-step__dot">@(index < currentStep ? "✓" : (index + 1).ToString())</div>
+                        <div class="delivery-step__body">
+                            <strong>@steps[index].Item1</strong>
+                            <span>@steps[index].Item2</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </section>
+</div>

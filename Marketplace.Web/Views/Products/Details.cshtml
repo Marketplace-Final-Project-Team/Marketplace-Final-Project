@@ -1,0 +1,83 @@
+@model Marketplace.Web.Models.Products.ProductDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Name;
+    var statusClass = Model.Status.ToLowerInvariant();
+    var statusLabel = Model.Status switch
+    {
+        "Active" => "Активний",
+        "Pending" => "На модерації",
+        "Banned" => "Заблокований",
+        _ => Model.Status
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/products.css" asp-append-version="true" />
+}
+
+<div class="products-page">
+    <a asp-action="Index" class="products-back">← Назад до товарів</a>
+    <header class="products-heading">
+        <div>
+            <div class="products-eyebrow">Картка товару</div>
+            <h1 class="products-title">@Model.Name</h1>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Редагувати</a>
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Видалити</a>
+        </div>
+    </header>
+
+    <div class="products-panel product-details-grid">
+        <div class="product-detail-media">
+            @if (!string.IsNullOrWhiteSpace(Model.MainImageUrl))
+            {
+                <img src="@Model.MainImageUrl" alt="@Model.Name" />
+            }
+            else
+            {
+                <div class="product-detail-placeholder">
+                    <span aria-hidden="true">□</span>
+                    Фото ще не додано
+                </div>
+            }
+        </div>
+
+        <div class="product-detail-content">
+            <span class="product-status product-status--@statusClass">@statusLabel</span>
+            <div class="product-detail-price">@Model.Price.ToString("N2") ₴</div>
+            <p>@(string.IsNullOrWhiteSpace(Model.Description) ? "Опис не додано." : Model.Description)</p>
+
+            <div class="product-meta">
+                <div class="product-meta__row">
+                    <span class="product-meta__label">Категорія</span>
+                    <strong>@Model.CategoryName</strong>
+                </div>
+                <div class="product-meta__row">
+                    <span class="product-meta__label">Кількість</span>
+                    <strong>@Model.Quantity шт.</strong>
+                </div>
+                <div class="product-meta__row">
+                    <span class="product-meta__label">ID</span>
+                    <span class="small text-break">@Model.Id</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.AdditionalImageUrls.Any())
+    {
+        <section class="products-panel mt-3">
+            <div class="product-form-section">
+                <h2 class="mb-0">Додаткові фото</h2>
+            </div>
+            <div class="product-gallery">
+                @foreach (var url in Model.AdditionalImageUrls)
+                {
+                    <img src="@url" alt="Додаткове фото товару @Model.Name" />
+                }
+            </div>
+        </section>
+    }
+</div>
