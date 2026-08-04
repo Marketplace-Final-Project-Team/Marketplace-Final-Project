@@ -12,6 +12,7 @@ namespace Marketplace.Domain.Entities
         public User User { get; set; } = null!;
 
         public BusinessMemberRole Role { get; set; }
-    
+        public bool IsAccepted { get; set; } = false;
+
     }
 }
