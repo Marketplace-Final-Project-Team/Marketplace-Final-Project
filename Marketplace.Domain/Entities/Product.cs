@@ -19,5 +19,6 @@ namespace Marketplace.Domain.Entities
         public ProductStatus Status { get; set; } = ProductStatus.Pending;
 
         public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
     }
 }
