@@ -3,6 +3,7 @@ using Marketplace.BLL.Interfaces;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
 using Marketplace.Web.Models;
+using Marketplace.Web.Models.Businesses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,20 +14,69 @@ namespace Marketplace.Web.Controllers
     public class BusinessController : Controller
     {
         private readonly IBusinessService _businessService;
+        private readonly IBusinessAccessService _businessAccessService;
+        private readonly IProductService _productService;
+        private readonly IOrderService _orderService;
         private readonly UserManager<User> _userManager;
         private readonly IEmailSender _emailSender;
 
-        public BusinessController(IBusinessService businessService, UserManager<User> userManager, IEmailSender emailSender)
+        public BusinessController(
+            IBusinessService businessService,
+            IBusinessAccessService businessAccessService,
+            IProductService productService,
+            IOrderService orderService,
+            UserManager<User> userManager,
+            IEmailSender emailSender)
         {
             _businessService = businessService;
+            _businessAccessService = businessAccessService;
+            _productService = productService;
+            _orderService = orderService;
             _userManager = userManager;
             _emailSender = emailSender;
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Challenge();
+            }
+
+            var businesses = await _businessAccessService.GetAccessibleBusinessesAsync(userId);
+            var businessCards = new List<BusinessDashboardItemViewModel>();
+
+            foreach (var business in businesses)
+            {
+                var products = await _productService.GetByBusinessAsync(business.Id);
+                var orderSummary = await _orderService.GetBusinessOrderSummary(business.Id);
+                businessCards.Add(new BusinessDashboardItemViewModel
+                {
+                    Id = business.Id,
+                    StoreName = business.StoreName,
+                    Description = business.Description,
+                    LogoUrl = business.LogoUrl,
+                    BannerUrl = business.BannerUrl,
+                    Status = business.Status,
+                    IsOwner = business.OwnerId == userId,
+                    ProductCount = products.Count,
+                    ActiveProductCount = products.Count(product => product.Status == Marketplace.Domain.Enums.ProductStatus.Active),
+                    PendingProductCount = products.Count(product => product.Status == Marketplace.Domain.Enums.ProductStatus.Pending),
+                    OutOfStockProductCount = products.Count(product => product.Quantity <= 0),
+                    OrderCount = orderSummary.TotalOrders,
+                    AwaitingOrderCount = orderSummary.AwaitingProcessingOrders,
+                    SoldItemCount = orderSummary.SoldItems,
+                    Revenue = orderSummary.Revenue
+                });
+            }
+
+            return View(new BusinessDashboardViewModel
+            {
+                Businesses = businessCards,
+                CanCreateBusiness = businesses.All(business => business.OwnerId != userId)
+            });
         }
 
         [HttpGet]
@@ -61,7 +111,8 @@ namespace Marketplace.Web.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("Index", "Home");
+            TempData["Success"] = "Бізнес створено та відправлено на перевірку.";
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet("business/{businessId}/add-member")]

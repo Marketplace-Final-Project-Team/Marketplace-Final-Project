@@ -2,53 +2,234 @@
 
 @{
     ViewData["Title"] = Model.Name;
+    var gallery = Model.GalleryImageUrls;
+    var mainImage = gallery.FirstOrDefault();
+    var productInitial = string.IsNullOrWhiteSpace(Model.Name) ? "M" : Model.Name[..1].ToUpperInvariant();
+    var storeInitial = string.IsNullOrWhiteSpace(Model.StoreName) ? "M" : Model.StoreName[..1].ToUpperInvariant();
+    var productCode = Model.Id.ToString()[..8].ToUpperInvariant();
+    var isLowStock = Model.Quantity <= 5;
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/product-details.css" asp-append-version="true" />
 }
 
-<div class="shop-page">
-    <a asp-action="Index" class="shop-back">← Назад до каталогу</a>
+<div class="product-page">
+    <nav class="product-breadcrumbs" aria-label="Навігаційний шлях">
+        <a asp-controller="Home" asp-action="Index">Головна</a>
+        <span aria-hidden="true">›</span>
+        <a asp-action="Index">Каталог</a>
+        <span aria-hidden="true">›</span>
+        <span aria-current="page">@Model.CategoryName</span>
+    </nav>
 
     @if (TempData["Success"] is string success)
     {
-        <div class="alert alert-success" role="alert">@success</div>
+        <div class="product-alert product-alert--success" role="status">
+            <span aria-hidden="true">✓</span><p><strong>Товар у кошику</strong>@success</p>
+            <a asp-controller="Cart" asp-action="Index">Відкрити кошик →</a>
+        </div>
     }
     @if (TempData["Error"] is string error)
     {
-        <div class="alert alert-warning" role="alert">@error</div>
+        <div class="product-alert product-alert--warning" role="alert">
+            <span aria-hidden="true">!</span><p><strong>Не вдалося виконати дію</strong>@error</p>
+        </div>
     }
 
-    <article class="shop-panel catalog-details">
-        <div class="catalog-details__media">
-            @if (!string.IsNullOrWhiteSpace(Model.MainImageUrl))
-            {
-                <img src="@Model.MainImageUrl" alt="@Model.Name" />
-            }
-            else
-            {
-                <span aria-hidden="true">@Model.Name[..1].ToUpperInvariant()</span>
-            }
-        </div>
-
-        <div class="catalog-details__body">
-            <div class="shop-kicker">@Model.CategoryName</div>
-            <h1>@Model.Name</h1>
-            <div class="catalog-details__store">Продавець: <strong>@Model.StoreName</strong></div>
-            <p class="catalog-details__description">@Model.Description</p>
-
-            <div class="catalog-details__price">@Model.Price.ToString("N2") ₴</div>
-            <div class="stock-label">✓ В наявності — @Model.Quantity шт.</div>
-
-            <div class="catalog-details__actions">
-                <form asp-controller="Cart" asp-action="Add" method="post">
-                    <input type="hidden" name="productId" value="@Model.Id" />
-                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                    <button type="submit" class="btn btn-primary">Додати до кошика</button>
-                </form>
-                <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-secondary">Відкрити кошик</a>
+    <article class="product-hero">
+        <section class="product-gallery" aria-label="Галерея товару @Model.Name">
+            <div class="product-gallery__stage">
+                <span class="product-gallery__badge">Новинка</span>
+                @if (!string.IsNullOrWhiteSpace(mainImage))
+                {
+                    <img src="@mainImage" alt="@Model.Name — основне зображення" data-gallery-main />
+                }
+                else
+                {
+                    <div class="product-gallery__placeholder" role="img" aria-label="Зображення товару @Model.Name відсутнє">
+                        <span aria-hidden="true">@productInitial</span>
+                        <small>Зображення готується</small>
+                    </div>
+                }
+                @if (gallery.Count > 1)
+                {
+                    <span class="product-gallery__counter" aria-live="polite" data-gallery-counter>1 / @gallery.Count</span>
+                }
             </div>
-        </div>
+
+            @if (gallery.Count > 1)
+            {
+                <div class="product-gallery__thumbs" role="group" aria-label="Оберіть зображення">
+                    @for (var index = 0; index < gallery.Count; index++)
+                    {
+                        var imageUrl = gallery[index];
+                        <button type="button"
+                                class="product-gallery__thumb @(index == 0 ? "is-active" : null)"
+                                data-gallery-thumb
+                                data-image-url="@imageUrl"
+                                data-image-alt="@Model.Name — зображення @(index + 1)"
+                                data-image-index="@(index + 1)"
+                                aria-label="Показати зображення @(index + 1)"
+                                aria-pressed="@(index == 0 ? "true" : "false")">
+                            <img src="@imageUrl" alt="" loading="lazy" />
+                        </button>
+                    }
+                </div>
+            }
+
+            <div class="product-gallery__hint">
+                <span aria-hidden="true">⌕</span>
+                <p><strong>Фото товару</strong>@(gallery.Count > 1 ? $"Доступно {gallery.Count} зображення" : "Перегляньте товар перед покупкою")</p>
+            </div>
+        </section>
+
+        <section class="product-summary" aria-labelledby="product-title">
+            <div class="product-summary__topline">
+                <a asp-action="Index" asp-route-search="@Model.CategoryName" class="product-category">@Model.CategoryName</a>
+                <span class="product-code">Код: @productCode</span>
+            </div>
+
+            <h1 id="product-title">@Model.Name</h1>
+            <p class="product-summary__lead">@Model.Description</p>
+
+            <div class="product-price-block">
+                <span class="product-price-block__label">Ціна</span>
+                <strong>@Model.Price.ToString("N2") ₴</strong>
+                <small>Ціна вказана з урахуванням усіх податків</small>
+            </div>
+
+            <div class="product-stock @(isLowStock ? "product-stock--low" : null)">
+                <span class="product-stock__mark" aria-hidden="true">@(isLowStock ? "!" : "✓")</span>
+                <p>
+                    <strong>@(isLowStock ? $"Залишилося лише {Model.Quantity} шт." : "Є в наявності")</strong>
+                    @(isLowStock ? "Рекомендуємо не відкладати замовлення" : $"Доступно до замовлення: {Model.Quantity} шт.")
+                </p>
+            </div>
+
+            <div class="product-buybox">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <form asp-controller="Cart" asp-action="Add" method="post">
+                        <input type="hidden" name="productId" value="@Model.Id" />
+                        <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                        <button type="submit" class="product-button product-button--primary">
+                            <span aria-hidden="true">＋</span> Додати до кошика
+                        </button>
+                    </form>
+                    <a asp-controller="Cart" asp-action="Index" class="product-button product-button--secondary">Відкрити кошик</a>
+                }
+                else
+                {
+                    <a asp-controller="Auth"
+                       asp-action="SignIn"
+                       asp-route-returnUrl="@Context.Request.Path"
+                       class="product-button product-button--primary">
+                        Увійти та додати до кошика <span aria-hidden="true">→</span>
+                    </a>
+                }
+                <p><span aria-hidden="true">✓</span> Безпечне оформлення замовлення</p>
+            </div>
+
+            <div class="product-fulfilment">
+                <div>
+                    <span class="product-fulfilment__icon product-fulfilment__icon--delivery" aria-hidden="true">→</span>
+                    <p><strong>Орієнтовна доставка</strong>@Model.EstimatedDeliveryStart.ToString("dd.MM")–@Model.EstimatedDeliveryEnd.ToString("dd.MM") · 2–4 робочі дні</p>
+                </div>
+                <div>
+                    <span class="product-fulfilment__icon product-fulfilment__icon--return" aria-hidden="true">↺</span>
+                    <p><strong>Просте повернення</strong>Повернення протягом 14 днів після отримання</p>
+                </div>
+                <div>
+                    <span class="product-fulfilment__icon product-fulfilment__icon--secure" aria-hidden="true">✓</span>
+                    <p><strong>Захищена покупка</strong>Статус замовлення та доставки завжди під рукою</p>
+                </div>
+            </div>
+
+            <section class="product-seller" aria-labelledby="seller-title">
+                @if (!string.IsNullOrWhiteSpace(Model.StoreLogoUrl))
+                {
+                    <img src="@Model.StoreLogoUrl" alt="Логотип продавця @Model.StoreName" />
+                }
+                else
+                {
+                    <span class="product-seller__logo" aria-hidden="true">@storeInitial</span>
+                }
+                <div>
+                    <span>Продавець</span>
+                    <h2 id="seller-title">@Model.StoreName</h2>
+                    <p>@(string.IsNullOrWhiteSpace(Model.StoreDescription) ? "Перевірений продавець Marketplace" : Model.StoreDescription)</p>
+                </div>
+                <span class="product-seller__verified" title="Перевірений продавець" aria-label="Перевірений продавець">✓</span>
+            </section>
+        </section>
     </article>
+
+    <div class="product-information">
+        <section class="product-content-card product-description-card">
+            <span class="product-section-kicker">Про товар</span>
+            <h2>Опис</h2>
+            <p>@Model.Description</p>
+            <div class="product-benefits">
+                <div><span aria-hidden="true">✓</span><p><strong>Перевірена наявність</strong>Актуальний залишок синхронізований із каталогом.</p></div>
+                <div><span aria-hidden="true">↺</span><p><strong>Зручне повернення</strong>Зрозумілий процес повернення після покупки.</p></div>
+                <div><span aria-hidden="true">→</span><p><strong>Контроль доставки</strong>Відстежуйте шлях замовлення в особистому кабінеті.</p></div>
+            </div>
+        </section>
+
+        <section class="product-content-card product-specifications">
+            <span class="product-section-kicker">Деталі</span>
+            <h2>Характеристики</h2>
+            <dl>
+                <div><dt>Категорія</dt><dd>@Model.CategoryName</dd></div>
+                <div><dt>Продавець</dt><dd>@Model.StoreName</dd></div>
+                <div><dt>Наявність</dt><dd>@Model.Quantity шт.</dd></div>
+                <div><dt>Код товару</dt><dd>@productCode</dd></div>
+                <div><dt>Стан</dt><dd>Новий товар</dd></div>
+            </dl>
+        </section>
+    </div>
+
+    @if (Model.RelatedProducts.Count > 0)
+    {
+        <section class="related-products" aria-labelledby="related-title">
+            <div class="related-products__heading">
+                <div>
+                    <span class="product-section-kicker">Може сподобатися</span>
+                    <h2 id="related-title">Схожі товари</h2>
+                </div>
+                <a asp-action="Index">Переглянути каталог <span aria-hidden="true">→</span></a>
+            </div>
+
+            <div class="related-products__grid">
+                @foreach (var related in Model.RelatedProducts)
+                {
+                    var relatedInitial = string.IsNullOrWhiteSpace(related.Name) ? "M" : related.Name[..1].ToUpperInvariant();
+                    <article class="related-card">
+                        <a asp-action="Details" asp-route-id="@related.Id" class="related-card__media" aria-label="Переглянути @related.Name">
+                            @if (!string.IsNullOrWhiteSpace(related.MainImageUrl))
+                            {
+                                <img src="@related.MainImageUrl" alt="@related.Name" loading="lazy" />
+                            }
+                            else
+                            {
+                                <span aria-hidden="true">@relatedInitial</span>
+                            }
+                            <small>В наявності</small>
+                        </a>
+                        <div class="related-card__body">
+                            <span>@related.CategoryName</span>
+                            <a asp-action="Details" asp-route-id="@related.Id">@related.Name</a>
+                            <strong>@related.Price.ToString("N2") ₴</strong>
+                        </div>
+                    </article>
+                }
+            </div>
+        </section>
+    }
 </div>
+
+@section Scripts {
+    <script src="~/js/product-details.js" asp-append-version="true"></script>
+}

@@ -17,4 +17,38 @@
             toggle.setAttribute("aria-pressed", shouldShow.toString());
         });
     });
+
+    const strengthInputs = document.querySelectorAll("[data-password-strength]");
+
+    const calculateStrength = (password) => {
+        if (!password) return { score: 0, label: "Не вказано", state: "empty" };
+
+        let score = 0;
+        if (password.length >= 8) score += 1;
+        if (password.length >= 12) score += 1;
+        if (/[a-zа-яіїєґ]/u.test(password) && /[A-ZА-ЯІЇЄҐ]/u.test(password)) score += 1;
+        if (/\d/.test(password)) score += 1;
+        if (/[^\p{L}\p{N}\s]/u.test(password)) score += 1;
+
+        if (score <= 2) return { score: 1, label: "Слабкий", state: "weak" };
+        if (score <= 4) return { score: 2, label: "Середній", state: "medium" };
+        return { score: 3, label: "Надійний", state: "strong" };
+    };
+
+    strengthInputs.forEach((input) => {
+        const field = input.closest(".field");
+        const meter = field?.querySelector("[data-password-strength-meter]");
+        const label = meter?.querySelector("[data-password-strength-label]");
+        if (!meter || !label) return;
+
+        const updateStrength = () => {
+            const result = calculateStrength(input.value);
+            meter.dataset.strength = result.state;
+            meter.style.setProperty("--password-strength", `${(result.score / 3) * 100}%`);
+            label.textContent = result.label;
+        };
+
+        input.addEventListener("input", updateStrength);
+        updateStrength();
+    });
 })();

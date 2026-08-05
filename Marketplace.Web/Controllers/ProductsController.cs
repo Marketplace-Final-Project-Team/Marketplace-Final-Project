@@ -8,9 +8,6 @@ using Marketplace.Web.Models.Products;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Marketplace.Domain.Entities;
-using Marketplace.Domain.Interfaces;
-using Marketplace.BLL.Authorization;
 
 namespace Marketplace.Web.Controllers;
 
@@ -92,9 +89,12 @@ public class ProductsController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Create()
+    public async Task<IActionResult> Create(Guid? businessId)
     {
-        var model = new ProductCreateViewModel();
+        var model = new ProductCreateViewModel
+        {
+            BusinessId = businessId ?? Guid.Empty
+        };
         await PopulateCreateOptionsAsync(model);
         return View(model);
     }

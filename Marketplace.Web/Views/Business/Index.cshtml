@@ -1,0 +1,219 @@
+@model Marketplace.Web.Models.Businesses.BusinessDashboardViewModel
+
+@{
+    ViewData["Title"] = "Панель продавця";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/business.css" asp-append-version="true" />
+}
+
+<div class="seller-dashboard">
+    <header class="seller-dashboard__heading">
+        <div>
+            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Seller workspace</div>
+            <h1>Панель продавця</h1>
+            <p>Контролюйте асортимент, замовлення та стан магазину в одному робочому просторі.</p>
+        </div>
+        @if (Model.CanCreateBusiness)
+        {
+            <a asp-action="Create" class="seller-button seller-button--primary">
+                <span aria-hidden="true">＋</span> Створити бізнес
+            </a>
+        }
+    </header>
+
+    @if (TempData["Success"] is string success)
+    {
+        <div class="seller-alert" role="status">
+            <span aria-hidden="true">✓</span>
+            <p><strong>Успішно</strong>@success</p>
+        </div>
+    }
+
+    @if (Model.Businesses.Count == 0)
+    {
+        <section class="seller-empty">
+            <div class="seller-empty__visual" aria-hidden="true">
+                <span class="seller-empty__store">M</span>
+                <span class="seller-empty__product seller-empty__product--one"></span>
+                <span class="seller-empty__product seller-empty__product--two"></span>
+            </div>
+            <p class="seller-dashboard__eyebrow">Почніть продавати</p>
+            <h2>Створіть свій перший магазин</h2>
+            <p>Додайте інформацію про бізнес, завантажте логотип і переходьте до створення асортименту.</p>
+            <a asp-action="Create" class="seller-button seller-button--primary">
+                Створити бізнес <span aria-hidden="true">→</span>
+            </a>
+        </section>
+    }
+    else
+    {
+        <div class="seller-store-list">
+            @foreach (var business in Model.Businesses)
+            {
+                var statusClass = business.Status.ToString().ToLowerInvariant();
+                var statusLabel = business.Status switch
+                {
+                    Marketplace.Domain.Enums.BusinessStatus.Pending => "На перевірці",
+                    Marketplace.Domain.Enums.BusinessStatus.Active => "Активний",
+                    Marketplace.Domain.Enums.BusinessStatus.Suspended => "Призупинений",
+                    Marketplace.Domain.Enums.BusinessStatus.Rejected => "Відхилений",
+                    _ => business.Status.ToString()
+                };
+                var statusDescription = business.Status switch
+                {
+                    Marketplace.Domain.Enums.BusinessStatus.Pending => "Команда модерації перевіряє дані магазину. Ви вже можете підготувати асортимент.",
+                    Marketplace.Domain.Enums.BusinessStatus.Active => "Магазин працює та доступний покупцям. Усі основні функції активні.",
+                    Marketplace.Domain.Enums.BusinessStatus.Suspended => "Роботу магазину тимчасово призупинено. Перевірте повідомлення адміністратора.",
+                    Marketplace.Domain.Enums.BusinessStatus.Rejected => "Дані магазину потребують виправлення перед повторною перевіркою.",
+                    _ => "Перевірте поточний стан магазину."
+                };
+                var storeInitial = string.IsNullOrWhiteSpace(business.StoreName)
+                    ? "M"
+                    : business.StoreName[..1].ToUpperInvariant();
+                var activePercent = business.ProductCount == 0
+                    ? 0
+                    : (int)Math.Round(business.ActiveProductCount * 100d / business.ProductCount);
+                var inStockCount = Math.Max(0, business.ProductCount - business.OutOfStockProductCount);
+
+                <article class="seller-store">
+                    <div class="seller-store__cover">
+                        @if (!string.IsNullOrWhiteSpace(business.BannerUrl))
+                        {
+                            <img src="@business.BannerUrl" alt="Банер магазину @business.StoreName" />
+                        }
+                        <div class="seller-store__cover-pattern" aria-hidden="true"></div>
+                        <div class="seller-store__cover-topline">
+                            <span class="seller-store__id">ID · @business.Id.ToString()[..8].ToUpperInvariant()</span>
+                            <span class="seller-status seller-status--@statusClass">
+                                <span aria-hidden="true"></span>@statusLabel
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="seller-store__content">
+                        <div class="seller-store__identity-row">
+                            <div class="seller-store__identity">
+                                @if (!string.IsNullOrWhiteSpace(business.LogoUrl))
+                                {
+                                    <img class="seller-store__logo" src="@business.LogoUrl" alt="Логотип магазину @business.StoreName" />
+                                }
+                                else
+                                {
+                                    <span class="seller-store__logo seller-store__logo--fallback" aria-hidden="true">@storeInitial</span>
+                                }
+                                <div>
+                                    <span class="seller-store__role">@(business.IsOwner ? "Ваш магазин" : "Командний доступ")</span>
+                                    <h2>@business.StoreName</h2>
+                                    <p>@business.Description</p>
+                                </div>
+                            </div>
+
+                            <div class="seller-store__primary-actions">
+                                <a asp-controller="Products"
+                                   asp-action="Create"
+                                   asp-route-businessId="@business.Id"
+                                   class="seller-button seller-button--primary">
+                                    <span aria-hidden="true">＋</span> Додати товар
+                                </a>
+                                <a asp-controller="Products"
+                                   asp-action="Index"
+                                   asp-route-businessId="@business.Id"
+                                   class="seller-button seller-button--secondary">
+                                    Відкрити товари <span aria-hidden="true">→</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="seller-state-note seller-state-note--@statusClass">
+                            <span class="seller-state-note__icon" aria-hidden="true">@(business.Status == Marketplace.Domain.Enums.BusinessStatus.Active ? "✓" : "i")</span>
+                            <p><strong>Статус: @statusLabel</strong>@statusDescription</p>
+                        </div>
+
+                        <section class="seller-kpis" aria-label="Основні показники магазину @business.StoreName">
+                            <div class="seller-kpi seller-kpi--blue">
+                                <span class="seller-kpi__icon" aria-hidden="true">▦</span>
+                                <div><span>Усього товарів</span><strong>@business.ProductCount</strong><small>@inStockCount у наявності</small></div>
+                            </div>
+                            <div class="seller-kpi seller-kpi--green">
+                                <span class="seller-kpi__icon" aria-hidden="true">✓</span>
+                                <div><span>Активні товари</span><strong>@business.ActiveProductCount</strong><small>@activePercent% асортименту</small></div>
+                            </div>
+                            <div class="seller-kpi seller-kpi--amber">
+                                <span class="seller-kpi__icon" aria-hidden="true">◷</span>
+                                <div><span>На модерації</span><strong>@business.PendingProductCount</strong><small>очікують перевірки</small></div>
+                            </div>
+                            <div class="seller-kpi seller-kpi--violet">
+                                <span class="seller-kpi__icon" aria-hidden="true">▣</span>
+                                <div><span>Замовлення</span><strong>@business.OrderCount</strong><small>@business.AwaitingOrderCount очікують дій</small></div>
+                            </div>
+                            <div class="seller-kpi seller-kpi--dark">
+                                <span class="seller-kpi__icon" aria-hidden="true">₴</span>
+                                <div><span>Оборот</span><strong>@business.Revenue.ToString("N0") ₴</strong><small>@business.SoldItemCount продано одиниць</small></div>
+                            </div>
+                        </section>
+
+                        <div class="seller-workspace-grid">
+                            <section class="seller-panel seller-panel--inventory">
+                                <div class="seller-panel__heading">
+                                    <div>
+                                        <span class="seller-panel__label">Асортимент</span>
+                                        <h3>Готовність каталогу</h3>
+                                    </div>
+                                    <strong>@activePercent%</strong>
+                                </div>
+                                <div class="seller-progress" role="progressbar" aria-label="Частка активних товарів" aria-valuenow="@activePercent" aria-valuemin="0" aria-valuemax="100">
+                                    <span style="width: @activePercent%"></span>
+                                </div>
+                                <div class="seller-inventory-summary">
+                                    <div><span>Активні</span><strong>@business.ActiveProductCount</strong></div>
+                                    <div><span>На модерації</span><strong>@business.PendingProductCount</strong></div>
+                                    <div class="@(business.OutOfStockProductCount > 0 ? "has-warning" : null)"><span>Немає в наявності</span><strong>@business.OutOfStockProductCount</strong></div>
+                                </div>
+                                @if (business.OutOfStockProductCount > 0)
+                                {
+                                    <p class="seller-panel__warning"><span aria-hidden="true">!</span> Поповніть залишки, щоб не втрачати продажі.</p>
+                                }
+                                else
+                                {
+                                    <p class="seller-panel__success"><span aria-hidden="true">✓</span> Усі товари мають актуальні залишки.</p>
+                                }
+                            </section>
+
+                            <section class="seller-panel seller-panel--orders">
+                                <span class="seller-panel__label">Замовлення</span>
+                                <h3>Активність магазину</h3>
+                                <div class="seller-order-highlight">
+                                    <strong>@business.AwaitingOrderCount</strong>
+                                    <span>очікують обробки</span>
+                                </div>
+                                <div class="seller-order-facts">
+                                    <div><span>Усього замовлень</span><strong>@business.OrderCount</strong></div>
+                                    <div><span>Продано товарів</span><strong>@business.SoldItemCount</strong></div>
+                                </div>
+                                <p>Детальна сторінка обробки замовлень з’явиться після підключення seller order flow.</p>
+                            </section>
+
+                            <aside class="seller-panel seller-panel--quick">
+                                <span class="seller-panel__label">Швидкі дії</span>
+                                <h3>Продовжити роботу</h3>
+                                <nav aria-label="Швидкі дії магазину @business.StoreName">
+                                    <a asp-controller="Products" asp-action="Create" asp-route-businessId="@business.Id">
+                                        <span aria-hidden="true">＋</span><div><strong>Новий товар</strong><small>Створити картку товару</small></div><b aria-hidden="true">→</b>
+                                    </a>
+                                    <a asp-controller="Products" asp-action="Index" asp-route-businessId="@business.Id">
+                                        <span aria-hidden="true">▦</span><div><strong>Асортимент</strong><small>Редагувати товари та залишки</small></div><b aria-hidden="true">→</b>
+                                    </a>
+                                    <a asp-controller="Catalog" asp-action="Index">
+                                        <span aria-hidden="true">◎</span><div><strong>Вітрина</strong><small>Переглянути каталог покупця</small></div><b aria-hidden="true">→</b>
+                                    </a>
+                                </nav>
+                            </aside>
+                        </div>
+                    </div>
+                </article>
+            }
+        </div>
+    }
+</div>

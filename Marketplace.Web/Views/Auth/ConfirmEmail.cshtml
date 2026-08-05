@@ -1,7 +1,41 @@
-﻿@{
-
+@{
+    var succeeded = ViewBag.Succeeded is bool value && value;
+    var message = ViewBag.Message as string ?? "Не вдалося підтвердити електронну пошту.";
+    ViewData["Title"] = succeeded ? "Email підтверджено" : "Помилка підтвердження";
 }
 
-<div class="d-flex align-items-center justify-content-center">
-    <p>@ViewBag.Message</p>
-</div>
+<section class="auth-card auth-card--status" aria-labelledby="confirmation-title">
+    <div class="status-mark @(succeeded ? "status-mark--success" : "status-mark--error")" aria-hidden="true">
+        @(succeeded ? "✓" : "!")
+    </div>
+    <p class="auth-kicker @(succeeded ? "auth-kicker--success" : "auth-kicker--error")">
+        @(succeeded ? "Підтверджено" : "Посилання не спрацювало")
+    </p>
+    <h2 id="confirmation-title">
+        @(succeeded ? "Електронну пошту підтверджено" : "Не вдалося підтвердити email")
+    </h2>
+    <p class="status-copy">@message</p>
+
+    @if (succeeded)
+    {
+        <div class="auth-success-panel">
+            <span aria-hidden="true">✓</span>
+            <p><strong>Акаунт готовий до роботи</strong>Тепер ви можете входити, купувати товари та створювати власний магазин.</p>
+        </div>
+        <div class="auth-status-actions">
+            <a asp-action="SignIn" class="button button--primary">Увійти до акаунта <span aria-hidden="true">→</span></a>
+            <a asp-controller="Home" asp-action="Index" class="button button--secondary">На головну</a>
+        </div>
+    }
+    else
+    {
+        <div class="auth-error-panel">
+            <span aria-hidden="true">!</span>
+            <p><strong>Що могло статися?</strong>Посилання пошкоджене, уже використане або термін його дії завершився.</p>
+        </div>
+        <div class="auth-status-actions">
+            <a asp-action="SignUp" class="button button--primary">Створити акаунт ще раз <span aria-hidden="true">→</span></a>
+            <a asp-action="SignIn" class="button button--secondary">Повернутися до входу</a>
+        </div>
+    }
+</section>

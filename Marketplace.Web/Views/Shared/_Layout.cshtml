@@ -48,7 +48,7 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="Index">Замовлення</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Business" asp-action="Create">Створити бізнес</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Business" asp-action="Index">Панель продавця</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Products" asp-action="Index">Мої товари</a>
@@ -58,16 +58,32 @@
                     <ul class="navbar-nav">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <li class="nav-item d-flex align-items-center">
-                                <span class="nav-user-chip" title="@fullUserName">
+                            <li class="nav-item dropdown d-flex align-items-center">
+                                <button class="nav-user-chip dropdown-toggle"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                        title="@fullUserName">
                                     <span class="nav-user-chip__avatar" aria-hidden="true">@userInitial</span>
                                     <span class="nav-user-chip__name">@compactUserName</span>
-                                </span>
-                            </li>
-                            <li class="nav-item">
-                                <form asp-controller="Auth" asp-action="Logout" method="post">
-                                    <button type="submit" class="nav-link btn btn-link text-dark nav-logout">Вийти</button>
-                                </form>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end nav-user-menu">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Profile" asp-action="Index">Мій профіль</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Order" asp-action="Index">Мої замовлення</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Products" asp-action="Index">Мої товари</a>
+                                    </li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <form asp-controller="Auth" asp-action="Logout" method="post">
+                                            <button type="submit" class="dropdown-item nav-user-menu__logout">Вийти</button>
+                                        </form>
+                                    </li>
+                                </ul>
                             </li>
                         }
                         else
