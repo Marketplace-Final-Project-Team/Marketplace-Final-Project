@@ -20,6 +20,9 @@ namespace Marketplace.DAL.Data
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Address> Addresses { get; set; }
 
+        public DbSet<Wishlist> Wishlists { get; set; }
+        public DbSet<WishlistItem> WishlistItems { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -35,6 +38,9 @@ namespace Marketplace.DAL.Data
             builder.Entity<Order>().HasQueryFilter(o => !o.IsDeleted);
             builder.Entity<OrderItem>().HasQueryFilter(oi => !oi.IsDeleted);
             builder.Entity<Address>().HasQueryFilter(a => !a.IsDeleted);
+            builder.Entity<Wishlist>().HasQueryFilter(w => !w.IsDeleted);
+            builder.Entity<WishlistItem>().HasQueryFilter(wi => !wi.IsDeleted);
+
 
             builder.Entity<Business>()
                 .HasOne(b => b.Owner)
@@ -114,9 +120,28 @@ namespace Marketplace.DAL.Data
                 .HasForeignKey(a => a.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Entity<Wishlist>()
+                .HasOne(w => w.User)
+                .WithMany(u => u.Wishlists)
+                .HasForeignKey(w => w.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<WishlistItem>()
+                .HasOne(wi => wi.Wishlist)
+                .WithMany(w => w.WishlistItems)
+                .HasForeignKey(wi => wi.WishlistId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<WishlistItem>()
+                .HasOne(wi => wi.Product)
+                .WithMany()
+                .HasForeignKey(wi => wi.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<Product>().Navigation(p => p.Category).AutoInclude();
             builder.Entity<Product>().Navigation(p => p.Images).AutoInclude();
             builder.Entity<Product>().Navigation(p => p.Business).AutoInclude();
+            builder.Entity<Wishlist>().Navigation(w => w.WishlistItems).AutoInclude();
         }
 
         public override int SaveChanges()

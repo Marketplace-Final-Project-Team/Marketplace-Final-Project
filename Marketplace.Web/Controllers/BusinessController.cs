@@ -1,6 +1,7 @@
 ﻿using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.Domain.Entities;
+using Marketplace.Domain.Enums;
 using Marketplace.Web.Models;
 using Marketplace.Web.Models.Businesses;
 using Microsoft.AspNetCore.Authorization;
@@ -17,19 +18,22 @@ namespace Marketplace.Web.Controllers
         private readonly IProductService _productService;
         private readonly IOrderService _orderService;
         private readonly UserManager<User> _userManager;
+        private readonly IEmailSender _emailSender;
 
         public BusinessController(
             IBusinessService businessService,
             IBusinessAccessService businessAccessService,
             IProductService productService,
             IOrderService orderService,
-            UserManager<User> userManager)
+            UserManager<User> userManager,
+            IEmailSender emailSender)
         {
             _businessService = businessService;
             _businessAccessService = businessAccessService;
             _productService = productService;
             _orderService = orderService;
             _userManager = userManager;
+            _emailSender = emailSender;
         }
 
         [HttpGet]
@@ -109,6 +113,70 @@ namespace Marketplace.Web.Controllers
 
             TempData["Success"] = "Бізнес створено та відправлено на перевірку.";
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet("business/{businessId}/add-member")]
+        public IActionResult AddMember(Guid businessId) 
+        {
+            var model = new BusinessMemberCreateViewModel { BusinessId = businessId };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddMember(BusinessMemberCreateViewModel model) 
+        {
+            if (!ModelState.IsValid) 
+            {
+                return View(model);
+            }
+
+            var result = await _businessService.AddBusinessMember(new BusinessMemberCreateDto
+            {
+                BusinessId = model.BusinessId,
+                UserId = model.EmployeeId,
+                Role = model.Role
+            });
+
+            if (!result.Succeeded) 
+            {
+                ModelState.AddModelError("", result.Message);
+                return View(model);
+            }
+
+            var approveLink = Url.Action("ApproveMembership", "Business", new { businessId = model.BusinessId, userId = model.EmployeeId, token = result.Token, role = model.Role }, Request.Scheme);
+            var denyLink = Url.Action("DenyMembership", "Business", new { businessId = model.BusinessId, userId = model.EmployeeId, token = result.Token, role = model.Role }, Request.Scheme);
+
+            await _emailSender.SendEmailAsync(result.Email!, "Запит на членство",
+                $"Вам було надіслано запит на членство: " +
+                $"<a href='{approveLink}'>Прийняти</a>" +
+                $"<a href='{denyLink}'>Відхилити</a>");
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> ApproveMembership(Guid businessId, string userId, string token, BusinessMemberRole role)
+        {
+            var result = await _businessService.ApproveMembership(userId, businessId, token, role);
+            return RedirectToAction("MembershipResult", new { message = result.Message });
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> DenyMembership(Guid businessId, string userId, string token, BusinessMemberRole role)
+        {
+            var result = await _businessService.DenyMembership(userId, businessId, token, role);
+            return RedirectToAction("MembershipResult", new { message = result.Message });
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult MembershipResult(string message)
+        {
+            ViewBag.Message = message;
+            return View();
         }
     }
 }

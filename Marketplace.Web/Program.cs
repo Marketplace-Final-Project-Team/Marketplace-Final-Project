@@ -10,6 +10,7 @@ using Marketplace.Domain.Entities;
 using Marketplace.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
+using Marketplace.BLL.Configs;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,11 +19,11 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    if (builder.Environment.IsDevelopment())
-    {
-        options.UseInMemoryDatabase("MarketplaceFrontendDb");
-        return;
-    }
+    //if (builder.Environment.IsDevelopment())
+    //{
+    //    options.UseInMemoryDatabase("MarketplaceFrontendDb");
+    //    return;
+    //}
 
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
@@ -57,6 +58,10 @@ var cloudinaryAccount = new Account(
 
 builder.Services.AddSingleton(new Cloudinary(cloudinaryAccount));
 
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
+builder.Services.AddScoped<IBusinessRepository, BusinessRepository>();
+
 builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -64,10 +69,20 @@ builder.Services.AddScoped<IBusinessService, BusinessService>();
 builder.Services.AddScoped<IBusinessAccessService, BusinessAccessService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IWishlistService, WishlistService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
+builder.Services.AddScoped<IAdminService, AdminService>();
+
+
+// LiqPay configuration
+
+builder.Services.Configure<LiqPayOptions>(builder.Configuration.GetSection("LiqPay"));
+builder.Services.AddScoped<IPaymentService, LiqPayPaymentService>();
+
+// Delivery API configuration
+builder.Services.Configure<DeliveryApiOptions>(builder.Configuration.GetSection("DeliveryApi"));
+builder.Services.AddScoped<IDeliveryProviderService, DeliveryProviderService>();
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<IEmailSender, EmailSender>();
