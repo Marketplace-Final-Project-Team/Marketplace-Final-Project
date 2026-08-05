@@ -19,6 +19,7 @@ namespace Marketplace.DAL.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Address> Addresses { get; set; }
+        public DbSet<Review> Reviews { get; set; }
 
         public DbSet<Wishlist> Wishlists { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
@@ -40,6 +41,7 @@ namespace Marketplace.DAL.Data
             builder.Entity<Address>().HasQueryFilter(a => !a.IsDeleted);
             builder.Entity<Wishlist>().HasQueryFilter(w => !w.IsDeleted);
             builder.Entity<WishlistItem>().HasQueryFilter(wi => !wi.IsDeleted);
+            builder.Entity<Review>().HasQueryFilter(r => !r.IsDeleted);
 
 
             builder.Entity<Business>()
@@ -138,10 +140,23 @@ namespace Marketplace.DAL.Data
                 .HasForeignKey(wi => wi.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<Review>()
+                .HasOne(r => r.User)
+                .WithMany()
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Review>()
+                .HasOne(r => r.Product)
+                .WithMany()
+                .HasForeignKey(r => r.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.Entity<Product>().Navigation(p => p.Category).AutoInclude();
             builder.Entity<Product>().Navigation(p => p.Images).AutoInclude();
             builder.Entity<Product>().Navigation(p => p.Business).AutoInclude();
             builder.Entity<Wishlist>().Navigation(w => w.WishlistItems).AutoInclude();
+            builder.Entity<Review>().Navigation(r => r.User).AutoInclude();
         }
 
         public override int SaveChanges()
