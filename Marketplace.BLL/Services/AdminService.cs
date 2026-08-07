@@ -26,44 +26,130 @@ namespace Marketplace.BLL.Services
             _context = context;
         }
 
-        public async Task<IReadOnlyList<ProductAdminDto>> GetAllProducts()
+        public async Task<PagedResult<ProductAdminDto>> GetProductsAsync(ProductAdminQueryDto query)
         {
-            var products = await _productRepo.GetAllAsync();
+            var productsQuery = _productRepo.GetQueryable();
 
-            return products.Select(p => new ProductAdminDto
+            if(query.CategoryId != null)
+            {
+                productsQuery = productsQuery.Where(p => p.CategoryId == query.CategoryId);
+            }
+
+            if(query.Search != null)
+            {
+                productsQuery = productsQuery.Where(p => p.Name.Contains(query.Search));
+            }
+
+            switch (query.SortOption)
+            {
+                case ProductSortOption.PriceAsc:
+                    productsQuery = productsQuery.OrderBy(p => p.Price);
+                    break;
+                case ProductSortOption.PriceDesc:
+                    productsQuery = productsQuery.OrderByDescending(p => p.Price);
+                    break;
+                case ProductSortOption.CreatedAtAsc:
+                    productsQuery = productsQuery.OrderBy(p => p.CreatedAt);
+                    break;
+                case ProductSortOption.CreatedAtDesc:
+                    productsQuery = productsQuery.OrderByDescending(p => p.CreatedAt);
+                    break;
+                case ProductSortOption.PopularityAsc:
+                    productsQuery = productsQuery.OrderBy(p => p.OrderItems.Sum(oi => oi.Quantity));
+                    break;
+                case ProductSortOption.PopularityDesc:
+                    productsQuery = productsQuery.OrderByDescending(p => p.OrderItems.Sum(oi => oi.Quantity));
+                    break;
+            }
+
+            var totalCount = await productsQuery.CountAsync();
+
+            var items = await productsQuery.Skip((query.Pagination.Page - 1) * query.Pagination.PageSize).Take(query.Pagination.PageSize).Select(p => new ProductAdminDto
             {
                 Id = p.Id,
                 Name = p.Name,
                 ImageUrl = p.MainImageUrl,
                 Price = p.Price,
                 Status = p.Status
-            }).ToList();
+            }).ToListAsync();
+
+            return new PagedResult<ProductAdminDto>
+            {
+                Items = items,
+                Page = query.Pagination.Page,
+                PageSize = query.Pagination.PageSize,
+                TotalCount = totalCount
+            };
         }
 
-        public async Task<IReadOnlyList<UserAdminDto>> GetAllUsers()
+        public async Task<PagedResult<UserAdminDto>> GetUsersAsync(UserAdminQueryDto query)
         {
-            var users = await _userManager.Users.ToListAsync();
+            var usersQuery = _userManager.Users;
 
-            return users.Select(u => new UserAdminDto
+            if (query.Status != null)
+            {
+                usersQuery = usersQuery.Where(u => u.Status == query.Status);
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                usersQuery = usersQuery.Where(u => u.Email!.Contains(query.Search) || u.UserName!.Contains(query.Search));
+            }
+
+            usersQuery = query.SortDescending == true ? usersQuery.OrderByDescending(u => u.CreatedAt) : usersQuery.OrderBy(u => u.CreatedAt);
+
+            var totalCount = await usersQuery.CountAsync();
+
+            var items = await usersQuery.Skip((query.Pagination.Page - 1) * query.Pagination.PageSize).Take(query.Pagination.PageSize).Select(u => new UserAdminDto
             {
                 Id = u.Id,
                 Email = u.Email!,
                 Status = u.Status
-            }).ToList();
+            }).ToListAsync();
+
+            return new PagedResult<UserAdminDto>
+            {
+                Items = items,
+                Page = query.Pagination.Page,
+                PageSize = query.Pagination.PageSize,
+                TotalCount = totalCount
+            };
         }
 
-        public async Task<IReadOnlyList<BusinessAdminDto>> GetAllBusinesses()
+        public async Task<PagedResult<BusinessAdminDto>> GetBusinessesAsync(BusinessAdminQueryParams query)
         {
-            var businesses = await _businessRepo.GetBusinessesWithOwnerAsync();
+            var businessesQuery = _businessRepo.GetQueryable();
 
-            return businesses.Select(b => new BusinessAdminDto
+            if(query.Status != null) 
             {
-                Id = b.Id,
-                Name = b.StoreName,
-                LogoUrl = b.LogoUrl,
-                Owner = b.Owner.Email!,
-                Status = b.Status
-            }).ToList();
+                businessesQuery = businessesQuery.Where(b => b.Status == query.Status);
+            }
+
+            if (!string.IsNullOrEmpty(query.Search))
+            {
+                businessesQuery = businessesQuery.Where(b => b.StoreName.Contains(query.Search));
+            }
+
+            businessesQuery = query.SortDescending == true ? businessesQuery.OrderByDescending(b => b.CreatedAt) : businessesQuery.OrderBy(b => b.CreatedAt);
+
+            var totalCount = await businessesQuery.CountAsync();
+
+            var items = await businessesQuery.Skip((query.Pagination.Page - 1) * query.Pagination.PageSize).Take(query.Pagination.PageSize).Select(i => new BusinessAdminDto
+            {
+                Id = i.Id,
+                Name = i.StoreName,
+                LogoUrl = i.LogoUrl,
+                Owner = i.Owner.Email!,
+                Status = i.Status
+            }).ToListAsync();
+
+            return new PagedResult<BusinessAdminDto> 
+            {
+                Items = items,
+                Page = query.Pagination.Page,
+                PageSize = query.Pagination.PageSize,
+                TotalCount = totalCount,
+            };
         }
 
         public async Task<ServiceResult> ChangeProductStatus(Guid productId, ProductStatus productStatus)
