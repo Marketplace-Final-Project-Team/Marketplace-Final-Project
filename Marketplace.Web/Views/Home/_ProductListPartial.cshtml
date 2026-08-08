@@ -1,0 +1,103 @@
+@model Marketplace.Web.Models.CatalogIndexViewModel
+
+<div class="home-section__heading align-items-end mb-4">
+    <div>
+        <span class="home-section__kicker">Каталог</span>
+        <h2>Усі товари</h2>
+    </div>
+
+
+    <form method="get" id="sortForm" class="d-flex align-items-center gap-2">
+        <input type="hidden" name="search" value="@Model.Search" />
+        @if (Model.CategoryId.HasValue)
+        {
+            <input type="hidden" name="categoryId" value="@Model.CategoryId" />
+        }
+        <label for="sortBySelect" class="text-muted small text-nowrap">Сортування:</label>
+        <select id="sortBySelect" name="sortBy" class="form-select form-select-sm js-async-sort" style="width: auto;">
+            <option value="" selected="@(string.IsNullOrEmpty(Model.SortBy))">Спочатку нові</option>
+            <option value="price_asc" selected="@(Model.SortBy == "price_asc")">Дешевші</option>
+            <option value="price_desc" selected="@(Model.SortBy == "price_desc")">Дорожчі</option>
+        </select>
+    </form>
+</div>
+
+@if (Model.Products == null || Model.Products.Count == 0)
+{
+    <div class="text-center py-5">
+        <div class="fs-1 text-muted mb-2">□</div>
+        <h4>Товарів не знайдено</h4>
+        <p class="text-muted">Спробуйте змінити пошуковий запит або обрати іншу категорію.</p>
+        <a href="javascript:void(0)" class="home-button home-button--ghost mt-2 js-reset-filters">Скинути всі фільтри</a>
+    </div>
+}
+else
+{
+    <div class="home-products">
+        @for (var index = 0; index < Model.Products.Count; index++)
+        {
+            var product = Model.Products[index];
+            var colorClass = index % 3 == 0 ? "blue" : index % 3 == 1 ? "violet" : "orange";
+             <article class="home-product">
+                <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="home-product__media home-product__media--@colorClass">
+                    @if (!string.IsNullOrWhiteSpace(product.MainImageUrl))
+                    {
+                        <img src="@product.MainImageUrl" alt="@product.Name" />
+                    }
+                    else
+                    {
+                        <span>@product.Name[..1].ToUpperInvariant()</span>
+                    }
+                    <small>В наявності</small>
+                </a>
+                <div class="home-product__body">
+                    <div class="home-product__category">@(string.IsNullOrEmpty(product.CategoryName) ? "Без категорії" : product.CategoryName)</div>
+                    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="home-product__name">@product.Name</a>
+                                            <div class="home-product__bottom">
+                                               <div class="home-product__price" style="display: flex; flex-direction: column; justify-content: flex-end; min-height: 40px;">
+                            @if (product.HasDiscount && product.OriginalPrice.HasValue)
+                            {
+                                <span style="font-size: 0.85rem; color: #8892b0; text-decoration: line-through; line-height: 1.1; font-weight: 500;">
+                                    @product.OriginalPrice.Value.ToString("N0") ₴
+                                </span>
+                                <span style="font-size: 1.2rem; font-weight: 700; color: #f44336; line-height: 1.2;">
+                                    @product.Price.ToString("N0") ₴
+                                </span>
+                            }
+                            else
+                            {
+                                <span style="font-size: 1.2rem; font-weight: 700; color: #0f172a; line-height: 1.2;">
+                                    @product.Price.ToString("N0") ₴
+                                </span>
+                            }
+                        </div>
+                        <form asp-controller="Cart" asp-action="Add" method="post">
+                            <input type="hidden" name="productId" value="@product.Id" />
+                            <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                            <button type="submit" aria-label="Додати @product.Name до кошика">+</button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+        }
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <div class="d-flex justify-content-center mt-5">
+            <ul class="pagination">
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.Page ? "active" : "")">
+                        <a class="page-link js-async-link"
+                           asp-action="Index"
+                           asp-route-search="@Model.Search"
+                           asp-route-categoryId="@Model.CategoryId"
+                           asp-route-sortBy="@Model.SortBy"
+                           asp-route-page="@i">@i</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+}

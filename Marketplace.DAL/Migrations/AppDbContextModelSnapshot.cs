@@ -228,6 +228,40 @@ namespace Marketplace.DAL.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("Marketplace.Domain.Entities.Discount", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Percent")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("Discounts");
+                });
+
             modelBuilder.Entity("Marketplace.Domain.Entities.Order", b =>
                 {
                     b.Property<Guid>("Id")
@@ -775,6 +809,17 @@ namespace Marketplace.DAL.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("Marketplace.Domain.Entities.Discount", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.Product", "Product")
+                        .WithMany("Discounts")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Marketplace.Domain.Entities.Order", b =>
                 {
                     b.HasOne("Marketplace.Domain.Entities.User", "User")
@@ -967,6 +1012,8 @@ namespace Marketplace.DAL.Migrations
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Product", b =>
                 {
+                    b.Navigation("Discounts");
+
                     b.Navigation("Images");
 
                     b.Navigation("Reviews");

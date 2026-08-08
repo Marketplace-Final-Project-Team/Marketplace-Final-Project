@@ -1,6 +1,10 @@
+using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
+using Marketplace.Domain.Entities;
+using Marketplace.Domain.Interfaces;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Diagnostics;
 
 namespace Marketplace.Web.Controllers
@@ -8,31 +12,61 @@ namespace Marketplace.Web.Controllers
     public class HomeController : Controller
     {
         private readonly IProductService _productService;
+        private readonly IGenericRepository<Category> _categoryRepository;
 
-        public HomeController(IProductService productService)
+        public HomeController(
+            IProductService productService,
+            IGenericRepository<Category> categoryRepository)
         {
             _productService = productService;
+            _categoryRepository = categoryRepository;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? search, Guid? categoryId, string? sortBy, int page = 1)
         {
-            var products = await _productService.GetCatalogAsync();
-            var featuredProducts = products
-                .Take(3)
-                .Select(product => new CatalogProductViewModel
-                {
-                    Id = product.Id,
-                    Name = product.Name,
-                    Description = product.Description,
-                    Price = product.Price,
-                    Quantity = product.Quantity,
-                    MainImageUrl = product.MainImageUrl,
-                    CategoryName = product.Category?.Name ?? "Без категорії",
-                    StoreName = product.Business?.StoreName ?? "Marketplace"
-                })
-                .ToList();
+            var query = new ProductCatalogQueryDto
+            {
+                Search = search,
+                CategoryId = categoryId,
+                SortBy = sortBy,
+                Page = page <= 0 ? 1 : page,
+                PageSize = 12
+            };
 
-            return View(featuredProducts);
+            var result = await _productService.GetCatalogAsync(query);
+            var categories = await _categoryRepository.GetAllAsync();
+
+            var model = new CatalogIndexViewModel
+            {
+                Products = result.Items.Select(p => p.ToCatalogProductViewModel()).ToList(),
+                Categories = categories.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name,
+                    Selected = c.Id == categoryId
+                }),
+                Search = search,
+                CategoryId = categoryId,
+                SortBy = sortBy,
+                Page = result.Page,
+                TotalPages = result.TotalPages
+            };
+
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_ProductListPartial", model);
+            }
+
+            return View(model);
+        }
+
+   
+        [HttpGet]
+        public async Task<IActionResult> AutoComplete(string? term)
+        {
+            var suggestions = await _productService.GetSearchSuggestionsAsync(term);
+            var names = suggestions.Select(s => s.Name).Distinct().ToList();
+            return Json(names);
         }
 
         public IActionResult Privacy()

@@ -71,11 +71,19 @@ namespace Marketplace.BLL.Services
                     return new OrderResultDto { Succeeded = false, Message = "Недостатньо товару на складі." };
                 }
 
+                var now = DateTime.UtcNow;
+                var activeDiscount = cartItem.Product.Discounts?
+                    .FirstOrDefault(d => d.StartDate <= now && d.EndDate >= now);
+
+                var unitPrice = activeDiscount != null
+                    ? cartItem.Product.Price - (cartItem.Product.Price * activeDiscount.Percent / 100m)
+                    : cartItem.Product.Price;
+
                 var orderItem = new OrderItem
                 {
                     ProductId = cartItem.ProductId,
                     ProductName = cartItem.Product.Name,
-                    UnitPrice = cartItem.Product.Price,
+                    UnitPrice = unitPrice,
                     Quantity = cartItem.Quantity
                 };
 

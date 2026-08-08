@@ -16,7 +16,9 @@ public class CatalogProductViewModel
     public DateTime EstimatedDeliveryStart { get; set; }
     public DateTime EstimatedDeliveryEnd { get; set; }
     public List<CatalogRelatedProductViewModel> RelatedProducts { get; set; } = new();
-
+    public decimal? OriginalPrice { get; set; }   
+    public int? DiscountPercent { get; set; }     
+    public bool HasDiscount => OriginalPrice.HasValue && DiscountPercent.HasValue;
     public IReadOnlyList<string> GalleryImageUrls => new[] { MainImageUrl }
         .Concat(AdditionalImageUrls)
         .Where(url => !string.IsNullOrWhiteSpace(url))

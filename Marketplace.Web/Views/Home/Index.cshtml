@@ -1,4 +1,4 @@
-@model IReadOnlyList<Marketplace.Web.Models.CatalogProductViewModel>
+@model Marketplace.Web.Models.CatalogIndexViewModel
 
 @{
     ViewData["Title"] = "Головна";
@@ -9,20 +9,37 @@
 }
 
 <div class="home-page">
+    <!-- HERO СЕКЦІЯ -->
     <section class="home-hero">
         <div class="home-hero__content">
             <div class="home-pill"><span></span> Покупки без зайвих кроків</div>
             <h1>Усе потрібне — <em>в одному місці</em></h1>
             <p>Знаходьте товари для роботи, дому й відпочинку. Порівнюйте пропозиції, додавайте до кошика та стежте за доставкою.</p>
 
-            <form asp-controller="Catalog" asp-action="Index" method="get" class="home-search" role="search">
+            <form asp-controller="Home" asp-action="Index" method="get" class="home-search" role="search" style="position: relative;">
                 <span aria-hidden="true">⌕</span>
-                <input name="search" placeholder="Що ви шукаєте?" aria-label="Пошук товарів" />
+                <input name="search" 
+                       id="searchInput" 
+                       value="@Model.Search" 
+                       placeholder="Що ви шукаєте?" 
+                       aria-label="Пошук товарів" 
+                       autocomplete="off" />
+
+                @if (Model.CategoryId.HasValue)
+                {
+                    <input type="hidden" name="categoryId" value="@Model.CategoryId" />
+                }
+                @if (!string.IsNullOrEmpty(Model.SortBy))
+                {
+                    <input type="hidden" name="sortBy" value="@Model.SortBy" />
+                }
                 <button type="submit">Знайти</button>
+
+                <ul id="searchSuggestions" class="search-suggestions" style="display: none;"></ul>
             </form>
 
             <div class="home-hero__actions">
-                <a asp-controller="Catalog" asp-action="Index" class="home-button home-button--primary">Перейти до каталогу <span>→</span></a>
+                <a href="#catalog-products" class="home-button home-button--primary">Перейти до товарів <span>↓</span></a>
                 @if (User.Identity?.IsAuthenticated != true)
                 {
                     <a asp-controller="Auth" asp-action="SignUp" class="home-button home-button--ghost">Створити акаунт</a>
@@ -59,7 +76,7 @@
                 <div class="visual-main-card__copy">
                     <small>Техніка для щоденних справ</small>
                     <strong>Знижки до 30%</strong>
-                    <a asp-controller="Catalog" asp-action="Index">Переглянути пропозиції →</a>
+                    <a href="#catalog-products">Переглянути пропозиції →</a>
                 </div>
             </div>
 
@@ -74,6 +91,7 @@
         </div>
     </section>
 
+    <!-- ПЕРЕВАГИ -->
     <section class="home-benefits" aria-label="Переваги маркетплейсу">
         <div><span>✓</span><p><strong>Перевірені товари</strong><small>зрозумілий статус наявності</small></p></div>
         <div><span>↺</span><p><strong>Просте повернення</strong><small>прозорий процес покупки</small></p></div>
@@ -81,95 +99,43 @@
         <div><span>→</span><p><strong>Контроль доставки</strong><small>від замовлення до отримання</small></p></div>
     </section>
 
+    <!-- КАТЕГОРІЇ -->
     <section class="home-section">
         <div class="home-section__heading">
             <div>
                 <span class="home-section__kicker">Обирайте швидше</span>
                 <h2>Популярні категорії</h2>
             </div>
-            <a asp-controller="Catalog" asp-action="Index">Увесь каталог →</a>
+            @if (Model.CategoryId.HasValue)
+            {
+                <a asp-action="Index" class="text-primary js-reset-filters">Скинути фільтр категорій ✕</a>
+            }
         </div>
 
         <div class="category-grid">
-            <a asp-controller="Catalog" asp-action="Index" class="category-card category-card--blue">
+            <a asp-action="Index" asp-route-search="@Model.Search" asp-route-sortBy="@Model.SortBy" class="category-card category-card--blue @(!Model.CategoryId.HasValue ? "border border-2 border-primary" : "")">
                 <span class="category-card__icon">⌁</span>
-                <strong>Електроніка</strong>
-                <small>Техніка та гаджети</small>
+                <strong>Усі категорії</strong>
+                <small>Переглянути все</small>
             </a>
-            <a asp-controller="Catalog" asp-action="Index" class="category-card category-card--orange">
-                <span class="category-card__icon">⌂</span>
-                <strong>Для дому</strong>
-                <small>Комфорт щодня</small>
-            </a>
-            <a asp-controller="Catalog" asp-action="Index" class="category-card category-card--rose">
-                <span class="category-card__icon">◇</span>
-                <strong>Одяг</strong>
-                <small>Нові образи</small>
-            </a>
-            <a asp-controller="Catalog" asp-action="Index" class="category-card category-card--green">
-                <span class="category-card__icon">●</span>
-                <strong>Спорт</strong>
-                <small>Для активного життя</small>
-            </a>
-            <a asp-controller="Catalog" asp-action="Index" class="category-card category-card--violet">
-                <span class="category-card__icon">≡</span>
-                <strong>Книги</strong>
-                <small>Ідеї та історії</small>
-            </a>
-            <a asp-controller="Catalog" asp-action="Index" class="category-card category-card--yellow">
-                <span class="category-card__icon">✦</span>
-                <strong>Краса</strong>
-                <small>Турбота про себе</small>
-            </a>
+            @foreach (var cat in Model.Categories)
+            {
+                var isSelected = Model.CategoryId?.ToString() == cat.Value;
+                <a asp-action="Index" asp-route-categoryId="@cat.Value" asp-route-search="@Model.Search" asp-route-sortBy="@Model.SortBy" class="category-card category-card--violet @(isSelected ? "border border-2 border-primary" : "")">
+                    <span class="category-card__icon">⌂</span>
+                    <strong>@cat.Text</strong>
+                    <small>Категорія</small>
+                </a>
+            }
         </div>
     </section>
 
-    @if (Model.Count > 0)
-    {
-        <section class="home-section home-featured">
-            <div class="home-section__heading">
-                <div>
-                    <span class="home-section__kicker">Варто переглянути</span>
-                    <h2>Популярне зараз</h2>
-                </div>
-                <a asp-controller="Catalog" asp-action="Index">Дивитися більше →</a>
-            </div>
+    <!-- СЕКЦІЯ ТОВАРІВ -->
+    <section class="home-section home-featured" id="catalog-products">
+        @await Html.PartialAsync("_ProductListPartial", Model)
+    </section>
 
-            <div class="home-products">
-                @for (var index = 0; index < Model.Count; index++)
-                {
-                    var product = Model[index];
-                    var colorClass = index % 3 == 0 ? "blue" : index % 3 == 1 ? "violet" : "orange";
-                    <article class="home-product">
-                        <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="home-product__media home-product__media--@colorClass">
-                            @if (!string.IsNullOrWhiteSpace(product.MainImageUrl))
-                            {
-                                <img src="@product.MainImageUrl" alt="@product.Name" />
-                            }
-                            else
-                            {
-                                <span>@product.Name[..1].ToUpperInvariant()</span>
-                            }
-                            <small>В наявності</small>
-                        </a>
-                        <div class="home-product__body">
-                            <div class="home-product__category">@product.CategoryName</div>
-                            <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="home-product__name">@product.Name</a>
-                            <div class="home-product__bottom">
-                                <strong>@product.Price.ToString("N2") ₴</strong>
-                                <form asp-controller="Cart" asp-action="Add" method="post">
-                                    <input type="hidden" name="productId" value="@product.Id" />
-                                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                                    <button type="submit" aria-label="Додати @product.Name до кошика">+</button>
-                                </form>
-                            </div>
-                        </div>
-                    </article>
-                }
-            </div>
-        </section>
-    }
-
+    <!-- ПРОМО ДЛЯ ПРОДАВЦІВ -->
     <section class="home-promo">
         <div class="home-promo__content">
             <span class="home-section__kicker">Для продавців</span>
@@ -197,3 +163,143 @@
         </div>
     </section>
 </div>
+
+@section Scripts {
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.getElementById('catalog-products');
+        const searchInput = document.getElementById('searchInput');
+        const suggestionsBox = document.getElementById('searchSuggestions');
+        let debounceTimer;
+
+        function updateCategoryHighlight(targetUrl) {
+            const urlObj = new URL(targetUrl, window.location.origin);
+            const activeCategoryId = urlObj.searchParams.get('categoryId');
+
+            document.querySelectorAll('.category-card').forEach(card => {
+                const cardHref = card.getAttribute('href');
+                if (!cardHref) return;
+
+                const cardUrl = new URL(cardHref, window.location.origin);
+                const cardCategoryId = cardUrl.searchParams.get('categoryId');
+
+                const isSelected = (!activeCategoryId && !cardCategoryId) || 
+                                   (activeCategoryId && activeCategoryId === cardCategoryId);
+
+                if (isSelected) {
+                    card.classList.add('border', 'border-2', 'border-primary');
+                } else {
+                    card.classList.remove('border', 'border-2', 'border-primary');
+                }
+            });
+        }
+
+        async function loadProducts(url) {
+            try {
+                container.style.opacity = '0.5';
+
+                const response = await fetch(url, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
+                if (!response.ok) throw new Error('Помилка завантаження даних');
+
+                const html = await response.text();
+                container.innerHTML = html;
+
+                history.pushState(null, '', url);
+                updateCategoryHighlight(url);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                container.style.opacity = '1';
+            }
+        }
+
+        if (searchInput && suggestionsBox) {
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(debounceTimer);
+                const query = e.target.value.trim();
+
+                if (query.length < 2) {
+                    suggestionsBox.style.display = 'none';
+                    suggestionsBox.innerHTML = '';
+                    return;
+                }
+
+                debounceTimer = setTimeout(async () => {
+                    try {
+                        const response = await fetch(`/Home/AutoComplete?term=${encodeURIComponent(query)}`);
+                        const suggestions = await response.json();
+
+                        if (!suggestions || suggestions.length === 0) {
+                            suggestionsBox.style.display = 'none';
+                            return;
+                        }
+
+                        suggestionsBox.innerHTML = suggestions.map(item => {
+                            const regex = new RegExp(`(${query})`, 'gi');
+                            const highlighted = item.replace(regex, '<mark>$1</mark>');
+                            return `<li data-value="${item}">${highlighted}</li>`;
+                        }).join('');
+
+                        suggestionsBox.style.display = 'block';
+                    } catch (err) {
+                        console.error('Помилка автодоповнення:', err);
+                    }
+                }, 250);
+            });
+
+     
+            suggestionsBox.addEventListener('click', (e) => {
+            const item = e.target.closest('li');
+            if (item) {
+                searchInput.value = item.dataset.value;
+                suggestionsBox.style.display = 'none';
+        
+                const form = searchInput.closest('form');
+                const formData = new FormData(form);
+                const params = new URLSearchParams(formData).toString();
+                loadProducts(`${form.action}?${params}`);
+            }
+        });
+
+ 
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.home-search')) {
+                    suggestionsBox.style.display = 'none';
+                }
+            });
+        }
+
+
+        document.addEventListener('click', (e) => {
+            const link = e.target.closest('.category-card, .js-async-link');
+            if (link && link.getAttribute('href') && !link.getAttribute('href').startsWith('#')) {
+                e.preventDefault();
+                loadProducts(link.href);
+            }
+
+            if (e.target.closest('.js-reset-filters')) {
+                e.preventDefault();
+                loadProducts('@Url.Action("Index", "Home")');
+            }
+        });
+
+        document.addEventListener('change', (e) => {
+            if (e.target.classList.contains('js-async-sort')) {
+                const form = e.target.closest('form');
+                const formData = new FormData(form);
+                const params = new URLSearchParams(formData).toString();
+                const url = `${window.location.pathname}?${params}`;
+
+                loadProducts(url);
+            }
+        });
+
+        window.addEventListener('popstate', () => {
+            loadProducts(window.location.href);
+        });
+    });
+</script>
+}
