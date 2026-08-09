@@ -1,6 +1,8 @@
 ﻿using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
+using Marketplace.DAL.Data;
 using Marketplace.Domain.Entities;
+using Marketplace.Domain.Interfaces;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -12,12 +14,27 @@ namespace Marketplace.Web.Controllers
     public class ProfileController : Controller
     {
         private readonly IProfileService _profileService;
+        private readonly IOrderService _orderService;
+        private readonly IWishlistService _wishlistService;
+        private readonly IGenericRepository<Address> _addressRepository;
+        private readonly AppDbContext _context;
         private readonly UserManager<User> _userManager;
         private readonly IEmailSender _emailSender;
 
-        public ProfileController(IProfileService profileService, UserManager<User> userManager, IEmailSender emailSender)
+        public ProfileController(
+            IProfileService profileService,
+            IOrderService orderService,
+            IWishlistService wishlistService,
+            IGenericRepository<Address> addressRepository,
+            AppDbContext context,
+            UserManager<User> userManager,
+            IEmailSender emailSender)
         {
             _profileService = profileService;
+            _orderService = orderService;
+            _wishlistService = wishlistService;
+            _addressRepository = addressRepository;
+            _context = context;
             _userManager = userManager;
             _emailSender = emailSender;
         }
@@ -34,12 +51,240 @@ namespace Marketplace.Web.Controllers
                 return NotFound();
             }
 
+            var orders = await _orderService.GetUserOrders(userId!);
+            var addresses = await _addressRepository.FindAsync(a => a.UserId == userId);
+            var wishlist = await _wishlistService.GetWishlistAsync(userId!);
+
             return View(new ProfileViewModel
             {
                 Username = profile.Username,
                 Email = profile.Email,
-                Avatar = profile.Avatar
+                Avatar = profile.Avatar,
+                OrdersCount = orders.Count,
+                AddressesCount = addresses.Count,
+                WishlistCount = wishlist.TotalItems
             });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Activity()
+        {
+            var userId = _userManager.GetUserId(User)!;
+            var orders = await _orderService.GetUserOrders(userId);
+
+            var items = orders
+                .OrderByDescending(o => o.UpdatedAt ?? o.CreatedAt)
+                .Take(20)
+                .Select(o => new ActivityItemViewModel
+                {
+                    OrderId = o.Id,
+                    Status = o.Status,
+                    Timestamp = o.UpdatedAt ?? o.CreatedAt,
+                    TotalAmount = o.TotalAmount
+                })
+                .ToList();
+
+            return View(items);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Wishlist()
+        {
+            var userId = _userManager.GetUserId(User)!;
+            var wishlist = await _wishlistService.GetWishlistAsync(userId);
+            return View(wishlist);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddToWishlist(Guid productId, string? returnUrl)
+        {
+            var userId = _userManager.GetUserId(User)!;
+            var result = await _wishlistService.AddToWishlistAsync(userId, productId);
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            return RedirectToLocalUrlOrWishlist(returnUrl);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveFromWishlist(Guid productId, string? returnUrl)
+        {
+            var userId = _userManager.GetUserId(User)!;
+            var result = await _wishlistService.RemoveFromWishlistAsync(userId, productId);
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            return RedirectToLocalUrlOrWishlist(returnUrl);
+        }
+
+        private IActionResult RedirectToLocalUrlOrWishlist(string? returnUrl)
+        {
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+
+            return RedirectToAction(nameof(Wishlist));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Addresses()
+        {
+            var userId = _userManager.GetUserId(User);
+            var addresses = await _addressRepository.FindAsync(a => a.UserId == userId);
+
+            var model = addresses
+                .OrderByDescending(a => a.IsDefault)
+                .ThenByDescending(a => a.CreatedAt)
+                .Select(a => new AddressViewModel
+                {
+                    Id = a.Id,
+                    Country = a.Country,
+                    City = a.City,
+                    Street = a.Street,
+                    IsDefault = a.IsDefault
+                })
+                .ToList();
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult CreateAddress()
+        {
+            return View("AddressForm", new AddressFormViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateAddress(AddressFormViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("AddressForm", model);
+            }
+
+            var userId = _userManager.GetUserId(User)!;
+
+            if (model.IsDefault)
+            {
+                await ClearDefaultAddressAsync(userId);
+            }
+
+            var address = new Address
+            {
+                UserId = userId,
+                Country = model.Country.Trim(),
+                City = model.City.Trim(),
+                Street = model.Street.Trim(),
+                IsDefault = model.IsDefault
+            };
+
+            await _addressRepository.AddAsync(address);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Адресу додано.";
+            return RedirectToAction(nameof(Addresses));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditAddress(Guid id)
+        {
+            var userId = _userManager.GetUserId(User);
+            var address = await _addressRepository.FirstOrDefaultAsync(a => a.Id == id && a.UserId == userId);
+            if (address is null)
+            {
+                return NotFound();
+            }
+
+            return View("AddressForm", new AddressFormViewModel
+            {
+                Id = address.Id,
+                Country = address.Country,
+                City = address.City,
+                Street = address.Street,
+                IsDefault = address.IsDefault
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditAddress(AddressFormViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("AddressForm", model);
+            }
+
+            var userId = _userManager.GetUserId(User)!;
+            var address = await _addressRepository.FirstOrDefaultAsync(a => a.Id == model.Id && a.UserId == userId);
+            if (address is null)
+            {
+                return NotFound();
+            }
+
+            if (model.IsDefault && !address.IsDefault)
+            {
+                await ClearDefaultAddressAsync(userId);
+            }
+
+            address.Country = model.Country.Trim();
+            address.City = model.City.Trim();
+            address.Street = model.Street.Trim();
+            address.IsDefault = model.IsDefault;
+
+            _addressRepository.Update(address);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Адресу оновлено.";
+            return RedirectToAction(nameof(Addresses));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteAddress(Guid id)
+        {
+            var userId = _userManager.GetUserId(User);
+            var address = await _addressRepository.FirstOrDefaultAsync(a => a.Id == id && a.UserId == userId);
+            if (address is null)
+            {
+                return NotFound();
+            }
+
+            address.IsDeleted = true;
+            _addressRepository.Update(address);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Адресу видалено.";
+            return RedirectToAction(nameof(Addresses));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetDefaultAddress(Guid id)
+        {
+            var userId = _userManager.GetUserId(User)!;
+            var address = await _addressRepository.FirstOrDefaultAsync(a => a.Id == id && a.UserId == userId);
+            if (address is null)
+            {
+                return NotFound();
+            }
+
+            await ClearDefaultAddressAsync(userId);
+            address.IsDefault = true;
+            _addressRepository.Update(address);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Основну адресу оновлено.";
+            return RedirectToAction(nameof(Addresses));
+        }
+
+        private async Task ClearDefaultAddressAsync(string userId)
+        {
+            var currentDefaults = await _addressRepository.FindAsync(a => a.UserId == userId && a.IsDefault);
+            foreach (var address in currentDefaults)
+            {
+                address.IsDefault = false;
+                _addressRepository.Update(address);
+            }
         }
 
         [HttpGet]

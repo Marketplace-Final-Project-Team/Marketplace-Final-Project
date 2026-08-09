@@ -61,6 +61,123 @@
     max-width: 40rem;
 }
 
+.catalog-filters {
+    background: #fff;
+    border: 1px solid var(--shop-line);
+    border-radius: 1rem;
+    box-shadow: 0 0.35rem 1.35rem rgba(23, 32, 51, 0.055);
+    margin: 1.5rem 0;
+    padding: 1.1rem;
+}
+
+.catalog-filters__grid {
+    display: grid;
+    gap: 0.85rem;
+    grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+}
+
+.catalog-filters__field {
+    display: grid;
+    gap: 0.35rem;
+}
+
+.catalog-filters__field label {
+    color: var(--shop-muted);
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.catalog-filters__price {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.catalog-filters__price span {
+    color: var(--shop-muted);
+}
+
+.catalog-filters__check {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    padding-top: 1.6rem;
+}
+
+.catalog-filters__actions {
+    align-items: center;
+    display: flex;
+    gap: 0.6rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.catalog-card__rating {
+    align-items: center;
+    color: #8a5b00;
+    display: flex;
+    font-size: 0.8rem;
+    font-weight: 700;
+    gap: 0.3rem;
+    margin-bottom: 0.35rem;
+}
+
+.catalog-card__rating span {
+    color: #d6dae3;
+}
+
+.catalog-card__rating[data-empty] {
+    color: var(--shop-muted);
+    font-weight: 600;
+}
+
+.catalog-pagination {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    justify-content: center;
+    margin: 2rem 0 0;
+}
+
+.catalog-pagination a,
+.catalog-pagination span {
+    align-items: center;
+    border: 1px solid var(--shop-line);
+    border-radius: 0.6rem;
+    color: var(--shop-ink);
+    display: inline-flex;
+    font-size: 0.86rem;
+    font-weight: 650;
+    height: 2.3rem;
+    justify-content: center;
+    min-width: 2.3rem;
+    padding: 0 0.5rem;
+    text-decoration: none;
+}
+
+.catalog-pagination a:hover {
+    border-color: #b9c6eb;
+    color: var(--shop-primary);
+}
+
+.catalog-pagination a.is-current,
+.catalog-pagination span.is-current {
+    background: var(--shop-primary);
+    border-color: var(--shop-primary);
+    color: #fff;
+}
+
+.catalog-pagination span.is-disabled {
+    color: #c3c9d6;
+}
+
+.catalog-pagination__ellipsis {
+    border: 0 !important;
+}
+
 .catalog-search .form-control,
 .checkout-form .form-control {
     border-color: #d8dde7;

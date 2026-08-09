@@ -1,4 +1,4 @@
-﻿@model ProfileViewModel
+@model ProfileViewModel
 
 @{
     ViewData["Title"] = "Мій профіль";
@@ -7,62 +7,80 @@
         : Model.Username[..1].ToUpperInvariant();
 }
 
-<div class="container mt-5">
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+}
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-
-            <div class="row align-items-center">
-
-                <div class="col-md-3 text-center">
-
-                    @if (!string.IsNullOrEmpty(Model.Avatar))
-                    {
-                        <img src="@Model.Avatar"
-                             class="profile-avatar"
-                             alt="Аватар користувача @Model.Username" />
-                    }
-                    else
-                    {
-                        <span class="profile-avatar profile-avatar--fallback"
-                              role="img"
-                              aria-label="Аватар користувача @Model.Username">@profileInitial</span>
-                    }
-
-                </div>
-
-                <div class="col-md-9">
-
-                    <h2>@Model.Username</h2>
-
-                    <p class="text-muted">
-                        @Model.Email
-                    </p>
-
-                    <div class="mt-4">
-
-                        <a asp-action="UpdateProfile"
-                           class="btn btn-primary">
-                            Редагувати профіль
-                        </a>
-
-                        <a asp-action="ChangeEmail"
-                           class="btn btn-outline-secondary">
-                            Змінити Email
-                        </a>
-
-                        <a asp-action="ChangePassword"
-                           class="btn btn-outline-danger">
-                            Змінити пароль
-                        </a>
-
-                    </div>
-
-                </div>
-
+<div class="profile-page">
+    <div class="profile-summary">
+        <div class="profile-summary__row">
+            @if (!string.IsNullOrEmpty(Model.Avatar))
+            {
+                <img src="@Model.Avatar" class="profile-avatar" alt="Аватар користувача @Model.Username" />
+            }
+            else
+            {
+                <span class="profile-avatar profile-avatar--fallback" role="img" aria-label="Аватар користувача @Model.Username">@profileInitial</span>
+            }
+            <div>
+                <h1>@Model.Username</h1>
+                <p>@Model.Email</p>
             </div>
-
         </div>
     </div>
 
+    <div class="profile-hub">
+        <a asp-controller="Order" asp-action="Index" class="profile-hub-card">
+            <span class="profile-hub-card__icon" aria-hidden="true">▣</span>
+            <div>
+                <strong>Мої замовлення</strong>
+                <span>Історія покупок і статус доставки</span>
+                <span class="profile-hub-card__badge">@Model.OrdersCount</span>
+            </div>
+        </a>
+
+        <a asp-action="Addresses" class="profile-hub-card">
+            <span class="profile-hub-card__icon" aria-hidden="true">⌂</span>
+            <div>
+                <strong>Адреси</strong>
+                <span>Керуйте адресами доставки</span>
+                <span class="profile-hub-card__badge">@Model.AddressesCount</span>
+            </div>
+        </a>
+
+        <a asp-action="Wishlist" class="profile-hub-card">
+            <span class="profile-hub-card__icon" aria-hidden="true">♡</span>
+            <div>
+                <strong>Список бажань</strong>
+                <span>Товари, які ви зберегли</span>
+                <span class="profile-hub-card__badge">@Model.WishlistCount</span>
+            </div>
+        </a>
+
+        <a asp-action="Activity" class="profile-hub-card">
+            <span class="profile-hub-card__icon" aria-hidden="true">🔔</span>
+            <div>
+                <strong>Сповіщення</strong>
+                <span>Останні події за вашими замовленнями</span>
+            </div>
+        </a>
+
+        <a asp-action="UpdateProfile" class="profile-hub-card">
+            <span class="profile-hub-card__icon" aria-hidden="true">✎</span>
+            <div>
+                <strong>Налаштування профілю</strong>
+                <span>Ім'я користувача та аватар</span>
+            </div>
+        </a>
+
+        <a asp-action="ChangePassword" class="profile-hub-card">
+            <span class="profile-hub-card__icon" aria-hidden="true">🔒</span>
+            <div>
+                <strong>Зміна пароля</strong>
+                <span>Оновіть пароль для входу</span>
+            </div>
+        </a>
+    </div>
+
+    <a asp-action="ChangeEmail" class="btn btn-outline-secondary">Змінити Email</a>
 </div>

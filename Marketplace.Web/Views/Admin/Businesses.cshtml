@@ -1,0 +1,109 @@
+@model IEnumerable<Marketplace.Web.Models.BusinessItemAdminViewModel>
+
+@{
+    ViewData["Title"] = "Бізнеси — Адмін-панель";
+    var businesses = Model.ToList();
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+}
+
+@functions {
+    private static string StatusLabel(Marketplace.Domain.Enums.BusinessStatus status) => status switch
+    {
+        Marketplace.Domain.Enums.BusinessStatus.Pending => "На перевірці",
+        Marketplace.Domain.Enums.BusinessStatus.Active => "Активний",
+        Marketplace.Domain.Enums.BusinessStatus.Suspended => "Призупинений",
+        Marketplace.Domain.Enums.BusinessStatus.Rejected => "Відхилений",
+        _ => status.ToString()
+    };
+}
+
+<div class="admin-page">
+    <header class="admin-header">
+        <div>
+            <div class="admin-kicker">Admin</div>
+            <h1 class="admin-title">Бізнеси</h1>
+            <p class="admin-subtitle">Усього магазинів на платформі: <strong>@businesses.Count</strong>.</p>
+        </div>
+    </header>
+
+    <partial name="_AdminNav" />
+
+    @if (businesses.Count == 0)
+    {
+        <div class="admin-panel">
+            <p class="admin-empty">Магазинів поки немає.</p>
+        </div>
+    }
+    else
+    {
+        <div class="admin-panel table-responsive">
+            <table class="table admin-table">
+                <thead>
+                    <tr>
+                        <th>Магазин</th>
+                        <th>Власник</th>
+                        <th>Статус</th>
+                        <th class="text-end">Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var business in businesses)
+                    {
+                        var statusClass = business.Status.ToString().ToLowerInvariant();
+                        var name = string.IsNullOrWhiteSpace(business.Name) ? "Без назви" : business.Name;
+                        var businessInitial = name[..1].ToUpperInvariant();
+
+                        <tr>
+                            <td>
+                                <div class="admin-entity-cell">
+                                    @if (!string.IsNullOrWhiteSpace(business.LogoUrl))
+                                    {
+                                        <img class="admin-entity-thumb" src="@business.LogoUrl" alt="@name" />
+                                    }
+                                    else
+                                    {
+                                        <div class="admin-entity-placeholder" aria-hidden="true">@businessInitial</div>
+                                    }
+                                    <span class="admin-entity-name">@name</span>
+                                </div>
+                            </td>
+                            <td class="admin-entity-meta">@business.Owner</td>
+                            <td><span class="admin-status admin-status--@statusClass">@StatusLabel(business.Status)</span></td>
+                            <td>
+                                <div class="admin-row-actions">
+                                    @if (business.Status != Marketplace.Domain.Enums.BusinessStatus.Active)
+                                    {
+                                        <form asp-action="ChangeBusinessStatus" method="post">
+                                            <input type="hidden" name="businessId" value="@business.Id" />
+                                            <input type="hidden" name="status" value="Active" />
+                                            <button type="submit" class="btn btn-sm btn-outline-success">Активувати</button>
+                                        </form>
+                                    }
+                                    @if (business.Status != Marketplace.Domain.Enums.BusinessStatus.Suspended)
+                                    {
+                                        <form asp-action="ChangeBusinessStatus" method="post">
+                                            <input type="hidden" name="businessId" value="@business.Id" />
+                                            <input type="hidden" name="status" value="Suspended" />
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary">Призупинити</button>
+                                        </form>
+                                    }
+                                    @if (business.Status != Marketplace.Domain.Enums.BusinessStatus.Rejected)
+                                    {
+                                        <form asp-action="ChangeBusinessStatus" method="post">
+                                            <input type="hidden" name="businessId" value="@business.Id" />
+                                            <input type="hidden" name="status" value="Rejected" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Відхилити</button>
+                                        </form>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

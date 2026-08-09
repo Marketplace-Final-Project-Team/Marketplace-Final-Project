@@ -77,6 +77,12 @@
                                     <li>
                                         <a class="dropdown-item" asp-controller="Products" asp-action="Index">Мої товари</a>
                                     </li>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Admin" asp-action="Index">Адмін-панель</a>
+                                        </li>
+                                    }
                                     <li><hr class="dropdown-divider" /></li>
                                     <li>
                                         <form asp-controller="Auth" asp-action="Logout" method="post">

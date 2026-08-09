@@ -16,9 +16,24 @@ namespace Marketplace.Web.Controllers
             _adminService = adminService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var users = await _adminService.GetAllUsers();
+            var products = await _adminService.GetAllProducts();
+            var businesses = await _adminService.GetAllBusinesses();
+
+            var model = new AdminDashboardViewModel
+            {
+                TotalUsers = users.Count,
+                BannedUsers = users.Count(u => u.Status == UserStatus.Banned),
+                TotalProducts = products.Count,
+                PendingProducts = products.Count(p => p.Status == ProductStatus.Pending),
+                BannedProducts = products.Count(p => p.Status == ProductStatus.Banned),
+                TotalBusinesses = businesses.Count,
+                PendingBusinesses = businesses.Count(b => b.Status == BusinessStatus.Pending),
+            };
+
+            return View(model);
         }
 
         [HttpGet]

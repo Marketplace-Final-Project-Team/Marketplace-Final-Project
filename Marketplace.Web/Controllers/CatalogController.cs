@@ -1,27 +1,77 @@
+using System.Security.Claims;
+using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Marketplace.Web.Controllers;
 
 [AllowAnonymous]
 public class CatalogController : Controller
 {
-    private readonly IProductService _productService;
+    private const int PageSize = 12;
 
-    public CatalogController(IProductService productService)
+    private readonly IProductService _productService;
+    private readonly IReviewService _reviewService;
+    private readonly ICategoryService _categoryService;
+    private readonly IWishlistService _wishlistService;
+
+    public CatalogController(
+        IProductService productService,
+        IReviewService reviewService,
+        ICategoryService categoryService,
+        IWishlistService wishlistService)
     {
         _productService = productService;
+        _reviewService = reviewService;
+        _categoryService = categoryService;
+        _wishlistService = wishlistService;
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index(string? search)
+    public async Task<IActionResult> Index(CatalogFilterViewModel filter)
     {
-        var products = await _productService.GetCatalogAsync(search);
-        ViewBag.Search = search;
+        filter.Page = filter.Page < 1 ? 1 : filter.Page;
 
-        return View(products.Select(MapProduct).ToList());
+        var categories = await _categoryService.GetAllCategories();
+
+        var result = await _productService.GetCatalogPageAsync(new CatalogFilterDto
+        {
+            Search = filter.Search,
+            CategoryId = filter.CategoryId,
+            MinPrice = filter.MinPrice,
+            MaxPrice = filter.MaxPrice,
+            InStockOnly = filter.InStockOnly,
+            MinRating = filter.MinRating,
+            Sort = filter.Sort,
+            Page = filter.Page,
+            PageSize = PageSize
+        });
+
+        // A page requested past the last available one (e.g. a filter change while on page 5
+        // of a shrinking result set) would otherwise render an empty grid with no way back.
+        if (result.TotalPages > 0 && filter.Page > result.TotalPages)
+        {
+            filter.Page = result.TotalPages;
+            return RedirectToAction(nameof(Index), filter);
+        }
+
+        var model = new CatalogPageViewModel
+        {
+            Filter = filter,
+            Categories = categories
+                .Select(category => new SelectListItem(category.Name, category.Id.ToString()))
+                .ToList(),
+            Products = result.Items.Select(item => MapProduct(item.Product, item.AverageRating, item.ReviewCount)).ToList(),
+            TotalCount = result.TotalCount,
+            Page = result.Page,
+            PageSize = result.PageSize,
+            TotalPages = result.TotalPages
+        };
+
+        return View(model);
     }
 
     [HttpGet]
@@ -53,10 +103,21 @@ public class CatalogController : Controller
             })
             .ToList();
 
+        model.Reviews = (await _reviewService.GetReviewsByProductId(id)).ToList();
+        model.CurrentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        model.ReviewCount = model.Reviews.Count;
+        model.AverageRating = model.Reviews.Count == 0 ? 0 : Math.Round(model.Reviews.Average(r => r.Rating), 1);
+
+        if (model.CurrentUserId is not null)
+        {
+            var wishlist = await _wishlistService.GetWishlistAsync(model.CurrentUserId);
+            model.IsInWishlist = wishlist.Items.Any(item => item.ProductId == id);
+        }
+
         return View(model);
     }
 
-    private static CatalogProductViewModel MapProduct(Marketplace.Domain.Entities.Product product)
+    private static CatalogProductViewModel MapProduct(Marketplace.Domain.Entities.Product product, double averageRating = 0, int reviewCount = 0)
     {
         return new CatalogProductViewModel
         {
@@ -70,7 +131,9 @@ public class CatalogController : Controller
             StoreName = product.Business?.StoreName ?? "Marketplace",
             StoreLogoUrl = product.Business?.LogoUrl ?? string.Empty,
             StoreDescription = product.Business?.Description ?? string.Empty,
-            AdditionalImageUrls = product.Images.Select(image => image.ImageUrl).ToList()
+            AdditionalImageUrls = product.Images.Select(image => image.ImageUrl).ToList(),
+            AverageRating = averageRating,
+            ReviewCount = reviewCount
         };
     }
 }

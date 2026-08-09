@@ -115,6 +115,121 @@ namespace Marketplace.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Orders(Guid businessId, OrderStatus? status)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var orders = await _orderService.GetBusinessOrders(businessId, status);
+
+            return View(new BusinessOrdersPageViewModel
+            {
+                BusinessId = businessId,
+                StoreName = business.StoreName,
+                StatusFilter = status,
+                Orders = orders.Select(order => new BusinessOrderListItemViewModel
+                {
+                    OrderId = order.OrderId,
+                    CreatedAt = order.CreatedAt,
+                    Status = order.Status,
+                    BuyerName = order.BuyerName,
+                    BuyerEmail = order.BuyerEmail,
+                    ShippingAddress = $"{order.ShippingCity}, {order.ShippingStreet}",
+                    ItemsCount = order.ItemsCount,
+                    LineTotal = order.LineTotal
+                }).ToList()
+            });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> OrderDetails(Guid businessId, Guid orderId)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var order = await _orderService.GetBusinessOrderDetails(businessId, orderId);
+            if (order is null)
+            {
+                return NotFound();
+            }
+
+            return View(new BusinessOrderDetailsViewModel
+            {
+                BusinessId = businessId,
+                StoreName = business.StoreName,
+                OrderId = order.OrderId,
+                CreatedAt = order.CreatedAt,
+                Status = order.Status,
+                OrderTotalAmount = order.OrderTotalAmount,
+                BuyerName = order.BuyerName,
+                BuyerEmail = order.BuyerEmail,
+                BuyerPhone = order.BuyerPhone,
+                ShippingCountry = order.ShippingCountry,
+                ShippingCity = order.ShippingCity,
+                ShippingStreet = order.ShippingStreet,
+                Items = order.Items.Select(item => new BusinessOrderLineViewModel
+                {
+                    ProductId = item.ProductId,
+                    ProductName = item.ProductName,
+                    ImageUrl = item.ImageUrl,
+                    UnitPrice = item.UnitPrice,
+                    Quantity = item.Quantity,
+                    BelongsToBusiness = item.BelongsToBusiness
+                }).ToList()
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeOrderStatus(Guid businessId, Guid orderId, OrderStatus status)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            // GetBusinessOrderDetails also acts as the ownership check: it returns null unless
+            // this business actually has a line item in the order, so a seller can't change the
+            // status of an order that has nothing to do with their store.
+            var order = await _orderService.GetBusinessOrderDetails(businessId, orderId);
+            if (order is null)
+            {
+                return NotFound();
+            }
+
+            var result = await _orderService.ChangeOrderStatus(orderId, status);
+            if (!result.Succeeded)
+            {
+                TempData["Error"] = result.Message;
+            }
+            else
+            {
+                TempData["Success"] = "Статус замовлення оновлено.";
+            }
+
+            return RedirectToAction(nameof(OrderDetails), new { businessId, orderId });
+        }
+
+        private async Task<Business?> GetAccessibleBusinessOrNullAsync(Guid businessId)
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return null;
+            }
+
+            var businesses = await _businessAccessService.GetAccessibleBusinessesAsync(userId);
+            return businesses.FirstOrDefault(b => b.Id == businessId);
+        }
+
         [HttpGet("business/{businessId}/add-member")]
         public IActionResult AddMember(Guid businessId) 
         {
@@ -123,8 +238,8 @@ namespace Marketplace.Web.Controllers
             return View(model);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> AddMember(BusinessMemberCreateViewModel model) 
+        [HttpPost("business/{businessId}/add-member")]
+        public async Task<IActionResult> AddMember(BusinessMemberCreateViewModel model)
         {
             if (!ModelState.IsValid) 
             {

@@ -17,6 +17,19 @@ public class CatalogProductViewModel
     public DateTime EstimatedDeliveryEnd { get; set; }
     public List<CatalogRelatedProductViewModel> RelatedProducts { get; set; } = new();
 
+    public List<Marketplace.BLL.DTOs.ReviewDto> Reviews { get; set; } = new();
+    public string? CurrentUserId { get; set; }
+    public bool IsInWishlist { get; set; }
+
+    // Set directly from the catalog query's aggregate (ProductService.GetCatalogPageAsync) on
+    // the listing page, where loading each product's full Reviews list would be wasteful; on
+    // the details page these are computed from Reviews after it's populated.
+    public int ReviewCount { get; set; }
+    public double AverageRating { get; set; }
+    public Marketplace.BLL.DTOs.ReviewDto? CurrentUserReview => string.IsNullOrEmpty(CurrentUserId)
+        ? null
+        : Reviews.FirstOrDefault(r => r.UserId == CurrentUserId);
+
     public IReadOnlyList<string> GalleryImageUrls => new[] { MainImageUrl }
         .Concat(AdditionalImageUrls)
         .Where(url => !string.IsNullOrWhiteSpace(url))
