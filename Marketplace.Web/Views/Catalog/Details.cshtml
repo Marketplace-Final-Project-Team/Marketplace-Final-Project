@@ -13,6 +13,7 @@
 @section Styles {
     <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/product-details.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/reviews.css" asp-append-version="true" />
 }
 
 <div class="product-page">
@@ -119,6 +120,26 @@
                         </button>
                     </form>
                     <a asp-controller="Cart" asp-action="Index" class="product-button product-button--secondary">Відкрити кошик</a>
+                    @if (Model.IsInWishlist)
+                    {
+                        <form asp-controller="Profile" asp-action="RemoveFromWishlist" method="post">
+                            <input type="hidden" name="productId" value="@Model.Id" />
+                            <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                            <button type="submit" class="product-button product-button--secondary">
+                                <span aria-hidden="true">♥</span> У списку бажань
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-controller="Profile" asp-action="AddToWishlist" method="post">
+                            <input type="hidden" name="productId" value="@Model.Id" />
+                            <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                            <button type="submit" class="product-button product-button--secondary">
+                                <span aria-hidden="true">♡</span> У список бажань
+                            </button>
+                        </form>
+                    }
                 }
                 else
                 {
@@ -190,6 +211,84 @@
             </dl>
         </section>
     </div>
+
+    <section class="product-content-card product-reviews" aria-labelledby="reviews-title">
+        <span class="product-section-kicker">Відгуки покупців</span>
+        <h2 id="reviews-title">Відгуки (@Model.ReviewCount)</h2>
+
+        <div class="product-reviews__summary">
+            <div class="product-reviews__score">
+                <strong>@(Model.ReviewCount > 0 ? Model.AverageRating.ToString("0.0") : "—")</strong>
+                <span>@(Model.ReviewCount > 0 ? $"на основі {Model.ReviewCount} відгуків" : "поки без відгуків")</span>
+            </div>
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                if (Model.CurrentUserReview is { } myReview)
+                {
+                    <a asp-controller="Reviews" asp-action="UpdateReview" asp-route-productId="@Model.Id" asp-route-reviewId="@myReview.Id" class="product-button product-button--secondary">Редагувати мій відгук</a>
+                }
+                else
+                {
+                    <a asp-controller="Reviews" asp-action="CreateReview" asp-route-productId="@Model.Id" class="product-button product-button--secondary">Написати відгук</a>
+                }
+            }
+            else
+            {
+                <a asp-controller="Auth" asp-action="SignIn" asp-route-returnUrl="@Context.Request.Path" class="product-button product-button--secondary">Увійти, щоб залишити відгук</a>
+            }
+        </div>
+
+        @if (Model.Reviews.Count == 0)
+        {
+            <p class="product-reviews__empty">Ще немає відгуків про цей товар. Будьте першим!</p>
+        }
+        else
+        {
+            <div class="review-list">
+                @foreach (var review in Model.Reviews)
+                {
+                    var isMine = review.UserId == Model.CurrentUserId;
+                    var reviewInitial = string.IsNullOrWhiteSpace(review.UserName) ? "?" : review.UserName[..1].ToUpperInvariant();
+                    var filledStars = Math.Clamp((int)Math.Round(review.Rating), 0, 5);
+
+                    <article class="review-item">
+                        <div class="review-item__head">
+                            <div class="review-item__author">
+                                <span class="review-item__avatar" aria-hidden="true">
+                                    @if (!string.IsNullOrWhiteSpace(review.AvatarUrl))
+                                    {
+                                        <img src="@review.AvatarUrl" alt="" />
+                                    }
+                                    else
+                                    {
+                                        @reviewInitial
+                                    }
+                                </span>
+                                <div>
+                                    <div class="review-item__name">@review.UserName</div>
+                                    <span class="star-display" aria-label="Оцінка @review.Rating з 5">@(new string('★', filledStars))@(new string('☆', 5 - filledStars))</span>
+                                </div>
+                            </div>
+                            <span class="review-item__date">@review.PublicationDate.ToLocalTime().ToString("dd.MM.yyyy")</span>
+                        </div>
+                        <p class="review-item__body">@review.Body</p>
+                        @if (isMine)
+                        {
+                            <div class="review-item__actions">
+                                <a asp-controller="Reviews" asp-action="UpdateReview" asp-route-productId="@Model.Id" asp-route-reviewId="@review.Id">Редагувати</a>
+                                <form asp-controller="Reviews" asp-action="DeleteReview" method="post" onsubmit="return confirm('Видалити цей відгук?');">
+                                    <input type="hidden" name="productId" value="@Model.Id" />
+                                    <input type="hidden" name="reviewId" value="@review.Id" />
+                                    <button type="submit" class="is-danger">Видалити</button>
+                                </form>
+                            </div>
+                        }
+                    </article>
+                }
+            </div>
+        }
+    </section>
 
     @if (Model.RelatedProducts.Count > 0)
     {

@@ -1,0 +1,55 @@
+@model Marketplace.BLL.DTOs.PaymentDataDto
+
+@{
+    ViewData["Title"] = "Перехід до оплати";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/payment.css" asp-append-version="true" />
+}
+
+<div class="payment-page">
+    <div class="payment-redirect">
+        <div class="payment-redirect__spinner" role="status" aria-label="Перенаправлення"></div>
+        <h1>Замовлення створено</h1>
+        <p>Зараз ми відкриємо безпечну сторінку оплати LiqPay. Це займе кілька секунд.</p>
+
+        <div class="payment-redirect__order">
+            Не оплачуйте одне замовлення двічі — якщо сторінка LiqPay вже відкрита в іншій вкладці, поверніться туди.
+        </div>
+
+        <form id="liqpay-form" action="@Model.Url" method="post" accept-charset="utf-8">
+            <input type="hidden" name="data" value="@Model.Data" />
+            <input type="hidden" name="signature" value="@Model.Signature" />
+
+            <noscript>
+                <button type="submit" class="btn btn-primary">Перейти до оплати</button>
+            </noscript>
+        </form>
+
+        <button type="button" class="btn btn-outline-secondary" id="liqpay-manual-submit">
+            Не відбулось перенаправлення? Перейти вручну
+        </button>
+
+        <a asp-controller="Order" asp-action="Index" class="payment-redirect__back">← Мої замовлення</a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var form = document.getElementById('liqpay-form');
+            var manualButton = document.getElementById('liqpay-manual-submit');
+
+            var redirectTimer = window.setTimeout(function () {
+                form.submit();
+            }, 900);
+
+            manualButton.addEventListener('click', function () {
+                window.clearTimeout(redirectTimer);
+                form.submit();
+            });
+        })();
+    </script>
+}

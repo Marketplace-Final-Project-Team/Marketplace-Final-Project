@@ -1,8 +1,36 @@
-@model IReadOnlyList<Marketplace.Web.Models.CatalogProductViewModel>
+@using Marketplace.BLL.DTOs.Products
+@model Marketplace.Web.Models.CatalogPageViewModel
 
 @{
     ViewData["Title"] = "Каталог товарів";
-    var search = ViewBag.Search as string;
+    var filter = Model.Filter;
+}
+
+@functions {
+    private static Dictionary<string, string> RouteValuesForPage(Marketplace.Web.Models.CatalogFilterViewModel filter, int page)
+    {
+        var values = new Dictionary<string, string>();
+
+        if (!string.IsNullOrWhiteSpace(filter.Search)) values["Search"] = filter.Search;
+        if (filter.CategoryId.HasValue) values["CategoryId"] = filter.CategoryId.Value.ToString();
+        if (filter.MinPrice.HasValue) values["MinPrice"] = filter.MinPrice.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        if (filter.MaxPrice.HasValue) values["MaxPrice"] = filter.MaxPrice.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        if (filter.InStockOnly) values["InStockOnly"] = "true";
+        if (filter.MinRating.HasValue) values["MinRating"] = filter.MinRating.Value.ToString();
+        if (filter.Sort != CatalogSortOption.Newest) values["Sort"] = filter.Sort.ToString();
+        values["Page"] = page.ToString();
+
+        return values;
+    }
+
+    private static string SortLabel(CatalogSortOption sort) => sort switch
+    {
+        CatalogSortOption.PriceAsc => "Дешевші спочатку",
+        CatalogSortOption.PriceDesc => "Дорожчі спочатку",
+        CatalogSortOption.Rating => "За рейтингом",
+        CatalogSortOption.Popularity => "За популярністю",
+        _ => "Спочатку нові"
+    };
 }
 
 @section Styles {
@@ -14,7 +42,7 @@
         <div>
             <div class="shop-kicker">MarketPlace</div>
             <h1 class="shop-title">Каталог товарів</h1>
-            <p class="shop-subtitle">Тестова вітрина маркетплейсу. Оберіть товар, перегляньте деталі та додайте його до кошика.</p>
+            <p class="shop-subtitle">Оберіть товар, перегляньте деталі та додайте його до кошика.</p>
         </div>
         @if (User.Identity?.IsAuthenticated == true)
         {
@@ -31,30 +59,84 @@
         <div class="alert alert-warning" role="alert">@error</div>
     }
 
-    <form asp-action="Index" method="get" class="catalog-search" role="search">
-        <input name="search" value="@search" class="form-control" placeholder="Пошук за назвою, описом або категорією" aria-label="Пошук товарів" />
-        <button type="submit" class="btn btn-primary">Знайти</button>
-        @if (!string.IsNullOrWhiteSpace(search))
-        {
-            <a asp-action="Index" class="btn btn-outline-secondary">Скинути</a>
-        }
+    <form asp-action="Index" method="get" class="catalog-filters" role="search" aria-label="Фільтри каталогу">
+        <div class="catalog-filters__grid">
+            <div class="catalog-filters__field" style="grid-column: 1 / -1;">
+                <label for="filter-search">Пошук</label>
+                <input id="filter-search" name="Search" value="@filter.Search" class="form-control" placeholder="Назва, опис або категорія" />
+            </div>
+
+            <div class="catalog-filters__field">
+                <label for="filter-category">Категорія</label>
+                <select id="filter-category" name="CategoryId" class="form-select">
+                    <option value="">Усі категорії</option>
+                    @foreach (var category in Model.Categories)
+                    {
+                        <option value="@category.Value" selected="@(category.Value == filter.CategoryId?.ToString())">@category.Text</option>
+                    }
+                </select>
+            </div>
+
+            <div class="catalog-filters__field">
+                <label>Ціна, ₴</label>
+                <div class="catalog-filters__price">
+                    <input type="number" min="0" step="1" name="MinPrice" value="@filter.MinPrice" class="form-control" placeholder="від" aria-label="Мінімальна ціна" />
+                    <span>—</span>
+                    <input type="number" min="0" step="1" name="MaxPrice" value="@filter.MaxPrice" class="form-control" placeholder="до" aria-label="Максимальна ціна" />
+                </div>
+            </div>
+
+            <div class="catalog-filters__field">
+                <label for="filter-rating">Рейтинг</label>
+                <select id="filter-rating" name="MinRating" class="form-select">
+                    <option value="">Будь-який</option>
+                    @for (var stars = 4; stars >= 1; stars--)
+                    {
+                        <option value="@stars" selected="@(filter.MinRating == stars)">@stars★ і вище</option>
+                    }
+                </select>
+            </div>
+
+            <div class="catalog-filters__field">
+                <label for="filter-sort">Сортування</label>
+                <select id="filter-sort" name="Sort" class="form-select">
+                    @foreach (var option in Enum.GetValues<CatalogSortOption>())
+                    {
+                        <option value="@option" selected="@(filter.Sort == option)">@SortLabel(option)</option>
+                    }
+                </select>
+            </div>
+
+            <div class="catalog-filters__check">
+                <input type="checkbox" id="filter-in-stock" name="InStockOnly" value="true" class="form-check-input" checked="@filter.InStockOnly" />
+                <label for="filter-in-stock" class="mb-0">Тільки в наявності</label>
+            </div>
+        </div>
+
+        <div class="catalog-filters__actions">
+            @if (filter.HasActiveFilters)
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary">Скинути фільтри</a>
+            }
+            <button type="submit" class="btn btn-primary">Застосувати</button>
+        </div>
     </form>
 
-    <div class="catalog-meta">Знайдено товарів: <strong>@Model.Count</strong></div>
+    <div class="catalog-meta">Знайдено товарів: <strong>@Model.TotalCount</strong></div>
 
-    @if (Model.Count == 0)
+    @if (Model.Products.Count == 0)
     {
         <section class="shop-empty">
             <div class="shop-empty__icon" aria-hidden="true">⌕</div>
             <h2>Товарів не знайдено</h2>
-            <p>Спробуйте змінити пошуковий запит або переглянути весь каталог.</p>
+            <p>Спробуйте змінити фільтри або переглянути весь каталог.</p>
             <a asp-action="Index" class="btn btn-primary">Увесь каталог</a>
         </section>
     }
     else
     {
         <div class="catalog-grid">
-            @foreach (var product in Model)
+            @foreach (var product in Model.Products)
             {
                 <article class="catalog-card">
                     <a asp-action="Details" asp-route-id="@product.Id" class="catalog-card__media" aria-label="Переглянути @product.Name">
@@ -69,6 +151,18 @@
                     </a>
                     <div class="catalog-card__body">
                         <div class="catalog-card__category">@product.CategoryName</div>
+                        @if (product.ReviewCount > 0)
+                        {
+                            var filledStars = (int)Math.Round(product.AverageRating);
+                            <div class="catalog-card__rating" aria-label="Рейтинг @product.AverageRating з 5, @product.ReviewCount відгуків">
+                                @(new string('★', filledStars))@(new string('☆', 5 - filledStars))
+                                <span>&nbsp;@product.AverageRating.ToString("0.0") (@product.ReviewCount)</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="catalog-card__rating" data-empty>Ще немає відгуків</div>
+                        }
                         <a asp-action="Details" asp-route-id="@product.Id" class="catalog-card__title">@product.Name</a>
                         <p class="catalog-card__description">@product.Description</p>
                         <div class="catalog-card__footer">
@@ -83,5 +177,61 @@
                 </article>
             }
         </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            var windowStart = Math.Max(1, Model.Page - 2);
+            var windowEnd = Math.Min(Model.TotalPages, Model.Page + 2);
+
+            <nav class="catalog-pagination" aria-label="Сторінки каталогу">
+                @if (Model.Page > 1)
+                {
+                    <a asp-action="Index" asp-all-route-data="RouteValuesForPage(filter, Model.Page - 1)" aria-label="Попередня сторінка">‹</a>
+                }
+                else
+                {
+                    <span class="is-disabled">‹</span>
+                }
+
+                @if (windowStart > 1)
+                {
+                    <a asp-action="Index" asp-all-route-data="RouteValuesForPage(filter, 1)">1</a>
+                    if (windowStart > 2)
+                    {
+                        <span class="catalog-pagination__ellipsis">…</span>
+                    }
+                }
+
+                @for (var pageNumber = windowStart; pageNumber <= windowEnd; pageNumber++)
+                {
+                    if (pageNumber == Model.Page)
+                    {
+                        <span class="is-current">@pageNumber</span>
+                    }
+                    else
+                    {
+                        <a asp-action="Index" asp-all-route-data="RouteValuesForPage(filter, pageNumber)">@pageNumber</a>
+                    }
+                }
+
+                @if (windowEnd < Model.TotalPages)
+                {
+                    if (windowEnd < Model.TotalPages - 1)
+                    {
+                        <span class="catalog-pagination__ellipsis">…</span>
+                    }
+                    <a asp-action="Index" asp-all-route-data="RouteValuesForPage(filter, Model.TotalPages)">@Model.TotalPages</a>
+                }
+
+                @if (Model.Page < Model.TotalPages)
+                {
+                    <a asp-action="Index" asp-all-route-data="RouteValuesForPage(filter, Model.Page + 1)" aria-label="Наступна сторінка">›</a>
+                }
+                else
+                {
+                    <span class="is-disabled">›</span>
+                }
+            </nav>
+        }
     }
 </div>

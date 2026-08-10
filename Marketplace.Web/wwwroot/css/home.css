@@ -321,6 +321,15 @@
     right: -1.8rem;
 }
 
+.visual-product__image {
+    border-radius: 1.25rem;
+    height: 11rem;
+    object-fit: cover;
+    position: relative;
+    width: 11rem;
+    z-index: 1;
+}
+
 .visual-main-card__copy {
     padding: 0 1.2rem 1.25rem;
 }
@@ -603,6 +612,13 @@
     font-size: 0.7rem;
     font-weight: 750;
     margin-bottom: 0.35rem;
+}
+
+.home-product__rating {
+    color: #966200;
+    font-size: 0.78rem;
+    font-weight: 650;
+    margin-top: 0.3rem;
 }
 
 .home-product__name {

@@ -28,12 +28,14 @@ namespace Marketplace.BLL.Services
         {
             var reviews = (await _reviewRepo.FindAsync(r => r.ProductId == productId)).Select(r => new ReviewDto
             {
+                Id = r.Id,
                 Body = r.Body,
                 Rating = r.Rating,
+                UserId = r.UserId,
                 UserName = r.User.UserName!,
                 AvatarUrl = r.User.AvatarUrl,
                 PublicationDate = r.CreatedAt
-            }).ToList();
+            }).OrderByDescending(r => r.PublicationDate).ToList();
 
             return reviews;
         }

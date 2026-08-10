@@ -1,0 +1,55 @@
+@model Marketplace.Web.Models.AddressFormViewModel
+
+@{
+    var isEdit = Model.Id.HasValue;
+    ViewData["Title"] = isEdit ? "Редагування адреси" : "Нова адреса";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+}
+
+<div class="profile-page">
+    <a asp-action="Addresses" class="profile-back">← До адрес</a>
+
+    <div class="address-form-card">
+        <h1>@(isEdit ? "Редагування адреси" : "Нова адреса")</h1>
+
+        <form asp-action="@(isEdit ? "EditAddress" : "CreateAddress")" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+            <input type="hidden" asp-for="Id" />
+
+            <div class="address-form-field">
+                <label asp-for="Country" class="form-label">Країна</label>
+                <input asp-for="Country" class="form-control" />
+                <span asp-validation-for="Country" class="text-danger small"></span>
+            </div>
+
+            <div class="address-form-field">
+                <label asp-for="City" class="form-label">Місто</label>
+                <input asp-for="City" class="form-control" placeholder="Київ" />
+                <span asp-validation-for="City" class="text-danger small"></span>
+            </div>
+
+            <div class="address-form-field">
+                <label asp-for="Street" class="form-label">Вулиця, будинок, квартира</label>
+                <input asp-for="Street" class="form-control" placeholder="вул. Хрещатик, 1, кв. 10" />
+                <span asp-validation-for="Street" class="text-danger small"></span>
+            </div>
+
+            <div class="form-check">
+                <input asp-for="IsDefault" class="form-check-input" />
+                <label asp-for="IsDefault" class="form-check-label">Зробити основною адресою</label>
+            </div>
+
+            <div class="address-form-actions">
+                <a asp-action="Addresses" class="btn btn-outline-secondary">Скасувати</a>
+                <button type="submit" class="btn btn-primary">Зберегти</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

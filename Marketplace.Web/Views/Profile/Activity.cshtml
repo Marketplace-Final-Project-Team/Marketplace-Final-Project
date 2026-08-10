@@ -1,0 +1,74 @@
+@model List<Marketplace.Web.Models.ActivityItemViewModel>
+
+@{
+    ViewData["Title"] = "Сповіщення";
+}
+
+@functions {
+    private static string StatusLabel(Marketplace.Domain.Enums.OrderStatus status) => status switch
+    {
+        Marketplace.Domain.Enums.OrderStatus.Pending => "очікує підтвердження",
+        Marketplace.Domain.Enums.OrderStatus.Confirmed => "підтверджено",
+        Marketplace.Domain.Enums.OrderStatus.Shipped => "відправлено",
+        Marketplace.Domain.Enums.OrderStatus.Delivered => "доставлено",
+        Marketplace.Domain.Enums.OrderStatus.Canceled => "скасовано",
+        _ => status.ToString()
+    };
+
+    private static string StatusIcon(Marketplace.Domain.Enums.OrderStatus status) => status switch
+    {
+        Marketplace.Domain.Enums.OrderStatus.Delivered => "✓",
+        Marketplace.Domain.Enums.OrderStatus.Canceled => "✕",
+        _ => "•"
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+}
+
+<div class="profile-page">
+    <a asp-action="Index" class="profile-back">← До кабінету</a>
+
+    <div class="profile-summary">
+        <h1>Сповіщення</h1>
+        <p>Останні події за вашими замовленнями.</p>
+    </div>
+
+    <p class="activity-note">
+        Це стрічка поточних статусів ваших замовлень, а не окремі сповіщення — історія проміжних змін статусу не зберігається.
+    </p>
+
+    @if (Model.Count == 0)
+    {
+        <div class="profile-empty">
+            <div class="profile-empty__icon" aria-hidden="true">🔔</div>
+            <h2>Подій ще немає</h2>
+            <p>Тут з'являться оновлення статусів після першого замовлення.</p>
+            <a asp-controller="Catalog" asp-action="Index" class="btn btn-primary">Перейти до каталогу</a>
+        </div>
+    }
+    else
+    {
+        <div class="activity-card">
+            <div class="delivery-timeline">
+                @foreach (var item in Model)
+                {
+                    <div class="delivery-step @(item.Status is Marketplace.Domain.Enums.OrderStatus.Delivered ? "is-complete" : "is-current")">
+                        <div class="delivery-step__dot">@StatusIcon(item.Status)</div>
+                        <div class="delivery-step__body">
+                            <strong>
+                                <a asp-controller="Order" asp-action="Details" asp-route-id="@item.OrderId">
+                                    Замовлення #@item.OrderId.ToString()[..8].ToUpperInvariant()
+                                </a>
+                                — @StatusLabel(item.Status)
+                            </strong>
+                            <span>@item.Timestamp.ToLocalTime().ToString("dd.MM.yyyy HH:mm") · @item.TotalAmount.ToString("N2") ₴</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
