@@ -1,0 +1,107 @@
+@model Marketplace.Web.Models.Businesses.BusinessSettingsViewModel
+
+@{
+    ViewData["Title"] = $"Налаштування — {Model.StoreName}";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/business.css" asp-append-version="true" />
+}
+
+<div class="seller-dashboard">
+    <a asp-action="Index" class="seller-order-back">← До панелі продавця</a>
+
+    <header class="seller-orders-header">
+        <div>
+            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Seller workspace</div>
+            <h1>Налаштування — @Model.StoreName</h1>
+            <p>Інформація про компанію, платежі та доступи.</p>
+        </div>
+    </header>
+
+    <partial name="_BusinessNav" model="Model.BusinessId" />
+
+    @if (TempData["Success"] is string success)
+    {
+        <div class="seller-alert" role="status">
+            <span aria-hidden="true">✓</span>
+            <p><strong>Успішно</strong>@success</p>
+        </div>
+    }
+
+    <section class="business-panel">
+        <h2>Інформація про компанію</h2>
+        <p class="business-panel__lead">Ці дані бачать покупці на сторінці магазину.</p>
+
+        <form asp-action="Settings" method="post" class="business-settings-form">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+            <input type="hidden" asp-for="BusinessId" />
+
+            <div>
+                <label asp-for="StoreName">Назва магазину</label>
+                <input asp-for="StoreName" class="form-control" />
+                <span asp-validation-for="StoreName" class="text-danger small"></span>
+            </div>
+            <div>
+                <label asp-for="Description">Опис</label>
+                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Description" class="text-danger small"></span>
+            </div>
+
+            <div>
+                <button type="submit" class="seller-button seller-button--primary">Зберегти</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="business-panel" data-local-settings data-business-id="@Model.BusinessId">
+        <h2>Юридичні та платіжні дані <span class="business-local-badge">Зберігається локально</span></h2>
+        <p class="business-panel__lead">
+            Ці поля ще не підключені до бази даних платформи — значення зберігаються лише в цьому браузері,
+            щоб продемонструвати майбутній інтерфейс налаштувань.
+        </p>
+
+        <div class="business-settings-form">
+            <div>
+                <label for="ls-legal-address">Юридична адреса</label>
+                <input type="text" id="ls-legal-address" data-local-field="legalAddress" class="form-control" placeholder="Місто, вулиця, будинок" />
+            </div>
+            <div>
+                <label for="ls-tax-id">Податковий номер (ІПН/ЄДРПОУ)</label>
+                <input type="text" id="ls-tax-id" data-local-field="taxId" class="form-control" placeholder="0000000000" />
+            </div>
+            <div>
+                <label for="ls-iban">Банківські реквізити (IBAN)</label>
+                <input type="text" id="ls-iban" data-local-field="iban" class="form-control" placeholder="UA00 0000 0000 0000 0000 0000 0" />
+            </div>
+            <div>
+                <label for="ls-shipping-note">Налаштування доставки за замовчуванням</label>
+                <input type="text" id="ls-shipping-note" data-local-field="shippingNote" class="form-control" placeholder="Наприклад: відправлення протягом 1 дня" />
+            </div>
+            <label class="d-flex align-items-center gap-2">
+                <input type="checkbox" data-local-field="notifyOrders" />
+                Надсилати email-сповіщення про нові замовлення
+            </label>
+            <label class="d-flex align-items-center gap-2">
+                <input type="checkbox" data-local-field="twoFactor" />
+                Двофакторна автентифікація для власника магазину
+            </label>
+
+            <div>
+                <button type="button" class="seller-button seller-button--secondary" data-save-local-settings>Зберегти локально</button>
+                <span class="business-empty" data-local-saved-hint hidden>Збережено ✓</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="business-panel">
+        <h2>Користувачі та права доступу</h2>
+        <p class="business-panel__lead">Керування учасниками та ролями винесено в окремий розділ.</p>
+        <a asp-action="Team" asp-route-businessId="@Model.BusinessId" class="seller-button seller-button--secondary">Відкрити «Команда» →</a>
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/business-settings.js" asp-append-version="true"></script>
+}

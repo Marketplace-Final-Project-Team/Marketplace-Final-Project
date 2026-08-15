@@ -185,3 +185,32 @@
     justify-content: flex-end;
     margin-top: 1.4rem;
 }
+
+/* ---------- Promo code ---------- */
+
+.checkout-promo {
+    display: flex;
+    gap: 0.6rem;
+}
+
+.checkout-promo input {
+    flex: 1;
+    text-transform: uppercase;
+}
+
+.checkout-promo__message {
+    color: #1f9d55;
+    font-size: 0.85rem;
+    font-weight: 650;
+    margin: 0.6rem 0 0;
+}
+
+.checkout-promo__message--error {
+    color: #d64545;
+}
+
+.checkout-promo__hint {
+    color: var(--shop-muted);
+    font-size: 0.8rem;
+    margin: 0.6rem 0 0;
+}

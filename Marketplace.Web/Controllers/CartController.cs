@@ -39,6 +39,20 @@ public class CartController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    public async Task<IActionResult> BuyNow(Guid productId)
+    {
+        var result = await _cartService.AddToCart(GetUserId(), productId);
+        if (!result.Succeeded)
+        {
+            TempData["Error"] = result.Message;
+            return RedirectToAction("Details", "Catalog", new { id = productId });
+        }
+
+        return RedirectToAction("Create", "Order");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Remove(Guid productId)
     {
         var result = await _cartService.RemoveFromCart(GetUserId(), productId);

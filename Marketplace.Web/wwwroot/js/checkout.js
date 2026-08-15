@@ -137,4 +137,54 @@
 
     syncNewAddressFieldsState();
     showStep(1);
+
+    const PROMO_CODES = { WELCOME10: 0.1 };
+
+    const promoInput = form.querySelector("[data-promo-input]");
+    const promoApply = form.querySelector("[data-promo-apply]");
+    const promoMessage = form.querySelector("[data-promo-message]");
+    const promoSummaryRow = document.querySelector("[data-promo-summary-row]");
+    const promoSummaryValue = document.querySelector("[data-promo-summary-value]");
+    const totalEl = document.querySelector("[data-order-total]");
+
+    if (promoApply && promoInput && totalEl) {
+        const baseTotal = parseFloat(totalEl.dataset.orderTotal.replace(",", "."));
+
+        const formatCurrency = (value) =>
+            value.toLocaleString("uk-UA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        const showMessage = (text, isError) => {
+            if (!promoMessage) return;
+            promoMessage.textContent = text;
+            promoMessage.hidden = false;
+            promoMessage.classList.toggle("checkout-promo__message--error", !!isError);
+        };
+
+        promoApply.addEventListener("click", () => {
+            const code = promoInput.value.trim().toUpperCase();
+            const rate = PROMO_CODES[code];
+
+            if (!code) {
+                showMessage("Введіть промокод.", true);
+                return;
+            }
+
+            if (!rate) {
+                showMessage("Такий промокод не знайдено або він вже не діє.", true);
+                if (promoSummaryRow) promoSummaryRow.hidden = true;
+                totalEl.textContent = `${formatCurrency(baseTotal)} ₴`;
+                return;
+            }
+
+            const discount = baseTotal * rate;
+            const newTotal = baseTotal - discount;
+
+            showMessage(`Промокод ${code} застосовано: знижка ${Math.round(rate * 100)}%.`, false);
+            if (promoSummaryRow && promoSummaryValue) {
+                promoSummaryRow.hidden = false;
+                promoSummaryValue.textContent = `−${formatCurrency(discount)} ₴`;
+            }
+            totalEl.textContent = `${formatCurrency(newTotal)} ₴`;
+        });
+    }
 })();

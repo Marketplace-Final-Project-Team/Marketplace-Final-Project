@@ -1,0 +1,114 @@
+@model Marketplace.Web.Models.Businesses.BusinessFinanceViewModel
+
+@{
+    ViewData["Title"] = $"Фінанси — {Model.StoreName}";
+}
+
+@functions {
+    private static string StatusLabel(Marketplace.Domain.Enums.OrderStatus status) => status switch
+    {
+        Marketplace.Domain.Enums.OrderStatus.Pending => "Очікує підтвердження",
+        Marketplace.Domain.Enums.OrderStatus.Confirmed => "Підтверджено",
+        Marketplace.Domain.Enums.OrderStatus.Shipped => "Відправлено",
+        Marketplace.Domain.Enums.OrderStatus.Delivered => "Доставлено",
+        Marketplace.Domain.Enums.OrderStatus.Canceled => "Скасовано",
+        _ => status.ToString()
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/business.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/postsale.css" asp-append-version="true" />
+}
+
+<div class="seller-dashboard">
+    <a asp-action="Index" class="seller-order-back">← До панелі продавця</a>
+
+    <header class="seller-orders-header">
+        <div>
+            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Seller workspace</div>
+            <h1>Фінанси — @Model.StoreName</h1>
+            <p>Оборот, продажі та стан виплат магазину.</p>
+        </div>
+    </header>
+
+    <partial name="_BusinessNav" model="Model.BusinessId" />
+
+    <div class="business-kpis">
+        <div class="business-kpi"><span>Оборот</span><strong>@Model.Revenue.ToString("N0") ₴</strong></div>
+        <div class="business-kpi"><span>Продано одиниць</span><strong>@Model.SoldItems</strong></div>
+        <div class="business-kpi"><span>Замовлень</span><strong>@Model.TotalOrders</strong></div>
+        <div class="business-kpi"><span>Середній чек</span><strong>@Model.AverageOrderValue.ToString("N0") ₴</strong></div>
+    </div>
+
+    <section class="business-panel">
+        <h2>Історія продажів</h2>
+        <p class="business-panel__lead">Останні замовлення, що містять товари цього магазину.</p>
+
+        @if (Model.RecentSales.Count == 0)
+        {
+            <p class="business-empty">Продажів поки немає.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="business-table">
+                    <thead>
+                        <tr><th>Замовлення</th><th>Дата</th><th>Статус</th><th>Товарів</th><th>Сума</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model.RecentSales)
+                        {
+                            <tr>
+                                <td><a asp-action="OrderDetails" asp-route-businessId="@Model.BusinessId" asp-route-orderId="@order.OrderId">#@order.OrderId.ToString()[..8].ToUpperInvariant()</a></td>
+                                <td>@order.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy")</td>
+                                <td>@StatusLabel(order.Status)</td>
+                                <td>@order.ItemsCount</td>
+                                <td>@order.LineTotal.ToString("N2") ₴</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+
+    <section class="business-panel">
+        <h2>Виплати</h2>
+        <p class="business-panel__lead">Автоматичні виплати на банківський рахунок ще не підключені.</p>
+        <div class="business-note">
+            <strong>Як це працює зараз</strong>
+            Кошти за продані товари обробляються вручну командою маркетплейсу. Комісія платформи стягується автоматично з кожного продажу та відображається в деталях виплати, коли функціонал буде запущено.
+        </div>
+        <button type="button" class="seller-button seller-button--secondary mt-3" data-open-payout-request>Запросити виплату</button>
+    </section>
+
+    <section class="business-panel">
+        <h2>Податкові документи</h2>
+        <p class="business-panel__lead">Акти, довідки та звіти для бухгалтерії.</p>
+        <p class="business-empty">Документи з'являться тут після підключення автоматичних виплат.</p>
+    </section>
+</div>
+
+<div class="postsale-modal" data-payout-modal hidden>
+    <div class="postsale-modal__card">
+        <button type="button" class="postsale-modal__close" aria-label="Закрити" data-close-payout>×</button>
+        <div data-payout-form>
+            <h3>Запит на виплату</h3>
+            <p>Магазин «@Model.StoreName»</p>
+            <label class="form-label mt-2">Сума до виплати</label>
+            <input type="text" class="form-control" value="@Model.Revenue.ToString("N2") ₴" disabled />
+            <button type="button" class="btn btn-primary mt-3 w-100" data-submit-payout>Надіслати запит</button>
+        </div>
+        <div class="postsale-modal__success" data-payout-success hidden>
+            <span aria-hidden="true">✓</span>
+            <h3>Запит надіслано</h3>
+            <p>Команда підтримки маркетплейсу зв'яжеться з вами для уточнення реквізитів виплати.</p>
+            <button type="button" class="btn btn-outline-secondary" data-close-payout>Закрити</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/business-finance.js" asp-append-version="true"></script>
+}

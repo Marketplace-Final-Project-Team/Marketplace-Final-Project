@@ -179,6 +179,11 @@
 }
 
 /* Data table shared by Users / Products / Businesses */
+.admin-search {
+    margin-bottom: 1rem;
+    max-width: 22rem;
+}
+
 .admin-panel {
     background: var(--admin-surface);
     border: 1px solid var(--admin-line);

@@ -1,0 +1,209 @@
+/* ---------- Buy-now accent button ---------- */
+
+.product-button--accent {
+    width: 100%;
+    background: var(--product-orange);
+    border-color: var(--product-orange);
+    color: #fff;
+    box-shadow: 0 10px 24px rgba(245, 158, 11, 0.28);
+}
+
+.product-button--accent:hover {
+    background: #d97e06;
+    color: #fff;
+}
+
+/* ---------- Variant selector ---------- */
+
+.product-variants {
+    border: 1px solid var(--product-line);
+    border-radius: 14px;
+    display: grid;
+    gap: 0.85rem;
+    margin: 1.25rem 0;
+    padding: 1rem 1.15rem;
+}
+
+.product-variants__row {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+}
+
+.product-variants__label {
+    color: var(--product-muted);
+    font-size: 0.85rem;
+    font-weight: 650;
+    min-width: 4.5rem;
+}
+
+.product-variants__options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.product-variant-swatch {
+    background: var(--swatch);
+    border: 2px solid transparent;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px var(--product-line);
+    cursor: pointer;
+    height: 1.75rem;
+    width: 1.75rem;
+}
+
+.product-variant-swatch.is-selected {
+    border-color: #fff;
+    box-shadow: 0 0 0 2px var(--product-blue);
+}
+
+.product-variant-chip {
+    background: #fff;
+    border: 1px solid #d8dee8;
+    border-radius: 8px;
+    color: var(--product-ink);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 650;
+    padding: 0.35rem 0.7rem;
+}
+
+.product-variant-chip.is-selected {
+    background: var(--product-blue);
+    border-color: var(--product-blue);
+    color: #fff;
+}
+
+.product-variants__size-guide {
+    background: none;
+    border: none;
+    color: var(--product-blue);
+    font-size: 0.82rem;
+    font-weight: 650;
+    margin-left: auto;
+}
+
+.product-variants__size-guide:hover {
+    text-decoration: underline;
+}
+
+.product-variants__hint {
+    color: var(--product-muted);
+    font-size: 0.76rem;
+    margin: 0;
+}
+
+/* ---------- Size guide modal ---------- */
+
+.size-guide-modal {
+    align-items: center;
+    background: rgba(23, 32, 51, 0.45);
+    display: flex;
+    inset: 0;
+    justify-content: center;
+    padding: 1rem;
+    position: fixed;
+    z-index: 1050;
+}
+
+.size-guide-modal__card {
+    background: #fff;
+    border-radius: 1.1rem;
+    max-width: 28rem;
+    padding: 1.75rem;
+    position: relative;
+    width: 100%;
+}
+
+.size-guide-modal__close {
+    background: none;
+    border: none;
+    color: var(--product-muted);
+    font-size: 1.4rem;
+    line-height: 1;
+    position: absolute;
+    right: 0.85rem;
+    top: 0.7rem;
+}
+
+.size-guide-modal__card h3 {
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.size-guide-modal__note {
+    color: var(--product-muted);
+    font-size: 0.82rem;
+    margin-bottom: 1rem;
+}
+
+.size-guide-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.size-guide-table th,
+.size-guide-table td {
+    border-bottom: 1px solid var(--product-line);
+    font-size: 0.85rem;
+    padding: 0.5rem 0.4rem;
+    text-align: center;
+}
+
+.size-guide-table th {
+    color: var(--product-muted);
+    font-weight: 650;
+}
+
+/* ---------- Product Q&A ---------- */
+
+.product-qa__form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 1rem 0 0.5rem;
+}
+
+.product-qa__form textarea {
+    border: 1px solid #d8dee8;
+    border-radius: 10px;
+    flex: 1;
+    font: inherit;
+    min-width: 14rem;
+    padding: 0.65rem 0.85rem;
+    resize: vertical;
+}
+
+.product-qa__hint {
+    color: var(--product-muted);
+    font-size: 0.8rem;
+    margin: 0 0 1rem;
+}
+
+.product-qa__empty {
+    color: var(--product-muted);
+    font-size: 0.9rem;
+}
+
+.product-qa__list {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.product-qa__item {
+    background: var(--product-soft-blue);
+    border-radius: 10px;
+    padding: 0.75rem 0.9rem;
+}
+
+.product-qa__item p {
+    margin: 0 0 0.3rem;
+}
+
+.product-qa__status {
+    color: var(--product-blue-dark);
+    font-size: 0.76rem;
+    font-weight: 650;
+}

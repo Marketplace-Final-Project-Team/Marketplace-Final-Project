@@ -1,0 +1,52 @@
+@model Marketplace.Web.Models.Businesses.BusinessPerformanceViewModel
+
+@{
+    ViewData["Title"] = $"Ефективність — {Model.StoreName}";
+    var statusClass = Model.Status.ToString().ToLowerInvariant();
+    var statusLabel = Model.Status switch
+    {
+        Marketplace.Domain.Enums.BusinessStatus.Pending => "На перевірці",
+        Marketplace.Domain.Enums.BusinessStatus.Active => "Активний",
+        Marketplace.Domain.Enums.BusinessStatus.Suspended => "Призупинений",
+        Marketplace.Domain.Enums.BusinessStatus.Rejected => "Відхилений",
+        _ => Model.Status.ToString()
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/business.css" asp-append-version="true" />
+}
+
+<div class="seller-dashboard">
+    <a asp-action="Index" class="seller-order-back">← До панелі продавця</a>
+
+    <header class="seller-orders-header">
+        <div>
+            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Seller workspace</div>
+            <h1>Ефективність акаунта — @Model.StoreName</h1>
+            <p>Стан магазину, якість обслуговування та відгуки покупців.</p>
+        </div>
+    </header>
+
+    <partial name="_BusinessNav" model="Model.BusinessId" />
+
+    <section class="business-panel">
+        <h2>Стан акаунта</h2>
+        <span class="seller-status seller-status--@statusClass"><span aria-hidden="true"></span>@statusLabel</span>
+    </section>
+
+    <div class="business-kpis">
+        <div class="business-kpi"><span>Рівень скасувань</span><strong>@Model.CancelRatePercent.ToString("0.0")%</strong></div>
+        <div class="business-kpi"><span>Скасовано / усього</span><strong>@Model.CanceledOrders / @Model.TotalOrders</strong></div>
+        <div class="business-kpi"><span>Середній рейтинг товарів</span><strong>@(Model.ReviewCount > 0 ? Model.AverageRating.ToString("0.0") : "—")</strong></div>
+        <div class="business-kpi"><span>Відгуків усього</span><strong>@Model.ReviewCount</strong></div>
+    </div>
+
+    <section class="business-panel">
+        <h2>Претензії та повернення</h2>
+        <div class="business-note">
+            <strong>Обробка вручну</strong>
+            Заявки на повернення та спірні питання наразі опрацьовує команда підтримки маркетплейсу вручну — окрема статистика за цим розділом ще не збирається автоматично.
+        </div>
+    </section>
+</div>

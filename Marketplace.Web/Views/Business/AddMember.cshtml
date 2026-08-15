@@ -18,7 +18,7 @@
 }
 
 <div class="seller-dashboard">
-    <a asp-action="Index" class="seller-form-back">← До панелі продавця</a>
+    <a asp-action="Team" asp-route-businessId="@Model.BusinessId" class="seller-form-back">← До команди</a>
 
     <div class="seller-form-card">
         <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Команда бізнесу</div>
@@ -43,7 +43,7 @@
             </div>
 
             <div class="seller-form-actions">
-                <a asp-action="Index" class="seller-button seller-button--secondary">Скасувати</a>
+                <a asp-action="Team" asp-route-businessId="@Model.BusinessId" class="seller-button seller-button--secondary">Скасувати</a>
                 <button type="submit" class="seller-button seller-button--primary">Надіслати запит</button>
             </div>
         </form>

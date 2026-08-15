@@ -1,0 +1,126 @@
+.notif-tabs {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.25rem;
+    overflow-x: auto;
+}
+
+.notif-tabs__btn {
+    align-items: center;
+    background: #fff;
+    border: 1px solid var(--profile-line);
+    border-radius: 0.85rem;
+    color: var(--profile-muted);
+    display: inline-flex;
+    flex-shrink: 0;
+    font-size: 0.88rem;
+    font-weight: 650;
+    gap: 0.4rem;
+    padding: 0.6rem 1rem;
+    transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.notif-tabs__btn:hover {
+    border-color: var(--profile-primary);
+    color: var(--profile-primary);
+}
+
+.notif-tabs__btn.is-active {
+    background: var(--profile-primary);
+    border-color: var(--profile-primary);
+    color: #fff;
+}
+
+.notif-tabs__badge {
+    background: rgba(23, 32, 51, 0.08);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    padding: 0.05rem 0.5rem;
+}
+
+.notif-tabs__btn.is-active .notif-tabs__badge {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.activity-note {
+    color: var(--profile-muted);
+    font-size: 0.88rem;
+    margin-bottom: 1rem;
+}
+
+.notif-product-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.notif-product-card {
+    background: #fff;
+    border: 1px solid var(--profile-line);
+    border-radius: 1rem;
+    color: inherit;
+    display: block;
+    overflow: hidden;
+    text-decoration: none;
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.notif-product-card:hover {
+    box-shadow: 0 0.65rem 1.6rem rgba(23, 32, 51, 0.1);
+    transform: translateY(-2px);
+}
+
+.notif-product-card__media {
+    align-items: center;
+    background: var(--profile-soft);
+    display: flex;
+    height: 140px;
+    justify-content: center;
+    position: relative;
+}
+
+.notif-product-card__media img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.notif-product-card__media span[aria-hidden] {
+    color: var(--profile-muted);
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.notif-product-card__media small {
+    background: var(--profile-primary);
+    border-radius: 999px;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 650;
+    padding: 0.15rem 0.55rem;
+    position: absolute;
+    right: 0.6rem;
+    top: 0.6rem;
+}
+
+.notif-product-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.85rem 1rem 1rem;
+}
+
+.notif-product-card__category {
+    color: var(--profile-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+.notif-product-card__name {
+    font-weight: 650;
+}
+
+.notif-product-card__body strong {
+    color: var(--profile-primary);
+    margin-top: 0.25rem;
+}
