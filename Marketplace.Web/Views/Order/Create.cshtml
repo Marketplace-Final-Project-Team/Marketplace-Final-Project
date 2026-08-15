@@ -128,6 +128,16 @@
                         </div>
 
                         <div class="checkout-review-block">
+                            <h3>Промокод</h3>
+                            <div class="checkout-promo">
+                                <input type="text" class="form-control" placeholder="Введіть промокод" data-promo-input maxlength="30" />
+                                <button type="button" class="btn btn-outline-secondary" data-promo-apply>Застосувати</button>
+                            </div>
+                            <p class="checkout-promo__message" data-promo-message hidden></p>
+                            <p class="checkout-promo__hint">Спробуйте код <strong>WELCOME10</strong> — знижка попередньо відображається тут, фінальна сума виставляється на сторінці оплати.</p>
+                        </div>
+
+                        <div class="checkout-review-block">
                             <h3>Товари у замовленні</h3>
                             <div class="order-lines">
                                 @foreach (var item in Model.Items)
@@ -164,7 +174,8 @@
                 <h2>Ваше замовлення</h2>
                 <div class="summary-row"><span>Товарів</span><strong>@units шт.</strong></div>
                 <div class="summary-row"><span>Доставка</span><strong>Безкоштовно</strong></div>
-                <div class="summary-total"><span>До сплати</span><span>@Model.Total.ToString("N2") ₴</span></div>
+                <div class="summary-row" data-promo-summary-row hidden><span>Знижка за промокодом</span><strong data-promo-summary-value>−0,00 ₴</strong></div>
+                <div class="summary-total"><span>До сплати</span><span data-order-total="@Model.Total.ToString(System.Globalization.CultureInfo.InvariantCulture)">@Model.Total.ToString("N2") ₴</span></div>
             </aside>
         </div>
     </form>

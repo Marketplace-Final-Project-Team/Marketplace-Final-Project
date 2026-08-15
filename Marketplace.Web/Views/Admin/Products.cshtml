@@ -38,8 +38,12 @@
     }
     else
     {
+        <input type="search" class="form-control admin-search" placeholder="Пошук за назвою..."
+               data-admin-search="#products-table" aria-label="Пошук товарів" />
+        <p class="admin-empty" data-admin-search-empty hidden>Нічого не знайдено за цим запитом.</p>
+
         <div class="admin-panel table-responsive">
-            <table class="table admin-table">
+            <table class="table admin-table" id="products-table">
                 <thead>
                     <tr>
                         <th>Товар</th>
@@ -105,3 +109,7 @@
         </div>
     }
 </div>
+
+@section Scripts {
+    <script src="~/js/admin-search.js" asp-append-version="true"></script>
+}

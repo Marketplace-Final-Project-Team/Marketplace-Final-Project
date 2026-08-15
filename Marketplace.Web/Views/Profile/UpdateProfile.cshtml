@@ -1,65 +1,78 @@
-﻿@model ProfileUpdateViewModel
+@model ProfileUpdateViewModel
 
 @{
     ViewData["Title"] = "Редагування профілю";
+    var initial = string.IsNullOrWhiteSpace(Model.Username) ? "U" : Model.Username[..1].ToUpperInvariant();
 }
 
-<div class="container mt-5">
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+}
 
-    <div class="card shadow-sm">
+<div class="profile-page">
+    <a asp-action="Index" class="profile-back">← До кабінету</a>
 
-        <div class="card-body">
+    <div class="address-form-card">
+        <h1>Редагування профілю</h1>
 
-            <h2 class="mb-4">Редагування профілю</h2>
+        <form asp-action="UpdateProfile" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-            <form asp-action="UpdateProfile" enctype="multipart/form-data">
-
-                <div asp-validation-summary="ModelOnly"
-                     class="text-danger mb-3">
+            <div class="profile-avatar-upload">
+                <div class="profile-avatar-upload__preview">
+                    @if (!string.IsNullOrWhiteSpace(Model.CurrentAvatarUrl))
+                    {
+                        <img src="@Model.CurrentAvatarUrl" alt="Поточний аватар" />
+                    }
+                    else
+                    {
+                        <span class="profile-avatar profile-avatar--fallback">@initial</span>
+                    }
                 </div>
-
-                <div class="mb-3">
-
-                    <label asp-for="Username" class="form-label"></label>
-
-                    <input asp-for="Username"
-                           class="form-control" />
-
-                    <span asp-validation-for="Username"
-                          class="text-danger"></span>
-
+                <div>
+                    <label class="btn btn-outline-primary" for="avatar-input">Змінити фото</label>
+                    <input asp-for="Avatar" id="avatar-input" class="visually-hidden" accept="image/png,image/jpeg,image/webp" data-avatar-input />
+                    <p class="profile-form-hint">JPG, PNG або WEBP. Замінить поточний аватар.</p>
+                    <span asp-validation-for="Avatar" class="text-danger small"></span>
                 </div>
+            </div>
 
-                <div class="mb-4">
+            <div class="address-form-field">
+                <label asp-for="Username" class="form-label">Ім'я користувача</label>
+                <input asp-for="Username" class="form-control" />
+                <span asp-validation-for="Username" class="text-danger small"></span>
+            </div>
 
-                    <label asp-for="Avatar"
-                           class="form-label"></label>
-
-                    <input asp-for="Avatar"
-                           class="form-control" />
-
-                    <span asp-validation-for="Avatar"
-                          class="text-danger"></span>
-
-                </div>
-
-                <button class="btn btn-primary">
-                    Зберегти
-                </button>
-
-                <a asp-action="Index"
-                   class="btn btn-secondary">
-                    Скасувати
-                </a>
-
-            </form>
-
-        </div>
-
+            <div class="address-form-actions">
+                <a asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
+                <button type="submit" class="btn btn-primary">Зберегти</button>
+            </div>
+        </form>
     </div>
-
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            var input = document.querySelector('[data-avatar-input]');
+            var previewWrap = document.querySelector('.profile-avatar-upload__preview');
+            if (!input || !previewWrap) {
+                return;
+            }
+
+            input.addEventListener('change', function () {
+                var file = input.files && input.files[0];
+                if (!file) {
+                    return;
+                }
+
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    previewWrap.innerHTML = '<img src="' + e.target.result + '" alt="Новий аватар" />';
+                };
+                reader.readAsDataURL(file);
+            });
+        })();
+    </script>
 }

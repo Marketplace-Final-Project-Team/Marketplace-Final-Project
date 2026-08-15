@@ -32,6 +32,8 @@
         </div>
     </header>
 
+    <partial name="_BusinessNav" model="Model.BusinessId" />
+
     @if (TempData["Success"] is string success)
     {
         <div class="seller-alert" role="status">

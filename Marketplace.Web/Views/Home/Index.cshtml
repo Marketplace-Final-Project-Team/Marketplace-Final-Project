@@ -182,6 +182,18 @@
         </section>
     }
 
+    <section class="home-section" data-recently-viewed-section hidden>
+        <div class="home-section__heading">
+            <div>
+                <span class="home-section__kicker">Ваша історія</span>
+                <h2>Нещодавно переглянуті</h2>
+            </div>
+            <a asp-controller="Catalog" asp-action="Index">Увесь каталог →</a>
+        </div>
+
+        <div class="home-products" data-recently-viewed-list></div>
+    </section>
+
     <section class="home-promo">
         <div class="home-promo__content">
             <span class="home-section__kicker">Для продавців</span>
@@ -209,3 +221,7 @@
         </div>
     </section>
 </div>
+
+@section Scripts {
+    <script src="~/js/recently-viewed.js" asp-append-version="true"></script>
+}

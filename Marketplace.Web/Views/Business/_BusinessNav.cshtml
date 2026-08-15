@@ -1,0 +1,19 @@
+@model Guid
+
+@{
+    var current = ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty;
+
+    string ActiveClass(string action) => string.Equals(current, action, StringComparison.OrdinalIgnoreCase)
+        ? "is-active"
+        : string.Empty;
+}
+
+<nav class="business-nav" aria-label="Розділи панелі магазину">
+    <a class="@ActiveClass("Orders")" asp-action="Orders" asp-route-businessId="@Model">Замовлення</a>
+    <a class="@ActiveClass("Finance")" asp-action="Finance" asp-route-businessId="@Model">Фінанси</a>
+    <a class="@ActiveClass("Performance")" asp-action="Performance" asp-route-businessId="@Model">Ефективність</a>
+    <a class="@ActiveClass("Growth")" asp-action="Growth" asp-route-businessId="@Model">Розвиток</a>
+    <a class="@ActiveClass("Integrations")" asp-action="Integrations" asp-route-businessId="@Model">Додатки</a>
+    <a class="@ActiveClass("Team")" asp-action="Team" asp-route-businessId="@Model">Команда</a>
+    <a class="@ActiveClass("Settings")" asp-action="Settings" asp-route-businessId="@Model">Налаштування</a>
+</nav>

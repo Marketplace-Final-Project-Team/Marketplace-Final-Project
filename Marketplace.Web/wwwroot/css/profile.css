@@ -54,6 +54,33 @@
     gap: 1.25rem;
 }
 
+.profile-avatar-wrap {
+    display: inline-block;
+    position: relative;
+}
+
+.profile-avatar-edit {
+    align-items: center;
+    background: var(--profile-primary);
+    border: 2px solid #fff;
+    border-radius: 50%;
+    bottom: -0.2rem;
+    box-shadow: 0 0.2rem 0.5rem rgba(23, 32, 51, 0.2);
+    color: #fff;
+    display: flex;
+    height: 1.75rem;
+    justify-content: center;
+    position: absolute;
+    right: -0.2rem;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+    width: 1.75rem;
+}
+
+.profile-avatar-wrap:hover .profile-avatar-edit {
+    background: var(--profile-primary-dark);
+    transform: scale(1.08);
+}
+
 .profile-summary h1 {
     font-size: clamp(1.5rem, 3vw, 2rem);
     font-weight: 800;
@@ -218,6 +245,60 @@
     font-size: 1.35rem;
     font-weight: 780;
     margin-bottom: 1.4rem;
+}
+
+.profile-avatar-upload {
+    align-items: center;
+    display: flex;
+    gap: 1.1rem;
+    margin-bottom: 1.6rem;
+}
+
+.profile-avatar-upload__preview {
+    flex: 0 0 auto;
+}
+
+.profile-avatar-upload__preview img,
+.profile-avatar-upload__preview .profile-avatar {
+    border-radius: 50%;
+    height: 4.5rem;
+    object-fit: cover;
+    width: 4.5rem;
+}
+
+.profile-avatar-upload__preview .profile-avatar--fallback {
+    font-size: 1.6rem;
+}
+
+.profile-password-field {
+    position: relative;
+}
+
+.profile-password-field input {
+    padding-right: 5.5rem;
+}
+
+.profile-password-toggle {
+    background: transparent;
+    border: 0;
+    color: var(--profile-primary);
+    font-size: 0.78rem;
+    font-weight: 650;
+    padding: 0.3rem 0.5rem;
+    position: absolute;
+    right: 0.3rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.profile-password-toggle:hover {
+    color: var(--profile-primary-dark);
+}
+
+.profile-form-hint {
+    color: var(--profile-muted);
+    font-size: 0.78rem;
+    margin: 0.4rem 0 0;
 }
 
 .address-form-field {

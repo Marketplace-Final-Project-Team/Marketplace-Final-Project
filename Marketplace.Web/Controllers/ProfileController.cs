@@ -1,4 +1,5 @@
 ﻿using Marketplace.BLL.DTOs;
+using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
 using Marketplace.Domain.Entities;
@@ -16,6 +17,7 @@ namespace Marketplace.Web.Controllers
         private readonly IProfileService _profileService;
         private readonly IOrderService _orderService;
         private readonly IWishlistService _wishlistService;
+        private readonly IProductService _productService;
         private readonly IGenericRepository<Address> _addressRepository;
         private readonly AppDbContext _context;
         private readonly UserManager<User> _userManager;
@@ -25,6 +27,7 @@ namespace Marketplace.Web.Controllers
             IProfileService profileService,
             IOrderService orderService,
             IWishlistService wishlistService,
+            IProductService productService,
             IGenericRepository<Address> addressRepository,
             AppDbContext context,
             UserManager<User> userManager,
@@ -33,6 +36,7 @@ namespace Marketplace.Web.Controllers
             _profileService = profileService;
             _orderService = orderService;
             _wishlistService = wishlistService;
+            _productService = productService;
             _addressRepository = addressRepository;
             _context = context;
             _userManager = userManager;
@@ -72,7 +76,7 @@ namespace Marketplace.Web.Controllers
             var userId = _userManager.GetUserId(User)!;
             var orders = await _orderService.GetUserOrders(userId);
 
-            var items = orders
+            var orderActivity = orders
                 .OrderByDescending(o => o.UpdatedAt ?? o.CreatedAt)
                 .Take(20)
                 .Select(o => new ActivityItemViewModel
@@ -84,8 +88,38 @@ namespace Marketplace.Web.Controllers
                 })
                 .ToList();
 
-            return View(items);
+            var newProducts = await _productService.GetCatalogPageAsync(new CatalogFilterDto
+            {
+                Sort = CatalogSortOption.Newest,
+                Page = 1,
+                PageSize = 6
+            });
+
+            var recommended = await _productService.GetCatalogPageAsync(new CatalogFilterDto
+            {
+                Sort = CatalogSortOption.Popularity,
+                Page = 1,
+                PageSize = 6
+            });
+
+            var model = new NotificationsViewModel
+            {
+                OrderActivity = orderActivity,
+                NewProducts = newProducts.Items.Select(MapNotificationProduct).ToList(),
+                RecommendedProducts = recommended.Items.Select(MapNotificationProduct).ToList()
+            };
+
+            return View(model);
         }
+
+        private static NotificationProductViewModel MapNotificationProduct(CatalogPageItemDto item) => new()
+        {
+            Id = item.Product.Id,
+            Name = item.Product.Name,
+            ImageUrl = item.Product.MainImageUrl,
+            Price = item.Product.Price,
+            CategoryName = item.Product.Category?.Name ?? "Без категорії"
+        };
 
         [HttpGet]
         public async Task<IActionResult> Wishlist()
@@ -296,7 +330,8 @@ namespace Marketplace.Web.Controllers
 
             var model = new ProfileUpdateViewModel
             {
-                Username = profile!.Username
+                Username = profile!.Username,
+                CurrentAvatarUrl = profile.Avatar
             };
 
             return View(model);
@@ -306,12 +341,13 @@ namespace Marketplace.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateProfile(ProfileUpdateViewModel model)
         {
+            var userId = _userManager.GetUserId(User);
+
             if (!ModelState.IsValid)
             {
+                model.CurrentAvatarUrl = (await _profileService.GetProfile(userId!))?.Avatar;
                 return View(model);
             }
-
-            var userId = _userManager.GetUserId(User);
 
             var updateDto = new UpdateProfileDto
             {
@@ -324,9 +360,11 @@ namespace Marketplace.Web.Controllers
             if (!result.Succeeded)
             {
                 ModelState.AddModelError(string.Empty, result.Message);
+                model.CurrentAvatarUrl = (await _profileService.GetProfile(userId!))?.Avatar;
                 return View(model);
             }
 
+            TempData["Success"] = "Профіль оновлено.";
             return RedirectToAction("Index");
         }
 

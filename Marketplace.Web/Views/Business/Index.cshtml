@@ -210,6 +210,18 @@
                                     <a asp-action="Orders" asp-route-businessId="@business.Id">
                                         <span aria-hidden="true">▣</span><div><strong>Замовлення</strong><small>Обробка та зміна статусу</small></div><b aria-hidden="true">→</b>
                                     </a>
+                                    <a asp-action="Finance" asp-route-businessId="@business.Id">
+                                        <span aria-hidden="true">₴</span><div><strong>Фінанси</strong><small>Оборот, продажі та виплати</small></div><b aria-hidden="true">→</b>
+                                    </a>
+                                    <a asp-action="Performance" asp-route-businessId="@business.Id">
+                                        <span aria-hidden="true">◈</span><div><strong>Ефективність</strong><small>Стан акаунта та рейтинг</small></div><b aria-hidden="true">→</b>
+                                    </a>
+                                    <a asp-action="Team" asp-route-businessId="@business.Id">
+                                        <span aria-hidden="true">☺</span><div><strong>Команда</strong><small>Учасники та доступи</small></div><b aria-hidden="true">→</b>
+                                    </a>
+                                    <a asp-action="Settings" asp-route-businessId="@business.Id">
+                                        <span aria-hidden="true">⚙</span><div><strong>Налаштування</strong><small>Дані компанії та платежі</small></div><b aria-hidden="true">→</b>
+                                    </a>
                                     <a asp-controller="Catalog" asp-action="Index">
                                         <span aria-hidden="true">◎</span><div><strong>Вітрина</strong><small>Переглянути каталог покупця</small></div><b aria-hidden="true">→</b>
                                     </a>
