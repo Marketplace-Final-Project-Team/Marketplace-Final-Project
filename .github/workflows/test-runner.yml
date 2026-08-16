@@ -11,4 +11,4 @@ jobs:
 
     steps:
       - name: Deploy
-        run: ~/deploy.sh
+        run: /home/devops/deploy.sh
