@@ -1,7 +1,9 @@
 name: Test EC2 Runner
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - develop
 
 jobs:
   test:
