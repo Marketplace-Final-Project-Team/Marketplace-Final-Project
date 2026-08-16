@@ -16,20 +16,20 @@
             <h1>Усе потрібне — <em>в одному місці</em></h1>
             <p>Знаходьте товари для роботи, дому й відпочинку. Порівнюйте пропозиції, додавайте до кошика та стежте за доставкою.</p>
 
-          <form asp-controller="Catalog" asp-action="Index" method="get" class="home-search" role="search" style="position: relative;">
+            <form asp-controller="Catalog" asp-action="Index" method="get" class="home-search" role="search" style="position: relative;">
                 <span aria-hidden="true">⌕</span>
                 <input name="search" 
                        id="searchInput" 
-                       value="@Model.Search" 
+                       value="@Model?.Search" 
                        placeholder="Що ви шукаєте?" 
                        aria-label="Пошук товарів" 
                        autocomplete="off" />
 
-                @if (Model.CategoryId.HasValue)
+                @if (Model?.CategoryId.HasValue == true)
                 {
                     <input type="hidden" name="categoryId" value="@Model.CategoryId" />
                 }
-                @if (!string.IsNullOrEmpty(Model.SortBy))
+                @if (!string.IsNullOrEmpty(Model?.SortBy))
                 {
                     <input type="hidden" name="sortBy" value="@Model.SortBy" />
                 }
@@ -106,33 +106,39 @@
                 <span class="home-section__kicker">Обирайте швидше</span>
                 <h2>Популярні категорії</h2>
             </div>
-            @if (Model.CategoryId.HasValue)
+            @if (Model?.CategoryId.HasValue == true)
             {
                 <a asp-action="Index" class="text-primary js-reset-filters">Скинути фільтр категорій ✕</a>
             }
         </div>
 
         <div class="category-grid">
-            <a asp-action="Index" asp-route-search="@Model.Search" asp-route-sortBy="@Model.SortBy" class="category-card category-card--blue @(!Model.CategoryId.HasValue ? "border border-2 border-primary" : "")">
+            <a asp-action="Index" asp-route-search="@Model?.Search" asp-route-sortBy="@Model?.SortBy" class="category-card category-card--blue @(Model?.CategoryId.HasValue != true ? "border border-2 border-primary" : "")">
                 <span class="category-card__icon">⌁</span>
                 <strong>Усі категорії</strong>
                 <small>Переглянути все</small>
             </a>
-            @foreach (var cat in Model.Categories)
-            {
-                var isSelected = Model.CategoryId?.ToString() == cat.Value;
-                <a asp-action="Index" asp-route-categoryId="@cat.Value" asp-route-search="@Model.Search" asp-route-sortBy="@Model.SortBy" class="category-card category-card--violet @(isSelected ? "border border-2 border-primary" : "")">
-                    <span class="category-card__icon">⌂</span>
-                    <strong>@cat.Text</strong>
-                    <small>Категорія</small>
-                </a>
-            }
+          @if (Model?.Categories != null)
+{
+    foreach (var cat in Model.Categories)
+    {
+        var isSelected = Model.CategoryId?.ToString() == cat.Value;
+        <a asp-action="Index" asp-route-categoryId="@cat.Value" asp-route-search="@Model?.Search" asp-route-sortBy="@Model?.SortBy" class="category-card category-card--violet @(isSelected ? "border border-2 border-primary" : "")">
+            <span class="category-card__icon">⌂</span>
+            <strong>@cat.Text</strong>
+            <small>Категорія</small>
+        </a>
+    }
+}
         </div>
     </section>
 
     <!-- СЕКЦІЯ ТОВАРІВ -->
     <section class="home-section home-featured" id="catalog-products">
-        @await Html.PartialAsync("_ProductListPartial", Model)
+        @if (Model != null)
+        {
+            @await Html.PartialAsync("_ProductListPartial", Model)
+        }
     </section>
 
     <!-- ПРОМО ДЛЯ ПРОДАВЦІВ -->
@@ -165,137 +171,155 @@
 </div>
 
 @section Scripts {
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const container = document.getElementById('catalog-products');
-        const searchInput = document.getElementById('searchInput');
-        const suggestionsBox = document.getElementById('searchSuggestions');
-        let debounceTimer;
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('catalog-products');
+            const searchInput = document.getElementById('searchInput');
+            const suggestionsBox = document.getElementById('searchSuggestions');
+            let debounceTimer;
 
-        function updateCategoryHighlight(targetUrl) {
-            const urlObj = new URL(targetUrl, window.location.origin);
-            const activeCategoryId = urlObj.searchParams.get('categoryId');
+            function updateCategoryHighlight(targetUrl) {
+                const urlObj = new URL(targetUrl, window.location.origin);
+                const activeCategoryId = urlObj.searchParams.get('categoryId');
 
-            document.querySelectorAll('.category-card').forEach(card => {
-                const cardHref = card.getAttribute('href');
-                if (!cardHref) return;
+                document.querySelectorAll('.category-card').forEach(card => {
+                    const cardHref = card.getAttribute('href');
+                    if (!cardHref) return;
 
-                const cardUrl = new URL(cardHref, window.location.origin);
-                const cardCategoryId = cardUrl.searchParams.get('categoryId');
+                    const cardUrl = new URL(cardHref, window.location.origin);
+                    const cardCategoryId = cardUrl.searchParams.get('categoryId');
 
-                const isSelected = (!activeCategoryId && !cardCategoryId) || 
-                                   (activeCategoryId && activeCategoryId === cardCategoryId);
+                    const isSelected = (!activeCategoryId && !cardCategoryId) || 
+                                       (activeCategoryId && activeCategoryId === cardCategoryId);
 
-                if (isSelected) {
-                    card.classList.add('border', 'border-2', 'border-primary');
-                } else {
-                    card.classList.remove('border', 'border-2', 'border-primary');
+                    if (isSelected) {
+                        card.classList.add('border', 'border-2', 'border-primary');
+                    } else {
+                        card.classList.remove('border', 'border-2', 'border-primary');
+                    }
+                });
+            }
+
+            async function loadProducts(url) {
+                if (!container) return;
+                try {
+                    container.style.opacity = '0.5';
+
+                    const response = await fetch(url, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+
+                    if (!response.ok) throw new Error('Помилка завантаження даних');
+
+                    const html = await response.text();
+                    container.innerHTML = html;
+
+                    history.pushState(null, '', url);
+                    updateCategoryHighlight(url);
+                } catch (err) {
+                    console.error('Помилка завантаження товарів:', err);
+                } finally {
+                    container.style.opacity = '1';
                 }
-            });
-        }
+            }
 
-        async function loadProducts(url) {
-            try {
-                container.style.opacity = '0.5';
+            function escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
 
-                const response = await fetch(url, {
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            if (searchInput && suggestionsBox) {
+                searchInput.addEventListener('input', (e) => {
+                    clearTimeout(debounceTimer);
+                    const query = e.target.value.trim();
+
+                    if (query.length < 2) {
+                        suggestionsBox.style.display = 'none';
+                        suggestionsBox.innerHTML = '';
+                        return;
+                    }
+
+                    debounceTimer = setTimeout(async () => {
+                        try {
+                            const response = await fetch(`/Home/AutoComplete?term=${encodeURIComponent(query)}`);
+                            if (!response.ok) return;
+
+                            const suggestions = await response.json();
+
+                            if (!suggestions || suggestions.length === 0) {
+                                suggestionsBox.style.display = 'none';
+                                return;
+                            }
+
+                            const safeQuery = escapeRegExp(query);
+                            const regex = new RegExp(`(${safeQuery})`, 'gi');
+
+                            suggestionsBox.innerHTML = suggestions.map(item => {
+                                const name = item.name || '';
+                                const highlighted = name.replace(regex, '<mark>$1</mark>');
+                                const displayPrice = item.hasActiveDiscount && item.discountedPrice ? item.discountedPrice : item.price;
+
+                                return `
+                                    <li data-id="${item.id}" data-value="${name}" class="d-flex align-items-center justify-content-between p-2">
+                                        <span>${highlighted}</span>
+                                        <small class="text-primary fw-bold ms-2">${displayPrice}</small>
+                                    </li>`;
+                            }).join('');
+
+                            suggestionsBox.style.display = 'block';
+                        } catch (err) {
+                            console.error('Помилка автодоповнення:', err);
+                        }
+                    }, 250);
                 });
 
-                if (!response.ok) throw new Error('Помилка завантаження даних');
-
-                const html = await response.text();
-                container.innerHTML = html;
-
-                history.pushState(null, '', url);
-                updateCategoryHighlight(url);
-            } catch (err) {
-                console.error(err);
-            } finally {
-                container.style.opacity = '1';
-            }
-        }
-
-        if (searchInput && suggestionsBox) {
-            searchInput.addEventListener('input', (e) => {
-                clearTimeout(debounceTimer);
-                const query = e.target.value.trim();
-
-                if (query.length < 2) {
-                    suggestionsBox.style.display = 'none';
-                    suggestionsBox.innerHTML = '';
-                    return;
-                }
-
-                debounceTimer = setTimeout(async () => {
-                    try {
-                        const response = await fetch(`/Home/AutoComplete?term=${encodeURIComponent(query)}`);
-                        const suggestions = await response.json();
-
-                        if (!suggestions || suggestions.length === 0) {
+                suggestionsBox.addEventListener('click', (e) => {
+                    const item = e.target.closest('li');
+                    if (item) {
+                        const productId = item.dataset.id;
+                        if (productId) {
+                            window.location.href = `/Catalog/Details/${productId}`;
+                        } else {
+                            searchInput.value = item.dataset.value;
                             suggestionsBox.style.display = 'none';
-                            return;
+                            searchInput.closest('form').submit();
                         }
-
-                        suggestionsBox.innerHTML = suggestions.map(item => {
-                            const regex = new RegExp(`(${query})`, 'gi');
-                            const highlighted = item.replace(regex, '<mark>$1</mark>');
-                            return `<li data-value="${item}">${highlighted}</li>`;
-                        }).join('');
-
-                        suggestionsBox.style.display = 'block';
-                    } catch (err) {
-                        console.error('Помилка автодоповнення:', err);
                     }
-                }, 250);
-            });
+                });
 
-     
-          suggestionsBox.addEventListener('click', (e) => {
-    const item = e.target.closest('li');
-    if (item) {
-        searchInput.value = item.dataset.value;
-        suggestionsBox.style.display = 'none';
-        searchInput.closest('form').submit();
-    }
-});
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.home-search')) {
+                        suggestionsBox.style.display = 'none';
+                    }
+                });
+            }
 
- 
             document.addEventListener('click', (e) => {
-                if (!e.target.closest('.home-search')) {
-                    suggestionsBox.style.display = 'none';
+                const link = e.target.closest('.category-card, .js-async-link');
+                if (link && link.getAttribute('href') && !link.getAttribute('href').startsWith('#')) {
+                    e.preventDefault();
+                    loadProducts(link.href);
+                }
+
+                if (e.target.closest('.js-reset-filters')) {
+                    e.preventDefault();
+                    loadProducts('@Url.Action("Index", "Home")');
                 }
             });
-        }
 
+            document.addEventListener('change', (e) => {
+                if (e.target.classList.contains('js-async-sort')) {
+                    const form = e.target.closest('form');
+                    const formData = new FormData(form);
+                    const params = new URLSearchParams(formData).toString();
+                    const url = `${window.location.pathname}?${params}`;
 
-        document.addEventListener('click', (e) => {
-            const link = e.target.closest('.category-card, .js-async-link');
-            if (link && link.getAttribute('href') && !link.getAttribute('href').startsWith('#')) {
-                e.preventDefault();
-                loadProducts(link.href);
-            }
+                    loadProducts(url);
+                }
+            });
 
-            if (e.target.closest('.js-reset-filters')) {
-                e.preventDefault();
-                loadProducts('@Url.Action("Index", "Home")');
-            }
+            window.addEventListener('popstate', () => {
+                loadProducts(window.location.href);
+            });
         });
-
-        document.addEventListener('change', (e) => {
-            if (e.target.classList.contains('js-async-sort')) {
-                const form = e.target.closest('form');
-                const formData = new FormData(form);
-                const params = new URLSearchParams(formData).toString();
-                const url = `${window.location.pathname}?${params}`;
-
-                loadProducts(url);
-            }
-        });
-
-        window.addEventListener('popstate', () => {
-            loadProducts(window.location.href);
-        });
-    });
-</script>
+    </script>
 }

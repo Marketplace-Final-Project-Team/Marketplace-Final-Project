@@ -2,6 +2,7 @@
 {
     public class ReviewDto
     {
+        public Guid UserId { get; set; }
         public string Body { get; set; } = string.Empty;
         public float Rating { get; set; }
 

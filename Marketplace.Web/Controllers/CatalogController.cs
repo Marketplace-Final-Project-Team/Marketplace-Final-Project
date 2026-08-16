@@ -23,7 +23,6 @@ public class CatalogController : Controller
         _categoryRepository = categoryRepository;
     }
 
-  
     [HttpGet]
     public async Task<IActionResult> Index(string? search, Guid? categoryId, string? sortBy, int page = 1)
     {
@@ -56,6 +55,26 @@ public class CatalogController : Controller
         };
 
         return View(model);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> SearchSuggestions(string? term)
+    {
+        var suggestions = await _productService.GetSearchSuggestionsAsync(term);
+
+        var result = suggestions.Select(s => new
+        {
+            id = s.Id,
+            name = s.Name,
+            categoryName = string.IsNullOrWhiteSpace(s.CategoryName) ? "Без категорії" : s.CategoryName,
+            mainImageUrl = s.MainImageUrl,
+            price = s.Price.ToString("N2") + " ₴",
+            hasActiveDiscount = s.HasActiveDiscount,
+            discountedPrice = s.DiscountedPrice.HasValue ? s.DiscountedPrice.Value.ToString("N2") + " ₴" : null,
+            discountPercentage = s.DiscountPercentage
+        });
+
+        return Json(result);
     }
 
     [HttpGet]

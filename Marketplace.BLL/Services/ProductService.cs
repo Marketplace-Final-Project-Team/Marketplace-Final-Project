@@ -61,19 +61,19 @@ public class ProductService : IProductService
         var items = await itemsQuery
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-           .Select(p => new
-           {
-               p.Id,
-               p.Name,
-               p.Price,
-               p.Quantity,
-               MainImageUrl = p.MainImageUrl ?? string.Empty,
-               CategoryName = p.Category != null ? p.Category.Name : null,
-               ActiveDiscount = p.Discounts
-        .Where(d => d.StartDate <= now && d.EndDate >= now)
-        .OrderByDescending(d => d.Percent)
-        .FirstOrDefault()
-           })
+            .Select(p => new
+            {
+                p.Id,
+                p.Name,
+                p.Price,
+                p.Quantity,
+                MainImageUrl = p.MainImageUrl ?? string.Empty,
+                CategoryName = p.Category != null ? p.Category.Name : null,
+                ActiveDiscount = p.Discounts
+                    .Where(d => d.StartDate <= now && d.EndDate >= now)
+                    .OrderByDescending(d => d.Percent)
+                    .FirstOrDefault()
+            })
             .Select(x => new CatalogProductDto
             {
                 Id = x.Id,
@@ -104,12 +104,13 @@ public class ProductService : IProductService
         return await _productRepository.FirstOrDefaultAsync(
             product => product.Id == id
                 && product.Status == ProductStatus.Active
-                && product.Quantity > 0);
+                && product.Quantity > 0
+                && !product.IsDeleted);
     }
 
     public async Task<IReadOnlyList<Product>> GetByBusinessAsync(Guid businessId)
     {
-        return await _productRepository.FindAsync(p => p.BusinessId == businessId);
+        return await _productRepository.FindAsync(p => p.BusinessId == businessId && !p.IsDeleted);
     }
 
     public async Task<Product?> GetByIdAsync(Guid id)
@@ -203,15 +204,16 @@ public class ProductService : IProductService
     public async Task<IReadOnlyList<CatalogProductDto>> GetSearchSuggestionsAsync(string? term, int limit = 8)
     {
         if (string.IsNullOrWhiteSpace(term) || term.Trim().Length < 2)
-            return new List<CatalogProductDto>();
+            return Array.Empty<CatalogProductDto>();
 
-        var normalizedTerm = term.Trim();
+        var normalizedTerm = term.Trim().ToLower();
         var now = DateTime.UtcNow;
 
         return await _context.Products
-            .Where(p => p.Status == ProductStatus.Active && p.Quantity > 0)
+            .AsNoTracking()
+            .Where(p => p.Status == ProductStatus.Active && p.Quantity > 0 && !p.IsDeleted)
             .Where(p => p.Business.Status == BusinessStatus.Active)
-            .Where(p => p.Name.Contains(normalizedTerm))
+            .Where(p => p.Name.ToLower().Contains(normalizedTerm))
             .OrderBy(p => p.Name)
             .Take(limit)
             .Select(p => new
@@ -219,7 +221,8 @@ public class ProductService : IProductService
                 p.Id,
                 p.Name,
                 p.Price,
-                p.MainImageUrl,
+                MainImageUrl = p.MainImageUrl ?? string.Empty,
+                CategoryName = p.Category != null ? p.Category.Name : null,
                 ActiveDiscount = p.Discounts
                     .Where(d => d.StartDate <= now && d.EndDate >= now)
                     .OrderByDescending(d => d.Percent)
@@ -231,6 +234,7 @@ public class ProductService : IProductService
                 Name = x.Name,
                 Price = x.Price,
                 MainImageUrl = x.MainImageUrl,
+                CategoryName = x.CategoryName,
                 HasActiveDiscount = x.ActiveDiscount != null,
                 DiscountPercentage = x.ActiveDiscount != null ? x.ActiveDiscount.Percent : null,
                 DiscountedPrice = x.ActiveDiscount != null

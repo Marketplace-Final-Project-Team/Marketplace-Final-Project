@@ -184,6 +184,7 @@ namespace Marketplace.BLL.Services
                 .ToListAsync();
 
             var orders = orderLines
+
                 .GroupBy(line => line.OrderId)
                 .Select(group => group.First())
                 .ToList();

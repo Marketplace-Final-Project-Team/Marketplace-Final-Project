@@ -162,6 +162,10 @@
 
             if (!searchInput || !suggestionsBox) return;
 
+            function escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+
             searchInput.addEventListener('input', (e) => {
                 clearTimeout(debounceTimer);
                 const query = e.target.value.trim();
@@ -174,7 +178,9 @@
 
                 debounceTimer = setTimeout(async () => {
                     try {
-                        const response = await fetch(`/Home/AutoComplete?term=${encodeURIComponent(query)}`);
+                        const response = await fetch(`/Catalog/SearchSuggestions?term=${encodeURIComponent(query)}`);
+                        if (!response.ok) return;
+
                         const suggestions = await response.json();
 
                         if (!suggestions || suggestions.length === 0) {
@@ -182,15 +188,29 @@
                             return;
                         }
 
+                        const safeQuery = escapeRegExp(query);
+                        const regex = new RegExp(`(${safeQuery})`, 'gi');
+
                         suggestionsBox.innerHTML = suggestions.map(item => {
-                            const regex = new RegExp(`(${query})`, 'gi');
-                            const highlighted = item.replace(regex, '<mark>$1</mark>');
-                            return `<li data-value="${item}">${highlighted}</li>`;
+                            const itemName = item.name || '';
+                            const highlightedName = itemName.replace(regex, '<mark>$1</mark>');
+                            const imgHtml = item.mainImageUrl 
+                                ? `<img src="${item.mainImageUrl}" style="width: 32px; height: 32px; object-fit: cover;" class="rounded" />` 
+                                : '';
+
+                            return `
+                                <li data-id="${item.id}" data-value="${itemName}" class="d-flex align-items-center justify-content-between gap-2">
+                                    <div class="d-flex align-items-center gap-2 text-truncate">
+                                        ${imgHtml}
+                                        <span class="text-truncate">${highlightedName}</span>
+                                    </div>
+                                    <small class="text-primary fw-bold ms-2">${item.price}</small>
+                                </li>`;
                         }).join('');
 
                         suggestionsBox.style.display = 'block';
                     } catch (err) {
-                        console.error('Помилка автодоповнення:', err);
+                        console.error('Помилка підказки:', err);
                     }
                 }, 250);
             });
@@ -198,9 +218,14 @@
             suggestionsBox.addEventListener('click', (e) => {
                 const item = e.target.closest('li');
                 if (item) {
-                    searchInput.value = item.dataset.value;
-                    suggestionsBox.style.display = 'none';
-                    searchInput.closest('form').submit();
+                    const productId = item.dataset.id;
+                    if (productId) {
+                        window.location.href = `/Catalog/Details/${productId}`;
+                    } else {
+                        searchInput.value = item.dataset.value;
+                        suggestionsBox.style.display = 'none';
+                        searchInput.closest('form').submit();
+                    }
                 }
             });
 

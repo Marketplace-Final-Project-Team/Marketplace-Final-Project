@@ -16,9 +16,22 @@ public class CatalogProductViewModel
     public DateTime EstimatedDeliveryStart { get; set; }
     public DateTime EstimatedDeliveryEnd { get; set; }
     public List<CatalogRelatedProductViewModel> RelatedProducts { get; set; } = new();
-    public decimal? OriginalPrice { get; set; }   
-    public int? DiscountPercent { get; set; }     
+
+    public List<Marketplace.BLL.DTOs.ReviewDto> Reviews { get; set; } = new();
+    public string? CurrentUserId { get; set; }
+    public bool IsInWishlist { get; set; }
+    public int ReviewCount { get; set; }
+    public double AverageRating { get; set; }
+
+    public Marketplace.BLL.DTOs.ReviewDto? CurrentUserReview =>
+        !string.IsNullOrEmpty(CurrentUserId) && Guid.TryParse(CurrentUserId, out var userGuid)
+            ? Reviews.FirstOrDefault(r => r.UserId == userGuid)
+            : null;
+
+    public decimal? OriginalPrice { get; set; }
+    public int? DiscountPercent { get; set; }
     public bool HasDiscount => OriginalPrice.HasValue && DiscountPercent.HasValue;
+
     public IReadOnlyList<string> GalleryImageUrls => new[] { MainImageUrl }
         .Concat(AdditionalImageUrls)
         .Where(url => !string.IsNullOrWhiteSpace(url))
