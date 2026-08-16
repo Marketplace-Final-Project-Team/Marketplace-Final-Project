@@ -10,9 +10,5 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Test runner
-        run: |
-          echo "Runner works!"
-          hostname
-          whoami
-          pwd
+      - name: Deploy
+        run: ~/deploy.sh
