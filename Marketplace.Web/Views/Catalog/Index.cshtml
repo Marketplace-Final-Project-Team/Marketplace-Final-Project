@@ -1,12 +1,37 @@
-@model IReadOnlyList<Marketplace.Web.Models.CatalogProductViewModel>
+@model Marketplace.Web.Models.CatalogIndexViewModel
 
 @{
     ViewData["Title"] = "Каталог товарів";
-    var search = ViewBag.Search as string;
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+    <style>
+        .search-suggestions {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: #ffffff !important;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            list-style: none;
+            padding: 6px 0;
+            margin: 0;
+            z-index: 9999 !important;
+        }
+
+        .search-suggestions li {
+            padding: 10px 16px;
+            cursor: pointer;
+            color: #1f2937;
+        }
+
+        .search-suggestions li:hover {
+            background-color: #f3f4f6;
+        }
+    </style>
 }
 
 <div class="shop-page">
@@ -14,7 +39,7 @@
         <div>
             <div class="shop-kicker">MarketPlace</div>
             <h1 class="shop-title">Каталог товарів</h1>
-            <p class="shop-subtitle">Тестова вітрина маркетплейсу. Оберіть товар, перегляньте деталі та додайте його до кошика.</p>
+            <p class="shop-subtitle">Знайдіть потрібний товар за допомогою пошуку, фільтрів та сортування.</p>
         </div>
         @if (User.Identity?.IsAuthenticated == true)
         {
@@ -31,30 +56,47 @@
         <div class="alert alert-warning" role="alert">@error</div>
     }
 
-    <form asp-action="Index" method="get" class="catalog-search" role="search">
-        <input name="search" value="@search" class="form-control" placeholder="Пошук за назвою, описом або категорією" aria-label="Пошук товарів" />
-        <button type="submit" class="btn btn-primary">Знайти</button>
-        @if (!string.IsNullOrWhiteSpace(search))
-        {
-            <a asp-action="Index" class="btn btn-outline-secondary">Скинути</a>
-        }
+    <form asp-action="Index" method="get" class="catalog-search row g-2" role="search" autocomplete="off">
+        <div class="col-auto flex-grow-1" style="position: relative;">
+            <input id="catalogSearchInput" name="search" value="@Model.Search" class="form-control" placeholder="Пошук за назвою або описом" aria-label="Пошук товарів" />
+            <ul id="catalogSearchSuggestions" class="search-suggestions" style="display: none;"></ul>
+        </div>
+        <div class="col-auto">
+            <select name="categoryId" class="form-select" asp-items="Model.Categories">
+                <option value="">Всі категорії</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <select name="sortBy" class="form-select">
+                <option value="" selected="@(string.IsNullOrEmpty(Model.SortBy))">Спочатку нові</option>
+                <option value="price_asc" selected="@(Model.SortBy == "price_asc")">Ціна: за зростанням</option>
+                <option value="price_desc" selected="@(Model.SortBy == "price_desc")">Ціна: за спаданням</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Знайти</button>
+            @if (!string.IsNullOrWhiteSpace(Model.Search) || Model.CategoryId.HasValue || !string.IsNullOrWhiteSpace(Model.SortBy))
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary">Скинути</a>
+            }
+        </div>
     </form>
 
-    <div class="catalog-meta">Знайдено товарів: <strong>@Model.Count</strong></div>
+    <div class="catalog-meta">Знайдено товарів: <strong>@Model.Products.Count</strong></div>
 
-    @if (Model.Count == 0)
+    @if (Model.Products.Count == 0)
     {
         <section class="shop-empty">
             <div class="shop-empty__icon" aria-hidden="true">⌕</div>
             <h2>Товарів не знайдено</h2>
-            <p>Спробуйте змінити пошуковий запит або переглянути весь каталог.</p>
+            <p>Спробуйте змінити пошуковий запит або скинути фільтри.</p>
             <a asp-action="Index" class="btn btn-primary">Увесь каталог</a>
         </section>
     }
     else
     {
         <div class="catalog-grid">
-            @foreach (var product in Model)
+            @foreach (var product in Model.Products)
             {
                 <article class="catalog-card">
                     <a asp-action="Details" asp-route-id="@product.Id" class="catalog-card__media" aria-label="Переглянути @product.Name">
@@ -72,7 +114,18 @@
                         <a asp-action="Details" asp-route-id="@product.Id" class="catalog-card__title">@product.Name</a>
                         <p class="catalog-card__description">@product.Description</p>
                         <div class="catalog-card__footer">
-                            <span class="shop-price">@product.Price.ToString("N2") ₴</span>
+                            <div class="catalog-card__price">
+                                @if (product.HasDiscount)
+                                {
+                                    <span class="text-muted text-decoration-line-through small d-block">@product.OriginalPrice?.ToString("N2") ₴</span>
+                                    <span class="shop-price text-danger fw-bold">@product.Price.ToString("N2") ₴</span>
+                                    <span class="badge bg-danger">-@product.DiscountPercent%</span>
+                                }
+                                else
+                                {
+                                    <span class="shop-price">@product.Price.ToString("N2") ₴</span>
+                                }
+                            </div>
                             <form asp-controller="Cart" asp-action="Add" method="post">
                                 <input type="hidden" name="productId" value="@product.Id" />
                                 <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
@@ -83,5 +136,79 @@
                 </article>
             }
         </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <nav class="mt-4">
+                <ul class="pagination">
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.Page ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { search = Model.Search, categoryId = Model.CategoryId, sortBy = Model.SortBy, page = i })">@i</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
     }
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('catalogSearchInput');
+            const suggestionsBox = document.getElementById('catalogSearchSuggestions');
+            let debounceTimer;
+
+            if (!searchInput || !suggestionsBox) return;
+
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(debounceTimer);
+                const query = e.target.value.trim();
+
+                if (query.length < 2) {
+                    suggestionsBox.style.display = 'none';
+                    suggestionsBox.innerHTML = '';
+                    return;
+                }
+
+                debounceTimer = setTimeout(async () => {
+                    try {
+                        const response = await fetch(`/Home/AutoComplete?term=${encodeURIComponent(query)}`);
+                        const suggestions = await response.json();
+
+                        if (!suggestions || suggestions.length === 0) {
+                            suggestionsBox.style.display = 'none';
+                            return;
+                        }
+
+                        suggestionsBox.innerHTML = suggestions.map(item => {
+                            const regex = new RegExp(`(${query})`, 'gi');
+                            const highlighted = item.replace(regex, '<mark>$1</mark>');
+                            return `<li data-value="${item}">${highlighted}</li>`;
+                        }).join('');
+
+                        suggestionsBox.style.display = 'block';
+                    } catch (err) {
+                        console.error('Помилка автодоповнення:', err);
+                    }
+                }, 250);
+            });
+
+            suggestionsBox.addEventListener('click', (e) => {
+                const item = e.target.closest('li');
+                if (item) {
+                    searchInput.value = item.dataset.value;
+                    suggestionsBox.style.display = 'none';
+                    searchInput.closest('form').submit();
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.catalog-search')) {
+                    suggestionsBox.style.display = 'none';
+                }
+            });
+        });
+    </script>
+}

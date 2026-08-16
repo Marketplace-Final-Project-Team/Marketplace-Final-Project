@@ -1,8 +1,11 @@
 using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
+using Marketplace.Domain.Entities;
+using Marketplace.Domain.Interfaces;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Marketplace.Web.Controllers;
 
@@ -10,10 +13,49 @@ namespace Marketplace.Web.Controllers;
 public class CatalogController : Controller
 {
     private readonly IProductService _productService;
+    private readonly IGenericRepository<Category> _categoryRepository;
 
-    public CatalogController(IProductService productService)
+    public CatalogController(
+        IProductService productService,
+        IGenericRepository<Category> categoryRepository)
     {
         _productService = productService;
+        _categoryRepository = categoryRepository;
+    }
+
+  
+    [HttpGet]
+    public async Task<IActionResult> Index(string? search, Guid? categoryId, string? sortBy, int page = 1)
+    {
+        var query = new ProductCatalogQueryDto
+        {
+            Search = search,
+            CategoryId = categoryId,
+            SortBy = sortBy,
+            Page = page <= 0 ? 1 : page,
+            PageSize = 12
+        };
+
+        var result = await _productService.GetCatalogAsync(query);
+        var categories = await _categoryRepository.GetAllAsync();
+
+        var model = new CatalogIndexViewModel
+        {
+            Products = result.Items.Select(p => p.ToCatalogProductViewModel()).ToList(),
+            Categories = categories.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Name,
+                Selected = c.Id == categoryId
+            }),
+            Search = search,
+            CategoryId = categoryId,
+            SortBy = sortBy,
+            Page = result.Page,
+            TotalPages = result.TotalPages
+        };
+
+        return View(model);
     }
 
     [HttpGet]
@@ -35,7 +77,6 @@ public class CatalogController : Controller
 
         model.EstimatedDeliveryStart = DateTime.Today.AddDays(2);
         model.EstimatedDeliveryEnd = DateTime.Today.AddDays(4);
-
 
         model.RelatedProducts = catalog.Items
             .Where(candidate => candidate.Id != product.Id)
