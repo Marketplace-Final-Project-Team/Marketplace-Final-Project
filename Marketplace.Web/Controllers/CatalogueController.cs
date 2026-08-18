@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Marketplace.Web.Controllers;
 
 [AllowAnonymous]
-public class CatalogController : Controller
+public class CatalogueController : Controller
 {
     private const int PageSize = 12;
 
@@ -18,7 +18,7 @@ public class CatalogController : Controller
     private readonly ICategoryService _categoryService;
     private readonly IWishlistService _wishlistService;
 
-    public CatalogController(
+    public CatalogueController(
         IProductService productService,
         IReviewService reviewService,
         ICategoryService categoryService,

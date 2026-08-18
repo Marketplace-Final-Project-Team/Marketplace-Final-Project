@@ -496,7 +496,62 @@ namespace Marketplace.Web.Controllers
         public IActionResult MembershipResult(string message)
         {
             ViewBag.Message = message;
+            
             return View();
+        }
+
+        [HttpPost("business/{businessId}/business-stats")]
+        public async Task<IActionResult> GetBusinessStatsByPeriod(BusinessStatsQueryViewModel query)
+        {
+            var result = await _businessService.GetBusinessStatsByPeriodAsync(
+                query.BusinessId, query.StartDate, query.EndDate);
+
+            var pageModel = new BusinessStatsPageViewModel { Query = query };
+
+            if (!result.Succeeded)
+            {
+                pageModel.ErrorMessage = result.Message;
+                return View(pageModel);
+            }
+
+            pageModel.Stats = result.Data;
+            return View(pageModel);
+        }
+
+        [HttpPost("business/{businessId}/products-stats")]
+        public async Task<IActionResult> GetProductsStatsByPeriod(ProductsStatsQueryViewModel query)
+        {
+            var result = await _businessService.GetProductsStatsByPeriodAsnyc(
+                query.BusinessId, query.StartDate, query.EndDate);
+
+            var pageModel = new ProductsStatsPageViewModel { Query = query };
+
+            if (!result.Succeeded)
+            {
+                pageModel.ErrorMessage = result.Message;
+                return View(pageModel);
+            }
+
+            pageModel.Stats = result.Data;
+            return View(pageModel);
+        }
+
+        [HttpPost("business/{businessId}/customers-stats")]
+        public async Task<IActionResult> GetCustomersStatsByPeriod(CustomersStatsQueryViewModel query)
+        {
+            var result = await _businessService.GetCustomersStatsByPeriodAsync(
+                query.BusinessId, query.StartDate, query.EndDate);
+
+            var pageModel = new CustomersStatsPageViewModel { Query = query };
+
+            if (!result.Succeeded)
+            {
+                pageModel.ErrorMessage = result.Message;
+                return View(pageModel);
+            }
+
+            pageModel.Stats = result.Data;
+            return View(pageModel);
         }
     }
 }
