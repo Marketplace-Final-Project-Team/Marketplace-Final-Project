@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Marketplace.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260805212607_CreateReviewTable")]
-    partial class CreateReviewTable
+    [Migration("20260818143556_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
