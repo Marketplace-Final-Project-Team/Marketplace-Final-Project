@@ -85,6 +85,7 @@
     gap: 0.65rem;
     max-width: 38rem;
     padding: 0.42rem 0.42rem 0.42rem 0.9rem;
+    position: relative;
 }
 
 .home-search > span {
@@ -182,36 +183,6 @@
 .home-hero__proof small {
     color: var(--home-muted);
     font-size: 0.75rem;
-}
-
-.home-avatars {
-    display: flex;
-    padding-left: 0.5rem;
-}
-
-.home-avatars span {
-    align-items: center;
-    background: #dfe7ff;
-    border: 2px solid #fff;
-    border-radius: 50%;
-    color: #3f5598;
-    display: flex;
-    font-size: 0.65rem;
-    font-weight: 800;
-    height: 2rem;
-    justify-content: center;
-    margin-left: -0.5rem;
-    width: 2rem;
-}
-
-.home-avatars span:nth-child(2) {
-    background: #ffe5d2;
-    color: #a65724;
-}
-
-.home-avatars span:nth-child(3) {
-    background: #e6dcff;
-    color: #6846a6;
 }
 
 .home-hero__visual {

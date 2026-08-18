@@ -1,0 +1,29 @@
+namespace Marketplace.Web.Infrastructure;
+
+// Recently-viewed products are tracked with a plain cookie holding just product ids
+// (no name/price/image cached in the cookie) so the list is always resolved against
+// the database when rendered — a product that was deleted, banned, or sold out since
+// the visit simply disappears instead of showing stale cached data.
+public static class RecentlyViewedCookie
+{
+    public const string Name = "mp_recently_viewed";
+    public const int MaxItems = 8;
+    public static readonly TimeSpan Lifetime = TimeSpan.FromDays(7);
+
+    public static List<Guid> Parse(string? rawValue)
+    {
+        if (string.IsNullOrWhiteSpace(rawValue))
+        {
+            return new List<Guid>();
+        }
+
+        return rawValue
+            .Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(segment => Guid.TryParse(segment, out var id) ? id : (Guid?)null)
+            .Where(id => id.HasValue)
+            .Select(id => id!.Value)
+            .ToList();
+    }
+
+    public static string Serialize(IEnumerable<Guid> ids) => string.Join(',', ids);
+}

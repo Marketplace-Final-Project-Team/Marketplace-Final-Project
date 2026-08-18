@@ -1,0 +1,28 @@
+<div class="visual-search-modal" data-visual-search-modal hidden>
+    <div class="visual-search-modal__card">
+        <button type="button" class="visual-search-modal__close" aria-label="Закрити" data-close-visual-search>×</button>
+
+        <div data-visual-search-intro>
+            <h3>Пошук за фото</h3>
+            <p>Завантажте фото товару — ми спробуємо знайти схоже в каталозі.</p>
+
+            <label class="visual-search-dropzone">
+                <span aria-hidden="true">📷</span>
+                <span>Натисніть, щоб обрати фото</span>
+                <input type="file" accept="image/*" data-visual-search-input hidden />
+            </label>
+        </div>
+
+        <div data-visual-search-loading hidden>
+            <img class="visual-search-preview" data-visual-search-preview alt="Завантажене фото" />
+            <p>Аналізуємо зображення…</p>
+        </div>
+
+        <div data-visual-search-result hidden class="visual-search-result">
+            <img class="visual-search-preview" data-visual-search-preview-2 alt="Завантажене фото" />
+            <p>🚧 Пошук за фото ще в розробці — поки не можемо порівняти ваше зображення з каталогом.</p>
+            <h4>А поки — популярне зараз:</h4>
+            <div class="visual-search-result__grid" data-visual-search-fallback></div>
+        </div>
+    </div>
+</div>

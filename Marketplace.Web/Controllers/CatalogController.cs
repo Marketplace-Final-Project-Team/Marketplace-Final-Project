@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
+using Marketplace.Web.Infrastructure;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -114,7 +115,144 @@ public class CatalogController : Controller
             model.IsInWishlist = wishlist.Items.Any(item => item.ProductId == id);
         }
 
+        RecordRecentlyViewed(id);
+
         return View(model);
+    }
+
+    private void RecordRecentlyViewed(Guid productId)
+    {
+        Request.Cookies.TryGetValue(RecentlyViewedCookie.Name, out var raw);
+        var ids = RecentlyViewedCookie.Parse(raw);
+
+        ids.RemoveAll(existingId => existingId == productId);
+        ids.Insert(0, productId);
+        if (ids.Count > RecentlyViewedCookie.MaxItems)
+        {
+            ids = ids.Take(RecentlyViewedCookie.MaxItems).ToList();
+        }
+
+        Response.Cookies.Append(RecentlyViewedCookie.Name, RecentlyViewedCookie.Serialize(ids), new CookieOptions
+        {
+            Expires = DateTimeOffset.UtcNow.Add(RecentlyViewedCookie.Lifetime),
+            HttpOnly = true,
+            SameSite = SameSiteMode.Lax,
+            IsEssential = false
+        });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> SearchSuggestions(string? term)
+    {
+        if (string.IsNullOrWhiteSpace(term) || term.Trim().Length < 2)
+        {
+            return Json(new SearchSuggestionsResultViewModel());
+        }
+
+        var normalized = term.Trim();
+        var catalog = await _productService.GetCatalogAsync();
+
+        var matches = catalog
+            .Where(product =>
+                product.Name.Contains(normalized, StringComparison.OrdinalIgnoreCase)
+                || (product.Category?.Name.Contains(normalized, StringComparison.OrdinalIgnoreCase) ?? false))
+            .OrderByDescending(product => product.Name.StartsWith(normalized, StringComparison.OrdinalIgnoreCase))
+            .ThenByDescending(product => product.CreatedAt)
+            .Take(6)
+            .ToList();
+
+        string? correctedTerm = null;
+
+        if (matches.Count == 0)
+        {
+            // No direct substring match — fall back to typo-tolerant matching against
+            // individual words of each product name, so a misspelled query like
+            // "клавіатрура" still surfaces "Механічна клавіатура KeyPro".
+            var threshold = Math.Max(1, normalized.Length / 3);
+            var fuzzy = catalog
+                .Select(product => new
+                {
+                    Product = product,
+                    Distance = product.Name
+                        .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                        .Select(word => LevenshteinDistance(normalized, word))
+                        .DefaultIfEmpty(int.MaxValue)
+                        .Min()
+                })
+                .Where(candidate => candidate.Distance <= threshold)
+                .OrderBy(candidate => candidate.Distance)
+                .ThenByDescending(candidate => candidate.Product.CreatedAt)
+                .Take(6)
+                .ToList();
+
+            if (fuzzy.Count > 0)
+            {
+                matches = fuzzy.Select(candidate => candidate.Product).ToList();
+                correctedTerm = fuzzy[0].Product.Name
+                    .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                    .OrderBy(word => LevenshteinDistance(normalized, word))
+                    .First();
+            }
+        }
+
+        return Json(new SearchSuggestionsResultViewModel
+        {
+            Term = normalized,
+            CorrectedTerm = correctedTerm,
+            Items = matches.Select(product => new SearchSuggestionItemViewModel
+            {
+                Id = product.Id,
+                Name = product.Name,
+                CategoryName = product.Category?.Name ?? "Без категорії",
+                Price = product.Price,
+                ImageUrl = product.MainImageUrl
+            }).ToList()
+        });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> PopularPicks()
+    {
+        var page = await _productService.GetCatalogPageAsync(new CatalogFilterDto
+        {
+            Sort = CatalogSortOption.Popularity,
+            Page = 1,
+            PageSize = 4
+        });
+
+        return Json(page.Items.Select(item => new SearchSuggestionItemViewModel
+        {
+            Id = item.Product.Id,
+            Name = item.Product.Name,
+            CategoryName = item.Product.Category?.Name ?? "Без категорії",
+            Price = item.Product.Price,
+            ImageUrl = item.Product.MainImageUrl
+        }));
+    }
+
+    private static int LevenshteinDistance(string a, string b)
+    {
+        a = a.ToLowerInvariant();
+        b = b.ToLowerInvariant();
+        var rows = a.Length + 1;
+        var cols = b.Length + 1;
+        var distance = new int[rows, cols];
+
+        for (var i = 0; i < rows; i++) distance[i, 0] = i;
+        for (var j = 0; j < cols; j++) distance[0, j] = j;
+
+        for (var i = 1; i < rows; i++)
+        {
+            for (var j = 1; j < cols; j++)
+            {
+                var cost = a[i - 1] == b[j - 1] ? 0 : 1;
+                distance[i, j] = Math.Min(
+                    Math.Min(distance[i - 1, j] + 1, distance[i, j - 1] + 1),
+                    distance[i - 1, j - 1] + cost);
+            }
+        }
+
+        return distance[rows - 1, cols - 1];
     }
 
     private static CatalogProductViewModel MapProduct(Marketplace.Domain.Entities.Product product, double averageRating = 0, int reviewCount = 0)
@@ -126,6 +264,7 @@ public class CatalogController : Controller
             Description = product.Description,
             Price = product.Price,
             Quantity = product.Quantity,
+            CreatedAt = product.CreatedAt,
             MainImageUrl = product.MainImageUrl,
             CategoryName = product.Category?.Name ?? "Без категорії",
             StoreName = product.Business?.StoreName ?? "Marketplace",

@@ -1,5 +1,6 @@
 using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
+using Marketplace.Web.Infrastructure;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -67,6 +68,7 @@ namespace Marketplace.Web.Controllers
                         Icon = CategoryIcons[index % CategoryIcons.Length]
                     })
                     .ToList(),
+                RecentlyViewed = await GetRecentlyViewedAsync(),
                 AverageRating = totalReviews > 0
                     ? Math.Round(reviewedItems.Sum(item => item.AverageRating * item.ReviewCount) / totalReviews, 1)
                     : null,
@@ -74,6 +76,37 @@ namespace Marketplace.Web.Controllers
             };
 
             return View(model);
+        }
+
+        private async Task<List<CatalogRelatedProductViewModel>> GetRecentlyViewedAsync()
+        {
+            Request.Cookies.TryGetValue(RecentlyViewedCookie.Name, out var raw);
+            var ids = RecentlyViewedCookie.Parse(raw);
+
+            var items = new List<CatalogRelatedProductViewModel>();
+            foreach (var id in ids)
+            {
+                // Re-fetched from the database on every request — a product that was
+                // deleted, banned, or sold out since the visit just won't come back here,
+                // so this never shows stale name/price/stock data from an earlier view.
+                var product = await _productService.GetCatalogProductAsync(id);
+                if (product is null)
+                {
+                    continue;
+                }
+
+                items.Add(new CatalogRelatedProductViewModel
+                {
+                    Id = product.Id,
+                    Name = product.Name,
+                    CategoryName = product.Category?.Name ?? "Без категорії",
+                    MainImageUrl = product.MainImageUrl,
+                    Price = product.Price,
+                    Quantity = product.Quantity
+                });
+            }
+
+            return items;
         }
 
         public IActionResult Privacy()
