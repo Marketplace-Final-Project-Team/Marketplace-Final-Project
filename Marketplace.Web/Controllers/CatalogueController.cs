@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Marketplace.Web.Controllers;
 
 [AllowAnonymous]
+[Route("Catalog")]
+[Route("Catalogue")]
 public class CatalogueController : Controller
 {
     private const int PageSize = 12;
@@ -31,6 +33,8 @@ public class CatalogueController : Controller
     }
 
     [HttpGet]
+    [Route("")]
+    [Route("Index")]
     public async Task<IActionResult> Index(CatalogFilterViewModel filter)
     {
         filter.Page = filter.Page < 1 ? 1 : filter.Page;
@@ -50,8 +54,6 @@ public class CatalogueController : Controller
             PageSize = PageSize
         });
 
-        // A page requested past the last available one (e.g. a filter change while on page 5
-        // of a shrinking result set) would otherwise render an empty grid with no way back.
         if (result.TotalPages > 0 && filter.Page > result.TotalPages)
         {
             filter.Page = result.TotalPages;
@@ -71,10 +73,11 @@ public class CatalogueController : Controller
             TotalPages = result.TotalPages
         };
 
-        return View(model);
+        return View("~/Views/Catalog/Index.cshtml", model);
     }
 
     [HttpGet]
+    [Route("Details/{id:guid}")]
     public async Task<IActionResult> Details(Guid id)
     {
         var product = await _productService.GetCatalogProductAsync(id);
@@ -114,17 +117,42 @@ public class CatalogueController : Controller
             model.IsInWishlist = wishlist.Items.Any(item => item.ProductId == id);
         }
 
-        return View(model);
+        return View("~/Views/Catalog/Details.cshtml", model);
+    }
+
+    [HttpGet]
+    [Route("SearchSuggestions")]
+    public async Task<IActionResult> SearchSuggestions(string term)
+    {
+        if (string.IsNullOrWhiteSpace(term) || term.Length < 2)
+        {
+            return Json(Array.Empty<object>());
+        }
+
+        var catalog = await _productService.GetCatalogAsync();
+        var suggestions = catalog
+            .Where(p => p.Name.Contains(term, StringComparison.OrdinalIgnoreCase))
+            .Take(5)
+            .Select(p => new
+            {
+                id = p.Id,
+                name = p.Name,
+                price = p.GetDiscountedPrice()
+            });
+
+        return Json(suggestions);
     }
 
     private static CatalogProductViewModel MapProduct(Marketplace.Domain.Entities.Product product, double averageRating = 0, int reviewCount = 0)
     {
+        var activeDiscount = product.GetActiveDiscount();
+
         return new CatalogProductViewModel
         {
             Id = product.Id,
             Name = product.Name,
             Description = product.Description,
-            Price = product.Price,
+            Price = activeDiscount != null ? product.GetDiscountedPrice() : product.Price,
             Quantity = product.Quantity,
             MainImageUrl = product.MainImageUrl,
             CategoryName = product.Category?.Name ?? "Без категорії",
@@ -133,7 +161,9 @@ public class CatalogueController : Controller
             StoreDescription = product.Business?.Description ?? string.Empty,
             AdditionalImageUrls = product.Images.Select(image => image.ImageUrl).ToList(),
             AverageRating = averageRating,
-            ReviewCount = reviewCount
+            ReviewCount = reviewCount,
+            OriginalPrice = activeDiscount != null ? product.Price : null,
+            DiscountPercent = activeDiscount?.Percent,
         };
     }
 }

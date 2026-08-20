@@ -65,17 +65,25 @@ namespace Marketplace.BLL.Services
                     };
                 }
 
-                if(cartItem.Product.Quantity < cartItem.Quantity)
+                if (cartItem.Product.Quantity < cartItem.Quantity)
 
                 {
                     return new OrderResultDto { Succeeded = false, Message = "Недостатньо товару на складі." };
                 }
 
+                var now = DateTime.UtcNow;
+                var activeDiscount = cartItem.Product.Discounts?
+                    .FirstOrDefault(d => d.StartDate <= now && d.EndDate >= now);
+
+                var unitPrice = activeDiscount != null
+                    ? cartItem.Product.Price - (cartItem.Product.Price * activeDiscount.Percent / 100m)
+                    : cartItem.Product.Price;
+
                 var orderItem = new OrderItem
                 {
                     ProductId = cartItem.ProductId,
                     ProductName = cartItem.Product.Name,
-                    UnitPrice = cartItem.Product.Price,
+                    UnitPrice = unitPrice,
                     Quantity = cartItem.Quantity
                 };
 
@@ -108,7 +116,7 @@ namespace Marketplace.BLL.Services
             description: $"Оплата замовлення #{order.Id}",
             successUrl: dto.SuccessUrl,
             cancelUrl: dto.CancelUrl
-            
+
             );
 
             return new OrderResultDto
@@ -119,7 +127,7 @@ namespace Marketplace.BLL.Services
                 PaymentData = paymentData
             };
         }
-        
+
 
         public async Task<ServiceResult> ChangeOrderStatus(Guid orderId, OrderStatus status)
         {
@@ -249,9 +257,7 @@ namespace Marketplace.BLL.Services
                 .ThenInclude(item => item.Product)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
 
-            // Product.Product is filtered by the global soft-delete query filter (Product.IsDeleted),
-            // so item.Product comes back null for a product that was later removed/banned — the
-            // ownership check and image lookup below both guard against that explicitly.
+  
             if (order == null || !order.Items.Any(item => item.Product != null && item.Product.BusinessId == businessId))
             {
                 return null;

@@ -435,7 +435,7 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet("business/{businessId}/add-member")]
-        public IActionResult AddMember(Guid businessId) 
+        public IActionResult AddMember(Guid businessId)
         {
             var model = new BusinessMemberCreateViewModel { BusinessId = businessId };
 
@@ -445,7 +445,7 @@ namespace Marketplace.Web.Controllers
         [HttpPost("business/{businessId}/add-member")]
         public async Task<IActionResult> AddMember(BusinessMemberCreateViewModel model)
         {
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
             {
                 return View(model);
             }
@@ -457,7 +457,7 @@ namespace Marketplace.Web.Controllers
                 Role = model.Role
             });
 
-            if (!result.Succeeded) 
+            if (!result.Succeeded)
             {
                 ModelState.AddModelError("", result.Message);
                 return View(model);
@@ -496,7 +496,7 @@ namespace Marketplace.Web.Controllers
         public IActionResult MembershipResult(string message)
         {
             ViewBag.Message = message;
-            
+
             return View();
         }
 

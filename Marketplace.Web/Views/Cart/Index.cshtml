@@ -56,7 +56,7 @@
 
                         <div>
                             <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.ProductId" class="cart-item__name">@item.ProductName</a>
-                            <div class="cart-item__unit">@item.Price.ToString("N2") ₴ за одиницю · доступно @item.StockQuantity</div>
+                           <div class="cart-item__unit">@item.Price.ToString("N2") ₴ за одиницю · доступно @item.StockQuantity</div>
 
                             <div class="quantity-control" aria-label="Кількість товару">
                                 <form asp-action="DecreaseQuantity" method="post">
@@ -71,13 +71,13 @@
                             </div>
                         </div>
 
-                        <div class="cart-item__price">
-                            <strong>@item.LineTotal.ToString("N2") ₴</strong>
-                            <form asp-action="Remove" method="post">
-                                <input type="hidden" name="productId" value="@item.ProductId" />
-                                <button type="submit" class="cart-remove">Видалити</button>
-                            </form>
-                        </div>
+                                          <div class="cart-item__price" style="text-align: right;">
+                        <strong style="font-size: 1.1rem; font-weight: 700; color: #0f172a;">@item.LineTotal.ToString("N2") ₴</strong>
+                        <form asp-action="Remove" method="post">
+                            <input type="hidden" name="productId" value="@item.ProductId" />
+                            <button type="submit" class="cart-remove">Видалити</button>
+                        </form>
+                    </div>
                     </article>
                 }
             </div>

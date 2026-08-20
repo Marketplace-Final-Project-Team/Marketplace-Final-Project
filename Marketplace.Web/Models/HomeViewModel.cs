@@ -15,6 +15,10 @@ namespace Marketplace.Web.Models
         public double? AverageRating { get; set; }
         public int ReviewCount { get; set; }
 
+        public string? Search { get; set; }
+        public Guid? CategoryId { get; set; }
+        public string? SortBy { get; set; }
+
         public CatalogProductViewModel? TopProduct => FeaturedProducts.FirstOrDefault();
     }
 }

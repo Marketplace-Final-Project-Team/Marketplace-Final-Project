@@ -68,6 +68,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IBusinessService, BusinessService>();
 builder.Services.AddScoped<IBusinessAccessService, BusinessAccessService>();
+builder.Services.AddScoped<IDiscountService, DiscountService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IWishlistService, WishlistService>();
@@ -96,10 +97,7 @@ using (var scope = app.Services.CreateScope())
     await Marketplace.DAL.Seed.DbSeeder.SeedAsync(scope.ServiceProvider);
 }
 
-if (app.Environment.IsDevelopment())
-{
-    await Marketplace.Web.Seed.DbSeeder.SeedAsync(app.Services);
-}
+
 
 if (!app.Environment.IsDevelopment())
 {
