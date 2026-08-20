@@ -1,14 +1,14 @@
-﻿namespace Marketplace.BLL.DTOs
+﻿namespace Marketplace.BLL.DTOs;
+
+public class ReviewDto
 {
-    public class ReviewDto
-    {
-        public Guid UserId { get; set; }
-        public string Body { get; set; } = string.Empty;
-        public float Rating { get; set; }
+    public Guid Id { get; set; }
+    public string UserId { get; set; } = string.Empty; // Тип змінено на string
+    public string Body { get; set; } = string.Empty;
+    public float Rating { get; set; }
 
-        public string UserName { get; set; } = string.Empty;
-        public string AvatarUrl { get; set; } = string.Empty;
+    public string UserName { get; set; } = string.Empty;
+    public string AvatarUrl { get; set; } = string.Empty;
 
-        public DateTime PublicationDate { get; set; }
-    }
+    public DateTime PublicationDate { get; set; }
 }

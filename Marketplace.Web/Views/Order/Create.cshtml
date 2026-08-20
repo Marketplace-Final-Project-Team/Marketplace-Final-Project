@@ -7,6 +7,7 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/checkout.css" asp-append-version="true" />
 }
 
 <div class="shop-page">
@@ -15,68 +16,166 @@
         <div>
             <div class="shop-kicker">Checkout</div>
             <h1 class="shop-title">Оформлення замовлення</h1>
-            <p class="shop-subtitle">Вкажіть адресу доставки та перевірте склад замовлення.</p>
+            <p class="shop-subtitle">Оберіть адресу, перевірте доставку й оплату, підтвердіть замовлення.</p>
         </div>
     </header>
 
-    <form asp-action="Create" method="post" class="checkout-form">
+    <div class="checkout-stepper" role="list" aria-label="Кроки оформлення замовлення">
+        <div class="checkout-stepper__step" data-step-indicator="1">
+            <span class="checkout-stepper__dot" aria-hidden="true">1</span>
+            <span class="checkout-stepper__label">Адреса</span>
+        </div>
+        <div class="checkout-stepper__step" data-step-indicator="2">
+            <span class="checkout-stepper__dot" aria-hidden="true">2</span>
+            <span class="checkout-stepper__label">Доставка</span>
+        </div>
+        <div class="checkout-stepper__step" data-step-indicator="3">
+            <span class="checkout-stepper__dot" aria-hidden="true">3</span>
+            <span class="checkout-stepper__label">Оплата</span>
+        </div>
+        <div class="checkout-stepper__step" data-step-indicator="4">
+            <span class="checkout-stepper__dot" aria-hidden="true">4</span>
+            <span class="checkout-stepper__label">Огляд</span>
+        </div>
+    </div>
+
+    <form asp-action="Create" method="post" class="checkout-form" id="checkout-form">
         <div class="checkout-layout">
             <div class="checkout-card">
                 <div asp-validation-summary="ModelOnly" class="alert alert-danger m-3" role="alert"></div>
 
-                <section class="checkout-section">
-                    <h2>Адреса доставки</h2>
-                    <div class="checkout-fields">
-                        <div>
-                            <label asp-for="Country" class="form-label">Країна</label>
-                            <input asp-for="Country" class="form-control" />
-                            <span asp-validation-for="Country" class="text-danger small"></span>
-                        </div>
-                        <div>
-                            <label asp-for="City" class="form-label">Місто</label>
-                            <input asp-for="City" class="form-control" placeholder="Київ" />
-                            <span asp-validation-for="City" class="text-danger small"></span>
-                        </div>
-                        <div class="wide">
-                            <label asp-for="Street" class="form-label">Вулиця, будинок, квартира</label>
-                            <input asp-for="Street" class="form-control" placeholder="вул. Хрещатик, 1, кв. 10" />
-                            <span asp-validation-for="Street" class="text-danger small"></span>
-                        </div>
-                    </div>
-                </section>
+                <div class="checkout-section">
+                    <section class="checkout-step" data-step="1">
+                        <h2>Адреса доставки</h2>
 
-                <section class="checkout-section">
-                    <h2>Товари у замовленні</h2>
-                    <div class="order-lines">
-                        @foreach (var item in Model.Items)
+                        @if (Model.SavedAddresses.Count > 0)
                         {
-                            <div class="order-line">
-                                @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                            <div class="checkout-address-options">
+                                @foreach (var address in Model.SavedAddresses)
                                 {
-                                    <img class="order-line__media" src="@item.ImageUrl" alt="@item.ProductName" />
+                                    <label class="checkout-address-option">
+                                        <input type="radio" name="SelectedAddressId" value="@address.Id" checked="@(Model.SelectedAddressId == address.Id)" />
+                                        <span data-address-label="@address.Id">
+                                            <strong>
+                                                @address.Country, @address.City
+                                                @if (address.IsDefault)
+                                                {
+                                                    <span class="checkout-address-option__badge">Основна</span>
+                                                }
+                                            </strong>
+                                            <span>@address.Street</span>
+                                        </span>
+                                    </label>
                                 }
-                                else
-                                {
-                                    <div class="order-line__media" aria-hidden="true">@item.ProductName[..1].ToUpperInvariant()</div>
-                                }
-                                <div>
-                                    <div class="order-line__name">@item.ProductName</div>
-                                    <div class="order-line__meta">@item.Quantity шт. × @item.Price.ToString("N2") ₴</div>
-                                </div>
-                                <div class="order-line__total">@item.LineTotal.ToString("N2") ₴</div>
+                                <label class="checkout-address-option">
+                                    <input type="radio" name="SelectedAddressId" value="" checked="@(!Model.SelectedAddressId.HasValue)" />
+                                    <span><strong>Нова адреса</strong><span>Вкажіть іншу адресу доставки</span></span>
+                                </label>
                             </div>
                         }
+
+                        <div class="checkout-new-address-fields" data-new-address-fields hidden="@(Model.SavedAddresses.Count > 0 && Model.IsUsingSavedAddress)">
+                            <div class="checkout-fields">
+                                <div>
+                                    <label asp-for="Country" class="form-label">Країна</label>
+                                    <input asp-for="Country" class="form-control" />
+                                    <span asp-validation-for="Country" class="text-danger small"></span>
+                                </div>
+                                <div>
+                                    <label asp-for="City" class="form-label">Місто</label>
+                                    <input asp-for="City" class="form-control" placeholder="Київ" />
+                                    <span asp-validation-for="City" class="text-danger small"></span>
+                                </div>
+                                <div class="wide">
+                                    <label asp-for="Street" class="form-label">Вулиця, будинок, квартира</label>
+                                    <input asp-for="Street" class="form-control" placeholder="вул. Хрещатик, 1, кв. 10" />
+                                    <span asp-validation-for="Street" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="checkout-step" data-step="2" hidden>
+                        <h2>Спосіб доставки</h2>
+                        <div class="checkout-info-card">
+                            <strong>Кур'єром на вказану адресу</strong>
+                            <span>Орієнтовний термін — 2–4 робочі дні після підтвердження замовлення. Інші способи доставки поки не підтримуються.</span>
+                        </div>
+                    </section>
+
+                    <section class="checkout-step" data-step="3" hidden>
+                        <h2>Спосіб оплати</h2>
+                        <div class="checkout-info-card">
+                            <strong>Онлайн-оплата через LiqPay</strong>
+                            <span>Після підтвердження замовлення ви перейдете на безпечну сторінку оплати LiqPay. Це єдиний спосіб оплати на платформі зараз.</span>
+                        </div>
+                    </section>
+
+                    <section class="checkout-step" data-step="4" hidden>
+                        <h2>Перевірте замовлення</h2>
+
+                        <div class="checkout-review-block">
+                            <h3>Адреса доставки</h3>
+                            <p data-review-address>—</p>
+                        </div>
+
+                        <div class="checkout-review-block">
+                            <h3>Доставка та оплата</h3>
+                            <dl>
+                                <div class="checkout-review-row"><dt>Спосіб доставки</dt><dd>Кур'єром</dd></div>
+                                <div class="checkout-review-row"><dt>Спосіб оплати</dt><dd>LiqPay (онлайн)</dd></div>
+                            </dl>
+                        </div>
+
+                        <div class="checkout-review-block">
+                            <h3>Промокод</h3>
+                            <div class="checkout-promo">
+                                <input type="text" class="form-control" placeholder="Введіть промокод" data-promo-input maxlength="30" />
+                                <button type="button" class="btn btn-outline-secondary" data-promo-apply>Застосувати</button>
+                            </div>
+                            <p class="checkout-promo__message" data-promo-message hidden></p>
+                            <p class="checkout-promo__hint">Спробуйте код <strong>WELCOME10</strong> — знижка попередньо відображається тут, фінальна сума виставляється на сторінці оплати.</p>
+                        </div>
+
+                        <div class="checkout-review-block">
+                            <h3>Товари у замовленні</h3>
+                            <div class="order-lines">
+                                @foreach (var item in Model.Items)
+                                {
+                                    <div class="order-line">
+                                        @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                                        {
+                                            <img class="order-line__media" src="@item.ImageUrl" alt="@item.ProductName" />
+                                        }
+                                        else
+                                        {
+                                            <div class="order-line__media" aria-hidden="true">@item.ProductName[..1].ToUpperInvariant()</div>
+                                        }
+                                        <div>
+                                            <div class="order-line__name">@item.ProductName</div>
+                                            <div class="order-line__meta">@item.Quantity шт. × @item.Price.ToString("N2") ₴</div>
+                                        </div>
+                                        <div class="order-line__total">@item.LineTotal.ToString("N2") ₴</div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="checkout-step-nav">
+                        <button type="button" class="btn btn-outline-secondary" data-step-back hidden>← Назад</button>
+                        <button type="button" class="btn btn-primary" data-step-next>Далі →</button>
+                        <button type="submit" class="btn btn-primary" data-step-submit hidden>Підтвердити замовлення</button>
                     </div>
-                </section>
+                </div>
             </div>
 
             <aside class="shop-panel summary-card">
                 <h2>Ваше замовлення</h2>
                 <div class="summary-row"><span>Товарів</span><strong>@units шт.</strong></div>
                 <div class="summary-row"><span>Доставка</span><strong>Безкоштовно</strong></div>
-                <div class="summary-total"><span>До сплати</span><span>@Model.Total.ToString("N2") ₴</span></div>
-                <button type="submit" class="btn btn-primary">Підтвердити замовлення</button>
-                <div class="text-secondary small text-center mt-2">Тестова оплата при отриманні</div>
+                <div class="summary-row" data-promo-summary-row hidden><span>Знижка за промокодом</span><strong data-promo-summary-value>−0,00 ₴</strong></div>
+                <div class="summary-total"><span>До сплати</span><span data-order-total="@Model.Total.ToString(System.Globalization.CultureInfo.InvariantCulture)">@Model.Total.ToString("N2") ₴</span></div>
             </aside>
         </div>
     </form>
@@ -84,4 +183,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/checkout.js" asp-append-version="true"></script>
 }

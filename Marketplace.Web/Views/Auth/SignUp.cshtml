@@ -114,4 +114,16 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Custom client adapter for [MustBeTrue]: must run after jquery.validate.unobtrusive
+        // loads but before its own $(document).ready() parse pass picks up the form.
+        (function () {
+            if (window.jQuery && jQuery.validator && jQuery.validator.unobtrusive) {
+                jQuery.validator.addMethod("mustbetrue", function (value, element) {
+                    return element.checked;
+                });
+                jQuery.validator.unobtrusive.adapters.addBool("mustbetrue");
+            }
+        })();
+    </script>
 }

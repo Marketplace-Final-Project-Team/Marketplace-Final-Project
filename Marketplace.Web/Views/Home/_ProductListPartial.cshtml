@@ -6,7 +6,6 @@
         <h2>Усі товари</h2>
     </div>
 
-
     <form method="get" id="sortForm" class="d-flex align-items-center gap-2">
         <input type="hidden" name="search" value="@Model.Search" />
         @if (Model.CategoryId.HasValue)
@@ -38,7 +37,8 @@ else
         {
             var product = Model.Products[index];
             var colorClass = index % 3 == 0 ? "blue" : index % 3 == 1 ? "violet" : "orange";
-             <article class="home-product">
+
+            <article class="home-product">
                 <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="home-product__media home-product__media--@colorClass">
                     @if (!string.IsNullOrWhiteSpace(product.MainImageUrl))
                     {
@@ -46,15 +46,16 @@ else
                     }
                     else
                     {
-                        <span>@product.Name[..1].ToUpperInvariant()</span>
+                        <span>@(string.IsNullOrWhiteSpace(product.Name) ? "?" : product.Name[..1].ToUpperInvariant())</span>
                     }
                     <small>В наявності</small>
                 </a>
                 <div class="home-product__body">
                     <div class="home-product__category">@(string.IsNullOrEmpty(product.CategoryName) ? "Без категорії" : product.CategoryName)</div>
                     <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="home-product__name">@product.Name</a>
-                                            <div class="home-product__bottom">
-                                               <div class="home-product__price" style="display: flex; flex-direction: column; justify-content: flex-end; min-height: 40px;">
+                    
+                    <div class="home-product__bottom">
+                        <div class="home-product__price" style="display: flex; flex-direction: column; justify-content: flex-end; min-height: 40px;">
                             @if (product.HasDiscount && product.OriginalPrice.HasValue)
                             {
                                 <span style="font-size: 0.85rem; color: #8892b0; text-decoration: line-through; line-height: 1.1; font-weight: 500;">
@@ -73,7 +74,7 @@ else
                         </div>
                         <form asp-controller="Cart" asp-action="Add" method="post">
                             <input type="hidden" name="productId" value="@product.Id" />
-                            <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                            <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
                             <button type="submit" aria-label="Додати @product.Name до кошика">+</button>
                         </form>
                     </div>

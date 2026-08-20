@@ -1,0 +1,14 @@
+name: Test EC2 Runner
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  test:
+    runs-on: self-hosted
+
+    steps:
+      - name: Deploy
+        run: ~/deploy.sh

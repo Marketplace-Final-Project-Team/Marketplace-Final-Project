@@ -65,7 +65,7 @@ namespace Marketplace.BLL.Services
                     };
                 }
 
-                if(cartItem.Product.Quantity < cartItem.Quantity)
+                if (cartItem.Product.Quantity < cartItem.Quantity)
 
                 {
                     return new OrderResultDto { Succeeded = false, Message = "Недостатньо товару на складі." };
@@ -116,7 +116,7 @@ namespace Marketplace.BLL.Services
             description: $"Оплата замовлення #{order.Id}",
             successUrl: dto.SuccessUrl,
             cancelUrl: dto.CancelUrl
-            
+
             );
 
             return new OrderResultDto
@@ -127,7 +127,7 @@ namespace Marketplace.BLL.Services
                 PaymentData = paymentData
             };
         }
-        
+
 
         public async Task<ServiceResult> ChangeOrderStatus(Guid orderId, OrderStatus status)
         {
@@ -184,7 +184,6 @@ namespace Marketplace.BLL.Services
                 .ToListAsync();
 
             var orders = orderLines
-
                 .GroupBy(line => line.OrderId)
                 .Select(group => group.First())
                 .ToList();
@@ -200,6 +199,93 @@ namespace Marketplace.BLL.Services
                 Revenue = orderLines
                     .Where(line => line.Status != OrderStatus.Canceled)
                     .Sum(line => line.LineTotal)
+            };
+        }
+
+        public async Task<IReadOnlyList<BusinessOrderListItemDto>> GetBusinessOrders(Guid businessId, OrderStatus? statusFilter = null)
+        {
+            var query = _context.OrderItems
+                .AsNoTracking()
+                .Where(item => item.Product.BusinessId == businessId);
+
+            if (statusFilter.HasValue)
+            {
+                query = query.Where(item => item.Order.Status == statusFilter.Value);
+            }
+
+            var lines = await query
+                .Select(item => new
+                {
+                    item.OrderId,
+                    item.Order.CreatedAt,
+                    item.Order.Status,
+                    item.Order.ShippingCountry,
+                    item.Order.ShippingCity,
+                    item.Order.ShippingStreet,
+                    BuyerName = item.Order.User.UserName,
+                    BuyerEmail = item.Order.User.Email,
+                    item.Quantity,
+                    LineTotal = item.UnitPrice * item.Quantity
+                })
+                .ToListAsync();
+
+            return lines
+                .GroupBy(line => line.OrderId)
+                .Select(group => new BusinessOrderListItemDto
+                {
+                    OrderId = group.Key,
+                    CreatedAt = group.First().CreatedAt,
+                    Status = group.First().Status,
+                    BuyerName = group.First().BuyerName ?? string.Empty,
+                    BuyerEmail = group.First().BuyerEmail ?? string.Empty,
+                    ShippingCountry = group.First().ShippingCountry,
+                    ShippingCity = group.First().ShippingCity,
+                    ShippingStreet = group.First().ShippingStreet,
+                    ItemsCount = group.Sum(line => line.Quantity),
+                    LineTotal = group.Sum(line => line.LineTotal)
+                })
+                .OrderByDescending(item => item.CreatedAt)
+                .ToList();
+        }
+
+        public async Task<BusinessOrderDetailsDto?> GetBusinessOrderDetails(Guid businessId, Guid orderId)
+        {
+            var order = await _context.Orders
+                .AsNoTracking()
+                .Include(o => o.User)
+                .Include(o => o.Items)
+                .ThenInclude(item => item.Product)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            // Product.Product is filtered by the global soft-delete query filter (Product.IsDeleted),
+            // so item.Product comes back null for a product that was later removed/banned — the
+            // ownership check and image lookup below both guard against that explicitly.
+            if (order == null || !order.Items.Any(item => item.Product != null && item.Product.BusinessId == businessId))
+            {
+                return null;
+            }
+
+            return new BusinessOrderDetailsDto
+            {
+                OrderId = order.Id,
+                CreatedAt = order.CreatedAt,
+                Status = order.Status,
+                OrderTotalAmount = order.TotalAmount,
+                BuyerName = order.User.UserName ?? string.Empty,
+                BuyerEmail = order.User.Email ?? string.Empty,
+                BuyerPhone = order.User.PhoneNumber ?? string.Empty,
+                ShippingCountry = order.ShippingCountry,
+                ShippingCity = order.ShippingCity,
+                ShippingStreet = order.ShippingStreet,
+                Items = order.Items.Select(item => new BusinessOrderLineDto
+                {
+                    ProductId = item.ProductId,
+                    ProductName = item.ProductName,
+                    ImageUrl = item.Product?.MainImageUrl ?? string.Empty,
+                    UnitPrice = item.UnitPrice,
+                    Quantity = item.Quantity,
+                    BelongsToBusiness = item.Product != null && item.Product.BusinessId == businessId
+                }).ToList()
             };
         }
     }

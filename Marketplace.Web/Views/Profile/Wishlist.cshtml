@@ -1,0 +1,82 @@
+@model Marketplace.BLL.DTOs.WishlistDto
+
+@{
+    ViewData["Title"] = "Список бажань";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/wishlist-collections.css" asp-append-version="true" />
+}
+
+<div class="profile-page">
+    <a asp-action="Index" class="profile-back">← До кабінету</a>
+
+    <div class="profile-summary">
+        <h1>Список бажань</h1>
+        <p>Товари, які ви зберегли на потім (@Model.TotalItems).</p>
+    </div>
+
+    @if (TempData["Success"] is string success)
+    {
+        <div class="alert alert-success" role="alert">@success</div>
+    }
+    @if (TempData["Error"] is string error)
+    {
+        <div class="alert alert-warning" role="alert">@error</div>
+    }
+
+    @if (Model.Items.Count == 0)
+    {
+        <div class="profile-empty">
+            <div class="profile-empty__icon" aria-hidden="true">♡</div>
+            <h2>Список бажань порожній</h2>
+            <p>Додавайте товари з каталогу, натискаючи "У список бажань" на сторінці товару.</p>
+            <a asp-controller="Catalog" asp-action="Index" class="btn btn-primary">Перейти до каталогу</a>
+        </div>
+    }
+    else
+    {
+        <div class="wishlist-collections" data-wishlist-collections>
+            <div class="wishlist-collections__bar">
+                <label for="new-collection-name">Нова колекція</label>
+                <input type="text" id="new-collection-name" placeholder="Наприклад: Подарунки" maxlength="40" data-new-collection-input />
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-add-collection>+ Створити</button>
+            </div>
+            <p class="wishlist-collections__hint">Колекції — це лише спосіб організувати список на цьому пристрої; сам список бажань зберігається на сервері.</p>
+        </div>
+
+        <div class="wishlist-grid" data-wishlist-grid>
+            @foreach (var item in Model.Items)
+            {
+                <article class="wishlist-card" data-wishlist-card data-product-id="@item.ProductId">
+                    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.ProductId" class="wishlist-card__media" aria-label="Переглянути @item.ProductName">
+                        @if (!string.IsNullOrWhiteSpace(item.MainImageUrl))
+                        {
+                            <img src="@item.MainImageUrl" alt="@item.ProductName" />
+                        }
+                        else
+                        {
+                            <span aria-hidden="true">@item.ProductName[..1].ToUpperInvariant()</span>
+                        }
+                    </a>
+                    <div class="wishlist-card__body">
+                        <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.ProductId" class="wishlist-card__title">@item.ProductName</a>
+                        <select class="wishlist-card__collection" data-collection-select aria-label="Колекція для @item.ProductName"></select>
+                        <div class="wishlist-card__footer">
+                            <span class="fw-semibold">@item.Price.ToString("N2") ₴</span>
+                            <form asp-action="RemoveFromWishlist" method="post">
+                                <input type="hidden" name="productId" value="@item.ProductId" />
+                                <button type="submit" class="wishlist-remove">Видалити</button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/wishlist-collections.js" asp-append-version="true"></script>
+}

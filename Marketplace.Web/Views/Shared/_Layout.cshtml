@@ -45,6 +45,9 @@
                                 @await Component.InvokeAsync("CartSummary")
                             </li>
                             <li class="nav-item">
+                                @await Component.InvokeAsync("WishlistSummary")
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="Index">Замовлення</a>
                             </li>
                             <li class="nav-item">
@@ -75,8 +78,17 @@
                                         <a class="dropdown-item" asp-controller="Order" asp-action="Index">Мої замовлення</a>
                                     </li>
                                     <li>
+                                        <a class="dropdown-item" asp-controller="Profile" asp-action="Wishlist">Список бажань</a>
+                                    </li>
+                                    <li>
                                         <a class="dropdown-item" asp-controller="Products" asp-action="Index">Мої товари</a>
                                     </li>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Admin" asp-action="Index">Адмін-панель</a>
+                                        </li>
+                                    }
                                     <li><hr class="dropdown-divider" /></li>
                                     <li>
                                         <form asp-controller="Auth" asp-action="Logout" method="post">
@@ -107,8 +119,9 @@
     </div>
 
     <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 MarketPlace — навчальний маркетплейс
+        <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <span>&copy; 2026 MarketPlace — навчальний маркетплейс</span>
+            <a asp-controller="Home" asp-action="Support" class="text-muted">Підтримка</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

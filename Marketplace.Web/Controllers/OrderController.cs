@@ -65,6 +65,7 @@ public class OrderController : Controller
     {
         var model = new OrderCreateViewModel();
         await PopulateCart(model);
+        await PopulateSavedAddresses(model);
 
         if (model.Items.Count == 0)
         {
@@ -87,31 +88,55 @@ public class OrderController : Controller
 
         if (!ModelState.IsValid)
         {
+            await PopulateSavedAddresses(model);
             return View(model);
         }
 
         var userId = GetUserId();
-        var address = new Address
+        Address address;
+        var isNewAddress = !model.IsUsingSavedAddress;
+
+        if (isNewAddress)
         {
-            UserId = userId,
-            Country = model.Country.Trim(),
-            City = model.City.Trim(),
-            Street = model.Street.Trim(),
-            IsDefault = true
-        };
+            address = new Address
+            {
+                UserId = userId,
+                Country = model.Country!.Trim(),
+                City = model.City!.Trim(),
+                Street = model.Street!.Trim(),
+                IsDefault = false
+            };
 
             await _addressRepository.AddAsync(address);
             await _context.SaveChangesAsync();
-            var result = await _orderService.CreateOrder(userId!, new OrderCreateDto { AddressId = address.Id, SuccessUrl = model.SuccessUrl, CancelUrl = model.CancelUrl });
+        }
+        else
+        {
+            var savedAddress = await _addressRepository.FirstOrDefaultAsync(
+                a => a.Id == model.SelectedAddressId!.Value && a.UserId == userId);
 
-            
-            
+            if (savedAddress is null)
+            {
+                ModelState.AddModelError(string.Empty, "Обрана адреса не знайдена.");
+                await PopulateSavedAddresses(model);
+                return View(model);
+            }
+
+            address = savedAddress;
+        }
+
+        var result = await _orderService.CreateOrder(userId!, new OrderCreateDto { AddressId = address.Id, SuccessUrl = model.SuccessUrl, CancelUrl = model.CancelUrl });
 
         if (!result.Succeeded)
         {
-            _addressRepository.Remove(address);
-            await _context.SaveChangesAsync();
+            if (isNewAddress)
+            {
+                _addressRepository.Remove(address);
+                await _context.SaveChangesAsync();
+            }
+
             ModelState.AddModelError(string.Empty, result.Message);
+            await PopulateSavedAddresses(model);
             return View(model);
         }
         if (result.PaymentData != null)
@@ -146,6 +171,34 @@ public class OrderController : Controller
     private async Task PopulateCart(OrderCreateViewModel model)
     {
         model.Items = await _cartService.GetCartItems(GetUserId());
+    }
+
+    private async Task PopulateSavedAddresses(OrderCreateViewModel model)
+    {
+        var userId = GetUserId();
+        var addresses = await _addressRepository.FindAsync(a => a.UserId == userId);
+
+        model.SavedAddresses = addresses
+            .OrderByDescending(a => a.IsDefault)
+            .ThenByDescending(a => a.CreatedAt)
+            .Select(a => new AddressViewModel
+            {
+                Id = a.Id,
+                Country = a.Country,
+                City = a.City,
+                Street = a.Street,
+                IsDefault = a.IsDefault
+            })
+            .ToList();
+
+        if (!model.SelectedAddressId.HasValue)
+        {
+            var defaultAddress = model.SavedAddresses.FirstOrDefault(a => a.IsDefault) ?? model.SavedAddresses.FirstOrDefault();
+            if (defaultAddress is not null)
+            {
+                model.SelectedAddressId = defaultAddress.Id;
+            }
+        }
     }
 
     private async Task<OrderDetailsViewModel?> BuildOrderDetails(Guid id)

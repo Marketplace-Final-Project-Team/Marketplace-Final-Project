@@ -1,0 +1,175 @@
+@model Marketplace.Web.Models.NotificationsViewModel
+
+@{
+    ViewData["Title"] = "Сповіщення";
+}
+
+@functions {
+    private static string StatusLabel(Marketplace.Domain.Enums.OrderStatus status) => status switch
+    {
+        Marketplace.Domain.Enums.OrderStatus.Pending => "очікує підтвердження",
+        Marketplace.Domain.Enums.OrderStatus.Confirmed => "підтверджено",
+        Marketplace.Domain.Enums.OrderStatus.Shipped => "відправлено",
+        Marketplace.Domain.Enums.OrderStatus.Delivered => "доставлено",
+        Marketplace.Domain.Enums.OrderStatus.Canceled => "скасовано",
+        _ => status.ToString()
+    };
+
+    private static string StatusIcon(Marketplace.Domain.Enums.OrderStatus status) => status switch
+    {
+        Marketplace.Domain.Enums.OrderStatus.Delivered => "✓",
+        Marketplace.Domain.Enums.OrderStatus.Canceled => "✕",
+        _ => "•"
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/notifications.css" asp-append-version="true" />
+}
+
+<div class="profile-page">
+    <a asp-action="Index" class="profile-back">← До кабінету</a>
+
+    <div class="profile-summary">
+        <h1>Сповіщення</h1>
+        <p>Статус замовлень, нові товари та підбірки для вас — в одному місці.</p>
+    </div>
+
+    <div class="notif-tabs" role="tablist" aria-label="Категорії сповіщень">
+        <button type="button" class="notif-tabs__btn is-active" data-notif-tab="orders" role="tab" aria-selected="true">
+            Про замовлення
+            @if (Model.OrderActivity.Count > 0)
+            {
+                <span class="notif-tabs__badge">@Model.OrderActivity.Count</span>
+            }
+        </button>
+        <button type="button" class="notif-tabs__btn" data-notif-tab="new" role="tab" aria-selected="false">
+            Нові товари
+        </button>
+        <button type="button" class="notif-tabs__btn" data-notif-tab="offers" role="tab" aria-selected="false">
+            Акційні пропозиції
+        </button>
+    </div>
+
+    <section class="notif-panel" data-notif-panel="orders">
+        <p class="activity-note">
+            Це стрічка поточних статусів ваших замовлень — історія проміжних змін статусу не зберігається.
+        </p>
+
+        @if (Model.OrderActivity.Count == 0)
+        {
+            <div class="profile-empty">
+                <div class="profile-empty__icon" aria-hidden="true">🔔</div>
+                <h2>Подій ще немає</h2>
+                <p>Тут з'являться оновлення статусів після першого замовлення.</p>
+                <a asp-controller="Catalog" asp-action="Index" class="btn btn-primary">Перейти до каталогу</a>
+            </div>
+        }
+        else
+        {
+            <div class="activity-card">
+                <div class="delivery-timeline">
+                    @foreach (var item in Model.OrderActivity)
+                    {
+                        <div class="delivery-step @(item.Status is Marketplace.Domain.Enums.OrderStatus.Delivered ? "is-complete" : "is-current")">
+                            <div class="delivery-step__dot">@StatusIcon(item.Status)</div>
+                            <div class="delivery-step__body">
+                                <strong>
+                                    <a asp-controller="Order" asp-action="Details" asp-route-id="@item.OrderId">
+                                        Замовлення #@item.OrderId.ToString()[..8].ToUpperInvariant()
+                                    </a>
+                                    — @StatusLabel(item.Status)
+                                </strong>
+                                <span>@item.Timestamp.ToLocalTime().ToString("dd.MM.yyyy HH:mm") · @item.TotalAmount.ToString("N2") ₴</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </section>
+
+    <section class="notif-panel" data-notif-panel="new" hidden>
+        <p class="activity-note">Щойно з'явилися в каталозі — можливо, саме те, що ви шукали.</p>
+
+        @if (Model.NewProducts.Count == 0)
+        {
+            <div class="profile-empty">
+                <div class="profile-empty__icon" aria-hidden="true">🆕</div>
+                <h2>Поки нічого нового</h2>
+                <p>Нові товари з'являться тут одразу після додавання в каталог.</p>
+            </div>
+        }
+        else
+        {
+            <div class="notif-product-grid">
+                @foreach (var product in Model.NewProducts)
+                {
+                    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="notif-product-card">
+                        <span class="notif-product-card__media">
+                            @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
+                            {
+                                <img src="@product.ImageUrl" alt="@product.Name" />
+                            }
+                            else
+                            {
+                                <span aria-hidden="true">@product.Name[..1].ToUpperInvariant()</span>
+                            }
+                            <small>Новинка</small>
+                        </span>
+                        <span class="notif-product-card__body">
+                            <span class="notif-product-card__category">@product.CategoryName</span>
+                            <span class="notif-product-card__name">@product.Name</span>
+                            <strong>@product.Price.ToString("N2") ₴</strong>
+                        </span>
+                    </a>
+                }
+            </div>
+        }
+    </section>
+
+    <section class="notif-panel" data-notif-panel="offers" hidden>
+        <p class="activity-note">Персональна підбірка популярних товарів на платформі.</p>
+
+        @if (Model.RecommendedProducts.Count == 0)
+        {
+            <div class="profile-empty">
+                <div class="profile-empty__icon" aria-hidden="true">✦</div>
+                <h2>Підбірок поки немає</h2>
+                <p>Рекомендації з'являться тут, щойно в каталозі буде більше товарів з відгуками.</p>
+            </div>
+        }
+        else
+        {
+            <div class="notif-product-grid">
+                @foreach (var product in Model.RecommendedProducts)
+                {
+                    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="notif-product-card">
+                        <span class="notif-product-card__media">
+                            @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
+                            {
+                                <img src="@product.ImageUrl" alt="@product.Name" />
+                            }
+                            else
+                            {
+                                <span aria-hidden="true">@product.Name[..1].ToUpperInvariant()</span>
+                            }
+                            <small>Рекомендуємо</small>
+                        </span>
+                        <span class="notif-product-card__body">
+                            <span class="notif-product-card__category">@product.CategoryName</span>
+                            <span class="notif-product-card__name">@product.Name</span>
+                            <strong>@product.Price.ToString("N2") ₴</strong>
+                        </span>
+                    </a>
+                }
+            </div>
+        }
+    </section>
+</div>
+
+@section Scripts {
+    <script src="~/js/notifications.js" asp-append-version="true"></script>
+}

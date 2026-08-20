@@ -1,0 +1,14 @@
+@{
+    var current = ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty;
+
+    string ActiveClass(string action) => string.Equals(current, action, StringComparison.OrdinalIgnoreCase)
+        ? "is-active"
+        : string.Empty;
+}
+
+<nav class="admin-nav" aria-label="Розділи адмін-панелі">
+    <a class="@ActiveClass("Index")" asp-controller="Admin" asp-action="Index">Дашборд</a>
+    <a class="@ActiveClass("Users")" asp-controller="Admin" asp-action="Users">Користувачі</a>
+    <a class="@ActiveClass("Products")" asp-controller="Admin" asp-action="Products">Товари</a>
+    <a class="@ActiveClass("Businesses")" asp-controller="Admin" asp-action="Businesses">Бізнеси</a>
+</nav>

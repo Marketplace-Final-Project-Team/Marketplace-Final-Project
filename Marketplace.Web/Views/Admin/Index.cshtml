@@ -1,0 +1,63 @@
+@model Marketplace.Web.Models.AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Адмін-панель";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+}
+
+<div class="admin-page">
+    <header class="admin-header">
+        <div>
+            <div class="admin-kicker">Admin</div>
+            <h1 class="admin-title">Адмін-панель</h1>
+            <p class="admin-subtitle">Загальний стан маркетплейсу: користувачі, товари та магазини, що потребують уваги.</p>
+        </div>
+    </header>
+
+    <partial name="_AdminNav" />
+
+    <div class="admin-stats" aria-label="Загальна статистика">
+        <div class="admin-stat-card">
+            <span class="admin-stat-card__label">Користувачі</span>
+            <strong class="admin-stat-card__value">@Model.TotalUsers</strong>
+            <span class="admin-stat-card__hint"><strong>@Model.BannedUsers</strong> заблоковано</span>
+        </div>
+        <div class="admin-stat-card @(Model.PendingProducts > 0 ? "admin-stat-card--warning" : null)">
+            <span class="admin-stat-card__label">Товари на модерації</span>
+            <strong class="admin-stat-card__value">@Model.PendingProducts</strong>
+            <span class="admin-stat-card__hint">з <strong>@Model.TotalProducts</strong> усього · @Model.BannedProducts заблоковано</span>
+        </div>
+        <div class="admin-stat-card @(Model.PendingBusinesses > 0 ? "admin-stat-card--warning" : null)">
+            <span class="admin-stat-card__label">Магазини на перевірці</span>
+            <strong class="admin-stat-card__value">@Model.PendingBusinesses</strong>
+            <span class="admin-stat-card__hint">з <strong>@Model.TotalBusinesses</strong> усього</span>
+        </div>
+    </div>
+
+    <div class="admin-quick-links">
+        <a class="admin-quick-link" asp-action="Users">
+            <span class="admin-quick-link__icon" aria-hidden="true">У</span>
+            <div>
+                <strong>Керувати користувачами</strong>
+                <span>Блокування та відновлення акаунтів</span>
+            </div>
+        </a>
+        <a class="admin-quick-link" asp-action="Products">
+            <span class="admin-quick-link__icon" aria-hidden="true">Т</span>
+            <div>
+                <strong>Модерувати товари</strong>
+                <span>Активація, модерація, блокування</span>
+            </div>
+        </a>
+        <a class="admin-quick-link" asp-action="Businesses">
+            <span class="admin-quick-link__icon" aria-hidden="true">М</span>
+            <div>
+                <strong>Перевіряти магазини</strong>
+                <span>Схвалення та призупинення бізнесів</span>
+            </div>
+        </a>
+    </div>
+</div>

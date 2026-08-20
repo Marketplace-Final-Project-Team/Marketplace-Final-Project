@@ -18,6 +18,7 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/postsale.css" asp-append-version="true" />
 }
 
 <div class="shop-page">
@@ -86,4 +87,79 @@
             </dl>
         </aside>
     </div>
+
+    @if (Model.Status is Marketplace.Domain.Enums.OrderStatus.Delivered)
+    {
+        <section class="shop-panel postsale-panel">
+            <h2>Післяпродажний сервіс та безпека</h2>
+            <div class="postsale-protection">
+                <span class="postsale-protection__icon" aria-hidden="true">🛡</span>
+                <div>
+                    <strong>Захист покупця</strong>
+                    <span>Кошти продавцю переказуються лише після підтвердження отримання товару. Повернення можливе протягом 14 днів з дати доставки.</span>
+                </div>
+            </div>
+            <div class="postsale-actions">
+                <button type="button" class="btn btn-outline-secondary" data-postsale-open="return">Оформити повернення</button>
+                <button type="button" class="btn btn-outline-secondary" data-postsale-open="dispute">Відкрити спір</button>
+            </div>
+        </section>
+    }
 </div>
+
+<div class="postsale-modal" data-postsale-modal="return" hidden>
+    <div class="postsale-modal__card">
+        <button type="button" class="postsale-modal__close" aria-label="Закрити" data-postsale-close>×</button>
+        <div data-postsale-form>
+            <h3>Оформлення повернення</h3>
+            <p>Замовлення #@Model.Id.ToString()[..8].ToUpperInvariant()</p>
+            <label class="form-label mt-2">Причина повернення</label>
+            <select class="form-select">
+                <option>Товар не підійшов за розміром</option>
+                <option>Товар не відповідає опису</option>
+                <option>Отримано пошкоджений товар</option>
+                <option>Передумав(-ла)</option>
+                <option>Інше</option>
+            </select>
+            <label class="form-label mt-3">Коментар (необов'язково)</label>
+            <textarea class="form-control" rows="3" placeholder="Розкажіть детальніше..."></textarea>
+            <button type="button" class="btn btn-primary mt-3 w-100" data-postsale-submit="return">Надіслати заявку</button>
+        </div>
+        <div class="postsale-modal__success" data-postsale-success hidden>
+            <span aria-hidden="true">✓</span>
+            <h3>Заявку прийнято</h3>
+            <p>Ми надіслали інструкції з поверненням на вашу пошту. Очікуйте на зворотний зв'язок протягом 1–2 робочих днів.</p>
+            <button type="button" class="btn btn-outline-secondary" data-postsale-close>Закрити</button>
+        </div>
+    </div>
+</div>
+
+<div class="postsale-modal" data-postsale-modal="dispute" hidden>
+    <div class="postsale-modal__card">
+        <button type="button" class="postsale-modal__close" aria-label="Закрити" data-postsale-close>×</button>
+        <div data-postsale-form>
+            <h3>Центр вирішення спірних питань</h3>
+            <p>Замовлення #@Model.Id.ToString()[..8].ToUpperInvariant()</p>
+            <label class="form-label mt-2">Тип проблеми</label>
+            <select class="form-select">
+                <option>Товар не прийшов</option>
+                <option>Товар не відповідає опису</option>
+                <option>Продавець не виходить на зв'язок</option>
+                <option>Інше</option>
+            </select>
+            <label class="form-label mt-3">Опишіть ситуацію</label>
+            <textarea class="form-control" rows="3" placeholder="Що сталося?"></textarea>
+            <button type="button" class="btn btn-primary mt-3 w-100" data-postsale-submit="dispute">Відкрити спір</button>
+        </div>
+        <div class="postsale-modal__success" data-postsale-success hidden>
+            <span aria-hidden="true">✓</span>
+            <h3>Спір відкрито</h3>
+            <p>Підтримка маркетплейсу підключиться до вирішення ситуації та зв'яжеться з вами протягом 24 годин.</p>
+            <button type="button" class="btn btn-outline-secondary" data-postsale-close>Закрити</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/postsale.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,249 @@
+/* ---------- Read-only star display (product page review list) ---------- */
+
+.star-display {
+    color: #e2a300;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+}
+
+.star-display[data-empty] {
+    color: #d6dae3;
+}
+
+/* ---------- Review summary + list on the product details page ---------- */
+
+.product-reviews__summary {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    justify-content: space-between;
+    margin-bottom: 1.4rem;
+}
+
+.product-reviews__score {
+    align-items: baseline;
+    display: flex;
+    gap: 0.6rem;
+}
+
+.product-reviews__score strong {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.product-reviews__score span {
+    color: var(--product-muted);
+    font-size: 0.9rem;
+}
+
+.product-reviews__empty {
+    color: var(--product-muted);
+}
+
+.review-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.review-item {
+    border-top: 1px solid var(--product-line);
+    display: grid;
+    gap: 0.5rem;
+    padding-top: 1rem;
+}
+
+.review-item__head {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    justify-content: space-between;
+}
+
+.review-item__author {
+    align-items: center;
+    display: flex;
+    gap: 0.6rem;
+}
+
+.review-item__avatar {
+    align-items: center;
+    background: var(--product-soft-blue);
+    border-radius: 50%;
+    color: var(--product-blue);
+    display: flex;
+    flex: 0 0 auto;
+    font-size: 0.85rem;
+    font-weight: 800;
+    height: 2.15rem;
+    justify-content: center;
+    overflow: hidden;
+    width: 2.15rem;
+}
+
+.review-item__avatar img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.review-item__name {
+    font-weight: 700;
+}
+
+.review-item__date {
+    color: var(--product-muted);
+    font-size: 0.78rem;
+}
+
+.review-item__body {
+    color: #3d4759;
+    line-height: 1.55;
+    margin: 0;
+}
+
+.review-item__actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.review-item__actions form {
+    margin: 0;
+}
+
+.review-item__actions a,
+.review-item__actions button {
+    background: transparent;
+    border: 0;
+    color: var(--product-muted);
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 650;
+    padding: 0;
+    text-decoration: none;
+}
+
+.review-item__actions a:hover,
+.review-item__actions button:hover {
+    color: var(--product-blue);
+}
+
+.review-item__actions button.is-danger:hover {
+    color: #b42318;
+}
+
+.product-reviews__cta {
+    margin-top: 1.25rem;
+}
+
+/* ---------- Star rating input (CreateReview / UpdateReview forms) ---------- */
+
+.star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 0.15rem;
+    width: max-content;
+}
+
+.star-rating input {
+    height: 1px;
+    opacity: 0;
+    position: absolute;
+    width: 1px;
+}
+
+.star-rating label {
+    color: #d6dae3;
+    cursor: pointer;
+    font-size: 2.1rem;
+    line-height: 1;
+    transition: color 0.12s ease;
+}
+
+.star-rating input:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: #e2a300;
+}
+
+.star-rating input:focus-visible + label {
+    outline: 2px solid #8ea2ed;
+    outline-offset: 2px;
+}
+
+/* ---------- Standalone CreateReview / UpdateReview pages ---------- */
+
+.review-form-page {
+    color: var(--product-ink, #172033);
+    margin: 0 auto;
+    max-width: 34rem;
+    padding: 2rem 1rem 3.5rem;
+}
+
+.review-form-card {
+    background: #fff;
+    border: 1px solid #e5eaf1;
+    border-radius: 1.1rem;
+    box-shadow: 0 0.35rem 1.35rem rgba(23, 32, 51, 0.055);
+    padding: clamp(1.5rem, 4vw, 2.25rem);
+}
+
+.review-form-card h1 {
+    font-size: 1.5rem;
+    font-weight: 750;
+    margin-bottom: 0.35rem;
+}
+
+.review-form-card > p {
+    color: #687386;
+    margin: 0 0 1.6rem;
+}
+
+.review-form-field {
+    display: grid;
+    gap: 0.5rem;
+    margin-bottom: 1.4rem;
+}
+
+.review-form-field label {
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.review-form-field textarea {
+    border: 1px solid #d8dde7;
+    border-radius: 0.75rem;
+    min-height: 8rem;
+    padding: 0.75rem 0.9rem;
+    resize: vertical;
+    width: 100%;
+}
+
+.review-form-field textarea:focus {
+    border-color: #8ea2ed;
+    box-shadow: 0 0 0 0.2rem rgba(54, 89, 217, 0.12);
+    outline: none;
+}
+
+.review-form-actions {
+    align-items: center;
+    display: flex;
+    gap: 0.65rem;
+    justify-content: flex-end;
+}
+
+.review-form-back {
+    color: #687386;
+    display: inline-block;
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-decoration: none;
+}
+
+.review-form-back:hover {
+    color: #1769e0;
+}

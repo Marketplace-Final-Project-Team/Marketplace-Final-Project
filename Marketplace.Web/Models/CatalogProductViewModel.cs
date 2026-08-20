@@ -20,12 +20,13 @@ public class CatalogProductViewModel
     public List<Marketplace.BLL.DTOs.ReviewDto> Reviews { get; set; } = new();
     public string? CurrentUserId { get; set; }
     public bool IsInWishlist { get; set; }
+
     public int ReviewCount { get; set; }
     public double AverageRating { get; set; }
 
     public Marketplace.BLL.DTOs.ReviewDto? CurrentUserReview =>
-        !string.IsNullOrEmpty(CurrentUserId) && Guid.TryParse(CurrentUserId, out var userGuid)
-            ? Reviews.FirstOrDefault(r => r.UserId == userGuid)
+        !string.IsNullOrEmpty(CurrentUserId)
+            ? Reviews.FirstOrDefault(r => r.UserId == CurrentUserId)
             : null;
 
     public decimal? OriginalPrice { get; set; }

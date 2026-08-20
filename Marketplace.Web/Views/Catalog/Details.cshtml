@@ -8,11 +8,15 @@
     var storeInitial = string.IsNullOrWhiteSpace(Model.StoreName) ? "M" : Model.StoreName[..1].ToUpperInvariant();
     var productCode = Model.Id.ToString()[..8].ToUpperInvariant();
     var isLowStock = Model.Quantity <= 5;
+    var variantCategories = new[] { "Одяг", "Спорт і відпочинок" };
+    var showVariants = variantCategories.Contains(Model.CategoryName, StringComparer.OrdinalIgnoreCase);
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/product-details.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/reviews.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/product-extras.css" asp-append-version="true" />
 }
 
 <div class="product-page">
@@ -108,9 +112,40 @@
                 </p>
             </div>
 
+            @if (showVariants)
+            {
+                <div class="product-variants">
+                    <div class="product-variants__row">
+                        <span class="product-variants__label">Колір</span>
+                        <div class="product-variants__options" data-variant-group="color">
+                            <button type="button" class="product-variant-swatch is-selected" style="--swatch: #172033" data-variant-option aria-pressed="true" title="Чорний"></button>
+                            <button type="button" class="product-variant-swatch" style="--swatch: #667085" data-variant-option aria-pressed="false" title="Сірий"></button>
+                            <button type="button" class="product-variant-swatch" style="--swatch: #3157d7" data-variant-option aria-pressed="false" title="Синій"></button>
+                        </div>
+                    </div>
+                    <div class="product-variants__row">
+                        <span class="product-variants__label">Розмір</span>
+                        <div class="product-variants__options" data-variant-group="size">
+                            @foreach (var size in new[] { "XS", "S", "M", "L", "XL" })
+                            {
+                                <button type="button" class="product-variant-chip @(size == "M" ? "is-selected" : null)" data-variant-option aria-pressed="@(size == "M" ? "true" : "false")">@size</button>
+                            }
+                        </div>
+                        <button type="button" class="product-variants__size-guide" data-open-size-guide>Таблиця розмірів</button>
+                    </div>
+                    <p class="product-variants__hint">Приклад інтерфейсу вибору варіанту — наразі товар продається в єдиній базовій комплектації.</p>
+                </div>
+            }
+
             <div class="product-buybox">
                 @if (User.Identity?.IsAuthenticated == true)
                 {
+                    <form asp-controller="Cart" asp-action="BuyNow" method="post">
+                        <input type="hidden" name="productId" value="@Model.Id" />
+                        <button type="submit" class="product-button product-button--accent">
+                            <span aria-hidden="true">⚡</span> Купити в 1 клік
+                        </button>
+                    </form>
                     <form asp-controller="Cart" asp-action="Add" method="post">
                         <input type="hidden" name="productId" value="@Model.Id" />
                         <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
@@ -119,6 +154,26 @@
                         </button>
                     </form>
                     <a asp-controller="Cart" asp-action="Index" class="product-button product-button--secondary">Відкрити кошик</a>
+                    @if (Model.IsInWishlist)
+                    {
+                        <form asp-controller="Profile" asp-action="RemoveFromWishlist" method="post">
+                            <input type="hidden" name="productId" value="@Model.Id" />
+                            <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                            <button type="submit" class="product-button product-button--secondary">
+                                <span aria-hidden="true">♥</span> У списку бажань
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-controller="Profile" asp-action="AddToWishlist" method="post">
+                            <input type="hidden" name="productId" value="@Model.Id" />
+                            <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                            <button type="submit" class="product-button product-button--secondary">
+                                <span aria-hidden="true">♡</span> У список бажань
+                            </button>
+                        </form>
+                    }
                 }
                 else
                 {
@@ -166,6 +221,29 @@
         </section>
     </article>
 
+    @if (showVariants)
+    {
+        <div class="size-guide-modal" data-size-guide hidden>
+            <div class="size-guide-modal__card">
+                <button type="button" class="size-guide-modal__close" aria-label="Закрити" data-close-size-guide>×</button>
+                <h3>Загальна таблиця розмірів</h3>
+                <p class="size-guide-modal__note">Орієнтовна відповідність — точні мірки можуть відрізнятися залежно від бренду.</p>
+                <table class="size-guide-table">
+                    <thead>
+                        <tr><th>Розмір</th><th>Груди, см</th><th>Талія, см</th><th>Стегна, см</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>XS</td><td>82–86</td><td>62–66</td><td>88–92</td></tr>
+                        <tr><td>S</td><td>86–90</td><td>66–70</td><td>92–96</td></tr>
+                        <tr><td>M</td><td>90–96</td><td>70–76</td><td>96–102</td></tr>
+                        <tr><td>L</td><td>96–102</td><td>76–82</td><td>102–108</td></tr>
+                        <tr><td>XL</td><td>102–110</td><td>82–90</td><td>108–116</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
     <div class="product-information">
         <section class="product-content-card product-description-card">
             <span class="product-section-kicker">Про товар</span>
@@ -190,6 +268,106 @@
             </dl>
         </section>
     </div>
+
+    <section class="product-content-card product-reviews" aria-labelledby="reviews-title">
+        <span class="product-section-kicker">Відгуки покупців</span>
+        <h2 id="reviews-title">Відгуки (@Model.ReviewCount)</h2>
+
+        <div class="product-reviews__summary">
+            <div class="product-reviews__score">
+                <strong>@(Model.ReviewCount > 0 ? Model.AverageRating.ToString("0.0") : "—")</strong>
+                <span>@(Model.ReviewCount > 0 ? $"на основі {Model.ReviewCount} відгуків" : "поки без відгуків")</span>
+            </div>
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                if (Model.CurrentUserReview is { } myReview)
+                {
+                    <a asp-controller="Reviews" asp-action="UpdateReview" asp-route-productId="@Model.Id" asp-route-reviewId="@myReview.Id" class="product-button product-button--secondary">Редагувати мій відгук</a>
+                }
+                else
+                {
+                    <a asp-controller="Reviews" asp-action="CreateReview" asp-route-productId="@Model.Id" class="product-button product-button--secondary">Написати відгук</a>
+                }
+            }
+            else
+            {
+                <a asp-controller="Auth" asp-action="SignIn" asp-route-returnUrl="@Context.Request.Path" class="product-button product-button--secondary">Увійти, щоб залишити відгук</a>
+            }
+        </div>
+
+        @if (Model.Reviews.Count == 0)
+        {
+            <p class="product-reviews__empty">Ще немає відгуків про цей товар. Будьте першим!</p>
+        }
+        else
+        {
+            <div class="review-list">
+                @foreach (var review in Model.Reviews)
+                {
+                    var isMine = review.UserId == Model.CurrentUserId;
+                    var reviewInitial = string.IsNullOrWhiteSpace(review.UserName) ? "?" : review.UserName[..1].ToUpperInvariant();
+                    var filledStars = Math.Clamp((int)Math.Round(review.Rating), 0, 5);
+
+                    <article class="review-item">
+                        <div class="review-item__head">
+                            <div class="review-item__author">
+                                <span class="review-item__avatar" aria-hidden="true">
+                                    @if (!string.IsNullOrWhiteSpace(review.AvatarUrl))
+                                    {
+                                        <img src="@review.AvatarUrl" alt="" />
+                                    }
+                                    else
+                                    {
+                                        @reviewInitial
+                                    }
+                                </span>
+                                <div>
+                                    <div class="review-item__name">@review.UserName</div>
+                                    <span class="star-display" aria-label="Оцінка @review.Rating з 5">@(new string('★', filledStars))@(new string('☆', 5 - filledStars))</span>
+                                </div>
+                            </div>
+                            <span class="review-item__date">@review.PublicationDate.ToLocalTime().ToString("dd.MM.yyyy")</span>
+                        </div>
+                        <p class="review-item__body">@review.Body</p>
+                        @if (isMine)
+                        {
+                            <div class="review-item__actions">
+                                <a asp-controller="Reviews" asp-action="UpdateReview" asp-route-productId="@Model.Id" asp-route-reviewId="@review.Id">Редагувати</a>
+                                <form asp-controller="Reviews" asp-action="DeleteReview" method="post" onsubmit="return confirm('Видалити цей відгук?');">
+                                    <input type="hidden" name="productId" value="@Model.Id" />
+                                    <input type="hidden" name="reviewId" value="@review.Id" />
+                                    <button type="submit" class="is-danger">Видалити</button>
+                                </form>
+                            </div>
+                        }
+                    </article>
+                }
+            </div>
+        }
+    </section>
+
+    <section class="product-content-card product-qa" aria-labelledby="qa-title" data-qa-section data-product-id="@Model.Id">
+        <span class="product-section-kicker">Запитання та відповіді</span>
+        <h2 id="qa-title">Запитайте продавця</h2>
+
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <div class="product-qa__form">
+                <textarea rows="2" placeholder="Наприклад: чи підходить цей товар для..." data-qa-input maxlength="500"></textarea>
+                <button type="button" class="product-button product-button--secondary" data-qa-submit>Надіслати запитання</button>
+            </div>
+            <p class="product-qa__hint">Продавець «@Model.StoreName» відповідає на запитання протягом 1–2 робочих днів.</p>
+        }
+        else
+        {
+            <a asp-controller="Auth" asp-action="SignIn" asp-route-returnUrl="@Context.Request.Path" class="product-button product-button--secondary">Увійти, щоб поставити запитання</a>
+        }
+
+        <div class="product-qa__list" data-qa-list>
+            <p class="product-qa__empty" data-qa-empty>Ще немає запитань про цей товар. Будьте першим!</p>
+        </div>
+    </section>
 
     @if (Model.RelatedProducts.Count > 0)
     {
@@ -228,8 +406,20 @@
             </div>
         </section>
     }
+
+    <script type="application/json" id="current-product-data">
+        {
+            "id": "@Model.Id",
+            "name": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Name)),
+            "categoryName": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategoryName)),
+            "imageUrl": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MainImageUrl)),
+            "price": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Price.ToString("N2") + " ₴"))
+        }
+    </script>
 </div>
 
 @section Scripts {
     <script src="~/js/product-details.js" asp-append-version="true"></script>
+    <script src="~/js/recently-viewed.js" asp-append-version="true"></script>
+    <script src="~/js/product-extras.js" asp-append-version="true"></script>
 }

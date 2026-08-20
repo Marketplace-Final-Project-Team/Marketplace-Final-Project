@@ -1,0 +1,91 @@
+@model IEnumerable<Marketplace.Web.Models.UserItemAdminViewModel>
+
+@{
+    ViewData["Title"] = "Користувачі — Адмін-панель";
+    var users = Model.ToList();
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+}
+
+@functions {
+    private static string StatusLabel(Marketplace.Domain.Enums.UserStatus status) => status switch
+    {
+        Marketplace.Domain.Enums.UserStatus.Active => "Активний",
+        Marketplace.Domain.Enums.UserStatus.Banned => "Заблокований",
+        _ => status.ToString()
+    };
+}
+
+<div class="admin-page">
+    <header class="admin-header">
+        <div>
+            <div class="admin-kicker">Admin</div>
+            <h1 class="admin-title">Користувачі</h1>
+            <p class="admin-subtitle">Усього зареєстровано <strong>@users.Count</strong> користувачів.</p>
+        </div>
+    </header>
+
+    <partial name="_AdminNav" />
+
+    @if (users.Count == 0)
+    {
+        <div class="admin-panel">
+            <p class="admin-empty">Користувачів поки немає.</p>
+        </div>
+    }
+    else
+    {
+        <input type="search" class="form-control admin-search" placeholder="Пошук за email..."
+               data-admin-search="#users-table" aria-label="Пошук користувачів" />
+        <p class="admin-empty" data-admin-search-empty hidden>Нічого не знайдено за цим запитом.</p>
+
+        <div class="admin-panel table-responsive">
+            <table class="table admin-table" id="users-table">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Статус</th>
+                        <th class="text-end">Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in users)
+                    {
+                        var statusClass = user.Status.ToString().ToLowerInvariant();
+
+                        <tr>
+                            <td class="admin-entity-name">@user.Email</td>
+                            <td><span class="admin-status admin-status--@statusClass">@StatusLabel(user.Status)</span></td>
+                            <td>
+                                <div class="admin-row-actions">
+                                    @if (user.Status == Marketplace.Domain.Enums.UserStatus.Active)
+                                    {
+                                        <form asp-action="ChangeUserStatus" method="post">
+                                            <input type="hidden" name="userId" value="@user.Id" />
+                                            <input type="hidden" name="status" value="Banned" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Заблокувати</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form asp-action="ChangeUserStatus" method="post">
+                                            <input type="hidden" name="userId" value="@user.Id" />
+                                            <input type="hidden" name="status" value="Active" />
+                                            <button type="submit" class="btn btn-sm btn-outline-success">Активувати</button>
+                                        </form>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/admin-search.js" asp-append-version="true"></script>
+}

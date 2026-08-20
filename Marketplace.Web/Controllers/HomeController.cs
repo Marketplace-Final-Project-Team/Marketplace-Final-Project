@@ -1,93 +1,121 @@
+using System.Diagnostics;
 using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
-using Marketplace.Domain.Entities;
-using Marketplace.Domain.Interfaces;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Diagnostics;
 
-namespace Marketplace.Web.Controllers;
-
-public class HomeController : Controller
+namespace Marketplace.Web.Controllers
 {
-    private readonly IProductService _productService;
-    private readonly IGenericRepository<Category> _categoryRepository;
-
-    public HomeController(
-        IProductService productService,
-        IGenericRepository<Category> categoryRepository)
+    public class HomeController : Controller
     {
-        _productService = productService;
-        _categoryRepository = categoryRepository;
-    }
+        private readonly IProductService _productService;
+        private readonly ICategoryService _categoryService;
 
-    public async Task<IActionResult> Index(string? search, Guid? categoryId, string? sortBy, int page = 1)
-    {
-        var query = new ProductCatalogQueryDto
+        public HomeController(IProductService productService, ICategoryService categoryService)
         {
-            Search = search,
-            CategoryId = categoryId,
-            SortBy = sortBy,
-            Page = page <= 0 ? 1 : page,
-            PageSize = 12
-        };
-
-        var result = await _productService.GetCatalogAsync(query);
-        var categories = await _categoryRepository.GetAllAsync();
-
-        var model = new CatalogIndexViewModel
-        {
-            Products = result.Items.Select(p => p.ToCatalogProductViewModel()).ToList(),
-            Categories = categories.Select(c => new SelectListItem
-            {
-                Value = c.Id.ToString(),
-                Text = c.Name,
-                Selected = c.Id == categoryId
-            }),
-            Search = search,
-            CategoryId = categoryId,
-            SortBy = sortBy,
-            Page = result.Page,
-            TotalPages = result.TotalPages
-        };
-
-        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-        {
-            return PartialView("_ProductListPartial", model);
+            _productService = productService;
+            _categoryService = categoryService;
         }
 
-        return View(model);
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> AutoComplete(string? term)
-    {
-        var suggestions = await _productService.GetSearchSuggestionsAsync(term);
-
-        var result = suggestions.Select(s => new
+        public async Task<IActionResult> Index([FromQuery] CatalogFilterViewModel filter)
         {
-            id = s.Id,
-            name = s.Name,
-            categoryName = string.IsNullOrWhiteSpace(s.CategoryName) ? "Без категорії" : s.CategoryName,
-            mainImageUrl = s.MainImageUrl,
-            price = s.Price.ToString("N2") + " ₴",
-            hasActiveDiscount = s.HasActiveDiscount,
-            discountedPrice = s.DiscountedPrice.HasValue ? s.DiscountedPrice.Value.ToString("N2") + " ₴" : null,
-            discountPercentage = s.DiscountPercentage
-        });
+            const int pageSize = 12;
+            filter.Page = filter.Page <= 0 ? 1 : filter.Page;
 
-        return Json(result);
-    }
+            var filterDto = new CatalogFilterDto
+            {
+                Search = filter.Search,
+                CategoryId = filter.CategoryId,
+                MinPrice = filter.MinPrice,
+                MaxPrice = filter.MaxPrice,
+                InStockOnly = filter.InStockOnly,
+                MinRating = filter.MinRating,
+                Sort = filter.Sort,
+                Page = filter.Page,
+                PageSize = pageSize
+            };
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
+            var catalogPage = await _productService.GetCatalogPageAsync(filterDto);
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var featuredProducts = catalogPage.Items
+                .Select(item =>
+                {
+                    var activeDiscount = item.Product.GetActiveDiscount();
+
+                    return new CatalogProductViewModel
+                    {
+                        Id = item.Product.Id,
+                        Name = item.Product.Name,
+                        Description = item.Product.Description,
+                        Price = activeDiscount != null ? item.Product.GetDiscountedPrice() : item.Product.Price,
+                        Quantity = item.Product.Quantity,
+                        MainImageUrl = item.Product.MainImageUrl,
+                        CategoryName = item.Product.Category?.Name ?? "Без категорії",
+                        StoreName = item.Product.Business?.StoreName ?? "Marketplace",
+                        AverageRating = item.AverageRating,
+                        ReviewCount = item.ReviewCount,
+                        OriginalPrice = activeDiscount != null ? item.Product.Price : null,
+                        DiscountPercent = activeDiscount?.Percent
+                    };
+                })
+                .ToList();
+
+            var rawCategories = await _categoryService.GetAllCategories();
+
+            var colors = new[] { "blue", "violet", "orange", "green", "teal" };
+            var icons = new[] { "📦", "💻", "👕", "🏠", "📚", "🎮" };
+
+            var homeCategories = rawCategories
+                .Select((c, index) => new HomeCategoryViewModel
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    ColorClass = colors[index % colors.Length],
+                    Icon = icons[index % icons.Length]
+                })
+                .ToList();
+
+            var viewModel = new HomeViewModel
+            {
+                FeaturedProducts = featuredProducts,
+                Categories = homeCategories,
+                Search = filter.Search,
+                CategoryId = filter.CategoryId,
+
+                SortBy = filter.Sort.ToString(),
+                AverageRating = featuredProducts.Any() ? featuredProducts.Average(p => p.AverageRating) : null,
+                ReviewCount = featuredProducts.Sum(p => p.ReviewCount)
+            };
+
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_ProductListPartial", viewModel);
+            }
+
+            return View(viewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AutoComplete(string? term)
+        {
+            var suggestions = await _productService.GetSearchSuggestionsAsync(term);
+            return Json(suggestions);
+        }
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        public IActionResult Support()
+        {
+            return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
     }
 }

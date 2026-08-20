@@ -1,7 +1,8 @@
-@model Marketplace.Web.Models.CatalogIndexViewModel
+@model Marketplace.Web.Models.HomeViewModel
 
 @{
     ViewData["Title"] = "Головна";
+    var topProduct = Model.TopProduct;
 }
 
 @section Styles {
@@ -9,37 +10,20 @@
 }
 
 <div class="home-page">
-    <!-- HERO СЕКЦІЯ -->
     <section class="home-hero">
         <div class="home-hero__content">
             <div class="home-pill"><span></span> Покупки без зайвих кроків</div>
             <h1>Усе потрібне — <em>в одному місці</em></h1>
             <p>Знаходьте товари для роботи, дому й відпочинку. Порівнюйте пропозиції, додавайте до кошика та стежте за доставкою.</p>
 
-            <form asp-controller="Catalog" asp-action="Index" method="get" class="home-search" role="search" style="position: relative;">
+            <form asp-controller="Catalog" asp-action="Index" method="get" class="home-search" role="search">
                 <span aria-hidden="true">⌕</span>
-                <input name="search" 
-                       id="searchInput" 
-                       value="@Model?.Search" 
-                       placeholder="Що ви шукаєте?" 
-                       aria-label="Пошук товарів" 
-                       autocomplete="off" />
-
-                @if (Model?.CategoryId.HasValue == true)
-                {
-                    <input type="hidden" name="categoryId" value="@Model.CategoryId" />
-                }
-                @if (!string.IsNullOrEmpty(Model?.SortBy))
-                {
-                    <input type="hidden" name="sortBy" value="@Model.SortBy" />
-                }
+                <input name="search" placeholder="Що ви шукаєте?" aria-label="Пошук товарів" />
                 <button type="submit">Знайти</button>
-
-                <ul id="searchSuggestions" class="search-suggestions" style="display: none;"></ul>
             </form>
 
             <div class="home-hero__actions">
-                <a href="#catalog-products" class="home-button home-button--primary">Перейти до товарів <span>↓</span></a>
+                <a asp-controller="Catalog" asp-action="Index" class="home-button home-button--primary">Перейти до каталогу <span>→</span></a>
                 @if (User.Identity?.IsAuthenticated != true)
                 {
                     <a asp-controller="Auth" asp-action="SignUp" class="home-button home-button--ghost">Створити акаунт</a>
@@ -64,25 +48,54 @@
 
             <div class="visual-main-card">
                 <div class="visual-main-card__top">
-                    <span class="visual-tag">Вибір тижня</span>
+                    <span class="visual-tag">@(topProduct is not null ? "Популярний вибір" : "Каталог")</span>
                     <span class="visual-heart" aria-hidden="true">♡</span>
                 </div>
                 <div class="visual-product">
                     <div class="visual-product__halo"></div>
-                    <div class="visual-product__shape" aria-hidden="true">
-                        <span></span>
-                    </div>
+                    @if (topProduct is not null && !string.IsNullOrWhiteSpace(topProduct.MainImageUrl))
+                    {
+                        <img src="@topProduct.MainImageUrl" alt="@topProduct.Name" class="visual-product__image" />
+                    }
+                    else
+                    {
+                        <div class="visual-product__shape" aria-hidden="true">
+                            <span></span>
+                        </div>
+                    }
                 </div>
                 <div class="visual-main-card__copy">
-                    <small>Техніка для щоденних справ</small>
-                    <strong>Знижки до 30%</strong>
-                    <a href="#catalog-products">Переглянути пропозиції →</a>
+                    @if (topProduct is not null)
+                    {
+                        <small>@topProduct.CategoryName</small>
+                        <strong>
+                            @topProduct.Name — @topProduct.Price.ToString("N0") ₴
+                            @if (topProduct.OriginalPrice.HasValue && topProduct.OriginalPrice.Value > topProduct.Price)
+                            {
+                                <span class="text-muted text-decoration-line-through small ms-1">@topProduct.OriginalPrice.Value.ToString("N0") ₴</span>
+                            }
+                        </strong>
+                        <a asp-controller="Catalog" asp-action="Details" asp-route-id="@topProduct.Id">Переглянути товар →</a>
+                    }
+                    else
+                    {
+                        <small>Marketplace</small>
+                        <strong>Товари ще завантажуються</strong>
+                        <a asp-controller="Catalog" asp-action="Index">Перейти до каталогу →</a>
+                    }
                 </div>
             </div>
 
             <div class="visual-float-card visual-float-card--rating">
                 <span class="visual-float-card__icon">★</span>
-                <div><strong>4.9</strong><small>оцінка покупців</small></div>
+                @if (Model.AverageRating.HasValue)
+                {
+                    <div><strong>@Model.AverageRating.Value.ToString("0.0")</strong><small>@Model.ReviewCount відгуків покупців</small></div>
+                }
+                else
+                {
+                    <div><strong>Новий каталог</strong><small>Будьте першим, хто залишить відгук</small></div>
+                }
             </div>
             <div class="visual-float-card visual-float-card--delivery">
                 <span class="visual-float-card__icon">✓</span>
@@ -91,7 +104,6 @@
         </div>
     </section>
 
-    <!-- ПЕРЕВАГИ -->
     <section class="home-benefits" aria-label="Переваги маркетплейсу">
         <div><span>✓</span><p><strong>Перевірені товари</strong><small>зрозумілий статус наявності</small></p></div>
         <div><span>↺</span><p><strong>Просте повернення</strong><small>прозорий процес покупки</small></p></div>
@@ -99,49 +111,109 @@
         <div><span>→</span><p><strong>Контроль доставки</strong><small>від замовлення до отримання</small></p></div>
     </section>
 
-    <!-- КАТЕГОРІЇ -->
     <section class="home-section">
         <div class="home-section__heading">
             <div>
                 <span class="home-section__kicker">Обирайте швидше</span>
                 <h2>Популярні категорії</h2>
             </div>
-            @if (Model?.CategoryId.HasValue == true)
-            {
-                <a asp-action="Index" class="text-primary js-reset-filters">Скинути фільтр категорій ✕</a>
-            }
+            <a asp-controller="Catalog" asp-action="Index">Увесь каталог →</a>
         </div>
 
-        <div class="category-grid">
-            <a asp-action="Index" asp-route-search="@Model?.Search" asp-route-sortBy="@Model?.SortBy" class="category-card category-card--blue @(Model?.CategoryId.HasValue != true ? "border border-2 border-primary" : "")">
-                <span class="category-card__icon">⌁</span>
-                <strong>Усі категорії</strong>
-                <small>Переглянути все</small>
-            </a>
-          @if (Model?.Categories != null)
-{
-    foreach (var cat in Model.Categories)
-    {
-        var isSelected = Model.CategoryId?.ToString() == cat.Value;
-        <a asp-action="Index" asp-route-categoryId="@cat.Value" asp-route-search="@Model?.Search" asp-route-sortBy="@Model?.SortBy" class="category-card category-card--violet @(isSelected ? "border border-2 border-primary" : "")">
-            <span class="category-card__icon">⌂</span>
-            <strong>@cat.Text</strong>
-            <small>Категорія</small>
-        </a>
-    }
-}
-        </div>
-    </section>
-
-    <!-- СЕКЦІЯ ТОВАРІВ -->
-    <section class="home-section home-featured" id="catalog-products">
-        @if (Model != null)
+        @if (Model.Categories.Count == 0)
         {
-            @await Html.PartialAsync("_ProductListPartial", Model)
+            <p class="text-secondary">Категорії ще не додані.</p>
+        }
+        else
+        {
+            <div class="category-grid">
+                @foreach (var category in Model.Categories)
+                {
+                    <a asp-controller="Catalog" asp-action="Index" asp-route-categoryId="@category.Id" class="category-card category-card--@category.ColorClass">
+                        <span class="category-card__icon">@category.Icon</span>
+                        <strong>@category.Name</strong>
+                    </a>
+                }
+            </div>
         }
     </section>
 
-    <!-- ПРОМО ДЛЯ ПРОДАВЦІВ -->
+    @if (Model.FeaturedProducts.Count > 0)
+    {
+        <section class="home-section home-featured">
+            <div class="home-section__heading">
+                <div>
+                    <span class="home-section__kicker">Варто переглянути</span>
+                    <h2>Популярне зараз</h2>
+                </div>
+                <a asp-controller="Catalog" asp-action="Index" asp-route-Sort="Popularity">Дивитися більше →</a>
+            </div>
+
+            <div class="home-products">
+                @for (var index = 0; index < Model.FeaturedProducts.Count; index++)
+                {
+                    var product = Model.FeaturedProducts[index];
+                    var colorClass = index % 3 == 0 ? "blue" : index % 3 == 1 ? "violet" : "orange";
+                    <article class="home-product">
+                        <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="home-product__media home-product__media--@colorClass">
+                            @if (!string.IsNullOrWhiteSpace(product.MainImageUrl))
+                            {
+                                <img src="@product.MainImageUrl" alt="@product.Name" />
+                            }
+                            else
+                            {
+                                <span>@product.Name[..1].ToUpperInvariant()</span>
+                            }
+                            <small>В наявності</small>
+                        </a>
+                        <div class="home-product__body">
+                            <div class="home-product__category">@product.CategoryName</div>
+                            <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="home-product__name">@product.Name</a>
+                            @if (product.ReviewCount > 0)
+                            {
+                                <div class="home-product__rating">★ @product.AverageRating.ToString("0.0") (@product.ReviewCount)</div>
+                            }
+                            <div class="home-product__bottom">
+                                <div class="home-product__price d-flex align-items-center gap-1">
+                                    @if (product.OriginalPrice.HasValue && product.OriginalPrice.Value > product.Price)
+                                    {
+                                        <strong class="text-danger">@product.Price.ToString("N2") ₴</strong>
+                                        <span class="text-muted text-decoration-line-through small">@product.OriginalPrice.Value.ToString("N2") ₴</span>
+                                        @if (product.DiscountPercent.HasValue)
+                                        {
+                                            <span class="badge bg-danger small">-@product.DiscountPercent%</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <strong>@product.Price.ToString("N2") ₴</strong>
+                                    }
+                                </div>
+                                <form asp-controller="Cart" asp-action="Add" method="post">
+                                    <input type="hidden" name="productId" value="@product.Id" />
+                                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                    <button type="submit" aria-label="Додати @product.Name до кошика">+</button>
+                                </form>
+                            </div>
+                        </div>
+                    </article>
+                }
+            </div>
+        </section>
+    }
+
+    <section class="home-section" data-recently-viewed-section hidden>
+        <div class="home-section__heading">
+            <div>
+                <span class="home-section__kicker">Ваша історія</span>
+                <h2>Нещодавно переглянуті</h2>
+            </div>
+            <a asp-controller="Catalog" asp-action="Index">Увесь каталог →</a>
+        </div>
+
+        <div class="home-products" data-recently-viewed-list></div>
+    </section>
+
     <section class="home-promo">
         <div class="home-promo__content">
             <span class="home-section__kicker">Для продавців</span>
@@ -171,155 +243,5 @@
 </div>
 
 @section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const container = document.getElementById('catalog-products');
-            const searchInput = document.getElementById('searchInput');
-            const suggestionsBox = document.getElementById('searchSuggestions');
-            let debounceTimer;
-
-            function updateCategoryHighlight(targetUrl) {
-                const urlObj = new URL(targetUrl, window.location.origin);
-                const activeCategoryId = urlObj.searchParams.get('categoryId');
-
-                document.querySelectorAll('.category-card').forEach(card => {
-                    const cardHref = card.getAttribute('href');
-                    if (!cardHref) return;
-
-                    const cardUrl = new URL(cardHref, window.location.origin);
-                    const cardCategoryId = cardUrl.searchParams.get('categoryId');
-
-                    const isSelected = (!activeCategoryId && !cardCategoryId) || 
-                                       (activeCategoryId && activeCategoryId === cardCategoryId);
-
-                    if (isSelected) {
-                        card.classList.add('border', 'border-2', 'border-primary');
-                    } else {
-                        card.classList.remove('border', 'border-2', 'border-primary');
-                    }
-                });
-            }
-
-            async function loadProducts(url) {
-                if (!container) return;
-                try {
-                    container.style.opacity = '0.5';
-
-                    const response = await fetch(url, {
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                    });
-
-                    if (!response.ok) throw new Error('Помилка завантаження даних');
-
-                    const html = await response.text();
-                    container.innerHTML = html;
-
-                    history.pushState(null, '', url);
-                    updateCategoryHighlight(url);
-                } catch (err) {
-                    console.error('Помилка завантаження товарів:', err);
-                } finally {
-                    container.style.opacity = '1';
-                }
-            }
-
-            function escapeRegExp(string) {
-                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            }
-
-            if (searchInput && suggestionsBox) {
-                searchInput.addEventListener('input', (e) => {
-                    clearTimeout(debounceTimer);
-                    const query = e.target.value.trim();
-
-                    if (query.length < 2) {
-                        suggestionsBox.style.display = 'none';
-                        suggestionsBox.innerHTML = '';
-                        return;
-                    }
-
-                    debounceTimer = setTimeout(async () => {
-                        try {
-                            const response = await fetch(`/Home/AutoComplete?term=${encodeURIComponent(query)}`);
-                            if (!response.ok) return;
-
-                            const suggestions = await response.json();
-
-                            if (!suggestions || suggestions.length === 0) {
-                                suggestionsBox.style.display = 'none';
-                                return;
-                            }
-
-                            const safeQuery = escapeRegExp(query);
-                            const regex = new RegExp(`(${safeQuery})`, 'gi');
-
-                            suggestionsBox.innerHTML = suggestions.map(item => {
-                                const name = item.name || '';
-                                const highlighted = name.replace(regex, '<mark>$1</mark>');
-                                const displayPrice = item.hasActiveDiscount && item.discountedPrice ? item.discountedPrice : item.price;
-
-                                return `
-                                    <li data-id="${item.id}" data-value="${name}" class="d-flex align-items-center justify-content-between p-2">
-                                        <span>${highlighted}</span>
-                                        <small class="text-primary fw-bold ms-2">${displayPrice}</small>
-                                    </li>`;
-                            }).join('');
-
-                            suggestionsBox.style.display = 'block';
-                        } catch (err) {
-                            console.error('Помилка автодоповнення:', err);
-                        }
-                    }, 250);
-                });
-
-                suggestionsBox.addEventListener('click', (e) => {
-                    const item = e.target.closest('li');
-                    if (item) {
-                        const productId = item.dataset.id;
-                        if (productId) {
-                            window.location.href = `/Catalog/Details/${productId}`;
-                        } else {
-                            searchInput.value = item.dataset.value;
-                            suggestionsBox.style.display = 'none';
-                            searchInput.closest('form').submit();
-                        }
-                    }
-                });
-
-                document.addEventListener('click', (e) => {
-                    if (!e.target.closest('.home-search')) {
-                        suggestionsBox.style.display = 'none';
-                    }
-                });
-            }
-
-            document.addEventListener('click', (e) => {
-                const link = e.target.closest('.category-card, .js-async-link');
-                if (link && link.getAttribute('href') && !link.getAttribute('href').startsWith('#')) {
-                    e.preventDefault();
-                    loadProducts(link.href);
-                }
-
-                if (e.target.closest('.js-reset-filters')) {
-                    e.preventDefault();
-                    loadProducts('@Url.Action("Index", "Home")');
-                }
-            });
-
-            document.addEventListener('change', (e) => {
-                if (e.target.classList.contains('js-async-sort')) {
-                    const form = e.target.closest('form');
-                    const formData = new FormData(form);
-                    const params = new URLSearchParams(formData).toString();
-                    const url = `${window.location.pathname}?${params}`;
-
-                    loadProducts(url);
-                }
-            });
-
-            window.addEventListener('popstate', () => {
-                loadProducts(window.location.href);
-            });
-        });
-    </script>
+    <script src="~/js/recently-viewed.js" asp-append-version="true"></script>
 }
