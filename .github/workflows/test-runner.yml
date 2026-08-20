@@ -1,9 +1,10 @@
-name: Test EC2 Runner
+name: EC2 Deployment Test
 
 on:
   push:
     branches:
       - develop
+  workflow_dispatch:
 
 jobs:
   test:
@@ -11,4 +12,4 @@ jobs:
 
     steps:
       - name: Deploy
-        run: ~/deploy.sh
+        run: /home/devops/deploy.sh

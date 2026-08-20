@@ -9,7 +9,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Marketplace.Web.Controllers;
 
 [AllowAnonymous]
-public class CatalogController : Controller
+[Route("Catalog")]
+[Route("Catalogue")]
+public class CatalogueController : Controller
 {
     private const int PageSize = 12;
 
@@ -18,7 +20,7 @@ public class CatalogController : Controller
     private readonly ICategoryService _categoryService;
     private readonly IWishlistService _wishlistService;
 
-    public CatalogController(
+    public CatalogueController(
         IProductService productService,
         IReviewService reviewService,
         ICategoryService categoryService,
@@ -31,6 +33,8 @@ public class CatalogController : Controller
     }
 
     [HttpGet]
+    [Route("")]
+    [Route("Index")]
     public async Task<IActionResult> Index(CatalogFilterViewModel filter)
     {
         filter.Page = filter.Page < 1 ? 1 : filter.Page;
@@ -69,10 +73,11 @@ public class CatalogController : Controller
             TotalPages = result.TotalPages
         };
 
-        return View(model);
+        return View("~/Views/Catalog/Index.cshtml", model);
     }
 
     [HttpGet]
+    [Route("Details/{id:guid}")]
     public async Task<IActionResult> Details(Guid id)
     {
         var product = await _productService.GetCatalogProductAsync(id);
@@ -112,11 +117,11 @@ public class CatalogController : Controller
             model.IsInWishlist = wishlist.Items.Any(item => item.ProductId == id);
         }
 
-        return View(model);
+        return View("~/Views/Catalog/Details.cshtml", model);
     }
 
-    // ЕНДПОЇНТ ДЛЯ АВТОДОПОВНЕННЯ В ПОШУКУ
     [HttpGet]
+    [Route("SearchSuggestions")]
     public async Task<IActionResult> SearchSuggestions(string term)
     {
         if (string.IsNullOrWhiteSpace(term) || term.Length < 2)
@@ -159,7 +164,6 @@ public class CatalogController : Controller
             ReviewCount = reviewCount,
             OriginalPrice = activeDiscount != null ? product.Price : null,
             DiscountPercent = activeDiscount?.Percent,
-     
         };
     }
 }

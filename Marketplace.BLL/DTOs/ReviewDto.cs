@@ -3,7 +3,7 @@
 public class ReviewDto
 {
     public Guid Id { get; set; }
-    public string UserId { get; set; } = string.Empty; // Тип змінено на string
+    public string UserId { get; set; } = string.Empty;
     public string Body { get; set; } = string.Empty;
     public float Rating { get; set; }
 

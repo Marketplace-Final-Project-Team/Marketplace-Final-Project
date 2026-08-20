@@ -1,96 +1,77 @@
 services:
 
-
   # ===== SQL Server =====
-  database:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: marketplace-db
-
-    environment:
-      ACCEPT_EULA: ${ACCEPT_EULA}
-      MSSQL_PID: ${MSSQL_PID}
-      MSSQL_SA_PASSWORD: ${DB_PASSWORD}
-
-    ports:
-      - "${DB_PORT}:1433"
-
-    volumes:
-      - sqlserver_data:/var/opt/mssql
-
-    restart: unless-stopped
+    #database:
+    #  image: mcr.microsoft.com/mssql/server:2022-latest
+    #  container_name: marketplace-db
+    #  environment:
+    #    ACCEPT_EULA: ${ACCEPT_EULA}
+    #    MSSQL_PID: ${MSSQL_PID}
+    #    MSSQL_SA_PASSWORD: ${DB_PASSWORD}
+    #  ports:
+    #    - "${DB_PORT}:1433"
+    #  volumes:
+    #    - sqlserver_data:/var/opt/mssql
+    #  restart: unless-stopped
 
   # ===== Backend and Frontend =====
-  web:
-    build: 
-    	context: ..
-    	dockerfile: devops/Dockerfile
-    container_name: marketplace-web
-
-    depends_on:
-      - database
-
-    restart: unless-stopped
-
+    web:
+      build:
+        context: ..
+        dockerfile: devops/Dockerfile
+      container_name: marketplace-web
+      environment:
+        ConnectionStrings__DefaultConnection: "Server=${DB_SERVER},${DB_PORT};Database=${DB_NAME};User ID=${DB_USER};Password=${DB_PASSWORD};Encrypt=True;TrustServerCertificate=True;"
+      #depends_on:
+      #  - database
+      restart: unless-stopped
 
   # ===== Nginx =====
-  nginx:
-    build: ./nginx
-    container_name: marketplace-nginx
+    nginx:
+      build: ./nginx
+      container_name: marketplace-nginx
+      ports:
+        - "80:80"
+        - "443:443"
+      depends_on:
+        web:
+          condition: service_started
+      restart: unless-stopped
 
-    ports:
-      - "80:80"
-      - "443:443"
+  # ===== Monitoring =====
+    prometheus:
+      image: prom/prometheus:v3.13.2
+      container_name: marketplace-prometheus
+      command:
+        - "--config.file=/etc/prometheus/prometheus.yml"
+        - "--web.enable-remote-write-receiver"
+      ports:
+        - "9090:9090"
+      volumes:
+        - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      restart: unless-stopped
 
-    depends_on:
-     	web:
-		condition: service_started
-
-    restart: unless-stopped
-
-
-      # ===== Monitoring =====
-  prometheus:
-    image: prom/prometheus:v3.13.2
-    container_name: marketplace-prometheus
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--web.enable-remote-write-receiver"
-
-    ports:
-      - "9090:9090"
-
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-
-    restart: unless-stopped
-
-  grafana:
-    image: grafana/grafana:13.1.3-slim
-    container_name: marketplace-grafana
-
-    ports:
-      - "3000:3000"
-
-  	volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning
-
-    depends_on:
-      - prometheus
-
-    restart: unless-stopped
-
+    grafana:
+      image: grafana/grafana:13.1.3-slim
+      container_name: marketplace-grafana
+      ports:
+        - "3000:3000"
+      volumes:
+        - ./grafana/provisioning:/etc/grafana/provisioning
+      depends_on:
+        - prometheus
+      restart: unless-stopped
 
   # ===== Load Testing =====
-  k6:
-    image: grafana/k6:2.1.0
-    container_name: marketplace-k6
-    volumes:
-    	- ./k6:/scripts
-
+    k6:
+      image: grafana/k6:2.1.0
+      container_name: marketplace-k6
+      volumes:
+        - ./k6:/scripts
 
   # ===== Other =====
-volumes:
-  sqlserver_data:
+#volumes:
+#  sqlserver_data:
 
 
 

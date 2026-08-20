@@ -257,9 +257,7 @@ namespace Marketplace.BLL.Services
                 .ThenInclude(item => item.Product)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
 
-            // Product.Product is filtered by the global soft-delete query filter (Product.IsDeleted),
-            // so item.Product comes back null for a product that was later removed/banned — the
-            // ownership check and image lookup below both guard against that explicitly.
+  
             if (order == null || !order.Items.Any(item => item.Product != null && item.Product.BusinessId == businessId))
             {
                 return null;
