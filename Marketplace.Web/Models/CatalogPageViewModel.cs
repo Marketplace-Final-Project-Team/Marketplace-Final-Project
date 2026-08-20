@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Marketplace.Web.Models
 {
     public class CatalogPageViewModel
