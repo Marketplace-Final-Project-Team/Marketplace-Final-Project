@@ -24,7 +24,9 @@ namespace Marketplace.DAL.Data
         public DbSet<Wishlist> Wishlists { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
 
-  
+        public DbSet<WishlistCollection> WishlistCollections { get; set; }
+
+
         public DbSet<Discount> Discounts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -137,7 +139,7 @@ namespace Marketplace.DAL.Data
                 .HasOne(wi => wi.Wishlist)
                 .WithMany(w => w.WishlistItems)
                 .HasForeignKey(wi => wi.WishlistId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<WishlistItem>()
                 .HasOne(wi => wi.Product)
@@ -161,6 +163,18 @@ namespace Marketplace.DAL.Data
                 .HasOne(d => d.Product)
                 .WithMany(p => p.Discounts)
                 .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<WishlistCollection>()
+                .HasOne(wc => wc.User)
+                .WithMany(u => u.WishlistCollections)
+                .HasForeignKey(wc => wc.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<WishlistCollection>()
+                .HasMany(wc => wc.Items)
+                .WithOne(wi => wi.WishlistCollection)
+                .HasForeignKey(wi => wi.WishlistCollectionId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Product>().Navigation(p => p.Category).AutoInclude();
