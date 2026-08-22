@@ -8,6 +8,7 @@
 @section Styles {
     <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/checkout.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/cart-sellers.css" asp-append-version="true" />
 }
 
 <div class="shop-page">
@@ -97,17 +98,80 @@
 
                     <section class="checkout-step" data-step="2" hidden>
                         <h2>Спосіб доставки</h2>
-                        <div class="checkout-info-card">
-                            <strong>Кур'єром на вказану адресу</strong>
-                            <span>Орієнтовний термін — 2–4 робочі дні після підтвердження замовлення. Інші способи доставки поки не підтримуються.</span>
+
+                        <div class="checkout-carrier-options">
+                            <label class="checkout-carrier-option">
+                                <input type="radio" name="DeliveryCarrier" value="NovaPoshta" data-carrier-radio checked="@(Model.DeliveryCarrier == "NovaPoshta")" />
+                                <span class="checkout-carrier-option__body">
+                                    <strong>Нова пошта</strong>
+                                    <span>Доставка у відділення або поштомат</span>
+                                </span>
+                            </label>
+                            <label class="checkout-carrier-option">
+                                <input type="radio" name="DeliveryCarrier" value="Ukrposhta" data-carrier-radio checked="@(Model.DeliveryCarrier == "Ukrposhta")" />
+                                <span class="checkout-carrier-option__body">
+                                    <strong>Укрпошта</strong>
+                                    <span>Доставка на вказану адресу</span>
+                                </span>
+                            </label>
+                            <label class="checkout-carrier-option">
+                                <input type="radio" name="DeliveryCarrier" value="Meest" data-carrier-radio checked="@(Model.DeliveryCarrier == "Meest")" />
+                                <span class="checkout-carrier-option__body">
+                                    <strong>Meest Express</strong>
+                                    <span>Доставка на вказану адресу</span>
+                                </span>
+                            </label>
+                        </div>
+
+                        <div class="checkout-nova-poshta" data-carrier-panel="NovaPoshta">
+                            <div class="checkout-fields">
+                                <div>
+                                    <label class="form-label">Місто</label>
+                                    <input type="text" class="form-control" placeholder="Почніть вводити назву міста" autocomplete="off" data-np-city-input value="@Model.NovaPoshtaCityName" />
+                                    <input type="hidden" name="NovaPoshtaCityRef" data-np-city-ref value="@Model.NovaPoshtaCityRef" />
+                                    <input type="hidden" name="NovaPoshtaCityName" data-np-city-name value="@Model.NovaPoshtaCityName" />
+                                </div>
+                                <div>
+                                    <label class="form-label">Відділення / поштомат</label>
+                                    <select class="form-select" data-np-branch-select disabled>
+                                        <option value="">Спочатку оберіть місто</option>
+                                    </select>
+                                    <input type="hidden" name="NovaPoshtaBranchRef" data-np-branch-ref value="@Model.NovaPoshtaBranchRef" />
+                                    <input type="hidden" name="NovaPoshtaBranchName" data-np-branch-name value="@Model.NovaPoshtaBranchName" />
+                                    <span class="text-danger small" data-np-branch-error hidden>Оберіть відділення Нової пошти</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="checkout-info-card" data-carrier-panel="Ukrposhta" hidden>
+                            <strong>Укрпошта</strong>
+                            <span>Кур'єрська доставка на адресу, вказану на кроці «Адреса». Орієнтовний термін — 3–5 робочих днів.</span>
+                        </div>
+
+                        <div class="checkout-info-card" data-carrier-panel="Meest" hidden>
+                            <strong>Meest Express</strong>
+                            <span>Кур'єрська доставка на адресу, вказану на кроці «Адреса». Орієнтовний термін — 2–4 робочі дні.</span>
                         </div>
                     </section>
 
                     <section class="checkout-step" data-step="3" hidden>
                         <h2>Спосіб оплати</h2>
-                        <div class="checkout-info-card">
-                            <strong>Онлайн-оплата через LiqPay</strong>
-                            <span>Після підтвердження замовлення ви перейдете на безпечну сторінку оплати LiqPay. Це єдиний спосіб оплати на платформі зараз.</span>
+
+                        <div class="checkout-carrier-options">
+                            <label class="checkout-carrier-option">
+                                <input type="radio" name="PaymentMethod" value="Online" data-payment-radio checked="@(Model.PaymentMethod == "Online")" />
+                                <span class="checkout-carrier-option__body">
+                                    <strong>Онлайн-оплата через LiqPay</strong>
+                                    <span>Після підтвердження ви перейдете на безпечну сторінку оплати</span>
+                                </span>
+                            </label>
+                            <label class="checkout-carrier-option">
+                                <input type="radio" name="PaymentMethod" value="CashOnDelivery" data-payment-radio checked="@(Model.PaymentMethod == "CashOnDelivery")" />
+                                <span class="checkout-carrier-option__body">
+                                    <strong>Оплата при отриманні</strong>
+                                    <span>Готівкою або карткою кур'єру чи у відділенні</span>
+                                </span>
+                            </label>
                         </div>
                     </section>
 
@@ -122,8 +186,8 @@
                         <div class="checkout-review-block">
                             <h3>Доставка та оплата</h3>
                             <dl>
-                                <div class="checkout-review-row"><dt>Спосіб доставки</dt><dd>Кур'єром</dd></div>
-                                <div class="checkout-review-row"><dt>Спосіб оплати</dt><dd>LiqPay (онлайн)</dd></div>
+                                <div class="checkout-review-row"><dt>Спосіб доставки</dt><dd data-review-carrier>—</dd></div>
+                                <div class="checkout-review-row"><dt>Спосіб оплати</dt><dd data-review-payment>—</dd></div>
                             </dl>
                         </div>
 
@@ -139,26 +203,40 @@
 
                         <div class="checkout-review-block">
                             <h3>Товари у замовленні</h3>
-                            <div class="order-lines">
-                                @foreach (var item in Model.Items)
+                            @if (Model.HasMultipleSellers)
+                            {
+                                <p class="cart-sellers-note">
+                                    <span aria-hidden="true">ⓘ</span>
+                                    Товари від @Model.SellerGroups.Count продавців — оформлюються одним замовленням.
+                                </p>
+                            }
+                            @foreach (var group in Model.SellerGroups)
+                            {
+                                @if (Model.HasMultipleSellers)
                                 {
-                                    <div class="order-line">
-                                        @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
-                                        {
-                                            <img class="order-line__media" src="@item.ImageUrl" alt="@item.ProductName" />
-                                        }
-                                        else
-                                        {
-                                            <div class="order-line__media" aria-hidden="true">@item.ProductName[..1].ToUpperInvariant()</div>
-                                        }
-                                        <div>
-                                            <div class="order-line__name">@item.ProductName</div>
-                                            <div class="order-line__meta">@item.Quantity шт. × @item.Price.ToString("N2") ₴</div>
-                                        </div>
-                                        <div class="order-line__total">@item.LineTotal.ToString("N2") ₴</div>
-                                    </div>
+                                    <div class="checkout-review-seller">@group.StoreName</div>
                                 }
-                            </div>
+                                <div class="order-lines">
+                                    @foreach (var item in group.Items)
+                                    {
+                                        <div class="order-line">
+                                            @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                                            {
+                                                <img class="order-line__media" src="@item.ImageUrl" alt="@item.ProductName" />
+                                            }
+                                            else
+                                            {
+                                                <div class="order-line__media" aria-hidden="true">@item.ProductName[..1].ToUpperInvariant()</div>
+                                            }
+                                            <div>
+                                                <div class="order-line__name">@item.ProductName</div>
+                                                <div class="order-line__meta">@item.Quantity шт. × @item.Price.ToString("N2") ₴</div>
+                                            </div>
+                                            <div class="order-line__total">@item.LineTotal.ToString("N2") ₴</div>
+                                        </div>
+                                    }
+                                </div>
+                            }
                         </div>
                     </section>
 

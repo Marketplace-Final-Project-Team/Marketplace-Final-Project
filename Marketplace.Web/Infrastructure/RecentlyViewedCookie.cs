@@ -8,7 +8,7 @@ public static class RecentlyViewedCookie
 {
     public const string Name = "mp_recently_viewed";
     public const int MaxItems = 8;
-    public static readonly TimeSpan Lifetime = TimeSpan.FromDays(7);
+    public static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(15);
 
     public static List<Guid> Parse(string? rawValue)
     {

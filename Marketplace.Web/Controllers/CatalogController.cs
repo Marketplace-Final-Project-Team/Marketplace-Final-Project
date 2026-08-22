@@ -122,6 +122,11 @@ public class CatalogController : Controller
 
     private void RecordRecentlyViewed(Guid productId)
     {
+        if (!CookieConsent.IsAccepted(Request.Cookies))
+        {
+            return;
+        }
+
         Request.Cookies.TryGetValue(RecentlyViewedCookie.Name, out var raw);
         var ids = RecentlyViewedCookie.Parse(raw);
 

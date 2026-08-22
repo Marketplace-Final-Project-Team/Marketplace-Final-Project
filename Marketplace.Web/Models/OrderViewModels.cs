@@ -10,6 +10,7 @@ public class OrderListItemViewModel
     public decimal TotalAmount { get; set; }
     public int ItemsCount { get; set; }
     public string ShippingAddress { get; set; } = string.Empty;
+    public string? DeliveryMethodLabel { get; set; }
 }
 
 public class OrderDetailsViewModel
@@ -21,6 +22,8 @@ public class OrderDetailsViewModel
     public string ShippingCountry { get; set; } = string.Empty;
     public string ShippingCity { get; set; } = string.Empty;
     public string ShippingStreet { get; set; } = string.Empty;
+    public string? DeliveryMethodLabel { get; set; }
+    public string? PaymentMethodLabel { get; set; }
     public List<OrderLineViewModel> Items { get; set; } = new();
 }
 
