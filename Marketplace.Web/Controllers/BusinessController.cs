@@ -553,5 +553,18 @@ namespace Marketplace.Web.Controllers
             pageModel.Stats = result.Data;
             return View(pageModel);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetBusinessBalance(Guid businessId)
+        {
+            var hasAcess = await _businessAccessService.HasAccessAsync(businessId, _userManager.GetUserId(User)!, BusinessMemberRole.Owner);
+            if (!hasAcess)
+            {
+                return Forbid();
+            }
+
+            var balance = await _businessService.GetBusinessBalance(businessId);
+            return Json(new { businessId, balance });
+        }
     }
 }
