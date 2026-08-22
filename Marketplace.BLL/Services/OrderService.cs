@@ -131,11 +131,31 @@ namespace Marketplace.BLL.Services
 
         public async Task<ServiceResult> ChangeOrderStatus(Guid orderId, OrderStatus status)
         {
-            var order = await _orerRepository.FirstOrDefaultAsync(o => o.Id == orderId);
+            var order = await _context.Orders
+                .Include(o => o.Items)
+                .ThenInclude(i => i.Product)
+                .ThenInclude(p => p.Business)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+
 
             if (order == null)
             {
                 return new ServiceResult { Succeeded = false, Message = "Замовлення не знайдено." };
+            }
+            if (status == OrderStatus.Confirmed && order.Status != OrderStatus.Confirmed) {
+                foreach (var item in order.Items) {
+                    if (item.Product.Business != null)
+                    {
+                        var business = item.Product.Business;
+                        if (business == null)
+                        {
+                            return new ServiceResult { Succeeded = false, Message = "Бізнес не знайдено." };
+                        }
+                        var amount = item.UnitPrice * item.Quantity;
+                        business.Balance += amount; 
+                    }
+                }
             }
 
             order.Status = status;

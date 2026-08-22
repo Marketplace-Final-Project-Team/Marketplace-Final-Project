@@ -289,5 +289,15 @@ namespace Marketplace.BLL.Services
                 }
             };
         }
+
+        public async Task<decimal> GetBusinessBalance(Guid businessid) {
+            
+            var business = await _businessRepo.GetByIdAsync(businessid);
+            if (business == null)
+            {
+                return 0;
+            }
+            return business.Balance;
+        }
     }
 }
