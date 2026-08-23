@@ -67,7 +67,6 @@
                 <label for="filter-search">Пошук</label>
                 <div class="catalog-filters__search-row">
                     <input id="filter-search" name="Search" value="@filter.Search" class="form-control" placeholder="Назва, опис або категорія" data-search-autocomplete autocomplete="off" />
-                    <button type="button" class="visual-search-btn" aria-label="Пошук за фото" data-open-visual-search>📷</button>
                 </div>
             </div>
 
@@ -265,10 +264,7 @@
     }
 </div>
 
-<partial name="_VisualSearchModal" />
-
 @section Scripts {
     <script src="~/js/search-autocomplete.js" asp-append-version="true"></script>
-    <script src="~/js/visual-search.js" asp-append-version="true"></script>
     <script src="~/js/saved-searches.js" asp-append-version="true"></script>
 }

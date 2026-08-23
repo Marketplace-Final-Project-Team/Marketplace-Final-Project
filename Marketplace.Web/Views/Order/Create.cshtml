@@ -145,12 +145,25 @@
 
                         <div class="checkout-info-card" data-carrier-panel="Ukrposhta" hidden>
                             <strong>Укрпошта</strong>
-                            <span>Кур'єрська доставка на адресу, вказану на кроці «Адреса». Орієнтовний термін — 3–5 робочих днів.</span>
+                            <span>Кур'єрська доставка. Орієнтовний термін — 3–5 робочих днів.</span>
                         </div>
 
                         <div class="checkout-info-card" data-carrier-panel="Meest" hidden>
                             <strong>Meest Express</strong>
-                            <span>Кур'єрська доставка на адресу, вказану на кроці «Адреса». Орієнтовний термін — 2–4 робочі дні.</span>
+                            <span>Кур'єрська доставка. Орієнтовний термін — 2–4 робочі дні.</span>
+                        </div>
+
+                        <div class="checkout-nova-poshta" data-carrier-panel="Ukrposhta,Meest" hidden>
+                            <div class="checkout-fields">
+                                <div>
+                                    <label class="form-label">Місто доставки</label>
+                                    <input type="text" name="DeliveryCity" class="form-control" placeholder="Наприклад, Львів" required value="@Model.DeliveryCity" />
+                                </div>
+                                <div>
+                                    <label class="form-label">Адреса доставки</label>
+                                    <input type="text" name="DeliveryStreet" class="form-control" placeholder="вул. Хрещатик, 1, кв. 10" required value="@Model.DeliveryStreet" />
+                                </div>
+                            </div>
                         </div>
                     </section>
 

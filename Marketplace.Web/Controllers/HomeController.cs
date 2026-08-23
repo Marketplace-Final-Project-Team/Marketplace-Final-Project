@@ -20,8 +20,12 @@ namespace Marketplace.Web.Controllers
 
         public async Task<IActionResult> Index([FromQuery] CatalogFilterViewModel filter)
         {
-            const int pageSize = 12;
+            const int pageSize = 6;
             filter.Page = filter.Page <= 0 ? 1 : filter.Page;
+
+            // "Популярне зараз" should actually rank by sales, not just show the newest
+            // listings — but only when the caller hasn't explicitly asked for another sort.
+            var sort = Request.Query.ContainsKey("Sort") ? filter.Sort : CatalogSortOption.Popularity;
 
             var filterDto = new CatalogFilterDto
             {
@@ -31,7 +35,7 @@ namespace Marketplace.Web.Controllers
                 MaxPrice = filter.MaxPrice,
                 InStockOnly = filter.InStockOnly,
                 MinRating = filter.MinRating,
-                Sort = filter.Sort,
+                Sort = sort,
                 Page = filter.Page,
                 PageSize = pageSize
             };
@@ -82,8 +86,8 @@ namespace Marketplace.Web.Controllers
                 Categories = homeCategories,
                 Search = filter.Search,
                 CategoryId = filter.CategoryId,
-                SortBy = filter.Sort.ToString(),
-                RecentlyViewed = await GetRecentlyViewedAsync(),
+                SortBy = sort.ToString(),
+                RecentlyViewed = (await GetRecentlyViewedAsync()).Take(3).ToList(),
                 AverageRating = featuredProducts.Any() ? featuredProducts.Average(p => p.AverageRating) : null,
                 ReviewCount = featuredProducts.Sum(p => p.ReviewCount)
             };
@@ -145,6 +149,26 @@ namespace Marketplace.Web.Controllers
         }
 
         public IActionResult CookiePolicy()
+        {
+            return View();
+        }
+
+        public IActionResult Terms()
+        {
+            return View();
+        }
+
+        public IActionResult ReturnsPolicy()
+        {
+            return View();
+        }
+
+        public IActionResult ShippingPolicy()
+        {
+            return View();
+        }
+
+        public IActionResult SellerRules()
         {
             return View();
         }

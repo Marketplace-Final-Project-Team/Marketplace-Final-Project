@@ -122,8 +122,13 @@
     <footer class="border-top footer text-muted">
         <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
             <span>&copy; 2026 MarketPlace — навчальний маркетплейс</span>
-            <div class="d-flex gap-3">
+            <div class="d-flex flex-wrap gap-3">
+                <a asp-controller="Home" asp-action="Privacy" class="text-muted">Конфіденційність</a>
+                <a asp-controller="Home" asp-action="Terms" class="text-muted">Умови використання</a>
                 <a asp-controller="Home" asp-action="CookiePolicy" class="text-muted">Політика кукі</a>
+                <a asp-controller="Home" asp-action="ReturnsPolicy" class="text-muted">Повернення та обмін</a>
+                <a asp-controller="Home" asp-action="ShippingPolicy" class="text-muted">Доставка</a>
+                <a asp-controller="Home" asp-action="SellerRules" class="text-muted">Для продавців</a>
                 <a asp-controller="Home" asp-action="Support" class="text-muted">Підтримка</a>
             </div>
         </div>

@@ -105,8 +105,12 @@
             const branchName = form.querySelector("[data-np-branch-name]")?.value;
             return cityName && branchName ? `Нова пошта — ${branchName}, ${cityName}` : "Нова пошта";
         }
-        if (carrier === "Ukrposhta") return "Укрпошта";
-        if (carrier === "Meest") return "Meest Express";
+        if (carrier === "Ukrposhta" || carrier === "Meest") {
+            const label = carrier === "Ukrposhta" ? "Укрпошта" : "Meest Express";
+            const city = form.querySelector('[name="DeliveryCity"]')?.value;
+            const street = form.querySelector('[name="DeliveryStreet"]')?.value;
+            return city && street ? `${label} — ${city}, ${street}` : label;
+        }
         return "—";
     };
 
@@ -185,7 +189,8 @@
     const syncCarrierPanels = () => {
         const carrier = form.querySelector('input[name="DeliveryCarrier"]:checked')?.value;
         carrierPanels.forEach((panel) => {
-            panel.hidden = panel.dataset.carrierPanel !== carrier;
+            const panelCarriers = panel.dataset.carrierPanel.split(",");
+            panel.hidden = !panelCarriers.includes(carrier);
         });
     };
 

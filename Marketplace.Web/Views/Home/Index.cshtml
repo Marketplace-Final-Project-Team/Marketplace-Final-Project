@@ -20,7 +20,6 @@
             <form asp-controller="Catalog" asp-action="Index" method="get" class="home-search" role="search" data-search-wrapper>
                 <span aria-hidden="true">⌕</span>
                 <input name="Search" placeholder="Що ви шукаєте?" aria-label="Пошук товарів" data-search-autocomplete autocomplete="off" />
-                <button type="button" class="visual-search-btn" aria-label="Пошук за фото" data-open-visual-search>📷</button>
                 <button type="submit">Знайти</button>
             </form>
 
@@ -269,9 +268,6 @@
     </section>
 </div>
 
-<partial name="_VisualSearchModal" />
-
 @section Scripts {
     <script src="~/js/search-autocomplete.js" asp-append-version="true"></script>
-    <script src="~/js/visual-search.js" asp-append-version="true"></script>
 }

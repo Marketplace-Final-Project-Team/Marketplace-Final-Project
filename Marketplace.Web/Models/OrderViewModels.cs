@@ -25,6 +25,15 @@ public class OrderDetailsViewModel
     public string? DeliveryMethodLabel { get; set; }
     public string? PaymentMethodLabel { get; set; }
     public List<OrderLineViewModel> Items { get; set; } = new();
+    public PostSaleRequestViewModel? ReturnRequest { get; set; }
+    public PostSaleRequestViewModel? DisputeRequest { get; set; }
+}
+
+public class PostSaleRequestViewModel
+{
+    public string Reason { get; set; } = string.Empty;
+    public string Comment { get; set; } = string.Empty;
+    public DateTime SubmittedAtUtc { get; set; }
 }
 
 public class OrderLineViewModel
