@@ -28,11 +28,5 @@
                 closeModal();
             }
         });
-
-        const submitButton = modal.querySelector("[data-postsale-submit]");
-        submitButton?.addEventListener("click", () => {
-            modal.querySelector("[data-postsale-form]").hidden = true;
-            modal.querySelector("[data-postsale-success]").hidden = false;
-        });
     });
 })();

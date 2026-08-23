@@ -33,12 +33,20 @@ public class OrderCreateViewModel : IValidatableObject
 
     public string DeliveryCarrier { get; set; } = DeliveryCarriers.NovaPoshta;
 
-    // Only populated/required when DeliveryCarrier == NovaPoshta — Укрпошта and Meest
-    // Express deliver to the address entered in step 1, no branch to pick.
+    // Only populated/required when DeliveryCarrier == NovaPoshta.
     public string? NovaPoshtaCityRef { get; set; }
     public string? NovaPoshtaCityName { get; set; }
     public string? NovaPoshtaBranchRef { get; set; }
     public string? NovaPoshtaBranchName { get; set; }
+
+    // Only populated/required when DeliveryCarrier is Ukrposhta or Meest — a delivery
+    // address that can differ from the billing address entered in step 1 (e.g. gifting
+    // an order to someone else).
+    [StringLength(100)]
+    public string? DeliveryCity { get; set; }
+
+    [StringLength(250)]
+    public string? DeliveryStreet { get; set; }
 
     public string PaymentMethod { get; set; } = PaymentMethods.Online;
 
@@ -66,6 +74,19 @@ public class OrderCreateViewModel : IValidatableObject
             && (string.IsNullOrWhiteSpace(NovaPoshtaCityRef) || string.IsNullOrWhiteSpace(NovaPoshtaBranchRef)))
         {
             yield return new ValidationResult("Оберіть місто та відділення Нової пошти", new[] { nameof(NovaPoshtaBranchRef) });
+        }
+
+        if (DeliveryCarrier is DeliveryCarriers.Ukrposhta or DeliveryCarriers.Meest)
+        {
+            if (string.IsNullOrWhiteSpace(DeliveryCity))
+            {
+                yield return new ValidationResult("Вкажіть місто доставки", new[] { nameof(DeliveryCity) });
+            }
+
+            if (string.IsNullOrWhiteSpace(DeliveryStreet))
+            {
+                yield return new ValidationResult("Вкажіть адресу доставки", new[] { nameof(DeliveryStreet) });
+            }
         }
     }
 }

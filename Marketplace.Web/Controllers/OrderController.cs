@@ -166,6 +166,74 @@ public class OrderController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RequestReturn(Guid orderId, string reason, string? comment)
+    {
+        var order = await _orderService.GetUserOrder(GetUserId(), orderId);
+        if (order is null || order.Status != OrderStatus.Delivered)
+        {
+            return NotFound();
+        }
+
+        if (string.IsNullOrWhiteSpace(reason))
+        {
+            TempData["Error"] = "Оберіть причину повернення.";
+            return RedirectToAction(nameof(Details), new { id = orderId });
+        }
+
+        if (CookieConsent.IsAccepted(Request.Cookies))
+        {
+            Response.Cookies.Append(
+                OrderPostSaleCookie.ReturnNameFor(orderId),
+                OrderPostSaleCookie.Serialize(reason.Trim(), comment, DateTime.UtcNow),
+                new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.Add(OrderPostSaleCookie.Lifetime),
+                    HttpOnly = true,
+                    SameSite = SameSiteMode.Lax,
+                    IsEssential = false
+                });
+        }
+
+        TempData["Success"] = "Заявку на повернення прийнято. Інструкції надішлемо на вашу пошту.";
+        return RedirectToAction(nameof(Details), new { id = orderId });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> OpenDispute(Guid orderId, string reason, string? comment)
+    {
+        var order = await _orderService.GetUserOrder(GetUserId(), orderId);
+        if (order is null || order.Status != OrderStatus.Delivered)
+        {
+            return NotFound();
+        }
+
+        if (string.IsNullOrWhiteSpace(reason))
+        {
+            TempData["Error"] = "Оберіть тип проблеми.";
+            return RedirectToAction(nameof(Details), new { id = orderId });
+        }
+
+        if (CookieConsent.IsAccepted(Request.Cookies))
+        {
+            Response.Cookies.Append(
+                OrderPostSaleCookie.DisputeNameFor(orderId),
+                OrderPostSaleCookie.Serialize(reason.Trim(), comment, DateTime.UtcNow),
+                new CookieOptions
+                {
+                    Expires = DateTimeOffset.UtcNow.Add(OrderPostSaleCookie.Lifetime),
+                    HttpOnly = true,
+                    SameSite = SameSiteMode.Lax,
+                    IsEssential = false
+                });
+        }
+
+        TempData["Success"] = "Спір відкрито. Підтримка зв'яжеться з вами протягом 24 годин.";
+        return RedirectToAction(nameof(Details), new { id = orderId });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> ChangeStatus(Guid orderId, OrderStatus status)
     {
@@ -185,9 +253,13 @@ public class OrderController : Controller
             return;
         }
 
-        var label = model.DeliveryCarrier == DeliveryCarriers.NovaPoshta
-            ? $"Нова пошта — {model.NovaPoshtaBranchName}, {model.NovaPoshtaCityName}"
-            : DeliveryCarriers.Label(model.DeliveryCarrier);
+        var label = model.DeliveryCarrier switch
+        {
+            DeliveryCarriers.NovaPoshta => $"Нова пошта — {model.NovaPoshtaBranchName}, {model.NovaPoshtaCityName}",
+            DeliveryCarriers.Ukrposhta or DeliveryCarriers.Meest =>
+                $"{DeliveryCarriers.Label(model.DeliveryCarrier)} — {model.DeliveryCity}, {model.DeliveryStreet}",
+            _ => DeliveryCarriers.Label(model.DeliveryCarrier)
+        };
 
         Response.Cookies.Append(OrderDeliveryCookie.NameFor(orderId), label, new CookieOptions
         {
@@ -226,6 +298,20 @@ public class OrderController : Controller
         return Request.Cookies.TryGetValue(OrderPaymentCookie.NameFor(orderId), out var label) && !string.IsNullOrWhiteSpace(label)
             ? label
             : null;
+    }
+
+    private PostSaleRequestViewModel? GetReturnRequest(Guid orderId)
+    {
+        Request.Cookies.TryGetValue(OrderPostSaleCookie.ReturnNameFor(orderId), out var raw);
+        var parsed = OrderPostSaleCookie.Parse(raw);
+        return parsed is null ? null : new PostSaleRequestViewModel { Reason = parsed.Reason, Comment = parsed.Comment, SubmittedAtUtc = parsed.SubmittedAtUtc };
+    }
+
+    private PostSaleRequestViewModel? GetDisputeRequest(Guid orderId)
+    {
+        Request.Cookies.TryGetValue(OrderPostSaleCookie.DisputeNameFor(orderId), out var raw);
+        var parsed = OrderPostSaleCookie.Parse(raw);
+        return parsed is null ? null : new PostSaleRequestViewModel { Reason = parsed.Reason, Comment = parsed.Comment, SubmittedAtUtc = parsed.SubmittedAtUtc };
     }
 
     private string GetUserId()
@@ -287,6 +373,8 @@ public class OrderController : Controller
             ShippingStreet = order.ShippingStreet,
             DeliveryMethodLabel = GetDeliveryChoice(order.Id),
             PaymentMethodLabel = GetPaymentChoice(order.Id),
+            ReturnRequest = GetReturnRequest(order.Id),
+            DisputeRequest = GetDisputeRequest(order.Id),
             Items = order.Items.Select(item => new OrderLineViewModel
             {
                 ProductId = item.ProductId,

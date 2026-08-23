@@ -219,27 +219,6 @@ public class CatalogueController : Controller
         });
     }
 
-    [HttpGet]
-    [Route("PopularPicks")]
-    public async Task<IActionResult> PopularPicks()
-    {
-        var page = await _productService.GetCatalogPageAsync(new CatalogFilterDto
-        {
-            Sort = CatalogSortOption.Popularity,
-            Page = 1,
-            PageSize = 4
-        });
-
-        return Json(page.Items.Select(item => new SearchSuggestionItemViewModel
-        {
-            Id = item.Product.Id,
-            Name = item.Product.Name,
-            CategoryName = item.Product.Category?.Name ?? "Без категорії",
-            Price = item.Product.GetActiveDiscount() != null ? item.Product.GetDiscountedPrice() : item.Product.Price,
-            ImageUrl = item.Product.MainImageUrl
-        }));
-    }
-
     private static int LevenshteinDistance(string a, string b)
     {
         a = a.ToLowerInvariant();
