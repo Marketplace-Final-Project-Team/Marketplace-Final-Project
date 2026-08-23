@@ -35,6 +35,8 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/search-autocomplete.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/saved-searches.css" asp-append-version="true" />
 }
 
 <div class="shop-page">
@@ -61,9 +63,12 @@
 
     <form asp-action="Index" method="get" class="catalog-filters" role="search" aria-label="Фільтри каталогу">
         <div class="catalog-filters__grid">
-            <div class="catalog-filters__field" style="grid-column: 1 / -1;">
+            <div class="catalog-filters__field" style="grid-column: 1 / -1;" data-search-wrapper>
                 <label for="filter-search">Пошук</label>
-                <input id="filter-search" name="Search" value="@filter.Search" class="form-control" placeholder="Назва, опис або категорія" />
+                <div class="catalog-filters__search-row">
+                    <input id="filter-search" name="Search" value="@filter.Search" class="form-control" placeholder="Назва, опис або категорія" data-search-autocomplete autocomplete="off" />
+                    <button type="button" class="visual-search-btn" aria-label="Пошук за фото" data-open-visual-search>📷</button>
+                </div>
             </div>
 
             <div class="catalog-filters__field">
@@ -117,10 +122,19 @@
             @if (filter.HasActiveFilters)
             {
                 <a asp-action="Index" class="btn btn-outline-secondary">Скинути фільтри</a>
+                <button type="button" class="btn btn-outline-primary" data-save-search>☆ Зберегти пошук</button>
             }
             <button type="submit" class="btn btn-primary">Застосувати</button>
         </div>
     </form>
+
+    <section class="saved-searches" data-saved-searches hidden>
+        <div class="saved-searches__heading">
+            <span class="saved-searches__kicker">Збережені запити</span>
+            <p>Швидко повертайтесь до пошуків, що вас цікавлять — нові товари з часу останнього перегляду позначені міткою «Нове».</p>
+        </div>
+        <div class="saved-searches__list" data-saved-searches-list></div>
+    </section>
 
     <div class="catalog-meta">Знайдено товарів: <strong>@Model.TotalCount</strong></div>
 
@@ -138,7 +152,8 @@
         <div class="catalog-grid">
             @foreach (var product in Model.Products)
             {
-                <article class="catalog-card">
+                <article class="catalog-card" data-product-id="@product.Id">
+                    <span class="catalog-card__new-badge" data-new-badge hidden>Нове</span>
                     <a asp-action="Details" asp-route-id="@product.Id" class="catalog-card__media" aria-label="Переглянути @product.Name">
                         @if (!string.IsNullOrWhiteSpace(product.MainImageUrl))
                         {
@@ -249,3 +264,11 @@
         }
     }
 </div>
+
+<partial name="_VisualSearchModal" />
+
+@section Scripts {
+    <script src="~/js/search-autocomplete.js" asp-append-version="true"></script>
+    <script src="~/js/visual-search.js" asp-append-version="true"></script>
+    <script src="~/js/saved-searches.js" asp-append-version="true"></script>
+}

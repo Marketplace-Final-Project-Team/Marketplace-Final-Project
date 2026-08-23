@@ -12,6 +12,7 @@ namespace Marketplace.Web.Models
     {
         public List<CatalogProductViewModel> FeaturedProducts { get; set; } = new();
         public List<HomeCategoryViewModel> Categories { get; set; } = new();
+        public List<CatalogRelatedProductViewModel> RecentlyViewed { get; set; } = new();
         public double? AverageRating { get; set; }
         public int ReviewCount { get; set; }
 

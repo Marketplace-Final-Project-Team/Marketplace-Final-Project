@@ -1,0 +1,87 @@
+@{
+    ViewData["Title"] = "Політика використання кукі";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/support.css" asp-append-version="true" />
+}
+
+<div class="support-page">
+    <header class="support-hero">
+        <div class="support-kicker">Політика кукі</div>
+        <h1>Як ми використовуємо кукі-файли</h1>
+        <p>Прозоро про те, які кукі ставить цей сайт, навіщо вони потрібні та скільки часу зберігаються.</p>
+    </header>
+
+    <section class="support-section">
+        <h2>Обов'язкові кукі</h2>
+        <p class="support-section__lead">Потрібні для роботи сайту — без них неможливо увійти в акаунт чи оформити замовлення. Їх не можна вимкнути.</p>
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr><th>Кукі</th><th>Призначення</th><th>Термін дії</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>.AspNetCore.Identity.Application</code></td>
+                        <td>Зберігає ваш вхід в акаунт</td>
+                        <td>До виходу з акаунту</td>
+                    </tr>
+                    <tr>
+                        <td><code>.AspNetCore.Antiforgery.*</code></td>
+                        <td>Захист форм від підробки запитів (CSRF)</td>
+                        <td>Сесія</td>
+                    </tr>
+                    <tr>
+                        <td><code>mp_cookie_consent</code></td>
+                        <td>Запам'ятовує ваш вибір у цьому вікні (прийняти / відхилити)</td>
+                        <td>365 днів</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="support-section">
+        <h2>Функціональні кукі</h2>
+        <p class="support-section__lead">Вмикають додаткові зручності. Ставляться лише якщо ви натиснули «Прийняти» у вікні згоди — якщо відхилили, ці функції просто не використовують кукі.</p>
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr><th>Кукі</th><th>Призначення</th><th>Термін дії</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>mp_recently_viewed</code></td>
+                        <td>Список ID нещодавно переглянутих товарів для блоку «Нещодавно переглянуті» на головній</td>
+                        <td>15 хвилин</td>
+                    </tr>
+                    <tr>
+                        <td><code>mp_order_delivery_*</code></td>
+                        <td>Обраний спосіб доставки (Нова пошта / Укрпошта / Meest) для конкретного замовлення</td>
+                        <td>365 днів</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="support-section">
+        <h2>Дані в локальному сховищі браузера</h2>
+        <p class="support-section__lead">
+            Це не кукі — вони не передаються на сервер — але для повноти картини: сайт також зберігає у
+            <code>localStorage</code> вашого браузера деякі суто клієнтські налаштування (колекції списку бажань,
+            збережені пошукові запити, локальні чернетки налаштувань магазину). Ці дані ніколи не покидають ваш пристрій.
+        </p>
+    </section>
+
+    <section class="support-section">
+        <h2>Керування вибором</h2>
+        <p class="support-section__lead">
+            Ви можете змінити свій вибір щодо функціональних кукі в будь-який момент.
+        </p>
+        <button type="button" class="btn btn-outline-primary" data-reopen-cookie-consent>Змінити налаштування кукі</button>
+    </section>
+</div>

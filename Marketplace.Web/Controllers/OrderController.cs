@@ -5,6 +5,7 @@ using Marketplace.DAL.Data;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
 using Marketplace.Domain.Interfaces;
+using Marketplace.Web.Infrastructure;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,17 +17,20 @@ public class OrderController : Controller
 {
     private readonly IOrderService _orderService;
     private readonly ICartService _cartService;
+    private readonly IProductService _productService;
     private readonly IGenericRepository<Address> _addressRepository;
     private readonly AppDbContext _context;
 
     public OrderController(
         IOrderService orderService,
         ICartService cartService,
+        IProductService productService,
         IGenericRepository<Address> addressRepository,
         AppDbContext context)
     {
         _orderService = orderService;
         _cartService = cartService;
+        _productService = productService;
         _addressRepository = addressRepository;
         _context = context;
     }
@@ -42,7 +46,8 @@ public class OrderController : Controller
             Status = order.Status,
             TotalAmount = order.TotalAmount,
             ItemsCount = order.Items.Sum(item => item.Quantity),
-            ShippingAddress = $"{order.ShippingCity}, {order.ShippingStreet}"
+            ShippingAddress = $"{order.ShippingCity}, {order.ShippingStreet}",
+            DeliveryMethodLabel = GetDeliveryChoice(order.Id)
         }).ToList());
     }
 
@@ -139,12 +144,23 @@ public class OrderController : Controller
             await PopulateSavedAddresses(model);
             return View(model);
         }
-        if (result.PaymentData != null)
+        if (Guid.TryParse(result.OrderId, out var createdOrderId))
+        {
+            RecordDeliveryChoice(createdOrderId, model);
+            RecordPaymentChoice(createdOrderId, model);
+        }
+
+        // CreateOrder always opens a LiqPay session under the hood, but a buyer who chose
+        // "pay on delivery" should never be pushed through it — the order already exists
+        // (Status = Pending), so we just skip straight to its details page.
+        if (result.PaymentData != null && model.PaymentMethod != PaymentMethods.CashOnDelivery)
         {
           return View("Payment", result.PaymentData);
         }
 
-        TempData["Success"] = "Замовлення успішно оформлено.";
+        TempData["Success"] = model.PaymentMethod == PaymentMethods.CashOnDelivery
+            ? "Замовлення оформлено. Оплата — при отриманні."
+            : "Замовлення успішно оформлено.";
         return RedirectToAction(nameof(Details), new { id = result.OrderId });
     }
 
@@ -162,6 +178,56 @@ public class OrderController : Controller
         return RedirectToAction(nameof(Details), new { id = orderId });
     }
 
+    private void RecordDeliveryChoice(Guid orderId, OrderCreateViewModel model)
+    {
+        if (!CookieConsent.IsAccepted(Request.Cookies))
+        {
+            return;
+        }
+
+        var label = model.DeliveryCarrier == DeliveryCarriers.NovaPoshta
+            ? $"Нова пошта — {model.NovaPoshtaBranchName}, {model.NovaPoshtaCityName}"
+            : DeliveryCarriers.Label(model.DeliveryCarrier);
+
+        Response.Cookies.Append(OrderDeliveryCookie.NameFor(orderId), label, new CookieOptions
+        {
+            Expires = DateTimeOffset.UtcNow.Add(OrderDeliveryCookie.Lifetime),
+            HttpOnly = true,
+            SameSite = SameSiteMode.Lax,
+            IsEssential = false
+        });
+    }
+
+    private string? GetDeliveryChoice(Guid orderId)
+    {
+        return Request.Cookies.TryGetValue(OrderDeliveryCookie.NameFor(orderId), out var label) && !string.IsNullOrWhiteSpace(label)
+            ? label
+            : null;
+    }
+
+    private void RecordPaymentChoice(Guid orderId, OrderCreateViewModel model)
+    {
+        if (!CookieConsent.IsAccepted(Request.Cookies))
+        {
+            return;
+        }
+
+        Response.Cookies.Append(OrderPaymentCookie.NameFor(orderId), PaymentMethods.Label(model.PaymentMethod), new CookieOptions
+        {
+            Expires = DateTimeOffset.UtcNow.Add(OrderPaymentCookie.Lifetime),
+            HttpOnly = true,
+            SameSite = SameSiteMode.Lax,
+            IsEssential = false
+        });
+    }
+
+    private string? GetPaymentChoice(Guid orderId)
+    {
+        return Request.Cookies.TryGetValue(OrderPaymentCookie.NameFor(orderId), out var label) && !string.IsNullOrWhiteSpace(label)
+            ? label
+            : null;
+    }
+
     private string GetUserId()
     {
         return User.FindFirstValue(ClaimTypes.NameIdentifier)
@@ -171,6 +237,7 @@ public class OrderController : Controller
     private async Task PopulateCart(OrderCreateViewModel model)
     {
         model.Items = await _cartService.GetCartItems(GetUserId());
+        model.SellerGroups = await CartGrouping.GroupBySellerAsync(model.Items, _productService);
     }
 
     private async Task PopulateSavedAddresses(OrderCreateViewModel model)
@@ -218,6 +285,8 @@ public class OrderController : Controller
             ShippingCountry = order.ShippingCountry,
             ShippingCity = order.ShippingCity,
             ShippingStreet = order.ShippingStreet,
+            DeliveryMethodLabel = GetDeliveryChoice(order.Id),
+            PaymentMethodLabel = GetPaymentChoice(order.Id),
             Items = order.Items.Select(item => new OrderLineViewModel
             {
                 ProductId = item.ProductId,

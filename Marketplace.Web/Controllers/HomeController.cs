@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
+using Marketplace.Web.Infrastructure;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -81,8 +82,8 @@ namespace Marketplace.Web.Controllers
                 Categories = homeCategories,
                 Search = filter.Search,
                 CategoryId = filter.CategoryId,
-
                 SortBy = filter.Sort.ToString(),
+                RecentlyViewed = await GetRecentlyViewedAsync(),
                 AverageRating = featuredProducts.Any() ? featuredProducts.Average(p => p.AverageRating) : null,
                 ReviewCount = featuredProducts.Sum(p => p.ReviewCount)
             };
@@ -102,12 +103,48 @@ namespace Marketplace.Web.Controllers
             return Json(suggestions);
         }
 
+        private async Task<List<CatalogRelatedProductViewModel>> GetRecentlyViewedAsync()
+        {
+            Request.Cookies.TryGetValue(RecentlyViewedCookie.Name, out var raw);
+            var ids = RecentlyViewedCookie.Parse(raw);
+
+            var items = new List<CatalogRelatedProductViewModel>();
+            foreach (var id in ids)
+            {
+                // Re-fetched from the database on every request — a product that was
+                // deleted, banned, or sold out since the visit just won't come back here,
+                // so this never shows stale name/price/stock data from an earlier view.
+                var product = await _productService.GetCatalogProductAsync(id);
+                if (product is null)
+                {
+                    continue;
+                }
+
+                items.Add(new CatalogRelatedProductViewModel
+                {
+                    Id = product.Id,
+                    Name = product.Name,
+                    CategoryName = product.Category?.Name ?? "Без категорії",
+                    MainImageUrl = product.MainImageUrl,
+                    Price = product.Price,
+                    Quantity = product.Quantity
+                });
+            }
+
+            return items;
+        }
+
         public IActionResult Privacy()
         {
             return View();
         }
 
         public IActionResult Support()
+        {
+            return View();
+        }
+
+        public IActionResult CookiePolicy()
         {
             return View();
         }

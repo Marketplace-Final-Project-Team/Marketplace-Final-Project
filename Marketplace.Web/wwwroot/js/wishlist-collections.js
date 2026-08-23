@@ -6,6 +6,7 @@
 
     const NAMES_KEY = "mp_wishlist_collection_names";
     const ASSIGNMENTS_KEY = "mp_wishlist_collection_assignments";
+    const COLLAPSED_KEY = "mp_wishlist_collapsed_collections";
     const UNASSIGNED = "Без колекції";
 
     const readJson = (key, fallback) => {
@@ -28,6 +29,8 @@
 
     const getCollectionNames = () => readJson(NAMES_KEY, []);
     const getAssignments = () => readJson(ASSIGNMENTS_KEY, {});
+    const getCollapsed = () => new Set(readJson(COLLAPSED_KEY, []));
+    const writeCollapsed = (set) => writeJson(COLLAPSED_KEY, Array.from(set));
 
     const cards = Array.from(grid.querySelectorAll("[data-wishlist-card]"));
     const cardsContainer = grid.parentElement;
@@ -64,27 +67,51 @@
 
         grid.hidden = true;
 
+        const collapsed = getCollapsed();
+
         allNames.forEach((name) => {
             const items = groups.get(name);
-            if (items.length === 0 && name !== UNASSIGNED) {
-                return;
-            }
             if (items.length === 0) {
                 return;
             }
 
+            const isCollapsed = collapsed.has(name);
+
             const section = document.createElement("div");
-            section.className = "wishlist-collection-group";
+            section.className = "wishlist-collection-group" + (isCollapsed ? " is-collapsed" : "");
             section.dataset.collectionGroup = "true";
 
-            const heading = document.createElement("h3");
-            heading.textContent = `${name} (${items.length})`;
+            const heading = document.createElement("button");
+            heading.type = "button";
+            heading.className = "wishlist-collection-group__heading";
+            heading.setAttribute("aria-expanded", String(!isCollapsed));
+            heading.innerHTML = `
+                <svg class="wishlist-collection-group__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
+                    <path d="m9 18 6-6-6-6" />
+                </svg>
+                <h3>${name} (${items.length})</h3>
+            `;
             section.appendChild(heading);
 
             const list = document.createElement("div");
             list.className = "wishlist-grid";
+            list.hidden = isCollapsed;
             items.forEach((card) => list.appendChild(card));
             section.appendChild(list);
+
+            heading.addEventListener("click", () => {
+                const nowCollapsed = section.classList.toggle("is-collapsed");
+                list.hidden = nowCollapsed;
+                heading.setAttribute("aria-expanded", String(!nowCollapsed));
+
+                const stored = getCollapsed();
+                if (nowCollapsed) {
+                    stored.add(name);
+                } else {
+                    stored.delete(name);
+                }
+                writeCollapsed(stored);
+            });
 
             cardsContainer.insertBefore(section, grid);
         });

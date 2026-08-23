@@ -91,9 +91,38 @@
 
         if (stepNumber === steps.length) {
             updateReviewAddress();
+            updateReviewCarrier();
+            updateReviewPayment();
         }
 
         window.scrollTo({ top: form.getBoundingClientRect().top + window.scrollY - 90, behavior: "smooth" });
+    };
+
+    const carrierLabel = () => {
+        const carrier = form.querySelector('input[name="DeliveryCarrier"]:checked')?.value;
+        if (carrier === "NovaPoshta") {
+            const cityName = form.querySelector("[data-np-city-name]")?.value;
+            const branchName = form.querySelector("[data-np-branch-name]")?.value;
+            return cityName && branchName ? `Нова пошта — ${branchName}, ${cityName}` : "Нова пошта";
+        }
+        if (carrier === "Ukrposhta") return "Укрпошта";
+        if (carrier === "Meest") return "Meest Express";
+        return "—";
+    };
+
+    const updateReviewCarrier = () => {
+        const summary = form.querySelector("[data-review-carrier]");
+        if (summary) summary.textContent = carrierLabel();
+    };
+
+    const paymentLabel = () => {
+        const method = form.querySelector('input[name="PaymentMethod"]:checked')?.value;
+        return method === "CashOnDelivery" ? "Оплата при отриманні" : "LiqPay (онлайн)";
+    };
+
+    const updateReviewPayment = () => {
+        const summary = form.querySelector("[data-review-payment]");
+        if (summary) summary.textContent = paymentLabel();
     };
 
     const validateStep = (stepNumber) => {
@@ -103,7 +132,7 @@
         }
 
         const fields = Array.from(step.querySelectorAll("input, select, textarea")).filter(
-            (el) => !el.disabled && !el.hidden
+            (el) => !el.disabled && !el.hidden && el.type !== "hidden"
         );
 
         for (const field of fields) {
@@ -111,6 +140,16 @@
                 field.reportValidity();
                 return false;
             }
+        }
+
+        if (stepNumber === 2) {
+            const carrier = form.querySelector('input[name="DeliveryCarrier"]:checked')?.value;
+            const branchError = form.querySelector("[data-np-branch-error]");
+            if (carrier === "NovaPoshta" && !form.querySelector("[data-np-branch-ref]")?.value) {
+                if (branchError) branchError.hidden = false;
+                return false;
+            }
+            if (branchError) branchError.hidden = true;
         }
 
         return true;
@@ -137,6 +176,151 @@
 
     syncNewAddressFieldsState();
     showStep(1);
+
+    // ---------- Delivery carrier selection ----------
+
+    const carrierRadios = Array.from(form.querySelectorAll("[data-carrier-radio]"));
+    const carrierPanels = Array.from(form.querySelectorAll("[data-carrier-panel]"));
+
+    const syncCarrierPanels = () => {
+        const carrier = form.querySelector('input[name="DeliveryCarrier"]:checked')?.value;
+        carrierPanels.forEach((panel) => {
+            panel.hidden = panel.dataset.carrierPanel !== carrier;
+        });
+    };
+
+    carrierRadios.forEach((radio) => radio.addEventListener("change", syncCarrierPanels));
+    syncCarrierPanels();
+
+    const cityInput = form.querySelector("[data-np-city-input]");
+    const cityRefInput = form.querySelector("[data-np-city-ref]");
+    const cityNameInput = form.querySelector("[data-np-city-name]");
+    const branchSelect = form.querySelector("[data-np-branch-select]");
+    const branchRefInput = form.querySelector("[data-np-branch-ref]");
+    const branchNameInput = form.querySelector("[data-np-branch-name]");
+
+    if (cityInput && branchSelect) {
+        const citySuggest = document.createElement("div");
+        citySuggest.className = "checkout-np-suggest";
+        citySuggest.hidden = true;
+        cityInput.insertAdjacentElement("afterend", citySuggest);
+
+        let cityDebounce;
+        const escapeHtml = (value) => {
+            const div = document.createElement("div");
+            div.textContent = value ?? "";
+            return div.innerHTML;
+        };
+
+        const closeCitySuggest = () => {
+            citySuggest.hidden = true;
+            citySuggest.innerHTML = "";
+        };
+
+        const resetBranches = (placeholder) => {
+            branchSelect.innerHTML = `<option value="">${escapeHtml(placeholder)}</option>`;
+            branchSelect.disabled = true;
+            branchRefInput.value = "";
+            branchNameInput.value = "";
+        };
+
+        const loadBranches = (cityRef, preselectBranchRef) => {
+            resetBranches("Завантаження відділень…");
+            fetch(`/Delivery/Branches?cityId=${encodeURIComponent(cityRef)}`)
+                .then((response) => (response.ok ? response.json() : []))
+                .then((branches) => {
+                    if (!Array.isArray(branches) || branches.length === 0) {
+                        resetBranches("Відділень не знайдено");
+                        return;
+                    }
+
+                    branchSelect.innerHTML =
+                        `<option value="">Оберіть відділення</option>` +
+                        branches
+                            .map((branch) => {
+                                const id = branch.id || branch.Id;
+                                const name = branch.name || branch.Name;
+                                const address = branch.address || branch.Address || "";
+                                return `<option value="${escapeHtml(id)}" data-name="${escapeHtml(name)}">${escapeHtml(name)}${address ? " — " + escapeHtml(address) : ""}</option>`;
+                            })
+                            .join("");
+                    branchSelect.disabled = false;
+
+                    if (preselectBranchRef) {
+                        branchSelect.value = preselectBranchRef;
+                        if (branchSelect.value === preselectBranchRef) {
+                            branchRefInput.value = preselectBranchRef;
+                            branchNameInput.value = branchSelect.selectedOptions[0].dataset.name;
+                        }
+                    }
+                })
+                .catch(() => resetBranches("Не вдалося завантажити відділення"));
+        };
+
+        cityInput.addEventListener("input", () => {
+            cityRefInput.value = "";
+            cityNameInput.value = "";
+            resetBranches("Спочатку оберіть місто");
+
+            clearTimeout(cityDebounce);
+            const term = cityInput.value.trim();
+            if (term.length < 2) {
+                closeCitySuggest();
+                return;
+            }
+
+            cityDebounce = setTimeout(() => {
+                fetch(`/Delivery/Cities?search=${encodeURIComponent(term)}&limit=8`)
+                    .then((response) => (response.ok ? response.json() : []))
+                    .then((cities) => {
+                        if (!Array.isArray(cities) || cities.length === 0) {
+                            citySuggest.innerHTML = `<div class="checkout-np-suggest__empty">Місто не знайдено</div>`;
+                            citySuggest.hidden = false;
+                            return;
+                        }
+
+                        citySuggest.innerHTML = cities
+                            .map((city) => {
+                                const id = city.id || city.Id;
+                                const name = city.name || city.Name;
+                                return `<button type="button" data-city-ref="${escapeHtml(id)}" data-city-name="${escapeHtml(name)}">${escapeHtml(name)}</button>`;
+                            })
+                            .join("");
+                        citySuggest.hidden = false;
+
+                        citySuggest.querySelectorAll("button").forEach((btn) => {
+                            btn.addEventListener("click", () => {
+                                cityInput.value = btn.dataset.cityName;
+                                cityRefInput.value = btn.dataset.cityRef;
+                                cityNameInput.value = btn.dataset.cityName;
+                                closeCitySuggest();
+                                loadBranches(btn.dataset.cityRef);
+                            });
+                        });
+                    })
+                    .catch(() => {
+                        citySuggest.innerHTML = `<div class="checkout-np-suggest__empty">Не вдалося завантажити міста</div>`;
+                        citySuggest.hidden = false;
+                    });
+            }, 300);
+        });
+
+        branchSelect.addEventListener("change", () => {
+            const option = branchSelect.selectedOptions[0];
+            branchRefInput.value = branchSelect.value;
+            branchNameInput.value = branchSelect.value ? option.dataset.name : "";
+        });
+
+        document.addEventListener("click", (event) => {
+            if (!citySuggest.contains(event.target) && event.target !== cityInput) {
+                closeCitySuggest();
+            }
+        });
+
+        if (cityRefInput.value) {
+            loadBranches(cityRefInput.value, branchRefInput.value);
+        }
+    }
 
     const PROMO_CODES = { WELCOME10: 0.1 };
 

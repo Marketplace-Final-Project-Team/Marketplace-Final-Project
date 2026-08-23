@@ -77,8 +77,12 @@
                     <dd>@Model.ShippingCountry, @Model.ShippingCity,<br />@Model.ShippingStreet</dd>
                 </div>
                 <div class="order-info__row">
+                    <dt>Доставка</dt>
+                    <dd>@(Model.DeliveryMethodLabel ?? "Кур'єром на вказану адресу")</dd>
+                </div>
+                <div class="order-info__row">
                     <dt>Оплата</dt>
-                    <dd>При отриманні</dd>
+                    <dd>@(Model.PaymentMethodLabel ?? "LiqPay (онлайн)")</dd>
                 </div>
                 <div class="order-info__row">
                     <dt>Разом</dt>
