@@ -69,6 +69,9 @@ namespace Marketplace.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("BannerUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -568,6 +571,33 @@ namespace Marketplace.DAL.Migrations
                     b.ToTable("Wishlists");
                 });
 
+            modelBuilder.Entity("Marketplace.Domain.Entities.WishlistCollection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("WishlistCollections");
+                });
+
             modelBuilder.Entity("Marketplace.Domain.Entities.WishlistItem", b =>
                 {
                     b.Property<Guid>("Id")
@@ -583,12 +613,17 @@ namespace Marketplace.DAL.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("WishlistId")
+                    b.Property<Guid?>("WishlistCollectionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("WishlistId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("WishlistCollectionId");
 
                     b.HasIndex("WishlistId");
 
@@ -900,6 +935,17 @@ namespace Marketplace.DAL.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Marketplace.Domain.Entities.WishlistCollection", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.User", "User")
+                        .WithMany("WishlistCollections")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Marketplace.Domain.Entities.WishlistItem", b =>
                 {
                     b.HasOne("Marketplace.Domain.Entities.Product", "Product")
@@ -908,15 +954,21 @@ namespace Marketplace.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Marketplace.Domain.Entities.WishlistCollection", "WishlistCollection")
+                        .WithMany("Items")
+                        .HasForeignKey("WishlistCollectionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("Marketplace.Domain.Entities.Wishlist", "Wishlist")
                         .WithMany("WishlistItems")
                         .HasForeignKey("WishlistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Product");
 
                     b.Navigation("Wishlist");
+
+                    b.Navigation("WishlistCollection");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1007,12 +1059,19 @@ namespace Marketplace.DAL.Migrations
 
                     b.Navigation("Reviews");
 
+                    b.Navigation("WishlistCollections");
+
                     b.Navigation("Wishlists");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Wishlist", b =>
                 {
                     b.Navigation("WishlistItems");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.WishlistCollection", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

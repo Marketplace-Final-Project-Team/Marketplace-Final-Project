@@ -211,6 +211,7 @@ namespace Marketplace.DAL.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LogoUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BannerUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -272,6 +273,27 @@ namespace Marketplace.DAL.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WishlistCollections",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WishlistCollections", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WishlistCollections_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -500,9 +522,10 @@ namespace Marketplace.DAL.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    WishlistId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    WishlistId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    AddedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    AddedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    WishlistCollectionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -514,11 +537,17 @@ namespace Marketplace.DAL.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
+                        name: "FK_WishlistItems_WishlistCollections_WishlistCollectionId",
+                        column: x => x.WishlistCollectionId,
+                        principalTable: "WishlistCollections",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_WishlistItems_Wishlists_WishlistId",
                         column: x => x.WishlistId,
                         principalTable: "Wishlists",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -641,9 +670,19 @@ namespace Marketplace.DAL.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_WishlistCollections_UserId",
+                table: "WishlistCollections",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_WishlistItems_ProductId",
                 table: "WishlistItems",
                 column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WishlistItems_WishlistCollectionId",
+                table: "WishlistItems",
+                column: "WishlistCollectionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WishlistItems_WishlistId",
@@ -709,6 +748,9 @@ namespace Marketplace.DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "Products");
+
+            migrationBuilder.DropTable(
+                name: "WishlistCollections");
 
             migrationBuilder.DropTable(
                 name: "Wishlists");
