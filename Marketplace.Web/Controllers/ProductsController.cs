@@ -6,7 +6,9 @@ using Marketplace.Domain.Entities;
 using Marketplace.Domain.Interfaces;
 using Marketplace.Web.Models.Products;
 using Microsoft.AspNetCore.Authorization;
+using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Marketplace.Web.Controllers;
@@ -144,6 +146,9 @@ public class ProductsController : Controller
         if (accessible.Result is not null) return accessible.Result;
 
         var product = accessible.Product!;
+
+        ViewBag.ActiveDiscount = product.GetActiveDiscount();
+
         return View(new ProductEditViewModel
         {
             Id = product.Id,

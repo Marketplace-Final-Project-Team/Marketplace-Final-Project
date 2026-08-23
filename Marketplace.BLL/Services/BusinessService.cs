@@ -2,6 +2,7 @@
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
+using Marketplace.DAL.DTOs;
 using Marketplace.DAL.Interfaces;
 using Marketplace.DAL.Repositories;
 using Marketplace.Domain.Entities;
@@ -17,18 +18,61 @@ namespace Marketplace.BLL.Services
         private readonly IBusinessRepository _businessRepo;
         private readonly IImageStorageService _imageService;
         private readonly UserManager<User> _userManager;
+        private readonly IOrderRepository _orderRepository;
         private readonly AppDbContext _context;
+        
+        private DateTime Today = DateTime.UtcNow.Date;
 
-        public BusinessService(IGenericRepository<BusinessMember> businessMemberRepo, IBusinessRepository businessRepo, IImageStorageService imageService, UserManager<User> userManager, AppDbContext context)
+        public BusinessService(IGenericRepository<BusinessMember> businessMemberRepo, IBusinessRepository businessRepo, IImageStorageService imageService, UserManager<User> userManager, IOrderRepository orderRepository, AppDbContext context)
         {
             _businessMemberRepo = businessMemberRepo;
             _businessRepo = businessRepo;
             _imageService = imageService;
             _userManager = userManager;
+            _orderRepository = orderRepository;
             _context = context;
         }
 
-        private async Task<(ServiceResult, BusinessMember?)> VerifyMembershipRequest(string userId, Guid businessId, string token, BusinessMemberRole role) 
+        private async Task<DataResult<(DateTime startDate, DateTime endDate)>> ValidateStatsRequestAsync(Guid businessId, DateTime? startDate, DateTime? endDate)
+        {
+            if ((await _businessRepo.GetByIdAsync(businessId)) == null)
+            {
+                return new DataResult<(DateTime startDate, DateTime endDate)>
+                {
+                    Message = "Бізнес не знайдено",
+                    Succeeded = false,
+                };
+            }
+
+            var actualEndDate = endDate ?? Today;
+            if (endDate.HasValue && actualEndDate.Date > DateTime.UtcNow.Date)
+            {
+                return new DataResult<(DateTime startDate, DateTime endDate)>
+                {
+                    Message = "Кінцева дата знаходиться у майбутньому",
+                    Succeeded = false
+                };
+            }
+
+            var actualStartDate = startDate ?? Today.AddDays(-7);
+            if (startDate.HasValue && actualStartDate > actualEndDate)
+            {
+                return new DataResult<(DateTime startDate, DateTime endDate)>
+                {
+                    Message = "Початкова дата більша за кінцеву",
+                    Succeeded = false
+                };
+            }
+
+            return new DataResult<(DateTime startDate, DateTime endDate)>
+            {
+                Message = string.Empty,
+                Succeeded = true,
+                Data = (actualStartDate, actualEndDate)
+            };
+        }
+
+        private async Task<(ServiceResult, BusinessMember?)> VerifyMembershipRequest(string userId, Guid businessId, string token, BusinessMemberRole role)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
@@ -134,11 +178,11 @@ namespace Marketplace.BLL.Services
             return new ServiceResult { Succeeded = true, Message = "Запит прийнято" };
         }
 
-        public async Task<ServiceResult> DenyMembership(string userId, Guid businessId, string token, BusinessMemberRole role) 
+        public async Task<ServiceResult> DenyMembership(string userId, Guid businessId, string token, BusinessMemberRole role)
         {
             var (verificationResult, businessMember) = await VerifyMembershipRequest(userId, businessId, token, role);
 
-            if(verificationResult.Succeeded == false) 
+            if (verificationResult.Succeeded == false)
             {
                 return verificationResult;
             }
@@ -147,6 +191,113 @@ namespace Marketplace.BLL.Services
             await _context.SaveChangesAsync();
 
             return new ServiceResult { Succeeded = true, Message = "Запит відхилено" };
+        }
+
+        //Статистика
+        public async Task<DataResult<BusinessStatsByPeriodDto>> GetBusinessStatsByPeriodAsync(Guid businessId, DateTime? startDate, DateTime? endDate)
+        {
+            var validationResult = await ValidateStatsRequestAsync(businessId, startDate, endDate);
+
+            if (validationResult.Succeeded == false)
+            {
+                return new DataResult<BusinessStatsByPeriodDto>
+                {
+                    Message = validationResult.Message,
+                    Succeeded = false,
+                };
+            }
+
+            var (actualStartDate, actualEndDate) = validationResult.Data;
+            var stats = await _orderRepository.GetBusinessStatByPeriodAsync(businessId, actualStartDate, actualEndDate);
+
+            var totalRevenue = stats.Sum(s => s.Revenue);
+            var totalOrders = stats.Sum(s => s.OrderCount);
+            var aov = totalOrders > 0 ? (float)totalRevenue / totalOrders : 0f;
+
+            return new DataResult<BusinessStatsByPeriodDto>
+            {
+                Message = string.Empty,
+                Succeeded = true,
+                Data = new BusinessStatsByPeriodDto
+                {
+                    StartDate = actualStartDate,
+                    EndDate = actualEndDate,
+                    Stats = stats,
+                    TotalRevenue = totalRevenue,
+                    AOV = aov
+                }
+            };
+        }
+
+        public async Task<DataResult<ProductsStatsByPeriodDto>> GetProductsStatsByPeriodAsnyc(Guid businessId, DateTime? startDate, DateTime? endDate, bool sortDescending = true)
+        {
+            var validationResult = await ValidateStatsRequestAsync(businessId, startDate, endDate);
+
+            if (validationResult.Succeeded == false)
+            {
+                return new DataResult<ProductsStatsByPeriodDto>
+                {
+                    Message = validationResult.Message,
+                    Succeeded = false,
+                };
+            }
+
+            var (actualStartDate, actualEndDate) = validationResult.Data;
+            var stats = await _orderRepository.GetProductsStatsByPeriodAsync(businessId, actualStartDate, actualEndDate);
+            stats = sortDescending ? stats.OrderByDescending(s => s.Revenue).ToList(): stats.OrderBy(s => s.Revenue).ToList();
+
+            return new DataResult<ProductsStatsByPeriodDto>
+            {
+                Message = string.Empty,
+                Succeeded = true,
+                Data = new  ProductsStatsByPeriodDto
+                {
+                    StartDate = actualStartDate,
+                    EndDate = actualEndDate,
+                    Stats = stats
+                }
+            };
+        }
+
+        public async Task<DataResult<CustomersStatsByPeriodDto>> GetCustomersStatsByPeriodAsync(Guid businessId, DateTime? startDate, DateTime? endDate, bool sortDescending = true)
+        {
+            var validationResult = await ValidateStatsRequestAsync(businessId, startDate, endDate);
+
+            if (validationResult.Succeeded == false)
+            {
+                return new DataResult<CustomersStatsByPeriodDto>
+                {
+                    Message = validationResult.Message,
+                    Succeeded = false,
+                };
+            }
+
+            var (actualStartDate, actualEndDate) = validationResult.Data;
+            var stats = await _orderRepository.GetCustomersStatsByPeriodAsync(businessId, actualStartDate, actualEndDate);
+            stats = sortDescending ? stats.OrderByDescending(s => s.Revenue).ToList() : stats.OrderBy(s => s.Revenue).ToList();
+
+            return new DataResult<CustomersStatsByPeriodDto>
+            {
+                Message = string.Empty,
+                Succeeded = true,
+                Data = new CustomersStatsByPeriodDto
+                {
+                    StartDate = actualStartDate,
+                    EndDate = actualEndDate,
+                    Stats = stats,
+                    UniqueCustomerCount = stats.Count
+                }
+            };
+        }
+
+        public async Task<decimal> GetBusinessBalance(Guid businessid) {
+            
+            var business = await _businessRepo.GetByIdAsync(businessid);
+            if (business == null)
+            {
+                return 0;
+            }
+            return business.Balance;
         }
     }
 }

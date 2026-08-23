@@ -10,7 +10,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Marketplace.Web.Controllers;
 
 [AllowAnonymous]
-public class CatalogController : Controller
+[Route("Catalog")]
+[Route("Catalogue")]
+public class CatalogueController : Controller
 {
     private const int PageSize = 12;
 
@@ -19,7 +21,7 @@ public class CatalogController : Controller
     private readonly ICategoryService _categoryService;
     private readonly IWishlistService _wishlistService;
 
-    public CatalogController(
+    public CatalogueController(
         IProductService productService,
         IReviewService reviewService,
         ICategoryService categoryService,
@@ -32,6 +34,8 @@ public class CatalogController : Controller
     }
 
     [HttpGet]
+    [Route("")]
+    [Route("Index")]
     public async Task<IActionResult> Index(CatalogFilterViewModel filter)
     {
         filter.Page = filter.Page < 1 ? 1 : filter.Page;
@@ -51,8 +55,6 @@ public class CatalogController : Controller
             PageSize = PageSize
         });
 
-        // A page requested past the last available one (e.g. a filter change while on page 5
-        // of a shrinking result set) would otherwise render an empty grid with no way back.
         if (result.TotalPages > 0 && filter.Page > result.TotalPages)
         {
             filter.Page = result.TotalPages;
@@ -72,10 +74,11 @@ public class CatalogController : Controller
             TotalPages = result.TotalPages
         };
 
-        return View(model);
+        return View("~/Views/Catalog/Index.cshtml", model);
     }
 
     [HttpGet]
+    [Route("Details/{id:guid}")]
     public async Task<IActionResult> Details(Guid id)
     {
         var product = await _productService.GetCatalogProductAsync(id);
@@ -117,7 +120,7 @@ public class CatalogController : Controller
 
         RecordRecentlyViewed(id);
 
-        return View(model);
+        return View("~/Views/Catalog/Details.cshtml", model);
     }
 
     private void RecordRecentlyViewed(Guid productId)
@@ -147,6 +150,7 @@ public class CatalogController : Controller
     }
 
     [HttpGet]
+    [Route("SearchSuggestions")]
     public async Task<IActionResult> SearchSuggestions(string? term)
     {
         if (string.IsNullOrWhiteSpace(term) || term.Trim().Length < 2)
@@ -209,13 +213,14 @@ public class CatalogController : Controller
                 Id = product.Id,
                 Name = product.Name,
                 CategoryName = product.Category?.Name ?? "Без категорії",
-                Price = product.Price,
+                Price = product.GetActiveDiscount() != null ? product.GetDiscountedPrice() : product.Price,
                 ImageUrl = product.MainImageUrl
             }).ToList()
         });
     }
 
     [HttpGet]
+    [Route("PopularPicks")]
     public async Task<IActionResult> PopularPicks()
     {
         var page = await _productService.GetCatalogPageAsync(new CatalogFilterDto
@@ -230,7 +235,7 @@ public class CatalogController : Controller
             Id = item.Product.Id,
             Name = item.Product.Name,
             CategoryName = item.Product.Category?.Name ?? "Без категорії",
-            Price = item.Product.Price,
+            Price = item.Product.GetActiveDiscount() != null ? item.Product.GetDiscountedPrice() : item.Product.Price,
             ImageUrl = item.Product.MainImageUrl
         }));
     }
@@ -262,12 +267,14 @@ public class CatalogController : Controller
 
     private static CatalogProductViewModel MapProduct(Marketplace.Domain.Entities.Product product, double averageRating = 0, int reviewCount = 0)
     {
+        var activeDiscount = product.GetActiveDiscount();
+
         return new CatalogProductViewModel
         {
             Id = product.Id,
             Name = product.Name,
             Description = product.Description,
-            Price = product.Price,
+            Price = activeDiscount != null ? product.GetDiscountedPrice() : product.Price,
             Quantity = product.Quantity,
             CreatedAt = product.CreatedAt,
             MainImageUrl = product.MainImageUrl,
@@ -277,7 +284,9 @@ public class CatalogController : Controller
             StoreDescription = product.Business?.Description ?? string.Empty,
             AdditionalImageUrls = product.Images.Select(image => image.ImageUrl).ToList(),
             AverageRating = averageRating,
-            ReviewCount = reviewCount
+            ReviewCount = reviewCount,
+            OriginalPrice = activeDiscount != null ? product.Price : null,
+            DiscountPercent = activeDiscount?.Percent,
         };
     }
 }

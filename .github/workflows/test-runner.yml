@@ -1,0 +1,15 @@
+name: EC2 Deployment Test
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: self-hosted
+
+    steps:
+      - name: Deploy
+        run: /home/devops/deploy.sh

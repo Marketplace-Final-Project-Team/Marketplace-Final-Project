@@ -13,6 +13,8 @@ namespace Marketplace.Domain.Entities
         public string LogoUrl { get; set; } = string.Empty;
         public string BannerUrl { get; set; } = string.Empty;
 
+        public decimal Balance { get; set; } = 0;
+
         public BusinessStatus Status { get; set; } = BusinessStatus.Pending;
 
         public ICollection<BusinessMember> Members { get; set; } = new List<BusinessMember>();

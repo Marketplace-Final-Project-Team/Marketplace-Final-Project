@@ -26,8 +26,12 @@ namespace Marketplace.BLL.Services
 
         public async Task<IReadOnlyList<Product>> GetCatalogAsync(string? search = null)
         {
-            var products = await _productRepository.FindAsync(
-                product => product.Status == ProductStatus.Active && product.Quantity > 0);
+            var products = await _context.Products
+                .Include(p => p.Discounts)
+                .Include(p => p.Category)
+                .Include(p => p.Business)
+                .Where(product => product.Status == ProductStatus.Active && product.Quantity > 0)
+                .ToListAsync();
 
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -36,7 +40,7 @@ namespace Marketplace.BLL.Services
                     .Where(product =>
                         product.Name.Contains(normalizedSearch, StringComparison.OrdinalIgnoreCase)
                         || product.Description.Contains(normalizedSearch, StringComparison.OrdinalIgnoreCase)
-                        || product.Category.Name.Contains(normalizedSearch, StringComparison.OrdinalIgnoreCase))
+                        || (product.Category != null && product.Category.Name.Contains(normalizedSearch, StringComparison.OrdinalIgnoreCase)))
                     .ToList();
             }
 
@@ -47,14 +51,12 @@ namespace Marketplace.BLL.Services
 
         public async Task<CatalogPageResultDto> GetCatalogPageAsync(CatalogFilterDto filter)
         {
-            // Built directly against AppDbContext rather than IGenericRepository: filtering,
-            // sorting by aggregated rating/sales and pagination all need query composition
-            // (correlated subqueries, Skip/Take) that the generic repository's single-predicate
-            // FindAsync cannot express. Product.Reviews is deliberately not used here — the
-            // Review->Product relationship is configured with WithMany() (no back-reference) in
-            // AppDbContext, so that navigation is backed by an unused shadow FK and is always
-            // empty; rating is computed from Reviews by ProductId instead.
-            var query = _context.Products.Where(p => p.Status == ProductStatus.Active);
+            var query = _context.Products
+                .Include(p => p.Discounts)
+                .Include(p => p.Category)
+                .Include(p => p.Business)
+                .Include(p => p.Images)
+                .Where(p => p.Status == ProductStatus.Active);
 
             if (filter.InStockOnly)
             {
@@ -139,8 +141,12 @@ namespace Marketplace.BLL.Services
 
         public async Task<Product?> GetCatalogProductAsync(Guid id)
         {
-            return await _productRepository.FirstOrDefaultAsync(
-                product => product.Id == id
+            return await _context.Products
+                .Include(p => p.Discounts)
+                .Include(p => p.Category)
+                .Include(p => p.Business)
+                .Include(p => p.Images)
+                .FirstOrDefaultAsync(product => product.Id == id
                     && product.Status == ProductStatus.Active
                     && product.Quantity > 0);
         }
@@ -152,7 +158,12 @@ namespace Marketplace.BLL.Services
 
         public async Task<Product?> GetByIdAsync(Guid id)
         {
-            return await _productRepository.GetByIdAsync(id);
+            return await _context.Products
+                .Include(p => p.Discounts)
+                .Include(p => p.Category)
+                .Include(p => p.Business)
+                .Include(p => p.Images)
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<Product> CreateAsync(ProductCreateDto dto)
@@ -165,7 +176,7 @@ namespace Marketplace.BLL.Services
                 Description = dto.Description,
                 Price = dto.Price,
                 Quantity = dto.Quantity,
-                Status = ProductStatus.Pending 
+                Status = ProductStatus.Pending
             };
 
             if (dto.MainImage != null)
@@ -201,8 +212,6 @@ namespace Marketplace.BLL.Services
             product.Description = dto.Description;
             product.Price = dto.Price;
             product.Quantity = dto.Quantity;
-
- 
             product.Status = ProductStatus.Pending;
 
             if (dto.MainImage != null)
@@ -233,11 +242,49 @@ namespace Marketplace.BLL.Services
             var product = await _productRepository.GetByIdAsync(id);
             if (product == null) return false;
 
-            product.IsDeleted = true; 
+            product.IsDeleted = true;
             _productRepository.Update(product);
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<IReadOnlyList<CatalogProductDto>> GetSearchSuggestionsAsync(string? term, int limit = 8)
+        {
+            if (string.IsNullOrWhiteSpace(term) || term.Trim().Length < 2)
+                return Array.Empty<CatalogProductDto>();
+
+            var normalizedTerm = term.Trim();
+            var now = DateTime.UtcNow;
+
+            var products = await _context.Products
+                .AsNoTracking()
+                .Include(p => p.Discounts)
+                .Where(p => p.Status == ProductStatus.Active && p.Quantity > 0)
+                .Where(p => p.Name.Contains(normalizedTerm))
+                .OrderBy(p => p.Name)
+                .Take(limit)
+                .ToListAsync();
+
+            return products.Select(p =>
+            {
+                var activeDiscount = p.Discounts?
+                    .Where(d => d.IsActive && d.StartDate <= now && d.EndDate >= now)
+                    .OrderByDescending(d => d.Percent)
+                    .FirstOrDefault();
+
+                var finalPrice = activeDiscount != null && activeDiscount.Percent > 0
+                    ? p.Price * (1 - (decimal)activeDiscount.Percent / 100)
+                    : p.Price;
+
+                return new CatalogProductDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Price = finalPrice,
+                    MainImageUrl = p.MainImageUrl
+                };
+            }).ToList();
         }
     }
 }

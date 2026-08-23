@@ -1,17 +1,14 @@
+using System.Diagnostics;
 using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
 using Marketplace.Web.Infrastructure;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace Marketplace.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private static readonly string[] CategoryColors = { "blue", "orange", "rose", "green", "violet", "yellow" };
-        private static readonly string[] CategoryIcons = { "⌁", "⌂", "◇", "●", "≡", "✦" };
-
         private readonly IProductService _productService;
         private readonly ICategoryService _categoryService;
 
@@ -21,61 +18,89 @@ namespace Marketplace.Web.Controllers
             _categoryService = categoryService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index([FromQuery] CatalogFilterViewModel filter)
         {
-            // GetCatalogPageAsync already aggregates AverageRating/ReviewCount per product via SQL
-            // (built for the catalog filters), so a single call here doubles as both "most popular
-            // products" and the raw material for a real, weighted site-wide rating below — no need
-            // for a per-product review loop.
-            var catalogPage = await _productService.GetCatalogPageAsync(new CatalogFilterDto
+            const int pageSize = 12;
+            filter.Page = filter.Page <= 0 ? 1 : filter.Page;
+
+            var filterDto = new CatalogFilterDto
             {
-                Sort = CatalogSortOption.Popularity,
-                Page = 1,
-                PageSize = 1000
-            });
+                Search = filter.Search,
+                CategoryId = filter.CategoryId,
+                MinPrice = filter.MinPrice,
+                MaxPrice = filter.MaxPrice,
+                InStockOnly = filter.InStockOnly,
+                MinRating = filter.MinRating,
+                Sort = filter.Sort,
+                Page = filter.Page,
+                PageSize = pageSize
+            };
+
+            var catalogPage = await _productService.GetCatalogPageAsync(filterDto);
 
             var featuredProducts = catalogPage.Items
-                .Take(3)
-                .Select(item => new CatalogProductViewModel
+                .Select(item =>
                 {
-                    Id = item.Product.Id,
-                    Name = item.Product.Name,
-                    Description = item.Product.Description,
-                    Price = item.Product.Price,
-                    Quantity = item.Product.Quantity,
-                    MainImageUrl = item.Product.MainImageUrl,
-                    CategoryName = item.Product.Category?.Name ?? "Без категорії",
-                    StoreName = item.Product.Business?.StoreName ?? "Marketplace",
-                    AverageRating = item.AverageRating,
-                    ReviewCount = item.ReviewCount
+                    var activeDiscount = item.Product.GetActiveDiscount();
+
+                    return new CatalogProductViewModel
+                    {
+                        Id = item.Product.Id,
+                        Name = item.Product.Name,
+                        Description = item.Product.Description,
+                        Price = activeDiscount != null ? item.Product.GetDiscountedPrice() : item.Product.Price,
+                        Quantity = item.Product.Quantity,
+                        MainImageUrl = item.Product.MainImageUrl,
+                        CategoryName = item.Product.Category?.Name ?? "Без категорії",
+                        StoreName = item.Product.Business?.StoreName ?? "Marketplace",
+                        AverageRating = item.AverageRating,
+                        ReviewCount = item.ReviewCount,
+                        OriginalPrice = activeDiscount != null ? item.Product.Price : null,
+                        DiscountPercent = activeDiscount?.Percent
+                    };
                 })
                 .ToList();
 
-            var reviewedItems = catalogPage.Items.Where(item => item.ReviewCount > 0).ToList();
-            var totalReviews = reviewedItems.Sum(item => item.ReviewCount);
+            var rawCategories = await _categoryService.GetAllCategories();
 
-            var categories = await _categoryService.GetAllCategories();
+            var colors = new[] { "blue", "violet", "orange", "green", "teal" };
+            var icons = new[] { "📦", "💻", "👕", "🏠", "📚", "🎮" };
 
-            var model = new HomeViewModel
+            var homeCategories = rawCategories
+                .Select((c, index) => new HomeCategoryViewModel
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    ColorClass = colors[index % colors.Length],
+                    Icon = icons[index % icons.Length]
+                })
+                .ToList();
+
+            var viewModel = new HomeViewModel
             {
                 FeaturedProducts = featuredProducts,
-                Categories = categories
-                    .Select((category, index) => new HomeCategoryViewModel
-                    {
-                        Id = category.Id,
-                        Name = category.Name,
-                        ColorClass = CategoryColors[index % CategoryColors.Length],
-                        Icon = CategoryIcons[index % CategoryIcons.Length]
-                    })
-                    .ToList(),
+                Categories = homeCategories,
+                Search = filter.Search,
+                CategoryId = filter.CategoryId,
+                SortBy = filter.Sort.ToString(),
                 RecentlyViewed = await GetRecentlyViewedAsync(),
-                AverageRating = totalReviews > 0
-                    ? Math.Round(reviewedItems.Sum(item => item.AverageRating * item.ReviewCount) / totalReviews, 1)
-                    : null,
-                ReviewCount = totalReviews
+                AverageRating = featuredProducts.Any() ? featuredProducts.Average(p => p.AverageRating) : null,
+                ReviewCount = featuredProducts.Sum(p => p.ReviewCount)
             };
 
-            return View(model);
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_ProductListPartial", viewModel);
+            }
+
+            return View(viewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AutoComplete(string? term)
+        {
+            var suggestions = await _productService.GetSearchSuggestionsAsync(term);
+            return Json(suggestions);
         }
 
         private async Task<List<CatalogRelatedProductViewModel>> GetRecentlyViewedAsync()

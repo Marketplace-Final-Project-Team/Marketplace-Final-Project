@@ -435,7 +435,7 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet("business/{businessId}/add-member")]
-        public IActionResult AddMember(Guid businessId) 
+        public IActionResult AddMember(Guid businessId)
         {
             var model = new BusinessMemberCreateViewModel { BusinessId = businessId };
 
@@ -445,7 +445,7 @@ namespace Marketplace.Web.Controllers
         [HttpPost("business/{businessId}/add-member")]
         public async Task<IActionResult> AddMember(BusinessMemberCreateViewModel model)
         {
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
             {
                 return View(model);
             }
@@ -457,7 +457,7 @@ namespace Marketplace.Web.Controllers
                 Role = model.Role
             });
 
-            if (!result.Succeeded) 
+            if (!result.Succeeded)
             {
                 ModelState.AddModelError("", result.Message);
                 return View(model);
@@ -496,7 +496,75 @@ namespace Marketplace.Web.Controllers
         public IActionResult MembershipResult(string message)
         {
             ViewBag.Message = message;
+
             return View();
+        }
+
+        [HttpPost("business/{businessId}/business-stats")]
+        public async Task<IActionResult> GetBusinessStatsByPeriod(BusinessStatsQueryViewModel query)
+        {
+            var result = await _businessService.GetBusinessStatsByPeriodAsync(
+                query.BusinessId, query.StartDate, query.EndDate);
+
+            var pageModel = new BusinessStatsPageViewModel { Query = query };
+
+            if (!result.Succeeded)
+            {
+                pageModel.ErrorMessage = result.Message;
+                return View(pageModel);
+            }
+
+            pageModel.Stats = result.Data;
+            return View(pageModel);
+        }
+
+        [HttpPost("business/{businessId}/products-stats")]
+        public async Task<IActionResult> GetProductsStatsByPeriod(ProductsStatsQueryViewModel query)
+        {
+            var result = await _businessService.GetProductsStatsByPeriodAsnyc(
+                query.BusinessId, query.StartDate, query.EndDate);
+
+            var pageModel = new ProductsStatsPageViewModel { Query = query };
+
+            if (!result.Succeeded)
+            {
+                pageModel.ErrorMessage = result.Message;
+                return View(pageModel);
+            }
+
+            pageModel.Stats = result.Data;
+            return View(pageModel);
+        }
+
+        [HttpPost("business/{businessId}/customers-stats")]
+        public async Task<IActionResult> GetCustomersStatsByPeriod(CustomersStatsQueryViewModel query)
+        {
+            var result = await _businessService.GetCustomersStatsByPeriodAsync(
+                query.BusinessId, query.StartDate, query.EndDate);
+
+            var pageModel = new CustomersStatsPageViewModel { Query = query };
+
+            if (!result.Succeeded)
+            {
+                pageModel.ErrorMessage = result.Message;
+                return View(pageModel);
+            }
+
+            pageModel.Stats = result.Data;
+            return View(pageModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetBusinessBalance(Guid businessId)
+        {
+            var hasAcess = await _businessAccessService.HasAccessAsync(businessId, _userManager.GetUserId(User)!, BusinessMemberRole.Owner);
+            if (!hasAcess)
+            {
+                return Forbid();
+            }
+
+            var balance = await _businessService.GetBusinessBalance(businessId);
+            return Json(new { businessId, balance });
         }
     }
 }

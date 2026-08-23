@@ -181,7 +181,21 @@
                         <a asp-action="Details" asp-route-id="@product.Id" class="catalog-card__title">@product.Name</a>
                         <p class="catalog-card__description">@product.Description</p>
                         <div class="catalog-card__footer">
-                            <span class="shop-price">@product.Price.ToString("N2") ₴</span>
+                            <div class="shop-price-container d-flex align-items-center gap-2">
+                                @if (product.OriginalPrice.HasValue && product.OriginalPrice.Value > product.Price)
+                                {
+                                    <span class="shop-price text-danger fw-bold">@product.Price.ToString("N2") ₴</span>
+                                    <span class="text-muted text-decoration-line-through small">@product.OriginalPrice.Value.ToString("N2") ₴</span>
+                                    @if (product.DiscountPercent.HasValue)
+                                    {
+                                        <span class="badge bg-danger small">-@product.DiscountPercent%</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="shop-price">@product.Price.ToString("N2") ₴</span>
+                                }
+                            </div>
                             <form asp-controller="Cart" asp-action="Add" method="post">
                                 <input type="hidden" name="productId" value="@product.Id" />
                                 <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
