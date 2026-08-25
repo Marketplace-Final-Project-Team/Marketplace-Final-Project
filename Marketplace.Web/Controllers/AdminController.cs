@@ -3,7 +3,8 @@ using Marketplace.Domain.Enums;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Asn1.Crmf;
+using Marketplace.BLL.DTOs;
+using Marketplace.BLL.Common;
 
 namespace Marketplace.Web.Controllers
 {
@@ -19,9 +20,9 @@ namespace Marketplace.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var users = await _adminService.GetAllUsers();
-            var products = await _adminService.GetAllProducts();
-            var businesses = await _adminService.GetAllBusinesses();
+            var users = _adminService.GetUsers();
+            var products = await _adminService.GetProductsAsync();
+            var businesses = await _adminService.GetBusinessesAsync();
 
             var model = new AdminDashboardViewModel
             {
@@ -38,43 +39,91 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Users() 
+        public async Task<IActionResult> Users([FromQuery] UserAdminFilterViewModel filter) 
         {
-            var result = await _adminService.GetAllUsers();
-            return View(result.Select(u => new UserItemAdminViewModel 
+            var result = await _adminService.GetFilteredUsersAsync(new UserAdminQueryDto 
             {
-                Id = u.Id,
-                Email = u.Email,
-                Status = u.Status,
-            }));
+                Search = filter.Search,
+                Status = filter.Status,
+                SortDescending = filter.SortDescending,
+                Pagination = new PaginationParams
+                {
+                    Page = filter.Page,
+                    PageSize = filter.PageSize
+                }
+            });
+
+            return View(new PagedResult<UserItemAdminViewModel>
+            {
+                Items = result.Items.Select(u => new UserItemAdminViewModel
+                {
+                    Id = u.Id,
+                    Email = u.Email,
+                    Status = u.Status,
+                }).ToList(),
+                TotalItems = result.TotalItems,
+                Page = result.Page,
+            });
         }
 
         [HttpGet]
-        public async Task<IActionResult> Products() 
+        public async Task<IActionResult> Products([FromQuery] ProductAdminFilterViewModel filter) 
         {
-            var result = await _adminService.GetAllProducts();
-            return View(result.Select(p => new ProductItemAdminViewModel 
+            var result = await _adminService.GetFilteredProductsAsync(new ProductAdminQueryDto
             {
-                Id = p.Id,
-                Name = p.Name,
-                ImageUrl = p.ImageUrl,
-                Price = p.Price,
-                Status = p.Status,
-            }));
+                CategoryId = filter.CategoryId,
+                Search = filter.Search,
+                SortOption = filter.SortOption,
+                Pagination = new PaginationParams
+                {
+                    Page = filter.Page,
+                    PageSize = filter.PageSize
+                }
+            });
+
+            return View(new PagedResult<ProductItemAdminViewModel>
+            {
+                Items = result.Items.Select(p => new ProductItemAdminViewModel
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    ImageUrl = p.ImageUrl,
+                    Price = p.Price,
+                    Status = p.Status,
+                }).ToList(),
+                TotalItems = result.TotalItems,
+                Page = result.Page
+            });
         }
 
         [HttpGet]
-        public async Task<IActionResult> Businesses() 
+        public async Task<IActionResult> Businesses([FromQuery] BusinessAdminFilterViewModel filter) 
         {
-            var result = await _adminService.GetAllBusinesses();
-            return View(result.Select(b => new BusinessItemAdminViewModel 
+            var result = await _adminService.GetFilteredBusinessesAsync(new BusinessAdminQueryParams 
             {
-                Id = b.Id,
-                Name = b.Name,
-                LogoUrl = b.LogoUrl,
-                Owner = b.Owner,
-                Status = b.Status,
-            }));
+                Search = filter.Search,
+                SortDescending = filter.SortDescending,
+                Pagination = new PaginationParams
+                {
+                    Page = filter.Page,
+                    PageSize = filter.PageSize
+                }
+            });
+
+
+            return View(new PagedResult<BusinessItemAdminViewModel>
+            {
+                Items = result.Items.Select(b => new BusinessItemAdminViewModel
+                {
+                    Id = b.Id,
+                    Name = b.Name,
+                    LogoUrl = b.LogoUrl,
+                    Owner = b.Owner,
+                    Status = b.Status,
+                }).ToList(),
+                TotalItems = result.TotalItems,
+                Page = result.Page
+            });
         }
 
         [HttpPost]

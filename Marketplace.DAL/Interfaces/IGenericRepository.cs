@@ -1,4 +1,6 @@
 ﻿using Marketplace.Domain.Common;
+using Marketplace.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace Marketplace.Domain.Interfaces
@@ -19,5 +21,7 @@ namespace Marketplace.Domain.Interfaces
 
         Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate);
         Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null);
+
+        IQueryable<T> GetQueryable();
     }
 }
