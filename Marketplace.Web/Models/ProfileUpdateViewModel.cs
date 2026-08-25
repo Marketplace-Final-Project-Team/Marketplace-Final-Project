@@ -7,5 +7,6 @@ namespace Marketplace.Web.Models
         [Required]
         public string Username { get; set; } = string.Empty;
         public IFormFile? Avatar { get; set; }
+        public string? CurrentAvatarUrl { get; set; }
     }
 }

@@ -24,6 +24,11 @@ namespace Marketplace.DAL.Data
         public DbSet<Wishlist> Wishlists { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
 
+        public DbSet<WishlistCollection> WishlistCollections { get; set; }
+
+
+        public DbSet<Discount> Discounts { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -42,6 +47,8 @@ namespace Marketplace.DAL.Data
             builder.Entity<Wishlist>().HasQueryFilter(w => !w.IsDeleted);
             builder.Entity<WishlistItem>().HasQueryFilter(wi => !wi.IsDeleted);
             builder.Entity<Review>().HasQueryFilter(r => !r.IsDeleted);
+
+            builder.Entity<Discount>().HasQueryFilter(d => !d.IsDeleted);
 
 
             builder.Entity<Business>()
@@ -132,7 +139,7 @@ namespace Marketplace.DAL.Data
                 .HasOne(wi => wi.Wishlist)
                 .WithMany(w => w.WishlistItems)
                 .HasForeignKey(wi => wi.WishlistId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<WishlistItem>()
                 .HasOne(wi => wi.Product)
@@ -140,16 +147,34 @@ namespace Marketplace.DAL.Data
                 .HasForeignKey(wi => wi.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Entity<Review>()
-                .HasOne(r => r.User)
-                .WithMany()
-                .HasForeignKey(r => r.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                    builder.Entity<Review>()
+            .HasOne(r => r.User)
+            .WithMany(u => u.Reviews) 
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Review>()
                 .HasOne(r => r.Product)
-                .WithMany()
+                .WithMany(p => p.Reviews)
                 .HasForeignKey(r => r.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Discount>()
+                .HasOne(d => d.Product)
+                .WithMany(p => p.Discounts)
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<WishlistCollection>()
+                .HasOne(wc => wc.User)
+                .WithMany(u => u.WishlistCollections)
+                .HasForeignKey(wc => wc.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<WishlistCollection>()
+                .HasMany(wc => wc.Items)
+                .WithOne(wi => wi.WishlistCollection)
+                .HasForeignKey(wi => wi.WishlistCollectionId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Product>().Navigation(p => p.Category).AutoInclude();
@@ -157,6 +182,9 @@ namespace Marketplace.DAL.Data
             builder.Entity<Product>().Navigation(p => p.Business).AutoInclude();
             builder.Entity<Wishlist>().Navigation(w => w.WishlistItems).AutoInclude();
             builder.Entity<Review>().Navigation(r => r.User).AutoInclude();
+
+      
+            builder.Entity<Product>().Navigation(p => p.Discounts).AutoInclude();
         }
 
         public override int SaveChanges()

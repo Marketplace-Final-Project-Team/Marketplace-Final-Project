@@ -57,7 +57,7 @@ namespace Marketplace.Web.Controllers
             }
 
 
-            return RedirectToAction("ProductDetails", "Products", new { id = model.ProductId });
+            return RedirectToAction("Details", "Catalog", new { id = model.ProductId });
         }
 
         [HttpGet]
@@ -104,7 +104,7 @@ namespace Marketplace.Web.Controllers
                 return View(model);
             }
             
-            return RedirectToAction("ProductDetails", "Products", new { id = model.ProductId });
+            return RedirectToAction("Details", "Catalog", new { id = model.ProductId });
         }
 
         [HttpPost]
@@ -119,7 +119,7 @@ namespace Marketplace.Web.Controllers
                 TempData["Error"] = result.Message;
             }
 
-            return RedirectToAction("ProductDetails", "Products", new { id = productId });
+            return RedirectToAction("Details", "Catalog", new { id = productId });
         }
     }
 }

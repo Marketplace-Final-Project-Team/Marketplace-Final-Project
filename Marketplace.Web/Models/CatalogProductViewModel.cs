@@ -7,6 +7,7 @@ public class CatalogProductViewModel
     public string Description { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public int Quantity { get; set; }
+    public DateTime CreatedAt { get; set; }
     public string MainImageUrl { get; set; } = string.Empty;
     public string CategoryName { get; set; } = string.Empty;
     public string StoreName { get; set; } = string.Empty;
@@ -16,6 +17,22 @@ public class CatalogProductViewModel
     public DateTime EstimatedDeliveryStart { get; set; }
     public DateTime EstimatedDeliveryEnd { get; set; }
     public List<CatalogRelatedProductViewModel> RelatedProducts { get; set; } = new();
+
+    public List<Marketplace.BLL.DTOs.ReviewDto> Reviews { get; set; } = new();
+    public string? CurrentUserId { get; set; }
+    public bool IsInWishlist { get; set; }
+
+    public int ReviewCount { get; set; }
+    public double AverageRating { get; set; }
+
+    public Marketplace.BLL.DTOs.ReviewDto? CurrentUserReview =>
+        !string.IsNullOrEmpty(CurrentUserId)
+            ? Reviews.FirstOrDefault(r => r.UserId == CurrentUserId)
+            : null;
+
+    public decimal? OriginalPrice { get; set; }
+    public int? DiscountPercent { get; set; }
+    public bool HasDiscount => OriginalPrice.HasValue && DiscountPercent.HasValue;
 
     public IReadOnlyList<string> GalleryImageUrls => new[] { MainImageUrl }
         .Concat(AdditionalImageUrls)

@@ -1,0 +1,65 @@
+/* ---------- Buy-now accent button ---------- */
+
+.product-button--accent {
+    width: 100%;
+    background: var(--product-orange);
+    border-color: var(--product-orange);
+    color: #fff;
+    box-shadow: 0 10px 24px rgba(245, 158, 11, 0.28);
+}
+
+.product-button--accent:hover {
+    background: #d97e06;
+    color: #fff;
+}
+
+/* ---------- Product Q&A ---------- */
+
+.product-qa__form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 1rem 0 0.5rem;
+}
+
+.product-qa__form textarea {
+    border: 1px solid #d8dee8;
+    border-radius: 10px;
+    flex: 1;
+    font: inherit;
+    min-width: 14rem;
+    padding: 0.65rem 0.85rem;
+    resize: vertical;
+}
+
+.product-qa__hint {
+    color: var(--product-muted);
+    font-size: 0.8rem;
+    margin: 0 0 1rem;
+}
+
+.product-qa__empty {
+    color: var(--product-muted);
+    font-size: 0.9rem;
+}
+
+.product-qa__list {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.product-qa__item {
+    background: var(--product-soft-blue);
+    border-radius: 10px;
+    padding: 0.75rem 0.9rem;
+}
+
+.product-qa__item p {
+    margin: 0 0 0.3rem;
+}
+
+.product-qa__status {
+    color: var(--product-blue-dark);
+    font-size: 0.76rem;
+    font-weight: 650;
+}

@@ -15,5 +15,7 @@ namespace Marketplace.BLL.Interfaces
         Task<IReadOnlyList<Order>> GetUserOrders(string userId);
         Task<Order?> GetUserOrder(string userId, Guid orderId);
         Task<BusinessOrderSummaryDto> GetBusinessOrderSummary(Guid businessId);
+        Task<IReadOnlyList<BusinessOrderListItemDto>> GetBusinessOrders(Guid businessId, OrderStatus? statusFilter = null);
+        Task<BusinessOrderDetailsDto?> GetBusinessOrderDetails(Guid businessId, Guid orderId);
     }
 }

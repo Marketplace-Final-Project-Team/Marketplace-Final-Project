@@ -1,0 +1,421 @@
+.profile-page {
+    --profile-ink: #172033;
+    --profile-muted: #667085;
+    --profile-line: #e5e9f1;
+    --profile-soft: #f6f8fc;
+    --profile-primary: #3157d7;
+    --profile-primary-dark: #2445bd;
+    color: var(--profile-ink);
+    padding: 1.4rem 0 3rem;
+}
+
+.profile-page .btn {
+    border-radius: 0.75rem;
+    font-weight: 650;
+}
+
+.profile-page .btn-primary {
+    background: var(--profile-primary);
+    border-color: var(--profile-primary);
+}
+
+.profile-page .btn-primary:hover {
+    background: var(--profile-primary-dark);
+    border-color: var(--profile-primary-dark);
+}
+
+.profile-back {
+    color: var(--profile-muted);
+    display: inline-block;
+    font-size: 0.88rem;
+    font-weight: 650;
+    margin-bottom: 0.85rem;
+    text-decoration: none;
+}
+
+.profile-back:hover {
+    color: var(--profile-primary);
+}
+
+/* ---------- Hub header card ---------- */
+
+.profile-summary {
+    background: #fff;
+    border: 1px solid var(--profile-line);
+    border-radius: 1.25rem;
+    box-shadow: 0 0.65rem 2.1rem rgba(23, 32, 51, 0.075);
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+}
+
+.profile-summary__row {
+    align-items: center;
+    display: flex;
+    gap: 1.25rem;
+}
+
+.profile-avatar-wrap {
+    display: inline-block;
+    position: relative;
+}
+
+.profile-avatar-edit {
+    align-items: center;
+    background: var(--profile-primary);
+    border: 2px solid #fff;
+    border-radius: 50%;
+    bottom: -0.2rem;
+    box-shadow: 0 0.2rem 0.5rem rgba(23, 32, 51, 0.2);
+    color: #fff;
+    display: flex;
+    height: 1.75rem;
+    justify-content: center;
+    position: absolute;
+    right: -0.2rem;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+    width: 1.75rem;
+}
+
+.profile-avatar-wrap:hover .profile-avatar-edit {
+    background: var(--profile-primary-dark);
+    transform: scale(1.08);
+}
+
+.profile-summary h1 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin: 0;
+}
+
+.profile-summary p {
+    color: var(--profile-muted);
+    margin: 0.2rem 0 0;
+}
+
+/* ---------- Nav hub grid ---------- */
+
+.profile-hub {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(15.5rem, 1fr));
+    margin-bottom: 1.5rem;
+}
+
+.profile-hub-card {
+    align-items: flex-start;
+    background: #fff;
+    border: 1px solid var(--profile-line);
+    border-radius: 1.1rem;
+    box-shadow: 0 0.35rem 1.35rem rgba(23, 32, 51, 0.055);
+    display: flex;
+    gap: 0.9rem;
+    padding: 1.2rem;
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.profile-hub-card:hover {
+    box-shadow: 0 0.65rem 1.6rem rgba(23, 32, 51, 0.1);
+    transform: translateY(-2px);
+}
+
+.profile-hub-card__icon {
+    align-items: center;
+    background: #edf1ff;
+    border-radius: 0.85rem;
+    color: var(--profile-primary);
+    display: flex;
+    flex: 0 0 auto;
+    font-size: 1.3rem;
+    font-weight: 800;
+    height: 2.8rem;
+    justify-content: center;
+    width: 2.8rem;
+}
+
+.profile-hub-card strong {
+    color: var(--profile-ink);
+    display: block;
+    font-size: 1rem;
+}
+
+.profile-hub-card span {
+    color: var(--profile-muted);
+    display: block;
+    font-size: 0.82rem;
+    margin-top: 0.2rem;
+}
+
+.profile-hub-card__badge {
+    background: var(--profile-soft);
+    border-radius: 999px;
+    color: var(--profile-primary);
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 750;
+    margin-top: 0.5rem;
+    padding: 0.15rem 0.55rem;
+}
+
+/* ---------- Address book ---------- */
+
+.address-list {
+    display: grid;
+    gap: 0.85rem;
+}
+
+.address-card {
+    align-items: flex-start;
+    background: #fff;
+    border: 1px solid var(--profile-line);
+    border-radius: 1rem;
+    box-shadow: 0 0.35rem 1.35rem rgba(23, 32, 51, 0.055);
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    padding: 1.1rem 1.25rem;
+}
+
+.address-card__badge {
+    background: #e8f7ef;
+    border-radius: 999px;
+    color: #16794a;
+    font-size: 0.7rem;
+    font-weight: 750;
+    margin-bottom: 0.4rem;
+    padding: 0.2rem 0.55rem;
+    display: inline-block;
+}
+
+.address-card__lines strong {
+    display: block;
+}
+
+.address-card__lines p {
+    color: var(--profile-muted);
+    margin: 0.15rem 0 0;
+}
+
+.address-card__actions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    justify-content: flex-end;
+}
+
+.address-card__actions form {
+    margin: 0;
+}
+
+.profile-empty {
+    background: var(--profile-soft);
+    border: 1px dashed #cfd5e2;
+    border-radius: 1rem;
+    padding: 3rem 1rem;
+    text-align: center;
+}
+
+.profile-empty__icon {
+    font-size: 2.2rem;
+    margin-bottom: 0.6rem;
+}
+
+.profile-empty h2 {
+    font-size: 1.15rem;
+    font-weight: 750;
+}
+
+.profile-empty p {
+    color: var(--profile-muted);
+}
+
+.address-form-card {
+    background: #fff;
+    border: 1px solid var(--profile-line);
+    border-radius: 1.1rem;
+    box-shadow: 0 0.35rem 1.35rem rgba(23, 32, 51, 0.055);
+    margin: 0 auto;
+    max-width: 30rem;
+    padding: clamp(1.5rem, 4vw, 2rem);
+}
+
+.address-form-card h1 {
+    font-size: 1.35rem;
+    font-weight: 780;
+    margin-bottom: 1.4rem;
+}
+
+.profile-avatar-upload {
+    align-items: center;
+    display: flex;
+    gap: 1.1rem;
+    margin-bottom: 1.6rem;
+}
+
+.profile-avatar-upload__preview {
+    flex: 0 0 auto;
+}
+
+.profile-avatar-upload__preview img,
+.profile-avatar-upload__preview .profile-avatar {
+    border-radius: 50%;
+    height: 4.5rem;
+    object-fit: cover;
+    width: 4.5rem;
+}
+
+.profile-avatar-upload__preview .profile-avatar--fallback {
+    font-size: 1.6rem;
+}
+
+.profile-password-field {
+    position: relative;
+}
+
+.profile-password-field input {
+    padding-right: 5.5rem;
+}
+
+.profile-password-toggle {
+    background: transparent;
+    border: 0;
+    color: var(--profile-primary);
+    font-size: 0.78rem;
+    font-weight: 650;
+    padding: 0.3rem 0.5rem;
+    position: absolute;
+    right: 0.3rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.profile-password-toggle:hover {
+    color: var(--profile-primary-dark);
+}
+
+.profile-form-hint {
+    color: var(--profile-muted);
+    font-size: 0.78rem;
+    margin: 0.4rem 0 0;
+}
+
+.address-form-field {
+    margin-bottom: 1.1rem;
+}
+
+.address-form-actions {
+    display: flex;
+    gap: 0.6rem;
+    justify-content: flex-end;
+    margin-top: 1.4rem;
+}
+
+/* ---------- Wishlist ---------- */
+
+.wishlist-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+}
+
+.wishlist-card {
+    background: #fff;
+    border: 1px solid var(--profile-line);
+    border-radius: 1rem;
+    box-shadow: 0 0.35rem 1.35rem rgba(23, 32, 51, 0.055);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.wishlist-card__media {
+    align-items: center;
+    background: linear-gradient(135deg, #edf1ff, #f8f9fc);
+    color: #7a89bb;
+    display: flex;
+    font-size: 2.4rem;
+    font-weight: 800;
+    height: 9rem;
+    justify-content: center;
+    overflow: hidden;
+    text-decoration: none;
+}
+
+.wishlist-card__media img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.wishlist-card__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+}
+
+.wishlist-card__title {
+    color: var(--profile-ink);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.wishlist-card__title:hover {
+    color: var(--profile-primary);
+}
+
+.wishlist-card__footer {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: space-between;
+    margin-top: auto;
+}
+
+.wishlist-card__footer form {
+    margin: 0;
+}
+
+.wishlist-remove {
+    background: transparent;
+    border: 0;
+    color: #b42318;
+    font-size: 0.78rem;
+    font-weight: 650;
+    padding: 0;
+}
+
+/* ---------- Activity feed ---------- */
+
+.activity-card {
+    background: #fff;
+    border: 1px solid var(--profile-line);
+    border-radius: 1.1rem;
+    box-shadow: 0 0.35rem 1.35rem rgba(23, 32, 51, 0.055);
+    padding: clamp(1.2rem, 4vw, 1.75rem);
+}
+
+.activity-note {
+    color: var(--profile-muted);
+    font-size: 0.82rem;
+    margin: 0 0 1.5rem;
+}
+
+@media (max-width: 575.98px) {
+    .profile-summary__row {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .address-card {
+        flex-direction: column;
+    }
+
+    .address-card__actions {
+        justify-content: flex-start;
+        width: 100%;
+    }
+}

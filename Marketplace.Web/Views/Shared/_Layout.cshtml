@@ -19,6 +19,7 @@
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/cookie-consent.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Marketplace.Web.styles.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -43,6 +44,9 @@
                         {
                             <li class="nav-item">
                                 @await Component.InvokeAsync("CartSummary")
+                            </li>
+                            <li class="nav-item">
+                                @await Component.InvokeAsync("WishlistSummary")
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="Index">Замовлення</a>
@@ -75,8 +79,17 @@
                                         <a class="dropdown-item" asp-controller="Order" asp-action="Index">Мої замовлення</a>
                                     </li>
                                     <li>
+                                        <a class="dropdown-item" asp-controller="Profile" asp-action="Wishlist">Список бажань</a>
+                                    </li>
+                                    <li>
                                         <a class="dropdown-item" asp-controller="Products" asp-action="Index">Мої товари</a>
                                     </li>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Admin" asp-action="Index">Адмін-панель</a>
+                                        </li>
+                                    }
                                     <li><hr class="dropdown-divider" /></li>
                                     <li>
                                         <form asp-controller="Auth" asp-action="Logout" method="post">
@@ -107,13 +120,26 @@
     </div>
 
     <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 MarketPlace — навчальний маркетплейс
+        <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <span>&copy; 2026 MarketPlace — навчальний маркетплейс</span>
+            <div class="d-flex flex-wrap gap-3">
+                <a asp-controller="Home" asp-action="Privacy" class="text-muted">Конфіденційність</a>
+                <a asp-controller="Home" asp-action="Terms" class="text-muted">Умови використання</a>
+                <a asp-controller="Home" asp-action="CookiePolicy" class="text-muted">Політика кукі</a>
+                <a asp-controller="Home" asp-action="ReturnsPolicy" class="text-muted">Повернення та обмін</a>
+                <a asp-controller="Home" asp-action="ShippingPolicy" class="text-muted">Доставка</a>
+                <a asp-controller="Home" asp-action="SellerRules" class="text-muted">Для продавців</a>
+                <a asp-controller="Home" asp-action="Support" class="text-muted">Підтримка</a>
+            </div>
         </div>
     </footer>
+
+    <partial name="_CookieConsent" />
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/cookie-consent.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

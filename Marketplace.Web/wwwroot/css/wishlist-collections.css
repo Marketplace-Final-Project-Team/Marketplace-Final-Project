@@ -1,0 +1,128 @@
+.wishlist-collections__bar {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 0.4rem;
+}
+
+.wishlist-collections__bar label {
+    color: var(--profile-muted);
+    font-size: 0.85rem;
+    font-weight: 650;
+}
+
+.wishlist-collections__bar input {
+    border: 1px solid var(--profile-line);
+    border-radius: 0.6rem;
+    padding: 0.4rem 0.65rem;
+}
+
+.wishlist-collections__hint {
+    color: var(--profile-muted);
+    font-size: 0.78rem;
+    margin-bottom: 1.25rem;
+}
+
+.wishlist-collection-group {
+    margin-bottom: 1.75rem;
+}
+
+.wishlist-collection-group__heading {
+    align-items: center;
+    background: none;
+    border: none;
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    padding: 0.25rem 0;
+    text-align: left;
+    width: 100%;
+}
+
+.wishlist-collection-group__heading:hover h3 {
+    color: var(--profile-primary);
+}
+
+.wishlist-collection-group__heading h3 {
+    color: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.wishlist-collection-group__chevron {
+    color: var(--profile-muted);
+    flex: 0 0 auto;
+    transition: transform 0.15s ease;
+}
+
+.wishlist-collection-group.is-collapsed .wishlist-collection-group__chevron {
+    transform: rotate(-90deg);
+}
+
+.wishlist-card__collection {
+    border: 1px solid var(--profile-line);
+    border-radius: 0.5rem;
+    color: var(--profile-muted);
+    font-size: 0.78rem;
+    margin: 0.35rem 0;
+    padding: 0.25rem 0.4rem;
+    width: 100%;
+}
+
+/* ---------- Price-drop / back-in-stock alerts ---------- */
+
+.wishlist-notifications-summary {
+    background: #fff4d8;
+    border-radius: 0.65rem;
+    color: #8a5b00;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 0.75rem 0 1.25rem;
+    padding: 0.65rem 0.9rem;
+}
+
+.wishlist-card__media {
+    position: relative;
+}
+
+.wishlist-card__alert {
+    border-radius: 999px;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    left: 0.6rem;
+    padding: 0.2rem 0.6rem;
+    position: absolute;
+    top: 0.6rem;
+    z-index: 2;
+}
+
+.wishlist-card__alert--price {
+    background: #16845b;
+}
+
+.wishlist-card__alert--stock {
+    background: var(--profile-primary);
+}
+
+.wishlist-card__stock {
+    background: rgba(23, 32, 51, 0.75);
+    bottom: 0;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 650;
+    left: 0;
+    padding: 0.3rem 0;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+}
+
+.wishlist-card__old-price {
+    color: var(--profile-muted);
+    font-size: 0.82rem;
+    font-weight: 500;
+    margin-right: 0.3rem;
+}

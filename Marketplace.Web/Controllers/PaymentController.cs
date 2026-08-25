@@ -51,14 +51,12 @@ namespace Marketplace.Web.Controllers
         public async Task<IActionResult> Callback([FromForm] string data, [FromForm] string signature)
         {
             
-            Console.WriteLine("=== CALLBACK RECEIVED ===");
-            Console.WriteLine($"Data: {data}");
-            Console.WriteLine($"Signature: {signature}");
+            
             var privateKey = _options.Value.PrivateKey;
             var computedSignature = privateKey + data + privateKey;
             byte[] inputBytes = Encoding.UTF8.GetBytes(computedSignature);
 
-            // Compute the hash in a single line
+            
             byte[] hashBytes = SHA1.HashData(inputBytes);
             string base64signature = Convert.ToBase64String(hashBytes);
 
@@ -77,7 +75,7 @@ namespace Marketplace.Web.Controllers
                 var orderId = Guid.Parse(callbackData.order_id);
                 await _orderService.ChangeOrderStatus(orderId, OrderStatus.Confirmed);
             }
-            Console.Write("CALLBACK 0-------");
+            
 
             return Ok();
 

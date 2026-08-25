@@ -65,17 +65,25 @@ namespace Marketplace.BLL.Services
                     };
                 }
 
-                if(cartItem.Product.Quantity < cartItem.Quantity)
+                if (cartItem.Product.Quantity < cartItem.Quantity)
 
                 {
                     return new OrderResultDto { Succeeded = false, Message = "Недостатньо товару на складі." };
                 }
 
+                var now = DateTime.UtcNow;
+                var activeDiscount = cartItem.Product.Discounts?
+                    .FirstOrDefault(d => d.StartDate <= now && d.EndDate >= now);
+
+                var unitPrice = activeDiscount != null
+                    ? cartItem.Product.Price - (cartItem.Product.Price * activeDiscount.Percent / 100m)
+                    : cartItem.Product.Price;
+
                 var orderItem = new OrderItem
                 {
                     ProductId = cartItem.ProductId,
                     ProductName = cartItem.Product.Name,
-                    UnitPrice = cartItem.Product.Price,
+                    UnitPrice = unitPrice,
                     Quantity = cartItem.Quantity
                 };
 
@@ -108,7 +116,7 @@ namespace Marketplace.BLL.Services
             description: $"Оплата замовлення #{order.Id}",
             successUrl: dto.SuccessUrl,
             cancelUrl: dto.CancelUrl
-            
+
             );
 
             return new OrderResultDto
@@ -119,15 +127,35 @@ namespace Marketplace.BLL.Services
                 PaymentData = paymentData
             };
         }
-        
+
 
         public async Task<ServiceResult> ChangeOrderStatus(Guid orderId, OrderStatus status)
         {
-            var order = await _orerRepository.FirstOrDefaultAsync(o => o.Id == orderId);
+            var order = await _context.Orders
+                .Include(o => o.Items)
+                .ThenInclude(i => i.Product)
+                .ThenInclude(p => p.Business)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+
 
             if (order == null)
             {
                 return new ServiceResult { Succeeded = false, Message = "Замовлення не знайдено." };
+            }
+            if (status == OrderStatus.Confirmed && order.Status != OrderStatus.Confirmed) {
+                foreach (var item in order.Items) {
+                    if (item.Product.Business != null)
+                    {
+                        var business = item.Product.Business;
+                        if (business == null)
+                        {
+                            return new ServiceResult { Succeeded = false, Message = "Бізнес не знайдено." };
+                        }
+                        var amount = item.UnitPrice * item.Quantity;
+                        business.Balance += amount; 
+                    }
+                }
             }
 
             order.Status = status;
@@ -191,6 +219,91 @@ namespace Marketplace.BLL.Services
                 Revenue = orderLines
                     .Where(line => line.Status != OrderStatus.Canceled)
                     .Sum(line => line.LineTotal)
+            };
+        }
+
+        public async Task<IReadOnlyList<BusinessOrderListItemDto>> GetBusinessOrders(Guid businessId, OrderStatus? statusFilter = null)
+        {
+            var query = _context.OrderItems
+                .AsNoTracking()
+                .Where(item => item.Product.BusinessId == businessId);
+
+            if (statusFilter.HasValue)
+            {
+                query = query.Where(item => item.Order.Status == statusFilter.Value);
+            }
+
+            var lines = await query
+                .Select(item => new
+                {
+                    item.OrderId,
+                    item.Order.CreatedAt,
+                    item.Order.Status,
+                    item.Order.ShippingCountry,
+                    item.Order.ShippingCity,
+                    item.Order.ShippingStreet,
+                    BuyerName = item.Order.User.UserName,
+                    BuyerEmail = item.Order.User.Email,
+                    item.Quantity,
+                    LineTotal = item.UnitPrice * item.Quantity
+                })
+                .ToListAsync();
+
+            return lines
+                .GroupBy(line => line.OrderId)
+                .Select(group => new BusinessOrderListItemDto
+                {
+                    OrderId = group.Key,
+                    CreatedAt = group.First().CreatedAt,
+                    Status = group.First().Status,
+                    BuyerName = group.First().BuyerName ?? string.Empty,
+                    BuyerEmail = group.First().BuyerEmail ?? string.Empty,
+                    ShippingCountry = group.First().ShippingCountry,
+                    ShippingCity = group.First().ShippingCity,
+                    ShippingStreet = group.First().ShippingStreet,
+                    ItemsCount = group.Sum(line => line.Quantity),
+                    LineTotal = group.Sum(line => line.LineTotal)
+                })
+                .OrderByDescending(item => item.CreatedAt)
+                .ToList();
+        }
+
+        public async Task<BusinessOrderDetailsDto?> GetBusinessOrderDetails(Guid businessId, Guid orderId)
+        {
+            var order = await _context.Orders
+                .AsNoTracking()
+                .Include(o => o.User)
+                .Include(o => o.Items)
+                .ThenInclude(item => item.Product)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+  
+            if (order == null || !order.Items.Any(item => item.Product != null && item.Product.BusinessId == businessId))
+            {
+                return null;
+            }
+
+            return new BusinessOrderDetailsDto
+            {
+                OrderId = order.Id,
+                CreatedAt = order.CreatedAt,
+                Status = order.Status,
+                OrderTotalAmount = order.TotalAmount,
+                BuyerName = order.User.UserName ?? string.Empty,
+                BuyerEmail = order.User.Email ?? string.Empty,
+                BuyerPhone = order.User.PhoneNumber ?? string.Empty,
+                ShippingCountry = order.ShippingCountry,
+                ShippingCity = order.ShippingCity,
+                ShippingStreet = order.ShippingStreet,
+                Items = order.Items.Select(item => new BusinessOrderLineDto
+                {
+                    ProductId = item.ProductId,
+                    ProductName = item.ProductName,
+                    ImageUrl = item.Product?.MainImageUrl ?? string.Empty,
+                    UnitPrice = item.UnitPrice,
+                    Quantity = item.Quantity,
+                    BelongsToBusiness = item.Product != null && item.Product.BusinessId == businessId
+                }).ToList()
             };
         }
     }

@@ -1,0 +1,95 @@
+.postsale-panel {
+    margin-top: 1.5rem;
+}
+
+.postsale-protection {
+    align-items: center;
+    background: #f6f8fc;
+    border-radius: 0.85rem;
+    display: flex;
+    gap: 0.85rem;
+    margin: 1rem 0 1.25rem;
+    padding: 1rem 1.15rem;
+}
+
+.postsale-protection__icon {
+    font-size: 1.4rem;
+}
+
+.postsale-protection strong {
+    display: block;
+    font-weight: 650;
+    margin-bottom: 0.15rem;
+}
+
+.postsale-protection span {
+    color: #667085;
+    font-size: 0.88rem;
+}
+
+.postsale-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.postsale-status {
+    align-items: center;
+    background: #e8f7ee;
+    border-radius: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.65rem 1rem;
+}
+
+.postsale-status strong {
+    color: #1f9d55;
+    font-weight: 650;
+}
+
+.postsale-status span {
+    color: #667085;
+    font-size: 0.82rem;
+}
+
+.postsale-modal {
+    align-items: center;
+    background: rgba(23, 32, 51, 0.45);
+    display: flex;
+    inset: 0;
+    justify-content: center;
+    padding: 1rem;
+    position: fixed;
+    z-index: 1050;
+}
+
+.postsale-modal__card {
+    background: #fff;
+    border-radius: 1.1rem;
+    max-width: 26rem;
+    padding: 1.75rem;
+    position: relative;
+    width: 100%;
+}
+
+.postsale-modal__close {
+    background: none;
+    border: none;
+    color: #667085;
+    font-size: 1.4rem;
+    line-height: 1;
+    position: absolute;
+    right: 0.85rem;
+    top: 0.7rem;
+}
+
+.postsale-modal__card h3 {
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.postsale-modal__card > form p {
+    color: #667085;
+    font-size: 0.88rem;
+}

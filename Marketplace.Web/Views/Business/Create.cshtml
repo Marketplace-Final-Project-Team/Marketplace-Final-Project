@@ -1,50 +1,58 @@
-﻿@model Marketplace.Web.Models.BusinessCreateViewModel
+@model Marketplace.Web.Models.BusinessCreateViewModel
 
 @{
-    ViewData["Title"] = "CreateBusiness";
+    ViewData["Title"] = "Створення бізнесу";
 }
 
-<div class="container" style="max-width: 600px;">
-    <h2 class="mb-4 text-center">Створення бізнесу</h2>
+@section Styles {
+    <link rel="stylesheet" href="~/css/business.css" asp-append-version="true" />
+}
 
-    <form asp-controller="Business" asp-action="Create" method="post" enctype="multipart/form-data">
-        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<div class="seller-dashboard">
+    <a asp-action="Index" class="seller-form-back">← До панелі продавця</a>
 
-        <div class="mb-3">
-            <label asp-for="StoreName" class="form-label">Назва магазину:</label>
-            <input asp-for="StoreName" class="form-control" placeholder="Назва вашого магазину" />
-            <span asp-validation-for="StoreName" class="text-danger"></span>
-        </div>
+    <div class="seller-form-card">
+        <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Seller workspace</div>
+        <h1>Створення бізнесу</h1>
+        <p>Заповніть основну інформацію — після створення магазин відправиться на перевірку.</p>
 
-        <div class="mb-3">
-            <label asp-for="Description" class="form-label">Опис бізнесу:</label>
-            <textarea asp-for="Description" class="form-control" rows="4" placeholder="Опишіть свій бізнес"></textarea>
-            <span asp-validation-for="Description" class="text-danger"></span>
-        </div>
+        <form asp-controller="Business" asp-action="Create" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-        <div class="mb-3">
-            <label asp-for="Logo" class="form-label">Логотип:</label>
-            <input asp-for="Logo" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
-            <span asp-validation-for="Logo" class="text-danger"></span>
-            <div class="form-text">JPG, PNG або WEBP, до 5 МБ</div>
-        </div>
+            <div class="seller-form-field">
+                <label asp-for="StoreName" class="form-label">Назва магазину</label>
+                <input asp-for="StoreName" class="form-control" placeholder="Назва вашого магазину" />
+                <span asp-validation-for="StoreName" class="text-danger small"></span>
+            </div>
 
-        <div class="mb-3">
-            <label asp-for="Banner" class="form-label">Банер:</label>
-            <input asp-for="Banner" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
-            <span asp-validation-for="Banner" class="text-danger"></span>
-            <div class="form-text">JPG, PNG або WEBP, до 5 МБ</div>
-        </div>
+            <div class="seller-form-field">
+                <label asp-for="Description" class="form-label">Опис бізнесу</label>
+                <textarea asp-for="Description" class="form-control" rows="4" placeholder="Опишіть свій бізнес"></textarea>
+                <span asp-validation-for="Description" class="text-danger small"></span>
+            </div>
 
-        <div class="d-flex gap-2 mt-4">
-            <button type="submit" class="btn btn-primary flex-grow-1">Створити</button>
-            <a asp-controller="Business" asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
-        </div>
-    </form>
+            <div class="seller-form-field">
+                <label asp-for="Logo" class="form-label">Логотип</label>
+                <input asp-for="Logo" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
+                <span asp-validation-for="Logo" class="text-danger small"></span>
+                <p class="seller-form-hint">JPG, PNG або WEBP, до 5 МБ</p>
+            </div>
+
+            <div class="seller-form-field">
+                <label asp-for="Banner" class="form-label">Банер</label>
+                <input asp-for="Banner" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
+                <span asp-validation-for="Banner" class="text-danger small"></span>
+                <p class="seller-form-hint">JPG, PNG або WEBP, до 5 МБ</p>
+            </div>
+
+            <div class="seller-form-actions">
+                <a asp-action="Index" class="seller-button seller-button--secondary">Скасувати</a>
+                <button type="submit" class="seller-button seller-button--primary">Створити</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }

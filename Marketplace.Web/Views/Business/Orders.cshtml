@@ -1,0 +1,114 @@
+@model Marketplace.Web.Models.Businesses.BusinessOrdersPageViewModel
+
+@{
+    ViewData["Title"] = $"Замовлення — {Model.StoreName}";
+}
+
+@functions {
+    private static string StatusLabel(Marketplace.Domain.Enums.OrderStatus status) => status switch
+    {
+        Marketplace.Domain.Enums.OrderStatus.Pending => "Очікує підтвердження",
+        Marketplace.Domain.Enums.OrderStatus.Confirmed => "Підтверджено",
+        Marketplace.Domain.Enums.OrderStatus.Shipped => "Відправлено",
+        Marketplace.Domain.Enums.OrderStatus.Delivered => "Доставлено",
+        Marketplace.Domain.Enums.OrderStatus.Canceled => "Скасовано",
+        _ => status.ToString()
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/business.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+}
+
+<div class="seller-dashboard">
+    <a asp-action="Index" class="seller-order-back">← До панелі продавця</a>
+
+    <header class="seller-orders-header">
+        <div>
+            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Seller workspace</div>
+            <h1>Замовлення — @Model.StoreName</h1>
+            <p>Список замовлень, що містять товари цього магазину.</p>
+        </div>
+    </header>
+
+    <partial name="_BusinessNav" model="Model.BusinessId" />
+
+    @if (TempData["Success"] is string success)
+    {
+        <div class="seller-alert" role="status">
+            <span aria-hidden="true">✓</span>
+            <p><strong>Успішно</strong>@success</p>
+        </div>
+    }
+    @if (TempData["Error"] is string error)
+    {
+        <div class="alert alert-warning" role="alert">@error</div>
+    }
+
+    <form asp-action="Orders" method="get" class="seller-orders-filter">
+        <input type="hidden" name="businessId" value="@Model.BusinessId" />
+        <div>
+            <label for="status-filter">Статус</label>
+            <select id="status-filter" name="status" class="form-select">
+                <option value="">Усі статуси</option>
+                @foreach (var option in Enum.GetValues<Marketplace.Domain.Enums.OrderStatus>())
+                {
+                    <option value="@option" selected="@(Model.StatusFilter == option)">@StatusLabel(option)</option>
+                }
+            </select>
+        </div>
+        <button type="submit" class="seller-button seller-button--secondary">Показати</button>
+        @if (Model.StatusFilter.HasValue)
+        {
+            <a asp-action="Orders" asp-route-businessId="@Model.BusinessId" class="seller-button seller-button--secondary">Скинути</a>
+        }
+    </form>
+
+    @if (Model.Orders.Count == 0)
+    {
+        <div class="seller-orders-panel">
+            <p class="seller-orders-empty">Замовлень із цим фільтром не знайдено.</p>
+        </div>
+    }
+    else
+    {
+        <div class="seller-orders-panel table-responsive">
+            <table class="table seller-orders-table">
+                <thead>
+                    <tr>
+                        <th>Замовлення</th>
+                        <th>Покупець</th>
+                        <th>Доставка</th>
+                        <th>Товарів</th>
+                        <th>Сума</th>
+                        <th>Статус</th>
+                        <th class="text-end">Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model.Orders)
+                    {
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">#@order.OrderId.ToString()[..8].ToUpperInvariant()</div>
+                                <div class="text-secondary small">@order.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+                            </td>
+                            <td class="seller-order-buyer">
+                                <strong>@order.BuyerName</strong>
+                                <span>@order.BuyerEmail</span>
+                            </td>
+                            <td>@order.ShippingAddress</td>
+                            <td>@order.ItemsCount шт.</td>
+                            <td class="fw-semibold">@order.LineTotal.ToString("N2") ₴</td>
+                            <td><span class="order-status order-status--@order.Status.ToString().ToLowerInvariant()">@StatusLabel(order.Status)</span></td>
+                            <td class="text-end">
+                                <a asp-action="OrderDetails" asp-route-businessId="@Model.BusinessId" asp-route-orderId="@order.OrderId" class="btn btn-sm btn-outline-primary">Деталі</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

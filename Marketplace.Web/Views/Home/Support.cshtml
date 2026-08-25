@@ -1,0 +1,103 @@
+@{
+    ViewData["Title"] = "Підтримка";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/support.css" asp-append-version="true" />
+}
+
+<div class="support-page">
+    <header class="support-hero">
+        <div class="support-kicker">Підтримка</div>
+        <h1>Чим можемо допомогти?</h1>
+        <p>Відповіді на часті запитання, контакти та центр вирішення спірних питань — в одному місці.</p>
+    </header>
+
+    <div class="support-contacts">
+        <div class="support-contact-card">
+            <span class="support-contact-card__icon" aria-hidden="true">✉</span>
+            <div>
+                <strong>Email підтримки</strong>
+                <span>support@marketplace.local</span>
+            </div>
+        </div>
+        <div class="support-contact-card">
+            <span class="support-contact-card__icon" aria-hidden="true">☎</span>
+            <div>
+                <strong>Телефон</strong>
+                <span>0 800 123 456 (щодня, 9:00–20:00)</span>
+            </div>
+        </div>
+        <button type="button" class="support-contact-card support-contact-card--action" data-open-chat-stub>
+            <span class="support-contact-card__icon" aria-hidden="true">💬</span>
+            <div>
+                <strong>Онлайн-чат</strong>
+                <span>Напишіть команді підтримки напряму</span>
+            </div>
+        </button>
+    </div>
+
+    <section class="support-section">
+        <h2>Часті запитання</h2>
+        <div class="support-faq" data-faq>
+            <div class="support-faq-item">
+                <button type="button" class="support-faq-item__question" aria-expanded="false">
+                    Як оформити повернення товару?
+                    <span aria-hidden="true">+</span>
+                </button>
+                <div class="support-faq-item__answer" hidden>
+                    <p>Повернення доступне протягом 14 днів після отримання замовлення. Відкрийте деталі замовлення в особистому кабінеті та натисніть «Оформити повернення» — далі просто дотримуйтесь інструкцій.</p>
+                </div>
+            </div>
+            <div class="support-faq-item">
+                <button type="button" class="support-faq-item__question" aria-expanded="false">
+                    Як довго обробляється замовлення?
+                    <span aria-hidden="true">+</span>
+                </button>
+                <div class="support-faq-item__answer" hidden>
+                    <p>Продавець підтверджує замовлення протягом 1 робочого дня, після чого починається доставка кур'єром — орієнтовно 2–4 робочі дні.</p>
+                </div>
+            </div>
+            <div class="support-faq-item">
+                <button type="button" class="support-faq-item__question" aria-expanded="false">
+                    Які способи оплати підтримуються?
+                    <span aria-hidden="true">+</span>
+                </button>
+                <div class="support-faq-item__answer" hidden>
+                    <p>Наразі доступна онлайн-оплата через LiqPay. Ми працюємо над додаванням Apple Pay, Google Pay та оплати частинами.</p>
+                </div>
+            </div>
+            <div class="support-faq-item">
+                <button type="button" class="support-faq-item__question" aria-expanded="false">
+                    Що робити, якщо товар не відповідає опису?
+                    <span aria-hidden="true">+</span>
+                </button>
+                <div class="support-faq-item__answer" hidden>
+                    <p>Кошти покупця заморожуються на транзитному рахунку маркетплейсу до підтвердження отримання. Якщо товар не відповідає опису — відкрийте спір у деталях замовлення, і команда підтримки допоможе вирішити ситуацію.</p>
+                </div>
+            </div>
+            <div class="support-faq-item">
+                <button type="button" class="support-faq-item__question" aria-expanded="false">
+                    Як стати продавцем на платформі?
+                    <span aria-hidden="true">+</span>
+                </button>
+                <div class="support-faq-item__answer" hidden>
+                    <p>Створіть бізнес-акаунт у розділі «Панель продавця» → «Створити бізнес». Після модерації адміністратором ви зможете додавати товари та отримувати замовлення.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="support-chat-stub" data-chat-stub hidden>
+        <div class="support-chat-stub__card">
+            <button type="button" class="support-chat-stub__close" aria-label="Закрити" data-close-chat-stub>×</button>
+            <span class="support-chat-stub__icon" aria-hidden="true">💬</span>
+            <h3>Онлайн-чат тимчасово недоступний</h3>
+            <p>Ми ще під'єднуємо живу підтримку. Напишіть нам на <a href="mailto:support@marketplace.local">support@marketplace.local</a> — відповімо якнайшвидше.</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/support.js" asp-append-version="true"></script>
+}

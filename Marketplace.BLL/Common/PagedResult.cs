@@ -1,11 +1,9 @@
-﻿namespace Marketplace.BLL.Common
+namespace Marketplace.BLL.Common;
+
+public class PagedResult<T>
 {
-    public class PagedResult<T>
-    {
-        public IReadOnlyList<T> Items { get; set; } = new List<T>();
-        public int TotalCount { get; set; }
-        public int Page { get; set; }
-        public int PageSize { get; set; }
-        public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
-    }
+	public IReadOnlyList<T> Items { get; set; } = new List<T>();
+	public int Page { get; set; }
+	public int TotalPages { get; set; }
+	public int TotalItems { get; set; }
 }

@@ -1,4 +1,4 @@
-﻿@model ProfileViewModel
+@model ProfileViewModel
 
 @{
     ViewData["Title"] = "Мій профіль";
@@ -7,62 +7,118 @@
         : Model.Username[..1].ToUpperInvariant();
 }
 
-<div class="container mt-5">
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+}
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-
-            <div class="row align-items-center">
-
-                <div class="col-md-3 text-center">
-
-                    @if (!string.IsNullOrEmpty(Model.Avatar))
-                    {
-                        <img src="@Model.Avatar"
-                             class="profile-avatar"
-                             alt="Аватар користувача @Model.Username" />
-                    }
-                    else
-                    {
-                        <span class="profile-avatar profile-avatar--fallback"
-                              role="img"
-                              aria-label="Аватар користувача @Model.Username">@profileInitial</span>
-                    }
-
-                </div>
-
-                <div class="col-md-9">
-
-                    <h2>@Model.Username</h2>
-
-                    <p class="text-muted">
-                        @Model.Email
-                    </p>
-
-                    <div class="mt-4">
-
-                        <a asp-action="UpdateProfile"
-                           class="btn btn-primary">
-                            Редагувати профіль
-                        </a>
-
-                        <a asp-action="ChangeEmail"
-                           class="btn btn-outline-secondary">
-                            Змінити Email
-                        </a>
-
-                        <a asp-action="ChangePassword"
-                           class="btn btn-outline-danger">
-                            Змінити пароль
-                        </a>
-
-                    </div>
-
-                </div>
-
+<div class="profile-page">
+    <div class="profile-summary">
+        <div class="profile-summary__row">
+            <a asp-action="UpdateProfile" class="profile-avatar-wrap" aria-label="Змінити аватар">
+                @if (!string.IsNullOrEmpty(Model.Avatar))
+                {
+                    <img src="@Model.Avatar" class="profile-avatar" alt="Аватар користувача @Model.Username" />
+                }
+                else
+                {
+                    <span class="profile-avatar profile-avatar--fallback" role="img" aria-label="Аватар користувача @Model.Username">@profileInitial</span>
+                }
+                <span class="profile-avatar-edit" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                    </svg>
+                </span>
+            </a>
+            <div>
+                <h1>@Model.Username</h1>
+                <p>@Model.Email</p>
             </div>
-
         </div>
     </div>
 
+    <div class="profile-hub">
+        <a asp-controller="Order" asp-action="Index" class="profile-hub-card">
+            <span class="profile-hub-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                    <path d="M21 8 12 3 3 8l9 5 9-5Z" />
+                    <path d="M3 8v8l9 5 9-5V8" />
+                    <path d="M12 13v8" />
+                </svg>
+            </span>
+            <div>
+                <strong>Мої замовлення</strong>
+                <span>Історія покупок і статус доставки</span>
+                <span class="profile-hub-card__badge">@Model.OrdersCount</span>
+            </div>
+        </a>
+
+        <a asp-action="Addresses" class="profile-hub-card">
+            <span class="profile-hub-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                    <path d="M3 11 12 3l9 8" />
+                    <path d="M5 10v10h14V10" />
+                </svg>
+            </span>
+            <div>
+                <strong>Адреси</strong>
+                <span>Керуйте адресами доставки</span>
+                <span class="profile-hub-card__badge">@Model.AddressesCount</span>
+            </div>
+        </a>
+
+        <a asp-action="Wishlist" class="profile-hub-card">
+            <span class="profile-hub-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                    <path d="M12 20s-7-4.35-9.5-8.5C.9 8.1 2 5 5.4 5c2 0 3.6 1.3 4.6 2.9C11 6.3 12.6 5 14.6 5c3.4 0 4.5 3.1 2.9 6.5C19 15.65 12 20 12 20Z" />
+                </svg>
+            </span>
+            <div>
+                <strong>Список бажань</strong>
+                <span>Товари, які ви зберегли</span>
+                <span class="profile-hub-card__badge">@Model.WishlistCount</span>
+            </div>
+        </a>
+
+        <a asp-action="Activity" class="profile-hub-card">
+            <span class="profile-hub-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                    <path d="M18 8a6 6 0 1 0-12 0c0 4-2 5-2 7h16c0-2-2-3-2-7" />
+                    <path d="M10 21a2 2 0 0 0 4 0" />
+                </svg>
+            </span>
+            <div>
+                <strong>Сповіщення</strong>
+                <span>Останні події за вашими замовленнями</span>
+            </div>
+        </a>
+
+        <a asp-action="UpdateProfile" class="profile-hub-card">
+            <span class="profile-hub-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5Z" />
+                </svg>
+            </span>
+            <div>
+                <strong>Налаштування профілю</strong>
+                <span>Ім'я користувача та аватар</span>
+            </div>
+        </a>
+
+        <a asp-action="ChangePassword" class="profile-hub-card">
+            <span class="profile-hub-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                    <rect x="5" y="11" width="14" height="9" rx="2" />
+                    <path d="M8 11V7a4 4 0 1 1 8 0v4" />
+                </svg>
+            </span>
+            <div>
+                <strong>Зміна пароля</strong>
+                <span>Оновіть пароль для входу</span>
+            </div>
+        </a>
+    </div>
+
+    <a asp-action="ChangeEmail" class="btn btn-outline-secondary">Змінити Email</a>
 </div>

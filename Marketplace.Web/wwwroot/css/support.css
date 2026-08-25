@@ -1,0 +1,200 @@
+.support-page {
+    --support-ink: #172033;
+    --support-muted: #667085;
+    --support-line: #e5e9f1;
+    --support-soft: #f6f8fc;
+    --support-primary: #3157d7;
+    color: var(--support-ink);
+    padding: 1.4rem 0 3rem;
+}
+
+.support-hero {
+    background: #fff;
+    border: 1px solid var(--support-line);
+    border-radius: 1.25rem;
+    box-shadow: 0 0.65rem 2.1rem rgba(23, 32, 51, 0.075);
+    margin-bottom: 1.5rem;
+    padding: 2rem;
+}
+
+.support-kicker {
+    color: var(--support-primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.support-hero h1 {
+    font-weight: 750;
+    margin: 0.35rem 0 0.5rem;
+}
+
+.support-hero p {
+    color: var(--support-muted);
+    margin: 0;
+    max-width: 46rem;
+}
+
+.support-contacts {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    margin-bottom: 2rem;
+}
+
+.support-contact-card {
+    align-items: center;
+    background: #fff;
+    border: 1px solid var(--support-line);
+    border-radius: 1rem;
+    display: flex;
+    gap: 0.85rem;
+    padding: 1.1rem 1.25rem;
+    text-align: left;
+}
+
+button.support-contact-card {
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+button.support-contact-card:hover {
+    border-color: var(--support-primary);
+    box-shadow: 0 0.5rem 1.4rem rgba(23, 32, 51, 0.1);
+}
+
+.support-contact-card__icon {
+    align-items: center;
+    background: var(--support-soft);
+    border-radius: 0.75rem;
+    display: flex;
+    flex-shrink: 0;
+    font-size: 1.25rem;
+    height: 2.75rem;
+    justify-content: center;
+    width: 2.75rem;
+}
+
+.support-contact-card div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.support-contact-card strong {
+    font-weight: 650;
+}
+
+.support-contact-card span {
+    color: var(--support-muted);
+    font-size: 0.88rem;
+}
+
+.support-section {
+    margin-bottom: 2rem;
+}
+
+.support-section h2 {
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.support-section__lead {
+    color: var(--support-muted);
+    margin-bottom: 1.1rem;
+    max-width: 42rem;
+}
+
+.support-section table {
+    background: #fff;
+}
+
+.support-section table code {
+    color: var(--support-primary);
+    font-size: 0.85rem;
+}
+
+.support-faq-item {
+    background: #fff;
+    border: 1px solid var(--support-line);
+    border-radius: 0.9rem;
+    margin-bottom: 0.65rem;
+    overflow: hidden;
+}
+
+.support-faq-item__question {
+    align-items: center;
+    background: none;
+    border: none;
+    color: var(--support-ink);
+    display: flex;
+    font-weight: 650;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    text-align: left;
+    width: 100%;
+}
+
+.support-faq-item__question span {
+    color: var(--support-muted);
+    font-size: 1.1rem;
+    transition: transform 0.15s ease;
+}
+
+.support-faq-item.is-open .support-faq-item__question span {
+    transform: rotate(45deg);
+}
+
+.support-faq-item__answer p {
+    color: var(--support-muted);
+    margin: 0;
+    padding: 0 1.25rem 1.1rem;
+}
+
+.support-chat-stub {
+    align-items: center;
+    background: rgba(23, 32, 51, 0.45);
+    display: flex;
+    inset: 0;
+    justify-content: center;
+    padding: 1rem;
+    position: fixed;
+    z-index: 1050;
+}
+
+.support-chat-stub__card {
+    background: #fff;
+    border-radius: 1.1rem;
+    max-width: 24rem;
+    padding: 1.75rem;
+    position: relative;
+    text-align: center;
+}
+
+.support-chat-stub__close {
+    background: none;
+    border: none;
+    color: var(--support-muted);
+    font-size: 1.4rem;
+    line-height: 1;
+    position: absolute;
+    right: 0.85rem;
+    top: 0.7rem;
+}
+
+.support-chat-stub__icon {
+    display: block;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.support-chat-stub__card h3 {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.support-chat-stub__card p {
+    color: var(--support-muted);
+    margin: 0;
+}

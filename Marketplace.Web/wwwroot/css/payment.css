@@ -1,0 +1,91 @@
+.payment-page {
+    --payment-ink: #172033;
+    --payment-muted: #667085;
+    --payment-line: #e6e9f0;
+    --payment-primary: #3659d9;
+    color: var(--payment-ink);
+    padding: 3rem 0;
+}
+
+.payment-redirect {
+    background: #fff;
+    border: 1px solid var(--payment-line);
+    border-radius: 1.25rem;
+    box-shadow: 0 0.35rem 1.35rem rgba(23, 32, 51, 0.055);
+    margin: 0 auto;
+    max-width: 32rem;
+    padding: clamp(2rem, 5vw, 3rem);
+    text-align: center;
+}
+
+.payment-redirect__spinner {
+    animation: payment-spin 0.9s linear infinite;
+    border: 3px solid #dfe5f5;
+    border-radius: 50%;
+    border-top-color: var(--payment-primary);
+    height: 3rem;
+    margin: 0 auto 1.5rem;
+    width: 3rem;
+}
+
+.payment-redirect h1 {
+    font-size: 1.5rem;
+    font-weight: 750;
+    margin-bottom: 0.6rem;
+}
+
+.payment-redirect p {
+    color: var(--payment-muted);
+    line-height: 1.55;
+    margin: 0 auto 1.75rem;
+    max-width: 26rem;
+}
+
+.payment-redirect__order {
+    background: #f6f8fc;
+    border-radius: 0.85rem;
+    color: var(--payment-muted);
+    font-size: 0.85rem;
+    margin-bottom: 1.75rem;
+    padding: 0.75rem 1rem;
+}
+
+.payment-redirect__order strong {
+    color: var(--payment-ink);
+}
+
+.payment-redirect .btn {
+    border-radius: 0.7rem;
+    font-weight: 650;
+    width: 100%;
+}
+
+.payment-redirect .btn + .btn,
+.payment-redirect .btn + a {
+    margin-top: 0.65rem;
+}
+
+.payment-redirect__back {
+    color: var(--payment-muted);
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    text-decoration: none;
+}
+
+.payment-redirect__back:hover {
+    color: var(--payment-primary);
+}
+
+@keyframes payment-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .payment-redirect__spinner {
+        animation-duration: 2.4s;
+    }
+}

@@ -1,0 +1,135 @@
+@model Marketplace.Web.Models.AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Адмін-панель";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+}
+
+<div class="admin-page">
+    <div class="admin-shell">
+        <partial name="_AdminNav" />
+
+        <div class="admin-content">
+            <header class="admin-header">
+                <div>
+                    <div class="admin-kicker">Admin</div>
+                    <h1 class="admin-title">Дашборд</h1>
+                    <p class="admin-subtitle">Загальний стан маркетплейсу: користувачі, товари та магазини, що потребують уваги.</p>
+                </div>
+            </header>
+
+            <div class="admin-stats" aria-label="Загальна статистика">
+                <div class="admin-stat-card">
+                    <span class="admin-stat-card__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                    </span>
+                    <div class="admin-stat-card__body">
+                        <span class="admin-stat-card__label">Користувачі</span>
+                        <strong class="admin-stat-card__value">@Model.TotalUsers</strong>
+                        <span class="admin-stat-card__hint"><strong>@Model.BannedUsers</strong> заблоковано</span>
+                    </div>
+                </div>
+                <div class="admin-stat-card @(Model.PendingProducts > 0 ? "admin-stat-card--warning" : null)">
+                    <span class="admin-stat-card__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                            <path d="M21 8 12 3 3 8l9 5 9-5Z" />
+                            <path d="M3 8v8l9 5 9-5V8" />
+                            <path d="M12 13v8" />
+                        </svg>
+                    </span>
+                    <div class="admin-stat-card__body">
+                        <span class="admin-stat-card__label">Товари на модерації</span>
+                        <strong class="admin-stat-card__value">@Model.PendingProducts</strong>
+                        <span class="admin-stat-card__hint">з <strong>@Model.TotalProducts</strong> усього · @Model.BannedProducts заблоковано</span>
+                    </div>
+                </div>
+                <div class="admin-stat-card @(Model.PendingBusinesses > 0 ? "admin-stat-card--warning" : null)">
+                    <span class="admin-stat-card__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                            <path d="M3 9 4 4h16l1 5" />
+                            <path d="M3 9a2 2 0 0 0 4 0 2 2 0 0 0 4 0 2 2 0 0 0 4 0 2 2 0 0 0 4 0" />
+                            <path d="M4 9v10h16V9" />
+                            <path d="M9 21v-6h6v6" />
+                        </svg>
+                    </span>
+                    <div class="admin-stat-card__body">
+                        <span class="admin-stat-card__label">Магазини на перевірці</span>
+                        <strong class="admin-stat-card__value">@Model.PendingBusinesses</strong>
+                        <span class="admin-stat-card__hint">з <strong>@Model.TotalBusinesses</strong> усього</span>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="admin-section-heading">Швидкі дії</h2>
+            <div class="admin-quick-links">
+                <a class="admin-quick-link" asp-action="Users">
+                    <span class="admin-quick-link__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                    </span>
+                    <div>
+                        <strong>Керувати користувачами</strong>
+                        <span>Блокування та відновлення акаунтів</span>
+                    </div>
+                    <span class="admin-quick-link__arrow" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                            <path d="M5 12h14" />
+                            <path d="m13 6 6 6-6 6" />
+                        </svg>
+                    </span>
+                </a>
+                <a class="admin-quick-link" asp-action="Products">
+                    <span class="admin-quick-link__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                            <path d="M21 8 12 3 3 8l9 5 9-5Z" />
+                            <path d="M3 8v8l9 5 9-5V8" />
+                            <path d="M12 13v8" />
+                        </svg>
+                    </span>
+                    <div>
+                        <strong>Модерувати товари</strong>
+                        <span>Активація, модерація, блокування</span>
+                    </div>
+                    <span class="admin-quick-link__arrow" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                            <path d="M5 12h14" />
+                            <path d="m13 6 6 6-6 6" />
+                        </svg>
+                    </span>
+                </a>
+                <a class="admin-quick-link" asp-action="Businesses">
+                    <span class="admin-quick-link__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                            <path d="M3 9 4 4h16l1 5" />
+                            <path d="M3 9a2 2 0 0 0 4 0 2 2 0 0 0 4 0 2 2 0 0 0 4 0 2 2 0 0 0 4 0" />
+                            <path d="M4 9v10h16V9" />
+                            <path d="M9 21v-6h6v6" />
+                        </svg>
+                    </span>
+                    <div>
+                        <strong>Перевіряти магазини</strong>
+                        <span>Схвалення та призупинення бізнесів</span>
+                    </div>
+                    <span class="admin-quick-link__arrow" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                            <path d="M5 12h14" />
+                            <path d="m13 6 6 6-6 6" />
+                        </svg>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

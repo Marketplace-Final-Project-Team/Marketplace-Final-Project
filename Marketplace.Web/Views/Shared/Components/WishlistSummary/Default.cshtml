@@ -1,0 +1,10 @@
+@model int
+
+<a class="nav-link text-dark nav-cart-link"
+   asp-controller="Profile"
+   asp-action="Wishlist"
+   aria-label="Список бажань, товарів: @Model">
+    <span aria-hidden="true">♡</span>
+    <span>Бажання</span>
+    <span class="nav-cart-count @(Model == 0 ? "is-empty" : null)">@Model</span>
+</a>

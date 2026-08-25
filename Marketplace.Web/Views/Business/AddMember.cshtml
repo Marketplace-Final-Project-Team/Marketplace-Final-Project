@@ -1,0 +1,55 @@
+@model Marketplace.Web.Models.BusinessMemberCreateViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Запросити співробітника";
+
+    var roleOptions = new List<SelectListItem>
+    {
+        new("Власник", nameof(Marketplace.Domain.Enums.BusinessMemberRole.Owner)),
+        new("Адміністратор", nameof(Marketplace.Domain.Enums.BusinessMemberRole.Admin)),
+        new("Бізнес-аналітик", nameof(Marketplace.Domain.Enums.BusinessMemberRole.BusinessAnalyst)),
+        new("Менеджер товарів", nameof(Marketplace.Domain.Enums.BusinessMemberRole.ProductManager)),
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/business.css" asp-append-version="true" />
+}
+
+<div class="seller-dashboard">
+    <a asp-action="Team" asp-route-businessId="@Model.BusinessId" class="seller-form-back">← До команди</a>
+
+    <div class="seller-form-card">
+        <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Команда бізнесу</div>
+        <h1>Запросити співробітника</h1>
+        <p>Надішліть запит на членство — людина отримає лист із посиланням для підтвердження або відхилення.</p>
+
+        <form asp-action="AddMember" method="post">
+            <input type="hidden" asp-for="BusinessId" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <div class="seller-form-field">
+                <label asp-for="EmployeeId">ID користувача</label>
+                <input asp-for="EmployeeId" class="form-control" placeholder="Наприклад, 3fa85f64-5717-4562-b3fc-2c963f66afa6" />
+                <span asp-validation-for="EmployeeId" class="text-danger small"></span>
+                <p class="seller-form-hint">Це внутрішній ID акаунта, а не email. Попросіть колегу скопіювати його зі сторінки профілю.</p>
+            </div>
+
+            <div class="seller-form-field">
+                <label asp-for="Role">Роль у бізнесі</label>
+                <select asp-for="Role" class="form-select" asp-items="roleOptions"></select>
+                <span asp-validation-for="Role" class="text-danger small"></span>
+            </div>
+
+            <div class="seller-form-actions">
+                <a asp-action="Team" asp-route-businessId="@Model.BusinessId" class="seller-button seller-button--secondary">Скасувати</a>
+                <button type="submit" class="seller-button seller-button--primary">Надіслати запит</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

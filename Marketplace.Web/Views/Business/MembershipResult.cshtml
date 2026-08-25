@@ -1,0 +1,16 @@
+@{
+    ViewData["Title"] = "Результат запиту на членство";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/business.css" asp-append-version="true" />
+}
+
+<div class="seller-dashboard">
+    <div class="seller-form-card seller-form-card--center">
+        <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Команда бізнесу</div>
+        <h1>Запит на членство обробено</h1>
+        <p>@ViewBag.Message</p>
+        <a asp-controller="Home" asp-action="Index" class="seller-button seller-button--primary">На головну</a>
+    </div>
+</div>
