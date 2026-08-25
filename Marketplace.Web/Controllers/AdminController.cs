@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Common;
-using Org.BouncyCastle.Asn1.Crmf;
 
 namespace Marketplace.Web.Controllers
 {
@@ -21,9 +20,9 @@ namespace Marketplace.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var users = await _adminService.GetAllUsers();
-            var products = await _adminService.GetAllProducts();
-            var businesses = await _adminService.GetAllBusinesses();
+            var users = _adminService.GetUsers();
+            var products = await _adminService.GetProductsAsync();
+            var businesses = await _adminService.GetBusinessesAsync();
 
             var model = new AdminDashboardViewModel
             {
@@ -42,7 +41,7 @@ namespace Marketplace.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Users([FromQuery] UserAdminFilterViewModel filter) 
         {
-            var result = await _adminService.GetUsersAsync(new UserAdminQueryDto 
+            var result = await _adminService.GetFilteredUsersAsync(new UserAdminQueryDto 
             {
                 Search = filter.Search,
                 Status = filter.Status,
@@ -62,16 +61,15 @@ namespace Marketplace.Web.Controllers
                     Email = u.Email,
                     Status = u.Status,
                 }).ToList(),
-                TotalCount = result.TotalCount,
+                TotalItems = result.TotalItems,
                 Page = result.Page,
-                PageSize = result.PageSize
             });
         }
 
         [HttpGet]
-        public async Task<IActionResult> Products([FromQuery] ProductAdminFiterViewModel filter) 
+        public async Task<IActionResult> Products([FromQuery] ProductAdminFilterViewModel filter) 
         {
-            var result = await _adminService.GetProductsAsync(new ProductAdminQueryDto
+            var result = await _adminService.GetFilteredProductsAsync(new ProductAdminQueryDto
             {
                 CategoryId = filter.CategoryId,
                 Search = filter.Search,
@@ -93,16 +91,15 @@ namespace Marketplace.Web.Controllers
                     Price = p.Price,
                     Status = p.Status,
                 }).ToList(),
-                TotalCount = result.TotalCount,
-                Page = result.Page,
-                PageSize = result.PageSize  
+                TotalItems = result.TotalItems,
+                Page = result.Page
             });
         }
 
         [HttpGet]
         public async Task<IActionResult> Businesses([FromQuery] BusinessAdminFilterViewModel filter) 
         {
-            var result = await _adminService.GetBusinessesAsync(new BusinessAdminQueryParams 
+            var result = await _adminService.GetFilteredBusinessesAsync(new BusinessAdminQueryParams 
             {
                 Search = filter.Search,
                 SortDescending = filter.SortDescending,
@@ -124,9 +121,8 @@ namespace Marketplace.Web.Controllers
                     Owner = b.Owner,
                     Status = b.Status,
                 }).ToList(),
-                TotalCount = result.TotalCount,
-                Page = result.Page,
-                PageSize = result.PageSize
+                TotalItems = result.TotalItems,
+                Page = result.Page
             });
         }
 

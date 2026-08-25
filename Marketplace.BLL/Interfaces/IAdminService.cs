@@ -8,9 +8,14 @@ namespace Marketplace.BLL.Interfaces
 {
     public interface IAdminService
     {
-        Task<PagedResult<ProductAdminDto>> GetProductsAsync(ProductAdminQueryDto query);
-        Task<PagedResult<UserAdminDto>> GetUsersAsync(UserAdminQueryDto query);
-        Task<PagedResult<BusinessAdminDto>> GetBusinessesAsync(BusinessAdminQueryParams query);
+        Task<PagedResult<ProductAdminDto>> GetFilteredProductsAsync(ProductAdminQueryDto query);
+        Task<PagedResult<UserAdminDto>> GetFilteredUsersAsync(UserAdminQueryDto query);
+        Task<PagedResult<BusinessAdminDto>> GetFilteredBusinessesAsync(BusinessAdminQueryParams query);
+
+        Task<IReadOnlyList<ProductAdminDto>> GetProductsAsync();
+        IReadOnlyList<UserAdminDto> GetUsers();
+        Task<IReadOnlyList<BusinessAdminDto>> GetBusinessesAsync();
+
 
         Task<ServiceResult> ChangeProductStatus(Guid productId, ProductStatus productStatus);
         Task<ServiceResult> ChangeUserStatus(string userId, UserStatus userStatus);

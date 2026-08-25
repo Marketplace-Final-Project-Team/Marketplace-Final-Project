@@ -26,7 +26,44 @@ namespace Marketplace.BLL.Services
             _context = context;
         }
 
-        public async Task<PagedResult<ProductAdminDto>> GetProductsAsync(ProductAdminQueryDto query)
+        public async Task<IReadOnlyList<ProductAdminDto>> GetProductsAsync() 
+        {
+            var res = (await _productRepo.GetAllAsync()).Select(p => new ProductAdminDto {
+                Id = p.Id,
+                ImageUrl = p.MainImageUrl, 
+                Name = p.Name,
+                Price = p.Price,
+                Status = p.Status,
+            }).ToList();
+
+            return res;
+        }
+
+        public IReadOnlyList<UserAdminDto> GetUsers() 
+        {
+            var res = _userManager.Users.Select(u => new UserAdminDto { 
+                Id = u.Id,
+                Email = u.Email!,
+                Status = u.Status
+            }).ToList();
+
+            return res;
+        }
+
+        public async Task<IReadOnlyList<BusinessAdminDto>> GetBusinessesAsync() 
+        {
+            var res = (await _businessRepo.GetBusinessesWithOwnerAsync()).Select(b => new BusinessAdminDto {
+                Id =b.Id,
+                LogoUrl = b.LogoUrl,
+                Name = b.StoreName,
+                Owner = b.Owner.Email!,
+                Status = b.Status
+            }).ToList();
+
+            return res;
+        }
+
+        public async Task<PagedResult<ProductAdminDto>> GetFilteredProductsAsync(ProductAdminQueryDto query)
         {
             var productsQuery = _productRepo.GetQueryable();
 
@@ -37,7 +74,8 @@ namespace Marketplace.BLL.Services
 
             if(query.Search != null)
             {
-                productsQuery = productsQuery.Where(p => p.Name.Contains(query.Search));
+                var normalizedSearch = query.Search.Trim();
+                productsQuery = productsQuery.Where(p => p.Name.Contains(normalizedSearch));
             }
 
             switch (query.SortOption)
@@ -62,9 +100,10 @@ namespace Marketplace.BLL.Services
                     break;
             }
 
+            var page = Math.Max(1, query.Pagination.Page);
             var totalCount = await productsQuery.CountAsync();
 
-            var items = await productsQuery.Skip((query.Pagination.Page - 1) * query.Pagination.PageSize).Take(query.Pagination.PageSize).Select(p => new ProductAdminDto
+            var items = await productsQuery.Skip((page - 1) * query.Pagination.PageSize).Take(query.Pagination.PageSize).Select(p => new ProductAdminDto
             {
                 Id = p.Id,
                 Name = p.Name,
@@ -76,13 +115,12 @@ namespace Marketplace.BLL.Services
             return new PagedResult<ProductAdminDto>
             {
                 Items = items,
-                Page = query.Pagination.Page,
-                PageSize = query.Pagination.PageSize,
-                TotalCount = totalCount
+                Page = page,
+                TotalItems = totalCount,
             };
         }
 
-        public async Task<PagedResult<UserAdminDto>> GetUsersAsync(UserAdminQueryDto query)
+        public async Task<PagedResult<UserAdminDto>> GetFilteredUsersAsync(UserAdminQueryDto query)
         {
             var usersQuery = _userManager.Users;
 
@@ -93,14 +131,17 @@ namespace Marketplace.BLL.Services
 
             if (!string.IsNullOrWhiteSpace(query.Search))
             {
-                usersQuery = usersQuery.Where(u => u.Email!.Contains(query.Search) || u.UserName!.Contains(query.Search));
+                var normalizedSearch = query.Search.Trim();
+
+                usersQuery = usersQuery.Where(u => u.Email!.Contains(normalizedSearch) || u.UserName!.Contains(normalizedSearch));
             }
 
             usersQuery = query.SortDescending == true ? usersQuery.OrderByDescending(u => u.CreatedAt) : usersQuery.OrderBy(u => u.CreatedAt);
 
+            var page = Math.Max(1, query.Pagination.Page);
             var totalCount = await usersQuery.CountAsync();
 
-            var items = await usersQuery.Skip((query.Pagination.Page - 1) * query.Pagination.PageSize).Take(query.Pagination.PageSize).Select(u => new UserAdminDto
+            var items = await usersQuery.Skip((page - 1) * query.Pagination.PageSize).Take(query.Pagination.PageSize).Select(u => new UserAdminDto
             {
                 Id = u.Id,
                 Email = u.Email!,
@@ -110,13 +151,12 @@ namespace Marketplace.BLL.Services
             return new PagedResult<UserAdminDto>
             {
                 Items = items,
-                Page = query.Pagination.Page,
-                PageSize = query.Pagination.PageSize,
-                TotalCount = totalCount
+                Page = page,
+                TotalItems = totalCount
             };
         }
 
-        public async Task<PagedResult<BusinessAdminDto>> GetBusinessesAsync(BusinessAdminQueryParams query)
+        public async Task<PagedResult<BusinessAdminDto>> GetFilteredBusinessesAsync(BusinessAdminQueryParams query)
         {
             var businessesQuery = _businessRepo.GetQueryable();
 
@@ -127,14 +167,16 @@ namespace Marketplace.BLL.Services
 
             if (!string.IsNullOrEmpty(query.Search))
             {
-                businessesQuery = businessesQuery.Where(b => b.StoreName.Contains(query.Search));
+                var normalizedSearch = query.Search.Trim();
+                businessesQuery = businessesQuery.Where(b => b.StoreName.Contains(normalizedSearch));
             }
 
             businessesQuery = query.SortDescending == true ? businessesQuery.OrderByDescending(b => b.CreatedAt) : businessesQuery.OrderBy(b => b.CreatedAt);
 
+            var page = Math.Max(1, query.Pagination.Page);
             var totalCount = await businessesQuery.CountAsync();
 
-            var items = await businessesQuery.Skip((query.Pagination.Page - 1) * query.Pagination.PageSize).Take(query.Pagination.PageSize).Select(i => new BusinessAdminDto
+            var items = await businessesQuery.Skip((page - 1) * query.Pagination.PageSize).Take(query.Pagination.PageSize).Select(i => new BusinessAdminDto
             {
                 Id = i.Id,
                 Name = i.StoreName,
@@ -146,9 +188,8 @@ namespace Marketplace.BLL.Services
             return new PagedResult<BusinessAdminDto> 
             {
                 Items = items,
-                Page = query.Pagination.Page,
-                PageSize = query.Pagination.PageSize,
-                TotalCount = totalCount,
+                Page = page,
+                TotalItems  = totalCount,
             };
         }
 
