@@ -15,11 +15,11 @@ namespace Marketplace.Web.Controllers
     [Route("api/[controller]")]
     public class PaymentController : Controller
     {
-        private readonly LiqPayPaymentService _paymentService;
+        private readonly IPaymentService _paymentService;
         private readonly IOptions<LiqPayOptions> _options;
         private readonly IOrderService _orderService;
 
-        public PaymentController(LiqPayPaymentService paymentService, IOptions<LiqPayOptions> options, IOrderService orderService)
+        public PaymentController(IPaymentService paymentService, IOptions<LiqPayOptions> options, IOrderService orderService)
         {
             _paymentService = paymentService;
             _options = options;
@@ -51,7 +51,7 @@ namespace Marketplace.Web.Controllers
         public async Task<IActionResult> Callback([FromForm] string data, [FromForm] string signature)
         {
             
-            
+
             var privateKey = _options.Value.PrivateKey;
             var computedSignature = privateKey + data + privateKey;
             byte[] inputBytes = Encoding.UTF8.GetBytes(computedSignature);
@@ -76,7 +76,7 @@ namespace Marketplace.Web.Controllers
                 await _orderService.ChangeOrderStatus(orderId, OrderStatus.Confirmed);
             }
             
-
+            
             return Ok();
 
 
