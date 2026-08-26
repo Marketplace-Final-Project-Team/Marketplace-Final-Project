@@ -13,7 +13,7 @@ namespace Marketplace.Web.Controllers
     {
         private readonly IAdminService _adminService;
 
-        public AdminController(IAdminService adminService) 
+        public AdminController(IAdminService adminService)
         {
             _adminService = adminService;
         }
@@ -39,9 +39,9 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Users([FromQuery] UserAdminFilterViewModel filter) 
+        public async Task<IActionResult> Users([FromQuery] UserAdminFilterViewModel filter)
         {
-            var result = await _adminService.GetFilteredUsersAsync(new UserAdminQueryDto 
+            var result = await _adminService.GetFilteredUsersAsync(new UserAdminQueryDto
             {
                 Search = filter.Search,
                 Status = filter.Status,
@@ -67,7 +67,7 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Products([FromQuery] ProductAdminFilterViewModel filter) 
+        public async Task<IActionResult> Products([FromQuery] ProductAdminFilterViewModel filter)
         {
             var result = await _adminService.GetFilteredProductsAsync(new ProductAdminQueryDto
             {
@@ -97,9 +97,9 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Businesses([FromQuery] BusinessAdminFilterViewModel filter) 
+        public async Task<IActionResult> Businesses([FromQuery] BusinessAdminFilterViewModel filter)
         {
-            var result = await _adminService.GetFilteredBusinessesAsync(new BusinessAdminQueryParams 
+            var result = await _adminService.GetFilteredBusinessesAsync(new BusinessAdminQueryParams
             {
                 Search = filter.Search,
                 SortDescending = filter.SortDescending,
@@ -127,7 +127,7 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ChangeUserStatus(string userId, UserStatus status) 
+        public async Task<IActionResult> ChangeUserStatus(string userId, UserStatus status)
         {
             var result = await _adminService.ChangeUserStatus(userId, status);
             return RedirectToAction("Users");
@@ -145,6 +145,13 @@ namespace Marketplace.Web.Controllers
         public async Task<IActionResult> ChangeBusinessStatus(Guid businessId, BusinessStatus status)
         {
             var result = await _adminService.ChangeBusinessStatus(businessId, status);
+            return RedirectToAction("Businesses");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangeBusinessCommission(Guid businessId, decimal commissionPercent)
+        {
+            var result = await _adminService.ChangeBusinessComission(businessId, commissionPercent);
             return RedirectToAction("Businesses");
         }
     }

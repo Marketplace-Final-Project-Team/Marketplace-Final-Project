@@ -244,5 +244,34 @@ namespace Marketplace.BLL.Services
 
             return new ServiceResult { Succeeded = true, Message = string.Empty };
         }
+
+        public async Task<ServiceResult> ChangeBusinessComission(Guid businessId, decimal commissionPercent)
+        {
+            var business = await _businessRepo.GetByIdAsync(businessId);
+            if (business == null)
+            {
+                return new ServiceResult
+                {
+                    Succeeded = false,
+                    Message = "Бізнес не знайдено"
+                };
+            }
+            if (commissionPercent < 0 && commissionPercent > 100)
+            {
+                return new ServiceResult
+                {
+                    Succeeded = false,
+                    Message = "Комісія повинна бути в межах від 0 до 100"
+                };
+            }
+            business.CommissionPercent = commissionPercent;
+            await _context.SaveChangesAsync();
+            return new ServiceResult
+            {
+                Succeeded = true,
+                Message = "Комісія успішно змінена",
+            };
+        }
     }
+        
 }

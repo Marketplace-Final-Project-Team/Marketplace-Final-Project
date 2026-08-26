@@ -14,6 +14,7 @@ namespace Marketplace.Domain.Entities
         public string BannerUrl { get; set; } = string.Empty;
 
         public decimal Balance { get; set; } = 0;
+        public decimal CommissionPercent {  get; set; } = 0;
 
         public BusinessStatus Status { get; set; } = BusinessStatus.Pending;
 
