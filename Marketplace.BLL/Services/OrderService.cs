@@ -153,7 +153,9 @@ namespace Marketplace.BLL.Services
                             return new ServiceResult { Succeeded = false, Message = "Бізнес не знайдено." };
                         }
                         var amount = item.UnitPrice * item.Quantity;
-                        business.Balance += amount; 
+                        var commission = amount * (business.CommissionPercent / 100m);
+                        var netAmount = amount - commission;
+                        business.Balance += netAmount;
                     }
                 }
             }
