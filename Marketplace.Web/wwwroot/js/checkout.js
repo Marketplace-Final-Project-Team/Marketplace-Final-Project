@@ -136,7 +136,11 @@
         }
 
         const fields = Array.from(step.querySelectorAll("input, select, textarea")).filter(
-            (el) => !el.disabled && !el.hidden && el.type !== "hidden"
+            // el.hidden only reflects the element's own [hidden] attribute, not an
+            // ancestor's — a required field inside a hidden carrier panel (e.g. the
+            // Ukrposhta/Meest address fields while NovaPoshta is selected) would
+            // otherwise still be treated as visible and block validation.
+            (el) => !el.disabled && !el.hidden && el.type !== "hidden" && el.offsetParent !== null
         );
 
         for (const field of fields) {
