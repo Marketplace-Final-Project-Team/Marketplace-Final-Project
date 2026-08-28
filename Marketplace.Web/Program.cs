@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Marketplace.BLL.Configs;
 using Microsoft.EntityFrameworkCore;
+using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,17 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddQuartz();
+
+builder.Services.AddQuartzHostedService(opt => 
+{
+    opt.WaitForJobsToComplete = true;
+});
+
+builder.Services.AddHttpClient();
+builder.Services.AddSingleton<IContentModerationService, ContentModerationService>();
+
 
 builder.Services
     .AddIdentity<User, IdentityRole>(options =>
@@ -78,9 +90,10 @@ builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IWishlistCollectionService, WishlistCollectionService>();
 
+builder.Services.AddScoped<IContentModerationService, ContentModerationService>();
+
 
 // LiqPay configuration
-
 builder.Services.Configure<LiqPayOptions>(builder.Configuration.GetSection("LiqPay"));
 builder.Services.AddScoped<IPaymentService, LiqPayPaymentService>();
 
