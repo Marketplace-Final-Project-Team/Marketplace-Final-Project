@@ -12,7 +12,7 @@ namespace Marketplace.Web.Controllers
     {
         private readonly IAdminService _adminService;
 
-        public AdminController(IAdminService adminService) 
+        public AdminController(IAdminService adminService)
         {
             _adminService = adminService;
         }
@@ -38,10 +38,10 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Users() 
+        public async Task<IActionResult> Users()
         {
             var result = await _adminService.GetAllUsers();
-            return View(result.Select(u => new UserItemAdminViewModel 
+            return View(result.Select(u => new UserItemAdminViewModel
             {
                 Id = u.Id,
                 Email = u.Email,
@@ -50,10 +50,10 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Products() 
+        public async Task<IActionResult> Products()
         {
             var result = await _adminService.GetAllProducts();
-            return View(result.Select(p => new ProductItemAdminViewModel 
+            return View(result.Select(p => new ProductItemAdminViewModel
             {
                 Id = p.Id,
                 Name = p.Name,
@@ -64,10 +64,10 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Businesses() 
+        public async Task<IActionResult> Businesses()
         {
             var result = await _adminService.GetAllBusinesses();
-            return View(result.Select(b => new BusinessItemAdminViewModel 
+            return View(result.Select(b => new BusinessItemAdminViewModel
             {
                 Id = b.Id,
                 Name = b.Name,
@@ -78,7 +78,7 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ChangeUserStatus(string userId, UserStatus status) 
+        public async Task<IActionResult> ChangeUserStatus(string userId, UserStatus status)
         {
             var result = await _adminService.ChangeUserStatus(userId, status);
             return RedirectToAction("Users");

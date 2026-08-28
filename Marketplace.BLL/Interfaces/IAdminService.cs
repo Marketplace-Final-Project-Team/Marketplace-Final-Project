@@ -1,6 +1,5 @@
 ﻿using Marketplace.BLL.Common;
 using Marketplace.BLL.DTOs;
-using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
 
 namespace Marketplace.BLL.Interfaces
@@ -14,5 +13,9 @@ namespace Marketplace.BLL.Interfaces
         Task<ServiceResult> ChangeProductStatus(Guid productId, ProductStatus productStatus);
         Task<ServiceResult> ChangeUserStatus(string userId, UserStatus userStatus);
         Task<ServiceResult> ChangeBusinessStatus(Guid businessId, BusinessStatus businessStatus);
+
+        Task<IReadOnlyList<BusinessAdminDto>> GetPendingAdultRequestsAsync();
+        Task<ServiceResult> ApproveAdultStatusAsync(Guid businessId);
+        Task<ServiceResult> RejectAdultStatusAsync(Guid businessId, string reason);
     }
 }

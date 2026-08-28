@@ -8,7 +8,6 @@ using Marketplace.Web.Models.Products;
 using Microsoft.AspNetCore.Authorization;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Marketplace.Web.Controllers;
@@ -123,17 +122,27 @@ public class ProductsController : Controller
             return View(model);
         }
 
-        await _productService.CreateAsync(new ProductCreateDto
+        try
         {
-            BusinessId = model.BusinessId,
-            CategoryId = model.CategoryId,
-            Name = model.Name,
-            Description = model.Description,
-            Price = model.Price,
-            Quantity = model.Quantity,
-            MainImage = model.MainImage,
-            AdditionalImages = model.AdditionalImages
-        });
+            await _productService.CreateAsync(new ProductCreateDto
+            {
+                BusinessId = model.BusinessId,
+                CategoryId = model.CategoryId,
+                Name = model.Name,
+                Description = model.Description,
+                Price = model.Price,
+                Quantity = model.Quantity,
+                IsAdultOnly = model.IsAdultOnly,
+                MainImage = model.MainImage,
+                AdditionalImages = model.AdditionalImages
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            ModelState.AddModelError(nameof(model.IsAdultOnly), ex.Message);
+            await PopulateCreateOptionsAsync(model);
+            return View(model);
+        }
 
         TempData["Success"] = "Товар створено та відправлено на модерацію.";
         return RedirectToAction(nameof(Index), new { businessId = model.BusinessId });
@@ -156,6 +165,7 @@ public class ProductsController : Controller
             Description = product.Description,
             Price = product.Price,
             Quantity = product.Quantity,
+            IsAdultOnly = product.IsAdultOnly, 
             CategoryId = product.CategoryId,
             ExistingMainImageUrl = product.MainImageUrl,
             Categories = await BuildCategoryOptionsAsync(product.CategoryId)
@@ -182,18 +192,29 @@ public class ProductsController : Controller
             return View(model);
         }
 
-        var updated = await _productService.UpdateAsync(new ProductEditDto
+        try
         {
-            Id = model.Id,
-            CategoryId = model.CategoryId,
-            Name = model.Name,
-            Description = model.Description,
-            Price = model.Price,
-            Quantity = model.Quantity,
-            MainImage = model.MainImage,
-            AdditionalImages = model.AdditionalImages
-        });
-        if (updated is null) return NotFound();
+            var updated = await _productService.UpdateAsync(new ProductEditDto
+            {
+                Id = model.Id,
+                CategoryId = model.CategoryId,
+                Name = model.Name,
+                Description = model.Description,
+                Price = model.Price,
+                Quantity = model.Quantity,
+                IsAdultOnly = model.IsAdultOnly,
+                MainImage = model.MainImage,
+                AdditionalImages = model.AdditionalImages
+            });
+
+            if (updated is null) return NotFound();
+        }
+        catch (InvalidOperationException ex)
+        {
+            ModelState.AddModelError(nameof(model.IsAdultOnly), ex.Message);
+            model.Categories = await BuildCategoryOptionsAsync(model.CategoryId);
+            return View(model);
+        }
 
         TempData["Success"] = "Товар оновлено та відправлено на повторну модерацію.";
         return RedirectToAction(nameof(Index), new { businessId = accessible.Product!.BusinessId });
@@ -246,7 +267,32 @@ public class ProductsController : Controller
             Text = b.StoreName,
             Selected = b.Id == model.BusinessId
         }).ToList();
-        model.Categories = await BuildCategoryOptionsAsync(model.CategoryId);
+
+   
+        var currentBusiness = businesses.FirstOrDefault(b => b.Id == model.BusinessId);
+
+  
+        bool isAdultApproved = currentBusiness?.AdultStatus == AdultContentStatus.Approved;
+
+        model.Categories = await BuildCategoryOptionsAsync(model.CategoryId, isAdultApproved);
+    }
+
+    private async Task<IReadOnlyList<SelectListItem>> BuildCategoryOptionsAsync(Guid selectedId, bool allowAdult = true)
+    {
+        var categories = await _categoryRepository.GetAllAsync();
+
+  
+        if (!allowAdult)
+        {
+            categories = categories.Where(c => !c.IsAdultOnly).ToList();
+        }
+
+        return categories.OrderBy(category => category.Name).Select(category => new SelectListItem
+        {
+            Value = category.Id.ToString(),
+            Text = category.IsAdultOnly ? $"{category.Name} (18+)" : category.Name,
+            Selected = category.Id == selectedId
+        }).ToList();
     }
 
     private async Task<IReadOnlyList<SelectListItem>> BuildCategoryOptionsAsync(Guid selectedId)

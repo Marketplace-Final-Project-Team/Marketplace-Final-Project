@@ -12,5 +12,6 @@ namespace Marketplace.BLL.DTOs.Products
         public int Quantity { get; set; }
         public IFormFile? MainImage { get; set; }
         public List<IFormFile>? AdditionalImages { get; set; }
+        public bool IsAdultOnly { get; set; }
     }
 }

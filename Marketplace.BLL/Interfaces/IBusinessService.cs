@@ -13,5 +13,6 @@ namespace Marketplace.BLL.Interfaces
         Task<DataResult<BusinessStatsByPeriodDto>> GetBusinessStatsByPeriodAsync(Guid businessId, DateTime? startDate, DateTime? endDate);
         Task<DataResult<ProductsStatsByPeriodDto>> GetProductsStatsByPeriodAsnyc(Guid businessId, DateTime? startDate, DateTime? endDate, bool sortDescending = true);
         Task<DataResult<CustomersStatsByPeriodDto>> GetCustomersStatsByPeriodAsync(Guid businessId, DateTime? startDate, DateTime? endDate, bool sortDescending = true);
+        Task<ServiceResult> RequestAdultStatusAsync(Guid businessId, string userId);
     }
 }

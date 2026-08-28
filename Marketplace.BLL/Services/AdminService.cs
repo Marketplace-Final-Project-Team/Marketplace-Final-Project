@@ -9,16 +9,23 @@ using Marketplace.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
+
+using AdultContentStatus = Marketplace.Domain.Entities.AdultContentStatus;
+
 namespace Marketplace.BLL.Services
 {
-    public class AdminService: IAdminService
+    public class AdminService : IAdminService
     {
         private readonly IGenericRepository<Product> _productRepo;
         private readonly UserManager<User> _userManager;
         private readonly IBusinessRepository _businessRepo;
         private readonly AppDbContext _context;
 
-        public AdminService(IGenericRepository<Product> productRepo, UserManager<User> userManager, IBusinessRepository businessRepo, AppDbContext context)
+        public AdminService(
+            IGenericRepository<Product> productRepo,
+            UserManager<User> userManager,
+            IBusinessRepository businessRepo,
+            AppDbContext context)
         {
             _productRepo = productRepo;
             _userManager = userManager;
@@ -69,10 +76,10 @@ namespace Marketplace.BLL.Services
         public async Task<ServiceResult> ChangeProductStatus(Guid productId, ProductStatus productStatus)
         {
             var product = await _productRepo.GetByIdAsync(productId);
-            
+
             if (product == null)
             {
-                return new ServiceResult { Succeeded = false, Message = "Продукт не найден" };
+                return new ServiceResult { Succeeded = false, Message = "Продукт не знайдено" };
             }
 
             product.Status = productStatus;
@@ -92,13 +99,13 @@ namespace Marketplace.BLL.Services
             }
 
             user.Status = userStatus;
-            
+
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
             {
                 return new ServiceResult { Succeeded = false, Message = "Не вдалося оновити статус користувача" };
             }
-            
+
             return new ServiceResult { Succeeded = true, Message = string.Empty };
         }
 
@@ -116,6 +123,58 @@ namespace Marketplace.BLL.Services
             await _context.SaveChangesAsync();
 
             return new ServiceResult { Succeeded = true, Message = string.Empty };
+        }
+
+        public async Task<IReadOnlyList<BusinessAdminDto>> GetPendingAdultRequestsAsync()
+        {
+            var pendingBusinesses = await _context.Businesses
+                .Include(b => b.Owner)
+                .Where(b => b.AdultStatus == AdultContentStatus.Pending)
+                .ToListAsync();
+
+            return pendingBusinesses.Select(b => new BusinessAdminDto
+            {
+                Id = b.Id,
+                Name = b.StoreName,
+                LogoUrl = b.LogoUrl,
+                Owner = b.Owner.Email!,
+                Status = b.Status
+            }).ToList();
+        }
+
+        public async Task<ServiceResult> ApproveAdultStatusAsync(Guid businessId)
+        {
+            var business = await _context.Businesses.FindAsync(businessId);
+            if (business == null)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Магазин не знайдено" };
+            }
+
+            business.AdultStatus = AdultContentStatus.Approved;
+            business.AdultRejectionReason = null;
+
+            await _context.SaveChangesAsync();
+            return new ServiceResult { Succeeded = true, Message = "Статус 18+ успішно підтверджено" };
+        }
+
+        public async Task<ServiceResult> RejectAdultStatusAsync(Guid businessId, string reason)
+        {
+            if (string.IsNullOrWhiteSpace(reason))
+            {
+                return new ServiceResult { Succeeded = false, Message = "Причина відхилення обов'язкова" };
+            }
+
+            var business = await _context.Businesses.FindAsync(businessId);
+            if (business == null)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Магазин не знайдено" };
+            }
+
+            business.AdultStatus = AdultContentStatus.Rejected;
+            business.AdultRejectionReason = reason;
+
+            await _context.SaveChangesAsync();
+            return new ServiceResult { Succeeded = true, Message = "Заявку на статус 18+ відхилено" };
         }
     }
 }

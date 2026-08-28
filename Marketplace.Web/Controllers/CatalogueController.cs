@@ -41,6 +41,8 @@ public class CatalogueController : Controller
 
         var categories = await _categoryService.GetAllCategories();
 
+        bool allowAdultContent = Request.Cookies["AdultConfirmed"] == "true";
+
         var result = await _productService.GetCatalogPageAsync(new CatalogFilterDto
         {
             Search = filter.Search,
@@ -52,7 +54,7 @@ public class CatalogueController : Controller
             Sort = filter.Sort,
             Page = filter.Page,
             PageSize = PageSize
-        });
+        }, allowAdultContent: allowAdultContent);
 
         if (result.TotalPages > 0 && filter.Page > result.TotalPages)
         {
@@ -80,14 +82,25 @@ public class CatalogueController : Controller
     [Route("Details/{id:guid}")]
     public async Task<IActionResult> Details(Guid id)
     {
-        var product = await _productService.GetCatalogProductAsync(id);
+        bool allowAdultContent = Request.Cookies["AdultConfirmed"] == "true";
+
+        var product = await _productService.GetCatalogProductAsync(id, allowAdultContent);
         if (product is null)
         {
+            // Якщо товар 18+, а користувач ще не підтверджував вік
+            var rawProduct = await _productService.GetByIdAsync(id);
+            if (rawProduct != null && rawProduct.IsAdultOnly)
+            {
+                // Перенаправляємо на сторінку підтвердження віку
+                return View("~/Views/Catalog/AgeVerification.cshtml", id);
+            }
+
             return NotFound();
         }
 
         var model = MapProduct(product);
-        var catalog = await _productService.GetCatalogAsync();
+        var catalog = await _productService.GetCatalogAsync(allowAdultContent: allowAdultContent);
+
         model.EstimatedDeliveryStart = DateTime.Today.AddDays(2);
         model.EstimatedDeliveryEnd = DateTime.Today.AddDays(4);
         model.RelatedProducts = catalog
@@ -120,6 +133,31 @@ public class CatalogueController : Controller
         return View("~/Views/Catalog/Details.cshtml", model);
     }
 
+    [HttpPost]
+    [Route("ConfirmAge")]
+    public IActionResult ConfirmAge(Guid? productId, string? returnUrl)
+    {
+        Response.Cookies.Append("AdultConfirmed", "true", new CookieOptions
+        {
+            Expires = DateTimeOffset.UtcNow.AddDays(30),
+            HttpOnly = true,
+            IsEssential = true,
+            SameSite = SameSiteMode.Lax
+        });
+
+        if (productId.HasValue && productId != Guid.Empty)
+        {
+            return RedirectToAction(nameof(Details), new { id = productId.Value });
+        }
+
+        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return Redirect(returnUrl);
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
     [HttpGet]
     [Route("SearchSuggestions")]
     public async Task<IActionResult> SearchSuggestions(string term)
@@ -129,16 +167,12 @@ public class CatalogueController : Controller
             return Json(Array.Empty<object>());
         }
 
-        var catalog = await _productService.GetCatalogAsync();
-        var suggestions = catalog
-            .Where(p => p.Name.Contains(term, StringComparison.OrdinalIgnoreCase))
-            .Take(5)
-            .Select(p => new
-            {
-                id = p.Id,
-                name = p.Name,
-                price = p.GetDiscountedPrice()
-            });
+        bool allowAdultContent = Request.Cookies["AdultConfirmed"] == "true";
+        var suggestions = await _productService.GetSearchSuggestionsAsync(
+            term: term,
+            limit: 5,
+            allowAdultContent: allowAdultContent
+        );
 
         return Json(suggestions);
     }
@@ -164,6 +198,7 @@ public class CatalogueController : Controller
             ReviewCount = reviewCount,
             OriginalPrice = activeDiscount != null ? product.Price : null,
             DiscountPercent = activeDiscount?.Percent,
+            IsAgeRestricted = product.IsAdultOnly
         };
     }
 }

@@ -12,19 +12,29 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Marketplace.BLL.Configs;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
+// 1. Конфігурація Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Marketplace API", Version = "v1" });
+});
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(2);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    //if (builder.Environment.IsDevelopment())
-    //{
-    //    options.UseInMemoryDatabase("MarketplaceFrontendDb");
-    //    return;
-    //}
-
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
@@ -62,7 +72,6 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
 builder.Services.AddScoped<IBusinessRepository, BusinessRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-
 builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -77,9 +86,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 
-
 // LiqPay configuration
-
 builder.Services.Configure<LiqPayOptions>(builder.Configuration.GetSection("LiqPay"));
 builder.Services.AddScoped<IPaymentService, LiqPayPaymentService>();
 
@@ -97,9 +104,17 @@ using (var scope = app.Services.CreateScope())
     await Marketplace.DAL.Seed.DbSeeder.SeedAsync(scope.ServiceProvider);
 }
 
-
-
-if (!app.Environment.IsDevelopment())
+// 2. Swagger Middleware
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Marketplace API v1");
+        c.RoutePrefix = "swagger";
+    });
+}
+else
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
@@ -114,6 +129,7 @@ var localizationOptions = new RequestLocalizationOptions
 };
 
 app.UseRequestLocalization(localizationOptions);
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
@@ -121,10 +137,14 @@ if (!app.Environment.IsDevelopment())
 
 app.UseStatusCodePagesWithReExecute("/error/{0}");
 app.UseRouting();
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+app.MapControllers();
+
 app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}")

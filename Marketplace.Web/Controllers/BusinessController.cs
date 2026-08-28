@@ -204,9 +204,7 @@ namespace Marketplace.Web.Controllers
                 return Forbid();
             }
 
-            // GetBusinessOrderDetails also acts as the ownership check: it returns null unless
-            // this business actually has a line item in the order, so a seller can't change the
-            // status of an order that has nothing to do with their store.
+         
             var order = await _orderService.GetBusinessOrderDetails(businessId, orderId);
             if (order is null)
             {
@@ -394,7 +392,8 @@ namespace Marketplace.Web.Controllers
             {
                 BusinessId = businessId,
                 StoreName = business.StoreName,
-                Description = business.Description
+                Description = business.Description,
+                AdultStatus = (Marketplace.Domain.Enums.AdultContentStatus)business.AdultStatus 
             });
         }
 
@@ -552,6 +551,25 @@ namespace Marketplace.Web.Controllers
 
             pageModel.Stats = result.Data;
             return View(pageModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RequestAdultStatus(Guid businessId)
+        {
+            var userId = _userManager.GetUserId(User)!;
+            var result = await _businessService.RequestAdultStatusAsync(businessId, userId);
+
+            if (!result.Succeeded)
+            {
+                TempData["Error"] = result.Message;
+            }
+            else
+            {
+                TempData["Success"] = "Заявку на отримання статусу 18+ успішно надіслано адміністратору.";
+            }
+
+            return RedirectToAction("Settings", new { businessId = businessId });
         }
     }
 }
