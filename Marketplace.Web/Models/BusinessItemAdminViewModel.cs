@@ -9,5 +9,6 @@ namespace Marketplace.Web.Models
         public string LogoUrl { get; set; } = string.Empty;
         public string Owner { get; set; } = string.Empty;
         public BusinessStatus Status { get; set; }
+        public decimal CommissionPercent { get; set; }
     }
 }

@@ -26,44 +26,176 @@ namespace Marketplace.BLL.Services
             _context = context;
         }
 
-        public async Task<IReadOnlyList<ProductAdminDto>> GetAllProducts()
+        public async Task<IReadOnlyList<ProductAdminDto>> GetProductsAsync() 
         {
-            var products = await _productRepo.GetAllAsync();
+            var res = (await _productRepo.GetAllAsync()).Select(p => new ProductAdminDto {
+                Id = p.Id,
+                ImageUrl = p.MainImageUrl, 
+                Name = p.Name,
+                Price = p.Price,
+                Status = p.Status,
+            }).ToList();
 
-            return products.Select(p => new ProductAdminDto
+            return res;
+        }
+
+        public IReadOnlyList<UserAdminDto> GetUsers() 
+        {
+            var res = _userManager.Users.Select(u => new UserAdminDto { 
+                Id = u.Id,
+                Email = u.Email!,
+                Status = u.Status
+            }).ToList();
+
+            return res;
+        }
+
+        public async Task<IReadOnlyList<BusinessAdminDto>> GetBusinessesAsync() 
+        {
+            var res = (await _businessRepo.GetBusinessesWithOwnerAsync()).Select(b => new BusinessAdminDto {
+                Id =b.Id,
+                LogoUrl = b.LogoUrl,
+                Name = b.StoreName,
+                Owner = b.Owner.Email!,
+                Status = b.Status,
+                CommissionPercent = b.CommissionPercent
+            }).ToList();
+
+            return res;
+        }
+
+        public async Task<PagedResult<ProductAdminDto>> GetFilteredProductsAsync(ProductAdminQueryDto query)
+        {
+            var productsQuery = _productRepo.GetQueryable();
+
+            if(query.CategoryId != null)
+            {
+                productsQuery = productsQuery.Where(p => p.CategoryId == query.CategoryId);
+            }
+
+            if(query.Search != null)
+            {
+                var normalizedSearch = query.Search.Trim();
+                productsQuery = productsQuery.Where(p => p.Name.Contains(normalizedSearch));
+            }
+
+            switch (query.SortOption)
+            {
+                case ProductSortOption.PriceAsc:
+                    productsQuery = productsQuery.OrderBy(p => p.Price);
+                    break;
+                case ProductSortOption.PriceDesc:
+                    productsQuery = productsQuery.OrderByDescending(p => p.Price);
+                    break;
+                case ProductSortOption.CreatedAtAsc:
+                    productsQuery = productsQuery.OrderBy(p => p.CreatedAt);
+                    break;
+                case ProductSortOption.CreatedAtDesc:
+                    productsQuery = productsQuery.OrderByDescending(p => p.CreatedAt);
+                    break;
+                case ProductSortOption.PopularityAsc:
+                    productsQuery = productsQuery.OrderBy(p => p.OrderItems.Sum(oi => oi.Quantity));
+                    break;
+                case ProductSortOption.PopularityDesc:
+                    productsQuery = productsQuery.OrderByDescending(p => p.OrderItems.Sum(oi => oi.Quantity));
+                    break;
+            }
+
+            var page = Math.Max(1, query.Pagination.Page);
+            var totalCount = await productsQuery.CountAsync();
+
+            var items = await productsQuery.Skip((page - 1) * query.Pagination.PageSize).Take(query.Pagination.PageSize).Select(p => new ProductAdminDto
             {
                 Id = p.Id,
                 Name = p.Name,
                 ImageUrl = p.MainImageUrl,
                 Price = p.Price,
                 Status = p.Status
-            }).ToList();
+            }).ToListAsync();
+
+            return new PagedResult<ProductAdminDto>
+            {
+                Items = items,
+                Page = page,
+                TotalItems = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)query.Pagination.PageSize)
+            };
         }
 
-        public async Task<IReadOnlyList<UserAdminDto>> GetAllUsers()
+        public async Task<PagedResult<UserAdminDto>> GetFilteredUsersAsync(UserAdminQueryDto query)
         {
-            var users = await _userManager.Users.ToListAsync();
+            var usersQuery = _userManager.Users;
 
-            return users.Select(u => new UserAdminDto
+            if (query.Status != null)
+            {
+                usersQuery = usersQuery.Where(u => u.Status == query.Status);
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var normalizedSearch = query.Search.Trim();
+
+                usersQuery = usersQuery.Where(u => u.Email!.Contains(normalizedSearch) || u.UserName!.Contains(normalizedSearch));
+            }
+
+            usersQuery = query.SortDescending == true ? usersQuery.OrderByDescending(u => u.CreatedAt) : usersQuery.OrderBy(u => u.CreatedAt);
+
+            var page = Math.Max(1, query.Pagination.Page);
+            var totalCount = await usersQuery.CountAsync();
+
+            var items = await usersQuery.Skip((page - 1) * query.Pagination.PageSize).Take(query.Pagination.PageSize).Select(u => new UserAdminDto
             {
                 Id = u.Id,
                 Email = u.Email!,
                 Status = u.Status
-            }).ToList();
+            }).ToListAsync();
+
+            return new PagedResult<UserAdminDto>
+            {
+                Items = items,
+                Page = page,
+                TotalItems = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)query.Pagination.PageSize)
+            };
         }
 
-        public async Task<IReadOnlyList<BusinessAdminDto>> GetAllBusinesses()
+        public async Task<PagedResult<BusinessAdminDto>> GetFilteredBusinessesAsync(BusinessAdminQueryParams query)
         {
-            var businesses = await _businessRepo.GetBusinessesWithOwnerAsync();
+            var businessesQuery = _businessRepo.GetQueryable();
 
-            return businesses.Select(b => new BusinessAdminDto
+            if(query.Status != null) 
             {
-                Id = b.Id,
-                Name = b.StoreName,
-                LogoUrl = b.LogoUrl,
-                Owner = b.Owner.Email!,
-                Status = b.Status
-            }).ToList();
+                businessesQuery = businessesQuery.Where(b => b.Status == query.Status);
+            }
+
+            if (!string.IsNullOrEmpty(query.Search))
+            {
+                var normalizedSearch = query.Search.Trim();
+                businessesQuery = businessesQuery.Where(b => b.StoreName.Contains(normalizedSearch));
+            }
+
+            businessesQuery = query.SortDescending == true ? businessesQuery.OrderByDescending(b => b.CreatedAt) : businessesQuery.OrderBy(b => b.CreatedAt);
+
+            var page = Math.Max(1, query.Pagination.Page);
+            var totalCount = await businessesQuery.CountAsync();
+
+            var items = await businessesQuery.Skip((page - 1) * query.Pagination.PageSize).Take(query.Pagination.PageSize).Select(i => new BusinessAdminDto
+            {
+                Id = i.Id,
+                Name = i.StoreName,
+                LogoUrl = i.LogoUrl,
+                Owner = i.Owner.Email!,
+                Status = i.Status,
+                CommissionPercent = i.CommissionPercent
+            }).ToListAsync();
+
+            return new PagedResult<BusinessAdminDto>
+            {
+                Items = items,
+                Page = page,
+                TotalItems  = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)query.Pagination.PageSize)
+            };
         }
 
         public async Task<ServiceResult> ChangeProductStatus(Guid productId, ProductStatus productStatus)
@@ -117,5 +249,34 @@ namespace Marketplace.BLL.Services
 
             return new ServiceResult { Succeeded = true, Message = string.Empty };
         }
+
+        public async Task<ServiceResult> ChangeBusinessComission(Guid businessId, decimal commissionPercent)
+        {
+            var business = await _businessRepo.GetByIdAsync(businessId);
+            if (business == null)
+            {
+                return new ServiceResult
+                {
+                    Succeeded = false,
+                    Message = "Бізнес не знайдено"
+                };
+            }
+            if (commissionPercent < 0 && commissionPercent > 100)
+            {
+                return new ServiceResult
+                {
+                    Succeeded = false,
+                    Message = "Комісія повинна бути в межах від 0 до 100"
+                };
+            }
+            business.CommissionPercent = commissionPercent;
+            await _context.SaveChangesAsync();
+            return new ServiceResult
+            {
+                Succeeded = true,
+                Message = "Комісія успішно змінена",
+            };
+        }
     }
+        
 }

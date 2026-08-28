@@ -74,5 +74,10 @@ namespace Marketplace.DAL.Repositories
                 ? await _dbSet.CountAsync()
                 : await _dbSet.CountAsync(predicate);
         }
+
+        public IQueryable<T> GetQueryable()
+        {
+            return _dbSet;
+        }
     }
 }

@@ -6,7 +6,5 @@ namespace Marketplace.BLL.Interfaces
     {
         Task<decimal> GetBalanceAsync();
         Task<MarketplaceBalance> GetOrCreateTrackedAsync();
-        Task<int> GetCommissionPercentAsync();
-        Task SetCommissionPercentAsync(int percent, string? actorUserId);
     }
 }

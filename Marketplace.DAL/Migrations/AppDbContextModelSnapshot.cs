@@ -76,6 +76,9 @@ namespace Marketplace.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("CommissionPercent")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -1136,7 +1139,7 @@ namespace Marketplace.DAL.Migrations
                         .IsRequired();
 
                     b.HasOne("Marketplace.Domain.Entities.Product", "Product")
-                        .WithMany()
+                        .WithMany("OrderItems")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -1374,6 +1377,8 @@ namespace Marketplace.DAL.Migrations
                     b.Navigation("Discounts");
 
                     b.Navigation("Images");
+
+                    b.Navigation("OrderItems");
 
                     b.Navigation("Reviews");
                 });

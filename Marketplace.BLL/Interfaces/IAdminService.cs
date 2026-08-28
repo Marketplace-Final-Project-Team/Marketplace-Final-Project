@@ -2,17 +2,25 @@
 using Marketplace.BLL.DTOs;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Marketplace.BLL.Interfaces
 {
     public interface IAdminService
     {
-        Task<IReadOnlyList<ProductAdminDto>> GetAllProducts();
-        Task<IReadOnlyList<UserAdminDto>> GetAllUsers();
-        Task<IReadOnlyList<BusinessAdminDto>> GetAllBusinesses();
+        Task<PagedResult<ProductAdminDto>> GetFilteredProductsAsync(ProductAdminQueryDto query);
+        Task<PagedResult<UserAdminDto>> GetFilteredUsersAsync(UserAdminQueryDto query);
+        Task<PagedResult<BusinessAdminDto>> GetFilteredBusinessesAsync(BusinessAdminQueryParams query);
+
+        Task<IReadOnlyList<ProductAdminDto>> GetProductsAsync();
+        IReadOnlyList<UserAdminDto> GetUsers();
+        Task<IReadOnlyList<BusinessAdminDto>> GetBusinessesAsync();
+
 
         Task<ServiceResult> ChangeProductStatus(Guid productId, ProductStatus productStatus);
         Task<ServiceResult> ChangeUserStatus(string userId, UserStatus userStatus);
         Task<ServiceResult> ChangeBusinessStatus(Guid businessId, BusinessStatus businessStatus);
+
+        Task<ServiceResult> ChangeBusinessComission(Guid businessId, decimal commissionPercent);
     }
 }

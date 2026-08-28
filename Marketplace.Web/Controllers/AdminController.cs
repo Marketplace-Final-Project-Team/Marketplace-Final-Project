@@ -4,6 +4,8 @@ using Marketplace.Domain.Enums;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Marketplace.BLL.DTOs;
+using Marketplace.BLL.Common;
 
 namespace Marketplace.Web.Controllers
 {
@@ -16,6 +18,7 @@ namespace Marketplace.Web.Controllers
         private readonly IProductService _productService;
         private readonly IConfiguration _configuration;
         private readonly IMarketplaceBalanceService _marketplaceBalanceService;
+        private readonly ICategoryService _categoryService;
 
         public AdminController(
             IAdminService adminService,
@@ -23,7 +26,8 @@ namespace Marketplace.Web.Controllers
             IActivityLogService activityLog,
             IProductService productService,
             IConfiguration configuration,
-            IMarketplaceBalanceService marketplaceBalanceService)
+            IMarketplaceBalanceService marketplaceBalanceService,
+            ICategoryService categoryService)
         {
             _adminService = adminService;
             _settingsService = settingsService;
@@ -31,15 +35,16 @@ namespace Marketplace.Web.Controllers
             _productService = productService;
             _configuration = configuration;
             _marketplaceBalanceService = marketplaceBalanceService;
+            _categoryService = categoryService;
         }
 
         private string? CurrentAdminId => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         public async Task<IActionResult> Index()
         {
-            var users = await _adminService.GetAllUsers();
-            var products = await _adminService.GetAllProducts();
-            var businesses = await _adminService.GetAllBusinesses();
+            var users = _adminService.GetUsers();
+            var products = await _adminService.GetProductsAsync();
+            var businesses = await _adminService.GetBusinessesAsync();
 
             var model = new AdminDashboardViewModel
             {
@@ -57,43 +62,108 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Users() 
+        public async Task<IActionResult> Users([FromQuery] UserAdminFilterViewModel filter)
         {
-            var result = await _adminService.GetAllUsers();
-            return View(result.Select(u => new UserItemAdminViewModel 
+            var result = await _adminService.GetFilteredUsersAsync(new UserAdminQueryDto
             {
-                Id = u.Id,
-                Email = u.Email,
-                Status = u.Status,
-            }));
+                Search = filter.Search,
+                Status = filter.Status,
+                SortDescending = filter.SortDescending,
+                Pagination = new PaginationParams
+                {
+                    Page = filter.Page,
+                    PageSize = filter.PageSize
+                }
+            });
+
+            return View(new AdminUsersPageViewModel
+            {
+                Filter = filter,
+                Result = new PagedResult<UserItemAdminViewModel>
+                {
+                    Items = result.Items.Select(u => new UserItemAdminViewModel
+                    {
+                        Id = u.Id,
+                        Email = u.Email,
+                        Status = u.Status,
+                    }).ToList(),
+                    TotalItems = result.TotalItems,
+                    Page = result.Page,
+                    TotalPages = result.TotalPages,
+                }
+            });
         }
 
         [HttpGet]
-        public async Task<IActionResult> Products() 
+        public async Task<IActionResult> Products([FromQuery] ProductAdminFilterViewModel filter)
         {
-            var result = await _adminService.GetAllProducts();
-            return View(result.Select(p => new ProductItemAdminViewModel 
+            var result = await _adminService.GetFilteredProductsAsync(new ProductAdminQueryDto
             {
-                Id = p.Id,
-                Name = p.Name,
-                ImageUrl = p.ImageUrl,
-                Price = p.Price,
-                Status = p.Status,
-            }));
+                CategoryId = filter.CategoryId,
+                Search = filter.Search,
+                SortOption = filter.SortOption,
+                Pagination = new PaginationParams
+                {
+                    Page = filter.Page,
+                    PageSize = filter.PageSize
+                }
+            });
+
+            return View(new AdminProductsPageViewModel
+            {
+                Filter = filter,
+                Categories = await _categoryService.GetAllCategories(),
+                Result = new PagedResult<ProductItemAdminViewModel>
+                {
+                    Items = result.Items.Select(p => new ProductItemAdminViewModel
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        ImageUrl = p.ImageUrl,
+                        Price = p.Price,
+                        Status = p.Status,
+                    }).ToList(),
+                    TotalItems = result.TotalItems,
+                    Page = result.Page,
+                    TotalPages = result.TotalPages,
+                }
+            });
         }
 
         [HttpGet]
-        public async Task<IActionResult> Businesses() 
+        public async Task<IActionResult> Businesses([FromQuery] BusinessAdminFilterViewModel filter)
         {
-            var result = await _adminService.GetAllBusinesses();
-            return View(result.Select(b => new BusinessItemAdminViewModel 
+            var result = await _adminService.GetFilteredBusinessesAsync(new BusinessAdminQueryParams
             {
-                Id = b.Id,
-                Name = b.Name,
-                LogoUrl = b.LogoUrl,
-                Owner = b.Owner,
-                Status = b.Status,
-            }));
+                Search = filter.Search,
+                Status = filter.Status,
+                SortDescending = filter.SortDescending,
+                Pagination = new PaginationParams
+                {
+                    Page = filter.Page,
+                    PageSize = filter.PageSize
+                }
+            });
+
+            return View(new AdminBusinessesPageViewModel
+            {
+                Filter = filter,
+                Result = new PagedResult<BusinessItemAdminViewModel>
+                {
+                    Items = result.Items.Select(b => new BusinessItemAdminViewModel
+                    {
+                        Id = b.Id,
+                        Name = b.Name,
+                        LogoUrl = b.LogoUrl,
+                        Owner = b.Owner,
+                        Status = b.Status,
+                        CommissionPercent = b.CommissionPercent,
+                    }).ToList(),
+                    TotalItems = result.TotalItems,
+                    Page = result.Page,
+                    TotalPages = result.TotalPages,
+                }
+            });
         }
 
         [HttpPost]
@@ -218,16 +288,26 @@ namespace Marketplace.Web.Controllers
             return View(new MarketplaceBalanceViewModel
             {
                 Balance = await _marketplaceBalanceService.GetBalanceAsync(),
-                CommissionPercent = await _marketplaceBalanceService.GetCommissionPercentAsync()
             });
         }
 
+        // Commission is set per business (see Business.CommissionPercent) rather than
+        // globally, so it's edited from the Businesses list instead of this page.
         [HttpPost]
-        public async Task<IActionResult> UpdateCommission(int commissionPercent)
+        public async Task<IActionResult> ChangeBusinessCommission(Guid businessId, decimal commissionPercent)
         {
-            await _marketplaceBalanceService.SetCommissionPercentAsync(commissionPercent, CurrentAdminId);
-            TempData["Success"] = "Комісію маркетплейсу оновлено.";
-            return RedirectToAction("MarketplaceBalance");
+            var result = await _adminService.ChangeBusinessComission(businessId, commissionPercent);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "CommissionChanged",
+                    $"Комісію бізнесу змінено адміністратором на {commissionPercent}%.",
+                    actorUserId: CurrentAdminId);
+            }
+            else
+            {
+                TempData["Error"] = result.Message;
+            }
+            return RedirectToAction("Businesses");
         }
 
         [HttpGet]

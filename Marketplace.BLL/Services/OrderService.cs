@@ -162,9 +162,8 @@ namespace Marketplace.BLL.Services
             }
             if (status == OrderStatus.Confirmed && order.Status != OrderStatus.Confirmed) {
                 // Commission is captured per line item at the moment of confirmation (see
-                // OrderItem.CommissionAmount) so a later change to the platform's commission
+                // OrderItem.CommissionAmount) so a later change to a business's commission
                 // rate can never retroactively change what a past order already settled.
-                var commissionPercent = await _marketplaceBalanceService.GetCommissionPercentAsync();
                 var marketplaceBalance = await _marketplaceBalanceService.GetOrCreateTrackedAsync();
 
                 foreach (var item in order.Items) {
@@ -176,7 +175,7 @@ namespace Marketplace.BLL.Services
                             return new ServiceResult { Succeeded = false, Message = "Бізнес не знайдено." };
                         }
                         var amount = item.UnitPrice * item.Quantity;
-                        var commission = Math.Round(amount * commissionPercent / 100m, 2);
+                        var commission = Math.Round(amount * business.CommissionPercent / 100m, 2);
                         var netAmount = amount - commission;
 
                         item.CommissionAmount = commission;

@@ -135,7 +135,7 @@ namespace Marketplace.DAL.Data
 
             builder.Entity<OrderItem>()
                 .HasOne(oi => oi.Product)
-                .WithMany()
+                .WithMany(p => p.OrderItems)
                 .HasForeignKey(oi => oi.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 

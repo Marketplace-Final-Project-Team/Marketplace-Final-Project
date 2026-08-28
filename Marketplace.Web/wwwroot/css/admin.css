@@ -441,6 +441,47 @@
     border-bottom: 0;
 }
 
+.admin-pagination {
+    align-items: center;
+    border-top: 1px solid var(--admin-line);
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.admin-pagination__link {
+    align-items: center;
+    border: 1px solid var(--admin-line);
+    border-radius: 0.5rem;
+    color: var(--admin-ink);
+    display: inline-flex;
+    font-size: 0.82rem;
+    font-weight: 650;
+    height: 2.2rem;
+    justify-content: center;
+    min-width: 2.2rem;
+    padding: 0 0.6rem;
+    text-decoration: none;
+    transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.admin-pagination__link:hover {
+    background: var(--admin-soft);
+    color: var(--admin-ink);
+}
+
+.admin-pagination__link--active {
+    background: var(--admin-primary);
+    border-color: var(--admin-primary);
+    color: #fff;
+}
+
+.admin-pagination__link[aria-disabled="true"] {
+    color: var(--admin-muted);
+    pointer-events: none;
+}
+
 .admin-entity-cell {
     align-items: center;
     display: flex;
@@ -542,6 +583,28 @@
 
 .admin-alert p {
     margin: 0;
+}
+
+.admin-alert--error {
+    background: #fdecec;
+    border-color: #f4b8b8;
+    color: #b3261e;
+}
+
+.admin-inline-form {
+    align-items: center;
+    display: flex;
+    gap: 0.4rem;
+}
+
+.admin-inline-form__input {
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-line);
+    border-radius: 0.5rem;
+    color: var(--admin-ink);
+    font-size: 0.85rem;
+    padding: 0.35rem 0.5rem;
+    width: 4.5rem;
 }
 
 /* ---------- Integrations / Settings cards ---------- */

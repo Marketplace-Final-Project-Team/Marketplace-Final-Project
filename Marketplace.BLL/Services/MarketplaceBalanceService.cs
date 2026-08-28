@@ -7,15 +7,11 @@ namespace Marketplace.BLL.Services
 {
     public class MarketplaceBalanceService : IMarketplaceBalanceService
     {
-        private const int DefaultCommissionPercent = 10;
-
         private readonly AppDbContext _context;
-        private readonly ISystemSettingsService _settingsService;
 
-        public MarketplaceBalanceService(AppDbContext context, ISystemSettingsService settingsService)
+        public MarketplaceBalanceService(AppDbContext context)
         {
             _context = context;
-            _settingsService = settingsService;
         }
 
         public async Task<decimal> GetBalanceAsync()
@@ -39,17 +35,6 @@ namespace Marketplace.BLL.Services
             }
 
             return balance;
-        }
-
-        public Task<int> GetCommissionPercentAsync()
-        {
-            return _settingsService.GetIntAsync("Marketplace", "CommissionPercent", DefaultCommissionPercent);
-        }
-
-        public Task SetCommissionPercentAsync(int percent, string? actorUserId)
-        {
-            var clamped = Math.Clamp(percent, 0, 100);
-            return _settingsService.SetAsync("Marketplace", "CommissionPercent", clamped.ToString(), false, actorUserId);
         }
     }
 }

@@ -40,39 +40,11 @@
                         <span class="admin-stat-card__hint">Накопичена комісія з підтверджених замовлень</span>
                     </div>
                 </div>
-                <div class="admin-stat-card">
-                    <span class="admin-stat-card__icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-                            <path d="M4 21V9" />
-                            <path d="M10 21V3" />
-                            <path d="M16 21v-7" />
-                        </svg>
-                    </span>
-                    <div class="admin-stat-card__body">
-                        <span class="admin-stat-card__label">Поточна комісія</span>
-                        <strong class="admin-stat-card__value">@Model.CommissionPercent%</strong>
-                        <span class="admin-stat-card__hint">Утримується з кожного продажу на користь маркетплейсу</span>
-                    </div>
-                </div>
             </div>
 
             <div class="admin-note">
                 <strong>Як це працює</strong>
-                Комісія розраховується й фіксується для кожної позиції замовлення в момент підтвердження продавцем (статус «Підтверджено») — продавцю зараховується сума за вирахуванням комісії, різниця йде на баланс маркетплейсу. Якщо підтверджене замовлення згодом скасовують, обидва баланси коригуються назад симетрично, за тією ставкою, що діяла на момент підтвердження.
-            </div>
-
-            <div class="admin-panel">
-                <form asp-action="UpdateCommission" method="post" class="admin-limits-form">
-                    <div class="admin-limits-form__field">
-                        <label for="commissionPercent">Комісія маркетплейсу, %</label>
-                        <input type="number" id="commissionPercent" name="commissionPercent" min="0" max="100" value="@Model.CommissionPercent" />
-                        <small>Застосовується до всіх нових підтверджень замовлень одразу після збереження.</small>
-                    </div>
-
-                    <div class="admin-limits-form__actions">
-                        <button type="submit" class="btn btn-primary">Зберегти комісію</button>
-                    </div>
-                </form>
+                Комісія задається окремо для кожного бізнесу (розділ «Бізнеси») і фіксується для кожної позиції замовлення в момент підтвердження продавцем (статус «Підтверджено») — продавцю зараховується сума за вирахуванням комісії, різниця йде на баланс маркетплейсу. Якщо підтверджене замовлення згодом скасовують, обидва баланси коригуються назад симетрично, за тією ставкою, що діяла на момент підтвердження.
             </div>
         </div>
     </div>
