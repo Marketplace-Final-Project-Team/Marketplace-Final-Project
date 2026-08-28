@@ -331,8 +331,6 @@
         }
     }
 
-    const PROMO_CODES = { WELCOME10: 0.1 };
-
     const promoInput = form.querySelector("[data-promo-input]");
     const promoApply = form.querySelector("[data-promo-apply]");
     const promoMessage = form.querySelector("[data-promo-message]");
@@ -353,31 +351,42 @@
             promoMessage.classList.toggle("checkout-promo__message--error", !!isError);
         };
 
-        promoApply.addEventListener("click", () => {
+        promoApply.addEventListener("click", async () => {
             const code = promoInput.value.trim().toUpperCase();
-            const rate = PROMO_CODES[code];
+            promoInput.value = code;
 
             if (!code) {
                 showMessage("Введіть промокод.", true);
                 return;
             }
 
-            if (!rate) {
-                showMessage("Такий промокод не знайдено або він вже не діє.", true);
-                if (promoSummaryRow) promoSummaryRow.hidden = true;
-                totalEl.textContent = `${formatCurrency(baseTotal)} ₴`;
-                return;
-            }
+            promoApply.disabled = true;
+            try {
+                const response = await fetch(`/Order/ValidatePromoCode?code=${encodeURIComponent(code)}`, {
+                    headers: { "X-Requested-With": "XMLHttpRequest" }
+                });
+                const result = await response.json();
 
-            const discount = baseTotal * rate;
-            const newTotal = baseTotal - discount;
+                if (!result.succeeded) {
+                    showMessage(result.message || "Такий промокод не знайдено або він вже не діє.", true);
+                    if (promoSummaryRow) promoSummaryRow.hidden = true;
+                    totalEl.textContent = `${formatCurrency(baseTotal)} ₴`;
+                    return;
+                }
 
-            showMessage(`Промокод ${code} застосовано: знижка ${Math.round(rate * 100)}%.`, false);
-            if (promoSummaryRow && promoSummaryValue) {
-                promoSummaryRow.hidden = false;
-                promoSummaryValue.textContent = `−${formatCurrency(discount)} ₴`;
+                const newTotal = baseTotal - result.discountAmount;
+
+                showMessage(`Промокод ${result.code} застосовано: знижка ${result.percent}% на товари магазину «${result.storeName}».`, false);
+                if (promoSummaryRow && promoSummaryValue) {
+                    promoSummaryRow.hidden = false;
+                    promoSummaryValue.textContent = `−${formatCurrency(result.discountAmount)} ₴`;
+                }
+                totalEl.textContent = `${formatCurrency(newTotal)} ₴`;
+            } catch {
+                showMessage("Не вдалося перевірити промокод. Спробуйте ще раз.", true);
+            } finally {
+                promoApply.disabled = false;
             }
-            totalEl.textContent = `${formatCurrency(newTotal)} ₴`;
         });
     }
 })();

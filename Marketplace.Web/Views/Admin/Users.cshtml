@@ -39,13 +39,25 @@
             }
             else
             {
-                <div class="admin-search-wrap">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
-                        <circle cx="11" cy="11" r="8" />
-                        <path d="m21 21-4.3-4.3" />
-                    </svg>
-                    <input type="search" class="form-control admin-search" placeholder="Пошук за email..."
-                           data-admin-search="#users-table" aria-label="Пошук користувачів" />
+                <div class="admin-toolbar">
+                    <div class="admin-search-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.3-4.3" />
+                        </svg>
+                        <input type="search" class="form-control admin-search" placeholder="Пошук за email..."
+                               data-admin-search="#users-table" aria-label="Пошук користувачів" />
+                    </div>
+                    <select class="form-select" data-admin-status-filter="#users-table" aria-label="Фільтр за статусом">
+                        <option value="">Усі статуси</option>
+                        <option value="Active">Активний</option>
+                        <option value="Banned">Заблокований</option>
+                    </select>
+                    <select class="form-select" data-admin-sort="#users-table" aria-label="Сортування">
+                        <option value="">За замовчуванням</option>
+                        <option value="email-asc">Email: А → Я</option>
+                        <option value="email-desc">Email: Я → А</option>
+                    </select>
                 </div>
                 <p class="admin-empty" data-admin-search-empty hidden>Нічого не знайдено за цим запитом.</p>
 
@@ -63,7 +75,7 @@
                             {
                                 var statusClass = user.Status.ToString().ToLowerInvariant();
 
-                                <tr>
+                                <tr data-status="@user.Status" data-sort-email="@user.Email.ToLowerInvariant()">
                                     <td class="admin-entity-name">@user.Email</td>
                                     <td><span class="admin-status admin-status--@statusClass">@StatusLabel(user.Status)</span></td>
                                     <td>

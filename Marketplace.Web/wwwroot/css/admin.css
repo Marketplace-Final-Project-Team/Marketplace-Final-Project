@@ -358,6 +358,28 @@
 
 /* ---------- Data table shared by Users / Products / Businesses ---------- */
 
+.admin-toolbar {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.admin-toolbar .admin-search-wrap {
+    margin-bottom: 0;
+}
+
+.admin-toolbar select {
+    background-color: var(--admin-surface);
+    border: 1px solid var(--admin-line);
+    border-radius: 0.6rem;
+    color: var(--admin-ink);
+    font-size: 0.85rem;
+    min-width: 10rem;
+    padding: 0.5rem 0.75rem;
+}
+
 .admin-search-wrap {
     margin-bottom: 1rem;
     max-width: 24rem;
@@ -497,6 +519,188 @@
     color: var(--admin-muted);
     padding: 3rem 1rem;
     text-align: center;
+}
+
+/* ---------- Alert (TempData feedback) ---------- */
+
+.admin-alert {
+    align-items: flex-start;
+    background: #e8f7ef;
+    border: 1px solid #bcebd7;
+    border-radius: 0.9rem;
+    color: #16794a;
+    display: flex;
+    gap: 0.65rem;
+    margin-bottom: 1.25rem;
+    padding: 0.85rem 1rem;
+}
+
+.admin-alert span {
+    flex: 0 0 auto;
+    font-weight: 900;
+}
+
+.admin-alert p {
+    margin: 0;
+}
+
+/* ---------- Integrations / Settings cards ---------- */
+
+.admin-integration-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(21rem, 1fr));
+}
+
+.admin-integration-card {
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-line);
+    border-radius: 1rem;
+    box-shadow: 0 0.35rem 1.3rem rgba(23, 32, 51, 0.055);
+    overflow: hidden;
+}
+
+.admin-integration-card__header {
+    align-items: flex-start;
+    border-bottom: 1px solid var(--admin-line);
+    display: flex;
+    gap: 0.75rem;
+    justify-content: space-between;
+    padding: 1.1rem 1.25rem;
+}
+
+.admin-integration-card__header h2 {
+    font-size: 1.02rem;
+    font-weight: 750;
+    margin: 0 0 0.2rem;
+}
+
+.admin-integration-card__header p {
+    color: var(--admin-muted);
+    font-size: 0.82rem;
+    margin: 0;
+}
+
+.admin-settings-row {
+    border-top: 1px solid var(--admin-line);
+    display: grid;
+    gap: 0.6rem 1rem;
+    grid-template-columns: 9rem 1fr auto;
+    align-items: center;
+    padding: 0.85rem 1.25rem;
+}
+
+.admin-settings-row:first-of-type {
+    border-top: 0;
+}
+
+.admin-settings-row__label {
+    align-items: center;
+    color: var(--admin-ink);
+    display: flex;
+    font-size: 0.85rem;
+    font-weight: 650;
+    gap: 0.4rem;
+}
+
+.admin-settings-row__badge {
+    background: #edf1ff;
+    border-radius: 999px;
+    color: var(--admin-primary);
+    font-size: 0.62rem;
+    font-weight: 750;
+    padding: 0.1rem 0.45rem;
+    text-transform: uppercase;
+}
+
+.admin-settings-row__value {
+    color: var(--admin-muted);
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.82rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-settings-row__form {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.admin-settings-row__form input {
+    border: 1px solid var(--admin-line);
+    border-radius: 0.6rem;
+    font-size: 0.82rem;
+    padding: 0.4rem 0.6rem;
+    width: 12rem;
+}
+
+/* ---------- Limits / config forms ---------- */
+
+.admin-limits-form {
+    display: grid;
+    gap: 1.1rem;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    padding: 1.35rem;
+}
+
+.admin-limits-form__field {
+    display: grid;
+    gap: 0.4rem;
+}
+
+.admin-limits-form__field label {
+    color: var(--admin-ink);
+    font-size: 0.85rem;
+    font-weight: 650;
+}
+
+.admin-limits-form__field input {
+    border: 1px solid var(--admin-line);
+    border-radius: 0.65rem;
+    padding: 0.55rem 0.75rem;
+    width: 100%;
+}
+
+.admin-limits-form__field small {
+    color: var(--admin-muted);
+    font-size: 0.76rem;
+}
+
+.admin-limits-form__actions {
+    grid-column: 1 / -1;
+}
+
+.admin-note {
+    background: var(--admin-soft);
+    border-radius: 0.75rem;
+    color: var(--admin-muted);
+    font-size: 0.82rem;
+    margin-bottom: 1.1rem;
+    padding: 0.85rem 1rem;
+}
+
+.admin-note strong {
+    color: var(--admin-ink);
+    display: block;
+    margin-bottom: 0.2rem;
+}
+
+/* ---------- Jobs table extras ---------- */
+
+.admin-job-name {
+    color: var(--admin-ink);
+    display: block;
+    font-weight: 700;
+}
+
+.admin-job-desc {
+    color: var(--admin-muted);
+    display: block;
+    font-size: 0.78rem;
+    margin-top: 0.15rem;
+    max-width: 26rem;
 }
 
 @media (max-width: 991.98px) {

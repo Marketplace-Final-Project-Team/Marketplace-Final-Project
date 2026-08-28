@@ -8,6 +8,7 @@ using Marketplace.Domain.Interfaces;
 using Marketplace.Web.Infrastructure;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marketplace.Web.Controllers;
@@ -18,21 +19,30 @@ public class OrderController : Controller
     private readonly IOrderService _orderService;
     private readonly ICartService _cartService;
     private readonly IProductService _productService;
+    private readonly IPostSaleService _postSaleService;
+    private readonly IPromoCodeService _promoCodeService;
     private readonly IGenericRepository<Address> _addressRepository;
     private readonly AppDbContext _context;
+    private readonly IActivityLogService _activityLog;
 
     public OrderController(
         IOrderService orderService,
         ICartService cartService,
         IProductService productService,
+        IPostSaleService postSaleService,
+        IPromoCodeService promoCodeService,
         IGenericRepository<Address> addressRepository,
-        AppDbContext context)
+        AppDbContext context,
+        IActivityLogService activityLog)
     {
         _orderService = orderService;
         _cartService = cartService;
         _productService = productService;
+        _postSaleService = postSaleService;
+        _promoCodeService = promoCodeService;
         _addressRepository = addressRepository;
         _context = context;
+        _activityLog = activityLog;
     }
 
     [HttpGet]
@@ -130,7 +140,13 @@ public class OrderController : Controller
             address = savedAddress;
         }
 
-        var result = await _orderService.CreateOrder(userId!, new OrderCreateDto { AddressId = address.Id, SuccessUrl = model.SuccessUrl, CancelUrl = model.CancelUrl });
+        var result = await _orderService.CreateOrder(userId!, new OrderCreateDto
+        {
+            AddressId = address.Id,
+            SuccessUrl = model.SuccessUrl,
+            CancelUrl = model.CancelUrl,
+            PromoCode = model.PromoCode
+        });
 
         if (!result.Succeeded)
         {
@@ -148,6 +164,7 @@ public class OrderController : Controller
         {
             RecordDeliveryChoice(createdOrderId, model);
             RecordPaymentChoice(createdOrderId, model);
+            await _activityLog.LogUserActionAsync(userId!, "OrderCreated", $"Створено замовлення на суму {model.Total:N2} ₴.", relatedEntityId: createdOrderId);
         }
 
         // CreateOrder always opens a LiqPay session under the hood, but a buyer who chose
@@ -164,71 +181,27 @@ public class OrderController : Controller
         return RedirectToAction(nameof(Details), new { id = result.OrderId });
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> RequestReturn(Guid orderId, string reason, string? comment)
+    [HttpGet]
+    public async Task<IActionResult> ValidatePromoCode(string code)
     {
-        var order = await _orderService.GetUserOrder(GetUserId(), orderId);
-        if (order is null || order.Status != OrderStatus.Delivered)
-        {
-            return NotFound();
-        }
-
-        if (string.IsNullOrWhiteSpace(reason))
-        {
-            TempData["Error"] = "Оберіть причину повернення.";
-            return RedirectToAction(nameof(Details), new { id = orderId });
-        }
-
-        if (CookieConsent.IsAccepted(Request.Cookies))
-        {
-            Response.Cookies.Append(
-                OrderPostSaleCookie.ReturnNameFor(orderId),
-                OrderPostSaleCookie.Serialize(reason.Trim(), comment, DateTime.UtcNow),
-                new CookieOptions
-                {
-                    Expires = DateTimeOffset.UtcNow.Add(OrderPostSaleCookie.Lifetime),
-                    HttpOnly = true,
-                    SameSite = SameSiteMode.Lax,
-                    IsEssential = false
-                });
-        }
-
-        TempData["Success"] = "Заявку на повернення прийнято. Інструкції надішлемо на вашу пошту.";
-        return RedirectToAction(nameof(Details), new { id = orderId });
+        var preview = await _promoCodeService.PreviewAsync(GetUserId(), code);
+        return Json(preview);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> OpenDispute(Guid orderId, string reason, string? comment)
+    public async Task<IActionResult> RequestReturn(Guid orderId, Guid orderItemId, string reason, string comment, List<IFormFile> photos)
     {
-        var order = await _orderService.GetUserOrder(GetUserId(), orderId);
-        if (order is null || order.Status != OrderStatus.Delivered)
+        var result = await _postSaleService.CreateRequestAsync(GetUserId(), orderItemId, reason?.Trim() ?? string.Empty, comment, photos);
+        if (!result.Succeeded)
         {
-            return NotFound();
-        }
-
-        if (string.IsNullOrWhiteSpace(reason))
-        {
-            TempData["Error"] = "Оберіть тип проблеми.";
+            TempData["Error"] = result.Message;
             return RedirectToAction(nameof(Details), new { id = orderId });
         }
 
-        if (CookieConsent.IsAccepted(Request.Cookies))
-        {
-            Response.Cookies.Append(
-                OrderPostSaleCookie.DisputeNameFor(orderId),
-                OrderPostSaleCookie.Serialize(reason.Trim(), comment, DateTime.UtcNow),
-                new CookieOptions
-                {
-                    Expires = DateTimeOffset.UtcNow.Add(OrderPostSaleCookie.Lifetime),
-                    HttpOnly = true,
-                    SameSite = SameSiteMode.Lax,
-                    IsEssential = false
-                });
-        }
+        await _activityLog.LogUserActionAsync(GetUserId(), "ReturnRequested", $"Подано заявку на повернення товару в замовленні (причина: {reason?.Trim()}).", relatedEntityId: orderItemId);
 
-        TempData["Success"] = "Спір відкрито. Підтримка зв'яжеться з вами протягом 24 годин.";
+        TempData["Success"] = "Заявку на повернення прийнято. Інструкції надішлемо на вашу пошту.";
         return RedirectToAction(nameof(Details), new { id = orderId });
     }
 
@@ -300,18 +273,22 @@ public class OrderController : Controller
             : null;
     }
 
-    private PostSaleRequestViewModel? GetReturnRequest(Guid orderId)
+    private static PostSaleRequestViewModel? ToViewModel(PostSaleRequestDto? dto)
     {
-        Request.Cookies.TryGetValue(OrderPostSaleCookie.ReturnNameFor(orderId), out var raw);
-        var parsed = OrderPostSaleCookie.Parse(raw);
-        return parsed is null ? null : new PostSaleRequestViewModel { Reason = parsed.Reason, Comment = parsed.Comment, SubmittedAtUtc = parsed.SubmittedAtUtc };
-    }
+        if (dto is null)
+        {
+            return null;
+        }
 
-    private PostSaleRequestViewModel? GetDisputeRequest(Guid orderId)
-    {
-        Request.Cookies.TryGetValue(OrderPostSaleCookie.DisputeNameFor(orderId), out var raw);
-        var parsed = OrderPostSaleCookie.Parse(raw);
-        return parsed is null ? null : new PostSaleRequestViewModel { Reason = parsed.Reason, Comment = parsed.Comment, SubmittedAtUtc = parsed.SubmittedAtUtc };
+        return new PostSaleRequestViewModel
+        {
+            Reason = dto.Reason,
+            Comment = dto.Comment ?? string.Empty,
+            PhotoUrls = dto.PhotoUrls,
+            SubmittedAtUtc = dto.CreatedAt,
+            Status = dto.Status,
+            SellerResponse = dto.SellerResponse
+        };
     }
 
     private string GetUserId()
@@ -362,6 +339,8 @@ public class OrderController : Controller
             return null;
         }
 
+        var postSaleRequests = await _postSaleService.GetRequestsForOrderAsync(order.Id);
+
         return new OrderDetailsViewModel
         {
             Id = order.Id,
@@ -373,15 +352,15 @@ public class OrderController : Controller
             ShippingStreet = order.ShippingStreet,
             DeliveryMethodLabel = GetDeliveryChoice(order.Id),
             PaymentMethodLabel = GetPaymentChoice(order.Id),
-            ReturnRequest = GetReturnRequest(order.Id),
-            DisputeRequest = GetDisputeRequest(order.Id),
             Items = order.Items.Select(item => new OrderLineViewModel
             {
+                Id = item.Id,
                 ProductId = item.ProductId,
                 ProductName = item.ProductName,
                 ImageUrl = item.Product?.MainImageUrl ?? string.Empty,
                 UnitPrice = item.UnitPrice,
-                Quantity = item.Quantity
+                Quantity = item.Quantity,
+                ReturnRequest = ToViewModel(postSaleRequests.FirstOrDefault(r => r.OrderItemId == item.Id))
             }).ToList()
         };
     }
