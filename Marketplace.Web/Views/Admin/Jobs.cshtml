@@ -1,4 +1,4 @@
-@model List<Marketplace.Web.Models.AdminJobViewModel>
+@model Marketplace.Web.Models.JobsPageViewModel
 
 @{
     ViewData["Title"] = "Задачі — Адмін-панель";
@@ -17,79 +17,107 @@
                 <div>
                     <div class="admin-kicker">Admin</div>
                     <h1 class="admin-title">Фонові задачі</h1>
-                    <p class="admin-subtitle">Заплановані процеси маркетплейсу: розклад, стан і результат останнього запуску.</p>
+                    <p class="admin-subtitle">Автоматична модерація товарів через Quartz.NET — планувальник, черга та журнал рішень.</p>
                 </div>
             </header>
 
-            @if (TempData["Success"] is string success)
-            {
-                <div class="admin-alert"><span>✓</span><p>@success</p></div>
-            }
+            <div class="admin-stats" aria-label="Стан планувальника">
+                <div class="admin-stat-card">
+                    <span class="admin-stat-card__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                            <circle cx="12" cy="12" r="9" />
+                            <path d="M12 7v5l3.5 2" />
+                        </svg>
+                    </span>
+                    <div class="admin-stat-card__body">
+                        <span class="admin-stat-card__label">Планувальник Quartz</span>
+                        <strong class="admin-stat-card__value">@(Model.IsSchedulerRunning ? "Працює" : "Зупинено")</strong>
+                        <span class="admin-stat-card__hint">ProductModerationJob — модерація товарів через Gemini</span>
+                    </div>
+                </div>
+                <div class="admin-stat-card">
+                    <span class="admin-stat-card__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                            <path d="M4 4h16v16H4z" />
+                            <path d="M8 9h8" />
+                            <path d="M8 13h8" />
+                            <path d="M8 17h5" />
+                        </svg>
+                    </span>
+                    <div class="admin-stat-card__body">
+                        <span class="admin-stat-card__label">У черзі зараз</span>
+                        <strong class="admin-stat-card__value">@Model.ScheduledJobs.Count</strong>
+                        <span class="admin-stat-card__hint">Товарів очікують на автоматичну перевірку</span>
+                    </div>
+                </div>
+            </div>
 
             <div class="admin-note">
-                <strong>У розробці</strong>
-                Розклад і виконання підключає Quartz.NET на бекенді — це робить інший розробник. Нижче показано контракт, під який адаптується цей UI, коли бекенд буде готовий.
+                <strong>Як це працює</strong>
+                Після створення або редагування товару система через 5 секунд запускає перевірку тексту й зображень через Gemini AI. Залежно від результату товар отримує статус «Активний» або «Заблокований»; у разі помилки перевірки — лишається «На модерації» для ручного розгляду.
             </div>
 
-            <div class="admin-panel table-responsive">
-                <table class="table admin-table">
-                    <thead>
-                        <tr>
-                            <th>Задача</th>
-                            <th>Розклад</th>
-                            <th>Стан</th>
-                            <th>Наступний запуск</th>
-                            <th>Останній запуск</th>
-                            <th class="text-end">Дії</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var job in Model)
-                        {
+            <section class="admin-panel table-responsive">
+                <div class="admin-header" style="padding: 1rem 1.25rem 0;">
+                    <h2 class="admin-title" style="font-size: 1.1rem;">У черзі на модерацію</h2>
+                </div>
+                @if (Model.ScheduledJobs.Count == 0)
+                {
+                    <p class="admin-empty">Зараз немає товарів, що очікують на автоматичну перевірку.</p>
+                }
+                else
+                {
+                    <table class="table admin-table">
+                        <thead>
                             <tr>
-                                <td>
-                                    <span class="admin-job-name">@job.DisplayName</span>
-                                    <span class="admin-job-desc">@job.Description</span>
-                                </td>
-                                <td>@job.Schedule</td>
-                                <td>
-                                    <span class="admin-status admin-status--@(job.IsPaused ? "rejected" : "active")">
-                                        @(job.IsPaused ? "Призупинено" : "Активна")
-                                    </span>
-                                </td>
-                                <td>@(job.NextRunAt?.ToString("dd.MM.yyyy HH:mm") ?? "—")</td>
-                                <td>
-                                    @if (job.LastRunAt.HasValue)
-                                    {
-                                        <div>@job.LastRunAt.Value.ToString("dd.MM.yyyy HH:mm")</div>
-                                        <span class="admin-status admin-status--@(job.LastRunSucceeded == true ? "active" : "banned")">
-                                            @(job.LastRunSucceeded == true ? "Успішно" : "Помилка")
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span>—</span>
-                                    }
-                                </td>
-                                <td>
-                                    <div class="admin-row-actions">
-                                        <form asp-action="RunJobNow" method="post">
-                                            <input type="hidden" name="jobName" value="@job.Name" />
-                                            <button type="submit" class="btn btn-sm btn-outline-primary">Запустити зараз</button>
-                                        </form>
-                                        <form asp-action="ToggleJobPaused" method="post">
-                                            <input type="hidden" name="jobName" value="@job.Name" />
-                                            <button type="submit" class="btn btn-sm btn-outline-secondary">
-                                                @(job.IsPaused ? "Відновити" : "Призупинити")
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
+                                <th>Товар</th>
+                                <th>Запуск перевірки</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            @foreach (var job in Model.ScheduledJobs)
+                            {
+                                <tr>
+                                    <td class="admin-entity-name">@job.ProductName</td>
+                                    <td>@(job.NextRunAtUtc?.ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss") ?? "—")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </section>
+
+            <section class="admin-panel table-responsive mt-3">
+                <div class="admin-header" style="padding: 1rem 1.25rem 0;">
+                    <h2 class="admin-title" style="font-size: 1.1rem;">Останні рішення модерації</h2>
+                </div>
+                @if (Model.RecentDecisions.Count == 0)
+                {
+                    <p class="admin-empty">Поки що немає жодного запису.</p>
+                }
+                else
+                {
+                    <table class="table admin-table">
+                        <thead>
+                            <tr>
+                                <th>Час</th>
+                                <th>Бізнес</th>
+                                <th>Опис</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var decision in Model.RecentDecisions)
+                            {
+                                <tr>
+                                    <td>@decision.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                                    <td class="admin-entity-name">@decision.BusinessName</td>
+                                    <td class="admin-entity-meta">@decision.Description</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </section>
         </div>
     </div>
 </div>

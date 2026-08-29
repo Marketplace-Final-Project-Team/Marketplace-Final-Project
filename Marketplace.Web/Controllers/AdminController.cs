@@ -1,11 +1,14 @@
 ﻿using System.Security.Claims;
 using Marketplace.BLL.Interfaces;
+using Marketplace.BLL.Services;
 using Marketplace.Domain.Enums;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Common;
+using Quartz;
+using Quartz.Impl.Matchers;
 
 namespace Marketplace.Web.Controllers
 {
@@ -19,6 +22,7 @@ namespace Marketplace.Web.Controllers
         private readonly IConfiguration _configuration;
         private readonly IMarketplaceBalanceService _marketplaceBalanceService;
         private readonly ICategoryService _categoryService;
+        private readonly ISchedulerFactory _schedulerFactory;
 
         public AdminController(
             IAdminService adminService,
@@ -27,7 +31,8 @@ namespace Marketplace.Web.Controllers
             IProductService productService,
             IConfiguration configuration,
             IMarketplaceBalanceService marketplaceBalanceService,
-            ICategoryService categoryService)
+            ICategoryService categoryService,
+            ISchedulerFactory schedulerFactory)
         {
             _adminService = adminService;
             _settingsService = settingsService;
@@ -36,6 +41,7 @@ namespace Marketplace.Web.Controllers
             _configuration = configuration;
             _marketplaceBalanceService = marketplaceBalanceService;
             _categoryService = categoryService;
+            _schedulerFactory = schedulerFactory;
         }
 
         private string? CurrentAdminId => User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -234,23 +240,57 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Jobs()
+        public async Task<IActionResult> Jobs()
         {
-            return View(BuildJobs());
-        }
+            var scheduler = await _schedulerFactory.GetScheduler();
 
-        [HttpPost]
-        public IActionResult RunJobNow(string jobName)
-        {
-            TempData["Success"] = $"Задачу «{jobName}» запущено (виконання підключить Quartz.NET на бекенді).";
-            return RedirectToAction("Jobs");
-        }
+            var jobKeys = await scheduler.GetJobKeys(GroupMatcher<JobKey>.GroupEquals("moderation"));
+            var scheduledJobs = new List<ScheduledModerationJobViewModel>();
 
-        [HttpPost]
-        public IActionResult ToggleJobPaused(string jobName)
-        {
-            TempData["Success"] = $"Стан задачі «{jobName}» змінено (керування станом підключить Quartz.NET на бекенді).";
-            return RedirectToAction("Jobs");
+            foreach (var jobKey in jobKeys)
+            {
+                if (!Guid.TryParse(jobKey.Name.Replace("moderation-job-", string.Empty), out var productId))
+                {
+                    continue;
+                }
+
+                var product = await _productService.GetByIdAsync(productId);
+                var triggers = await scheduler.GetTriggersOfJob(jobKey);
+                var nextFireTime = triggers
+                    .Select(t => t.GetNextFireTimeUtc())
+                    .Where(t => t.HasValue)
+                    .Select(t => t!.Value.UtcDateTime)
+                    .OrderBy(t => t)
+                    .Cast<DateTime?>()
+                    .FirstOrDefault();
+
+                scheduledJobs.Add(new ScheduledModerationJobViewModel
+                {
+                    ProductId = productId,
+                    ProductName = product?.Name ?? "(товар видалено)",
+                    NextRunAtUtc = nextFireTime
+                });
+            }
+
+            var recentDecisions = (await _activityLog.GetRecentBusinessActionsAsync())
+                .Where(l => l.Action == ProductModerationJob.ActivityLogAction)
+                .Take(30)
+                .Select(l => new BusinessActivityLogItemViewModel
+                {
+                    BusinessName = l.BusinessName,
+                    ActorUserId = l.ActorUserId,
+                    Action = l.Action,
+                    Description = l.Description,
+                    CreatedAt = l.CreatedAt
+                })
+                .ToList();
+
+            return View(new JobsPageViewModel
+            {
+                IsSchedulerRunning = scheduler.IsStarted && !scheduler.InStandbyMode && !scheduler.IsShutdown,
+                ScheduledJobs = scheduledJobs.OrderBy(j => j.NextRunAtUtc).ToList(),
+                RecentDecisions = recentDecisions
+            });
         }
 
         [HttpGet]
@@ -422,34 +462,5 @@ namespace Marketplace.Web.Controllers
                 : new string('•', 8) + value[^4..];
         }
 
-        private static List<AdminJobViewModel> BuildJobs()
-        {
-            var now = DateTime.Now;
-            return new List<AdminJobViewModel>
-            {
-                new()
-                {
-                    Name = "ExpireStalePendingOrdersJob",
-                    DisplayName = "Скасування прострочених замовлень",
-                    Description = "Автоматично скасовує замовлення зі статусом «Очікує підтвердження», якщо з моменту створення минуло більше за ліміт (див. розділ «Ліміти бізнесу»). Повертає товар на склад.",
-                    Schedule = "кожні 15 хв",
-                    IsPaused = false,
-                    NextRunAt = now.AddMinutes(15),
-                    LastRunAt = now.AddMinutes(-5),
-                    LastRunSucceeded = true,
-                },
-                new()
-                {
-                    Name = "LowStockAlertJob",
-                    DisplayName = "Сповіщення про низький залишок",
-                    Description = "Раз на добу перевіряє залишки товарів і надсилає власникам бізнесів лист зі списком товарів, кількість яких нижча за поріг.",
-                    Schedule = "щодня о 08:00",
-                    IsPaused = false,
-                    NextRunAt = now.Date.AddDays(now.Hour >= 8 ? 1 : 0).AddHours(8),
-                    LastRunAt = now.Date.AddHours(8).AddDays(now.Hour >= 8 ? 0 : -1),
-                    LastRunSucceeded = true,
-                },
-            };
-        }
     }
 }

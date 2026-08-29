@@ -247,6 +247,7 @@ namespace Marketplace.BLL.Services
             product.Price = dto.Price;
             product.Quantity = dto.Quantity;
             product.Status = ProductStatus.Pending;
+            product.ModerationReason = null;
 
             if (dto.MainImage != null)
             {

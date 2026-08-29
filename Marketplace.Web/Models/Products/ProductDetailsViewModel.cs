@@ -10,6 +10,7 @@ namespace Marketplace.Web.Models.Products
         public string MainImageUrl { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
         public string CategoryName { get; set; } = string.Empty;
+        public string? ModerationReason { get; set; }
         public List<string> AdditionalImageUrls { get; set; } = new();
     }
 }

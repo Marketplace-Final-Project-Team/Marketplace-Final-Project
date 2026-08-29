@@ -210,6 +210,13 @@
     color: #b42318;
 }
 
+.product-moderation-reason {
+    color: #b42318;
+    font-size: 0.78rem;
+    margin-top: 0.35rem;
+    max-width: 16rem;
+}
+
 .product-actions {
     display: flex;
     gap: 0.4rem;

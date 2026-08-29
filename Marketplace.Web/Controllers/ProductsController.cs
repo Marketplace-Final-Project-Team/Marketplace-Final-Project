@@ -69,7 +69,8 @@ public class ProductsController : Controller
             Quantity = p.Quantity,
             MainImageUrl = p.MainImageUrl,
             Status = p.Status.ToString(),
-            CategoryName = p.Category?.Name ?? string.Empty
+            CategoryName = p.Category?.Name ?? string.Empty,
+            ModerationReason = p.ModerationReason
         }).ToList());
     }
 
@@ -89,6 +90,7 @@ public class ProductsController : Controller
             MainImageUrl = product.MainImageUrl,
             Status = product.Status.ToString(),
             CategoryName = product.Category?.Name ?? "Без категорії",
+            ModerationReason = product.ModerationReason,
             AdditionalImageUrls = product.Images.Select(i => i.ImageUrl).ToList()
         });
     }
