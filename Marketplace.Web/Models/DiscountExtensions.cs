@@ -4,14 +4,32 @@ namespace Marketplace.Web.Models
 {
     public static class DiscountExtensions
     {
-     
+
         public static Discount? GetActiveDiscount(this Product product)
         {
             var now = DateTime.UtcNow;
-            return product.Discounts?
+
+            
+            var productDiscount = product.Discounts?
                 .Where(d => d.StartDate <= now && d.EndDate >= now)
-                .OrderByDescending(d => d.Percent)
+                .OrderByDescending(d => d.CreatedAt)
                 .FirstOrDefault();
+
+            
+            var businessDiscount = product.Business?.Discounts?
+                .Where(d => d.StartDate <= now && d.EndDate >= now)
+                .OrderByDescending(d => d.CreatedAt)
+                .FirstOrDefault();
+
+           
+            if (productDiscount != null && businessDiscount != null)
+            {
+                return productDiscount.CreatedAt > businessDiscount.CreatedAt
+                    ? productDiscount
+                    : businessDiscount;
+            }
+
+            return productDiscount ?? businessDiscount;
         }
 
         public static decimal GetDiscountedPrice(this Product product)
