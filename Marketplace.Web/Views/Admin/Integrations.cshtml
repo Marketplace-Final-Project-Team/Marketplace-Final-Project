@@ -1,0 +1,73 @@
+@model List<Marketplace.Web.Models.IntegrationSettingViewModel>
+
+@{
+    ViewData["Title"] = "Інтеграції — Адмін-панель";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+}
+
+<div class="admin-page">
+    <div class="admin-shell">
+        <partial name="_AdminNav" />
+
+        <div class="admin-content">
+            <header class="admin-header">
+                <div>
+                    <div class="admin-kicker">Admin</div>
+                    <h1 class="admin-title">Інтеграції та ключі</h1>
+                    <p class="admin-subtitle">Ключі зовнішніх сервісів, які використовує маркетплейс. Секретні значення ніколи не показуються повторно — лише перезаписуються.</p>
+                </div>
+            </header>
+
+            @if (TempData["Success"] is string success)
+            {
+                <div class="admin-alert"><span>✓</span><p>@success</p></div>
+            }
+
+            <div class="admin-note">
+                <strong>Значення зберігаються реально</strong>
+                Кожне збережене тут значення записується в таблицю <code>SystemSettings</code> (зашифроване для секретних полів). Поки без позначки «змінено» — це поточне значення з <code>appsettings.json</code>. Підключення до живого LiqPay/Nova Poshta/Cloudinary/Email (щоб зміни тут реально впливали на оплати/доставку/пошту) — окремий крок, що вимагає правок у наявних сервісах інтеграцій.
+            </div>
+
+            <div class="admin-integration-grid">
+                @foreach (var integration in Model)
+                {
+                    <div class="admin-integration-card">
+                        <div class="admin-integration-card__header">
+                            <div>
+                                <h2>@integration.DisplayName</h2>
+                                <p>@integration.Description</p>
+                            </div>
+                            <span class="admin-status admin-status--@(integration.IsConfigured ? "active" : "pending")">
+                                @(integration.IsConfigured ? "Налаштовано" : "Не налаштовано")
+                            </span>
+                        </div>
+
+                        @foreach (var key in integration.Keys)
+                        {
+                            <div class="admin-settings-row">
+                                <span class="admin-settings-row__label">
+                                    @key.Label
+                                    @if (key.IsOverridden)
+                                    {
+                                        <small class="admin-settings-row__badge">змінено</small>
+                                    }
+                                </span>
+                                <span class="admin-settings-row__value" title="@key.MaskedValue">@key.MaskedValue</span>
+                                <form asp-action="UpdateIntegrationKey" method="post" class="admin-settings-row__form">
+                                    <input type="hidden" name="category" value="@integration.Category" />
+                                    <input type="hidden" name="key" value="@key.Key" />
+                                    <input type="hidden" name="isSecret" value="@key.IsSecret" />
+                                    <input type="@(key.IsSecret ? "password" : "text")" name="value" placeholder="Нове значення" autocomplete="off" />
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">Зберегти</button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

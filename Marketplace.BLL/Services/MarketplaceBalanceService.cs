@@ -1,0 +1,40 @@
+using Marketplace.BLL.Interfaces;
+using Marketplace.DAL.Data;
+using Marketplace.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace Marketplace.BLL.Services
+{
+    public class MarketplaceBalanceService : IMarketplaceBalanceService
+    {
+        private readonly AppDbContext _context;
+
+        public MarketplaceBalanceService(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<decimal> GetBalanceAsync()
+        {
+            var balance = await _context.MarketplaceBalances.AsNoTracking().FirstOrDefaultAsync();
+            return balance?.Balance ?? 0m;
+        }
+
+        // Returns the tracked singleton row so a caller already inside a unit of work (e.g.
+        // OrderService.ChangeOrderStatus) can mutate .Balance directly and have it persist
+        // together with the rest of that method's SaveChangesAsync — same pattern as
+        // Business.Balance elsewhere in this codebase.
+        public async Task<MarketplaceBalance> GetOrCreateTrackedAsync()
+        {
+            var balance = await _context.MarketplaceBalances.FirstOrDefaultAsync();
+            if (balance is null)
+            {
+                balance = new MarketplaceBalance { Balance = 0 };
+                _context.MarketplaceBalances.Add(balance);
+                await _context.SaveChangesAsync();
+            }
+
+            return balance;
+        }
+    }
+}

@@ -77,6 +77,16 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IWishlistCollectionService, WishlistCollectionService>();
+builder.Services.AddScoped<IPostSaleService, PostSaleService>();
+builder.Services.AddScoped<IPromoCodeService, PromoCodeService>();
+
+// System settings (admin-editable key/value store) and activity logs — new,
+// additive infrastructure that doesn't touch any existing service's behavior.
+builder.Services.AddMemoryCache();
+builder.Services.AddDataProtection();
+builder.Services.AddScoped<ISystemSettingsService, SystemSettingsService>();
+builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
+builder.Services.AddScoped<IMarketplaceBalanceService, MarketplaceBalanceService>();
 
 
 // LiqPay configuration
