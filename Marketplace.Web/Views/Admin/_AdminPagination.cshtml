@@ -1,0 +1,23 @@
+@model Marketplace.Web.Models.AdminPaginationViewModel
+
+@if (Model.TotalPages > 1)
+{
+    var routeValues = Context.Request.Query
+        .Where(q => !string.Equals(q.Key, "Page", StringComparison.OrdinalIgnoreCase))
+        .ToDictionary(q => q.Key, q => (object?)q.Value.ToString());
+
+    string PageUrl(int page)
+    {
+        var values = new Dictionary<string, object?>(routeValues) { ["Page"] = page };
+        return Url.Action(ViewContext.RouteData.Values["action"]!.ToString(), values)!;
+    }
+
+    <nav class="admin-pagination" aria-label="Сторінки">
+        <a class="admin-pagination__link" href="@PageUrl(Math.Max(1, Model.Page - 1))" aria-disabled="@(Model.Page <= 1)">‹</a>
+        @for (var p = 1; p <= Model.TotalPages; p++)
+        {
+            <a class="admin-pagination__link @(p == Model.Page ? "admin-pagination__link--active" : "")" href="@PageUrl(p)">@p</a>
+        }
+        <a class="admin-pagination__link" href="@PageUrl(Math.Min(Model.TotalPages, Model.Page + 1))" aria-disabled="@(Model.Page >= Model.TotalPages)">›</a>
+    </nav>
+}

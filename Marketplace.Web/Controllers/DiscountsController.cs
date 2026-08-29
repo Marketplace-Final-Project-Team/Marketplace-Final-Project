@@ -15,17 +15,20 @@ namespace Marketplace.Web.Controllers
         private readonly IProductService _productService;
         private readonly IBusinessAccessService _businessAccessService;
         private readonly IBusinessService _businessService;
+        private readonly IActivityLogService _activityLog;
 
         public DiscountsController(
             IDiscountService discountService,
             IProductService productService,
             IBusinessAccessService businessAccessService,
             IBusinessService businessService)
+            IActivityLogService activityLog)
         {
             _discountService = discountService;
             _productService = productService;
             _businessAccessService = businessAccessService;
             _businessService = businessService;
+            _activityLog = activityLog;
         }
 
         private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
@@ -44,6 +47,9 @@ namespace Marketplace.Web.Controllers
             try
             {
                 await _discountService.SetDiscountAsync(productId, percent, startDate, endDate);
+                await _activityLog.LogBusinessActionAsync(product.BusinessId, "DiscountSet",
+                    $"Встановлено знижку {percent}% на товар «{product.Name}».",
+                    actorUserId: CurrentUserId, relatedEntityId: productId);
                 TempData["Success"] = "Знижку встановлено.";
             }
             catch (Exception ex) when (ex is ArgumentOutOfRangeException or ArgumentException)
@@ -66,6 +72,9 @@ namespace Marketplace.Web.Controllers
             if (!hasAccess) return Forbid();
 
             await _discountService.RemoveDiscountAsync(productId);
+            await _activityLog.LogBusinessActionAsync(product.BusinessId, "DiscountRemoved",
+                $"Знижку на товар «{product.Name}» скасовано.",
+                actorUserId: CurrentUserId, relatedEntityId: productId);
             TempData["Success"] = "Знижку скасовано.";
 
             return RedirectToAction("Edit", "Products", new { id = productId });

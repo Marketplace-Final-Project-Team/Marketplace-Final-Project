@@ -20,10 +20,11 @@ namespace Marketplace.BLL.Services
         private readonly UserManager<User> _userManager;
         private readonly IOrderRepository _orderRepository;
         private readonly AppDbContext _context;
-        
+        private readonly IActivityLogService _activityLog;
+
         private DateTime Today = DateTime.UtcNow.Date;
 
-        public BusinessService(IGenericRepository<BusinessMember> businessMemberRepo, IBusinessRepository businessRepo, IImageStorageService imageService, UserManager<User> userManager, IOrderRepository orderRepository, AppDbContext context)
+        public BusinessService(IGenericRepository<BusinessMember> businessMemberRepo, IBusinessRepository businessRepo, IImageStorageService imageService, UserManager<User> userManager, IOrderRepository orderRepository, AppDbContext context, IActivityLogService activityLog)
         {
             _businessMemberRepo = businessMemberRepo;
             _businessRepo = businessRepo;
@@ -31,6 +32,7 @@ namespace Marketplace.BLL.Services
             _userManager = userManager;
             _orderRepository = orderRepository;
             _context = context;
+            _activityLog = activityLog;
         }
 
         private async Task<DataResult<(DateTime startDate, DateTime endDate)>> ValidateStatsRequestAsync(Guid businessId, DateTime? startDate, DateTime? endDate)
@@ -130,6 +132,10 @@ namespace Marketplace.BLL.Services
 
             await _businessRepo.AddAsync(business);
             await _context.SaveChangesAsync();
+
+            await _activityLog.LogBusinessActionAsync(business.Id, "BusinessCreated",
+                $"Бізнес «{business.StoreName}» створено та відправлено на перевірку.",
+                actorUserId: business.OwnerId);
 
             return new ServiceResult { Succeeded = true, Message = string.Empty };
         }

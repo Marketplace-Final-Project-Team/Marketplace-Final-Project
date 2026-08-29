@@ -1,0 +1,72 @@
+@model List<Marketplace.Web.Models.UserActivityLogItemViewModel>
+
+@{
+    ViewData["Title"] = "Журнал користувачів — Адмін-панель";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+}
+
+<div class="admin-page">
+    <div class="admin-shell">
+        <partial name="_AdminNav" />
+
+        <div class="admin-content">
+            <header class="admin-header">
+                <div>
+                    <div class="admin-kicker">Admin</div>
+                    <h1 class="admin-title">Журнал дій користувачів</h1>
+                    <p class="admin-subtitle">Реєстрація, вхід/вихід, замовлення, заявки на повернення, зміни статусу — останні @Model.Count записів.</p>
+                </div>
+            </header>
+
+            @if (Model.Count == 0)
+            {
+                <div class="admin-panel">
+                    <p class="admin-empty">Поки що немає жодного запису.</p>
+                </div>
+            }
+            else
+            {
+                <div class="admin-search-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                    </svg>
+                    <input type="search" class="form-control admin-search" placeholder="Пошук за email або дією..."
+                           data-admin-search="#user-log-table" aria-label="Пошук у журналі" />
+                </div>
+                <p class="admin-empty" data-admin-search-empty hidden>Нічого не знайдено за цим запитом.</p>
+
+                <div class="admin-panel table-responsive">
+                    <table class="table admin-table" id="user-log-table">
+                        <thead>
+                            <tr>
+                                <th>Час</th>
+                                <th>Користувач</th>
+                                <th>Подія</th>
+                                <th>Опис</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var log in Model)
+                            {
+                                <tr>
+                                    <td>@log.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                                    <td class="admin-entity-name">@log.UserEmail</td>
+                                    <td><span class="admin-status admin-status--active">@log.Action</span></td>
+                                    <td class="admin-entity-meta">@log.Description</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/admin-search.js" asp-append-version="true"></script>
+}

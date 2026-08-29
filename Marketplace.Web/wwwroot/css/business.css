@@ -722,6 +722,68 @@
     margin-bottom: 1rem;
 }
 
+.seller-postsale {
+    margin-top: 1.25rem;
+}
+
+.seller-postsale-item {
+    background: var(--seller-soft);
+    border-radius: 0.85rem;
+    margin-bottom: 0.85rem;
+    padding: 1rem 1.1rem;
+}
+
+.seller-postsale-item:last-child {
+    margin-bottom: 0;
+}
+
+.seller-postsale-item--approved {
+    background: #e8f7ee;
+}
+
+.seller-postsale-item--rejected {
+    background: #fdecec;
+}
+
+.seller-postsale-item__header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+}
+
+.seller-postsale-item__status {
+    color: var(--seller-muted);
+    font-size: 0.82rem;
+    font-weight: 650;
+}
+
+.seller-postsale-item__meta {
+    color: var(--seller-muted);
+    font-size: 0.85rem;
+    margin: 0.3rem 0 0;
+}
+
+.seller-postsale-item__comment {
+    font-size: 0.85rem;
+    margin: 0.4rem 0 0;
+}
+
+.seller-postsale-item__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+}
+
+.seller-postsale-item__actions .form-control {
+    flex: 1 1 100%;
+}
+
+.seller-postsale-item__buttons {
+    display: flex;
+    gap: 0.6rem;
+}
+
 .seller-order-line {
     align-items: center;
     display: grid;

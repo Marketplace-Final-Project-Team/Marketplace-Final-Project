@@ -50,6 +50,9 @@ public class OrderCreateViewModel : IValidatableObject
 
     public string PaymentMethod { get; set; } = PaymentMethods.Online;
 
+    [StringLength(30)]
+    public string? PromoCode { get; set; }
+
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         if (!IsUsingSavedAddress)

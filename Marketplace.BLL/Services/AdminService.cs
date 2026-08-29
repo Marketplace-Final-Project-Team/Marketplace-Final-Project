@@ -57,7 +57,8 @@ namespace Marketplace.BLL.Services
                 LogoUrl = b.LogoUrl,
                 Name = b.StoreName,
                 Owner = b.Owner.Email!,
-                Status = b.Status
+                Status = b.Status,
+                CommissionPercent = b.CommissionPercent
             }).ToList();
 
             return res;
@@ -117,6 +118,7 @@ namespace Marketplace.BLL.Services
                 Items = items,
                 Page = page,
                 TotalItems = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)query.Pagination.PageSize)
             };
         }
 
@@ -152,7 +154,8 @@ namespace Marketplace.BLL.Services
             {
                 Items = items,
                 Page = page,
-                TotalItems = totalCount
+                TotalItems = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)query.Pagination.PageSize)
             };
         }
 
@@ -182,14 +185,16 @@ namespace Marketplace.BLL.Services
                 Name = i.StoreName,
                 LogoUrl = i.LogoUrl,
                 Owner = i.Owner.Email!,
-                Status = i.Status
+                Status = i.Status,
+                CommissionPercent = i.CommissionPercent
             }).ToListAsync();
 
-            return new PagedResult<BusinessAdminDto> 
+            return new PagedResult<BusinessAdminDto>
             {
                 Items = items,
                 Page = page,
                 TotalItems  = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)query.Pagination.PageSize)
             };
         }
 
