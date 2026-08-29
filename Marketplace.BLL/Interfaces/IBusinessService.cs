@@ -1,5 +1,6 @@
 ﻿using Marketplace.BLL.Common;
 using Marketplace.BLL.DTOs;
+using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
 
 namespace Marketplace.BLL.Interfaces
@@ -14,5 +15,6 @@ namespace Marketplace.BLL.Interfaces
         Task<DataResult<ProductsStatsByPeriodDto>> GetProductsStatsByPeriodAsnyc(Guid businessId, DateTime? startDate, DateTime? endDate, bool sortDescending = true);
         Task<DataResult<CustomersStatsByPeriodDto>> GetCustomersStatsByPeriodAsync(Guid businessId, DateTime? startDate, DateTime? endDate, bool sortDescending = true);
         Task<decimal> GetBusinessBalance(Guid businessid);
+        Task<Business> GetByIdAsync(Guid id);
     }
 }

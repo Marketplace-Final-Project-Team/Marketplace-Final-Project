@@ -25,8 +25,9 @@ namespace Marketplace.BLL.Services
         private readonly IMarketplaceBalanceService _marketplaceBalanceService;
         public readonly IOptions<LiqPayOptions> _options;
 
+        public readonly IGenericRepository<Business> _businessRepository;
 
-        public OrderService(IGenericRepository<Order> orerRepository, ICartItemRepository cartItemRepository, IGenericRepository<Address> addressRepository, IGenericRepository<Product> productRepository, AppDbContext context, IPaymentService paymentService, IPromoCodeService promoCodeService, IMarketplaceBalanceService marketplaceBalanceService, IOptions<LiqPayOptions> options)
+        public OrderService(IGenericRepository<Order> orerRepository, ICartItemRepository cartItemRepository, IGenericRepository<Address> addressRepository, IGenericRepository<Product> productRepository, AppDbContext context, IPaymentService paymentService, IPromoCodeService promoCodeService, IMarketplaceBalanceService marketplaceBalanceService, IOptions<LiqPayOptions> options,IGenericRepository<Business> businessRepository)
         {
             _orerRepository = orerRepository;
             _cartItemRepository = cartItemRepository;
@@ -37,16 +38,19 @@ namespace Marketplace.BLL.Services
             _marketplaceBalanceService = marketplaceBalanceService;
             _context = context;
             _options = options;
+            _businessRepository = businessRepository;
         }
 
         public async Task<OrderResultDto> CreateOrder(string userId, OrderCreateDto dto)
         {
             var cartItems = await _cartItemRepository.GetCartItemsByUserIdAsync(userId);
-
+            
             if (cartItems == null || !cartItems.Any())
             {
                 return new OrderResultDto { Succeeded = false, Message = "Кошик пустий." };
             }
+            
+            
 
             var address = await _addressRepository.FirstOrDefaultAsync(a => a.Id == dto.AddressId && a.UserId == userId);
 
@@ -65,7 +69,7 @@ namespace Marketplace.BLL.Services
 
             foreach (var cartItem in cartItems)
             {
-
+                
                 if (cartItem.Product.Status != ProductStatus.Active)
                 {
                     return new OrderResultDto
@@ -81,19 +85,46 @@ namespace Marketplace.BLL.Services
                     return new OrderResultDto { Succeeded = false, Message = "Недостатньо товару на складі." };
                 }
 
+                var business = await _businessRepository.FirstOrDefaultAsync(b => b.Id == cartItem.Product.BusinessId);
+                
+                
+
                 var now = DateTime.UtcNow;
-                var activeDiscount = cartItem.Product.Discounts?
+                Discount? latestDiscount = null;
+                var productDiscount = cartItem.Product.Discounts?
                     .FirstOrDefault(d => d.StartDate <= now && d.EndDate >= now);
 
+                var businessDiscount = business?.Discounts?
+                    .FirstOrDefault(d => d.StartDate <= now && d.EndDate >= now);
+                if (productDiscount != null && businessDiscount != null) {
+                    if (productDiscount.CreatedAt > businessDiscount.CreatedAt)
+                    {
+                        latestDiscount = productDiscount;
+                    }
+                }
+                else if (productDiscount != null)
+                {
+                    latestDiscount = productDiscount;
+                }
+                else if (businessDiscount != null)
+                {
+                    latestDiscount = businessDiscount;
+                }
+                
+                var discountPercent = latestDiscount?.Percent ?? 0;
+                
                 // If a promo code applies to this item's business, use whichever discount
                 // is bigger — the product's own sale or the promo — instead of stacking them.
                 var promoPercent = promoCode is not null && promoCode.BusinessId == cartItem.Product.BusinessId
                     ? promoCode.Percent
                     : 0;
-                var effectivePercent = Math.Max(activeDiscount?.Percent ?? 0, promoPercent);
+                var effectivePercent = discountPercent+promoPercent;
+                if (effectivePercent > 100){
+                  effectivePercent = 100;
+                }
 
                 var unitPrice = effectivePercent > 0
-                    ? cartItem.Product.Price - (cartItem.Product.Price * effectivePercent / 100m)
+                    ? cartItem.Product.Price * (1 - effectivePercent / 100m)
                     : cartItem.Product.Price;
 
                 var orderItem = new OrderItem
