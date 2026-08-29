@@ -1,4 +1,4 @@
-﻿using Marketplace.BLL.Common;
+using Marketplace.BLL.Common;
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
@@ -8,7 +8,6 @@ using Marketplace.Domain.Enums;
 using Marketplace.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Quartz;
-using Quartz.Core;
 
 namespace Marketplace.BLL.Services
 {
@@ -21,16 +20,19 @@ namespace Marketplace.BLL.Services
         private readonly IOrderRepository _orderRepository;
         private readonly AppDbContext _context;
         private readonly ISchedulerFactory _schedulerFactory;
+        private readonly IActivityLogService _activityLog;
 
         private DateTime Today = DateTime.UtcNow.Date;
 
         public BusinessService(
-            IGenericRepository<BusinessMember> businessMemberRepo, 
-            IBusinessRepository businessRepo, IImageStorageService imageService, 
-            UserManager<User> userManager, IOrderRepository orderRepository, 
+            IGenericRepository<BusinessMember> businessMemberRepo,
+            IBusinessRepository businessRepo,
+            IImageStorageService imageService,
+            UserManager<User> userManager,
+            IOrderRepository orderRepository,
             AppDbContext context,
-            ISchedulerFactory sheduleFactory
-            )
+            ISchedulerFactory schedulerFactory,
+            IActivityLogService activityLog)
         {
             _businessMemberRepo = businessMemberRepo;
             _businessRepo = businessRepo;
@@ -38,7 +40,8 @@ namespace Marketplace.BLL.Services
             _userManager = userManager;
             _orderRepository = orderRepository;
             _context = context;
-            _schedulerFactory = sheduleFactory;
+            _schedulerFactory = schedulerFactory;
+            _activityLog = activityLog;
         }
 
         private async Task ScheduleModerationJobAsync(Guid businessId)
@@ -169,6 +172,11 @@ namespace Marketplace.BLL.Services
             await _context.SaveChangesAsync();
 
             await ScheduleModerationJobAsync(business.Id);
+
+            await _activityLog.LogBusinessActionAsync(business.Id, "BusinessCreated",
+                $"Бізнес «{business.StoreName}» створено та відправлено на перевірку.",
+                actorUserId: business.OwnerId);
+
             return new ServiceResult { Succeeded = true, Message = string.Empty };
         }
 
@@ -336,6 +344,15 @@ namespace Marketplace.BLL.Services
                 return 0;
             }
             return business.Balance;
+        }
+        public async Task<Business> GetByIdAsync(Guid id)
+        {
+            var business = await _businessRepo.GetByIdAsync(id);
+            if (business == null)
+            {
+                throw new Exception("Business not found");
+            }
+            return business;
         }
     }
 }

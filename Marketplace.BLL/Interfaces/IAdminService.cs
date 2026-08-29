@@ -20,5 +20,7 @@ namespace Marketplace.BLL.Interfaces
         Task<ServiceResult> ChangeProductStatus(Guid productId, ProductStatus productStatus);
         Task<ServiceResult> ChangeUserStatus(string userId, UserStatus userStatus);
         Task<ServiceResult> ChangeBusinessStatus(Guid businessId, BusinessStatus businessStatus);
+
+        Task<ServiceResult> ChangeBusinessComission(Guid businessId, decimal commissionPercent);
     }
 }

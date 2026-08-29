@@ -11,6 +11,7 @@ namespace Marketplace.BLL.Interfaces
 
         Task<OrderResultDto> CreateOrder(string userId, OrderCreateDto dto);
         Task<ServiceResult> ChangeOrderStatus(Guid orderId, OrderStatus status);
+        Task<ServiceResult> RefundOrderItemAsync(Guid orderItemId);
         Task<Order?> GetOrderByIdAsync(Guid orderId);
         Task<IReadOnlyList<Order>> GetUserOrders(string userId);
         Task<Order?> GetUserOrder(string userId, Guid orderId);

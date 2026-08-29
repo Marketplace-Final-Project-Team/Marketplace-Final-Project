@@ -31,7 +31,7 @@ public class CatalogProductViewModel
             : null;
 
     public decimal? OriginalPrice { get; set; }
-    public int? DiscountPercent { get; set; }
+    public decimal? DiscountPercent { get; set; }
     public bool HasDiscount => OriginalPrice.HasValue && DiscountPercent.HasValue;
 
     public IReadOnlyList<string> GalleryImageUrls => new[] { MainImageUrl }

@@ -14,11 +14,19 @@
         Marketplace.Domain.Enums.OrderStatus.Canceled => "Скасовано",
         _ => status.ToString()
     };
+
+    private static string PostSaleStatusLabel(Marketplace.Domain.Enums.PostSaleRequestStatus status) => status switch
+    {
+        Marketplace.Domain.Enums.PostSaleRequestStatus.Approved => "Підтверджено",
+        Marketplace.Domain.Enums.PostSaleRequestStatus.Rejected => "Відхилено",
+        _ => "Очікує розгляду"
+    };
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/css/business.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/postsale.css" asp-append-version="true" />
 }
 
 <div class="seller-dashboard">
@@ -114,4 +122,52 @@
             </form>
         </aside>
     </div>
+
+    @if (Model.PostSaleRequests.Any())
+    {
+        <section class="seller-order-card seller-postsale">
+            <h2>Заявки на повернення</h2>
+            @foreach (var request in Model.PostSaleRequests)
+            {
+                <div class="seller-postsale-item seller-postsale-item--@request.Status.ToString().ToLowerInvariant()">
+                    <div class="seller-postsale-item__header">
+                        <strong>Повернення: @request.ProductName</strong>
+                        <span class="seller-postsale-item__status">@PostSaleStatusLabel(request.Status)</span>
+                    </div>
+                    <p class="seller-postsale-item__meta">@request.CreatedAt.ToLocalTime().ToString("dd MMMM yyyy, HH:mm") · @request.Reason</p>
+                    @if (!string.IsNullOrWhiteSpace(request.Comment))
+                    {
+                        <p class="seller-postsale-item__comment">«@request.Comment»</p>
+                    }
+                    @if (request.PhotoUrls.Any())
+                    {
+                        <div class="postsale-photos">
+                            @foreach (var url in request.PhotoUrls)
+                            {
+                                <a href="@url" target="_blank" rel="noopener"><img src="@url" alt="Фото до заявки" /></a>
+                            }
+                        </div>
+                    }
+
+                    @if (request.Status == Marketplace.Domain.Enums.PostSaleRequestStatus.Pending)
+                    {
+                        <form asp-action="ResolvePostSaleRequest" method="post" class="seller-postsale-item__actions">
+                            <input type="hidden" name="businessId" value="@Model.BusinessId" />
+                            <input type="hidden" name="orderId" value="@Model.OrderId" />
+                            <input type="hidden" name="requestId" value="@request.Id" />
+                            <input type="text" name="sellerResponse" class="form-control" placeholder="Коментар покупцю (необов'язково)" />
+                            <div class="seller-postsale-item__buttons">
+                                <button type="submit" name="decision" value="Approved" class="seller-button seller-button--primary">Підтвердити й повернути кошти</button>
+                                <button type="submit" name="decision" value="Rejected" class="seller-button">Відхилити</button>
+                            </div>
+                        </form>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(request.SellerResponse))
+                    {
+                        <p class="seller-postsale-item__comment">Ваша відповідь: «@request.SellerResponse»</p>
+                    }
+                </div>
+            }
+        </section>
+    }
 </div>

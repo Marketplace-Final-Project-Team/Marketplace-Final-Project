@@ -207,11 +207,11 @@
                         <div class="checkout-review-block">
                             <h3>Промокод</h3>
                             <div class="checkout-promo">
-                                <input type="text" class="form-control" placeholder="Введіть промокод" data-promo-input maxlength="30" />
+                                <input type="text" class="form-control" name="PromoCode" placeholder="Введіть промокод" data-promo-input maxlength="30" value="@Model.PromoCode" />
                                 <button type="button" class="btn btn-outline-secondary" data-promo-apply>Застосувати</button>
                             </div>
                             <p class="checkout-promo__message" data-promo-message hidden></p>
-                            <p class="checkout-promo__hint">Спробуйте код <strong>WELCOME10</strong> — знижка попередньо відображається тут, фінальна сума виставляється на сторінці оплати.</p>
+                            <p class="checkout-promo__hint">Знижка застосовується лише до товарів магазину, який видав промокод.</p>
                         </div>
 
                         <div class="checkout-review-block">

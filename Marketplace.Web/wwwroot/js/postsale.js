@@ -9,6 +9,10 @@
         button.addEventListener("click", () => {
             const modal = document.querySelector(`[data-postsale-modal="${button.dataset.postsaleOpen}"]`);
             if (modal) {
+                const itemIdField = modal.querySelector("[data-postsale-item-id-field]");
+                if (itemIdField && button.dataset.orderItemId) {
+                    itemIdField.value = button.dataset.orderItemId;
+                }
                 modal.hidden = false;
             }
         });
@@ -29,4 +33,15 @@
             }
         });
     });
+
+    const photosInput = document.querySelector('input[type="file"][name="photos"]');
+    if (photosInput) {
+        photosInput.addEventListener("change", () => {
+            if (photosInput.files.length > 5) {
+                photosInput.setCustomValidity("Можна додати не більше 5 фото.");
+            } else {
+                photosInput.setCustomValidity("");
+            }
+        });
+    }
 })();

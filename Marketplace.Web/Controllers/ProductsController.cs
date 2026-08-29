@@ -19,15 +19,18 @@ public class ProductsController : Controller
     private readonly IProductService _productService;
     private readonly IGenericRepository<Category> _categoryRepository;
     private readonly IBusinessAccessService _businessAccessService;
+    private readonly IActivityLogService _activityLog;
 
     public ProductsController(
         IProductService productService,
         IGenericRepository<Category> categoryRepository,
-        IBusinessAccessService businessAccessService)
+        IBusinessAccessService businessAccessService,
+        IActivityLogService activityLog)
     {
         _productService = productService;
         _categoryRepository = categoryRepository;
         _businessAccessService = businessAccessService;
+        _activityLog = activityLog;
     }
 
     public async Task<IActionResult> Index(Guid? businessId)
@@ -123,7 +126,7 @@ public class ProductsController : Controller
             return View(model);
         }
 
-        await _productService.CreateAsync(new ProductCreateDto
+        var createdProduct = await _productService.CreateAsync(new ProductCreateDto
         {
             BusinessId = model.BusinessId,
             CategoryId = model.CategoryId,
@@ -134,6 +137,9 @@ public class ProductsController : Controller
             MainImage = model.MainImage,
             AdditionalImages = model.AdditionalImages
         });
+
+        await _activityLog.LogBusinessActionAsync(model.BusinessId, "ProductCreated",
+            $"Додано товар «{createdProduct.Name}».", actorUserId: userId, relatedEntityId: createdProduct.Id);
 
         TempData["Success"] = "Товар створено та відправлено на модерацію.";
         return RedirectToAction(nameof(Index), new { businessId = model.BusinessId });
@@ -194,6 +200,9 @@ public class ProductsController : Controller
             AdditionalImages = model.AdditionalImages
         });
         if (updated is null) return NotFound();
+
+        await _activityLog.LogBusinessActionAsync(updated.BusinessId, "ProductEdited",
+            $"Товар «{updated.Name}» відредаговано.", actorUserId: GetCurrentUserId(), relatedEntityId: updated.Id);
 
         TempData["Success"] = "Товар оновлено та відправлено на повторну модерацію.";
         return RedirectToAction(nameof(Index), new { businessId = accessible.Product!.BusinessId });
