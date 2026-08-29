@@ -37,8 +37,6 @@ builder.Services.AddQuartzHostedService(opt =>
 });
 
 builder.Services.AddHttpClient();
-builder.Services.AddSingleton<IContentModerationService, ContentModerationService>();
-
 
 builder.Services
     .AddIdentity<User, IdentityRole>(options =>
