@@ -90,9 +90,6 @@ builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IWishlistCollectionService, WishlistCollectionService>();
 
-builder.Services.AddScoped<IContentModerationService, ContentModerationService>();
-
-
 // LiqPay configuration
 builder.Services.Configure<LiqPayOptions>(builder.Configuration.GetSection("LiqPay"));
 builder.Services.AddScoped<IPaymentService, LiqPayPaymentService>();
