@@ -1,14 +1,13 @@
-﻿using Marketplace.BLL.Common;
+using Marketplace.BLL.Common;
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
-using Marketplace.DAL.DTOs;
 using Marketplace.DAL.Interfaces;
-using Marketplace.DAL.Repositories;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
 using Marketplace.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Quartz;
 
 namespace Marketplace.BLL.Services
 {
@@ -20,11 +19,20 @@ namespace Marketplace.BLL.Services
         private readonly UserManager<User> _userManager;
         private readonly IOrderRepository _orderRepository;
         private readonly AppDbContext _context;
+        private readonly ISchedulerFactory _schedulerFactory;
         private readonly IActivityLogService _activityLog;
 
         private DateTime Today = DateTime.UtcNow.Date;
 
-        public BusinessService(IGenericRepository<BusinessMember> businessMemberRepo, IBusinessRepository businessRepo, IImageStorageService imageService, UserManager<User> userManager, IOrderRepository orderRepository, AppDbContext context, IActivityLogService activityLog)
+        public BusinessService(
+            IGenericRepository<BusinessMember> businessMemberRepo,
+            IBusinessRepository businessRepo,
+            IImageStorageService imageService,
+            UserManager<User> userManager,
+            IOrderRepository orderRepository,
+            AppDbContext context,
+            ISchedulerFactory schedulerFactory,
+            IActivityLogService activityLog)
         {
             _businessMemberRepo = businessMemberRepo;
             _businessRepo = businessRepo;
@@ -32,7 +40,37 @@ namespace Marketplace.BLL.Services
             _userManager = userManager;
             _orderRepository = orderRepository;
             _context = context;
+            _schedulerFactory = schedulerFactory;
             _activityLog = activityLog;
+        }
+
+        private async Task ScheduleModerationJobAsync(Guid businessId)
+        {
+            var scheduler = await _schedulerFactory.GetScheduler();
+
+            var jobKey = new JobKey($"moderation-job-{businessId}", "moderation");
+
+            if (await scheduler.CheckExists(jobKey))
+            {
+                await scheduler.DeleteJob(jobKey);
+            }
+
+            var jobData = new JobDataMap
+            {
+                { "BusinessId", businessId }
+            };
+
+            var job = JobBuilder.Create<BusinessModerationJob>()
+                .WithIdentity(jobKey)
+                .UsingJobData(jobData)
+                .Build();
+
+            var trigger = TriggerBuilder.Create()
+                .WithIdentity($"moderation-trigger-{businessId}", "moderation")
+                .StartAt(DateBuilder.FutureDate(5, IntervalUnit.Second))
+                .Build();
+
+            await scheduler.ScheduleJob(job, trigger);
         }
 
         private async Task<DataResult<(DateTime startDate, DateTime endDate)>> ValidateStatsRequestAsync(Guid businessId, DateTime? startDate, DateTime? endDate)
@@ -132,6 +170,8 @@ namespace Marketplace.BLL.Services
 
             await _businessRepo.AddAsync(business);
             await _context.SaveChangesAsync();
+
+            await ScheduleModerationJobAsync(business.Id);
 
             await _activityLog.LogBusinessActionAsync(business.Id, "BusinessCreated",
                 $"Бізнес «{business.StoreName}» створено та відправлено на перевірку.",
