@@ -21,7 +21,7 @@ namespace Marketplace.Web.Controllers
             IDiscountService discountService,
             IProductService productService,
             IBusinessAccessService businessAccessService,
-            IBusinessService businessService)
+            IBusinessService businessService,
             IActivityLogService activityLog)
         {
             _discountService = discountService;
