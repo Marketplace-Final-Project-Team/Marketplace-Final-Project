@@ -276,7 +276,7 @@ namespace Marketplace.BLL.Services
                     Message = "Бізнес не знайдено"
                 };
             }
-            if (commissionPercent < 0 && commissionPercent > 100)
+            if (commissionPercent < 0 || commissionPercent > 100)
             {
                 return new ServiceResult
                 {

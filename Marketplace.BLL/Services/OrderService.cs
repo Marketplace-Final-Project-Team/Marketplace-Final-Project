@@ -175,6 +175,18 @@ namespace Marketplace.BLL.Services
             {
                 return new ServiceResult { Succeeded = false, Message = "Замовлення не знайдено." };
             }
+
+            // Commission/balance is credited exactly once, the moment an order first becomes
+            // Confirmed, and reversed exactly once when a credited order is cancelled (see
+            // below). Without restricting which status can follow which, a seller could
+            // toggle Confirmed -> Pending -> Confirmed to re-trigger that credit indefinitely,
+            // or skip Pending -> Shipped/Delivered to dodge it entirely and then have Cancel
+            // claw back money that was never actually paid out.
+            if (status != order.Status && !OrderStatusTransitions.GetAllowedNext(order.Status).Contains(status))
+            {
+                return new ServiceResult { Succeeded = false, Message = $"Неможливо змінити статус замовлення з «{order.Status}» на «{status}»." };
+            }
+
             if (status == OrderStatus.Confirmed && order.Status != OrderStatus.Confirmed) {
                 // Commission is captured per line item at the moment of confirmation (see
                 // OrderItem.CommissionAmount) so a later change to a business's commission

@@ -328,6 +328,12 @@ namespace Marketplace.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> BusinessLimits(BusinessLimitsViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Перевірте введені значення - деякі з них поза допустимими межами.";
+                return View(model);
+            }
+
             await _settingsService.SetAsync("BusinessRules", "MaxProductsPerBusiness", model.MaxProductsPerBusiness.ToString(), false, CurrentAdminId);
             await _settingsService.SetAsync("BusinessRules", "MaxDiscountPercent", model.MaxDiscountPercent.ToString(), false, CurrentAdminId);
             await _settingsService.SetAsync("BusinessRules", "MaxPromoCodePercent", model.MaxPromoCodePercent.ToString(), false, CurrentAdminId);

@@ -109,17 +109,28 @@
                 </div>
             </dl>
 
-            <form asp-action="ChangeOrderStatus" method="post" class="seller-order-status-form">
-                <input type="hidden" name="businessId" value="@Model.BusinessId" />
-                <input type="hidden" name="orderId" value="@Model.OrderId" />
-                <select name="status" class="form-select">
-                    @foreach (var option in Enum.GetValues<Marketplace.Domain.Enums.OrderStatus>())
-                    {
-                        <option value="@option" selected="@(Model.Status == option)">@StatusLabel(option)</option>
-                    }
-                </select>
-                <button type="submit" class="seller-button seller-button--primary">Змінити статус</button>
-            </form>
+            @{
+                var allowedNextStatuses = Marketplace.BLL.Common.OrderStatusTransitions.GetAllowedNext(Model.Status);
+            }
+            @if (allowedNextStatuses.Length > 0)
+            {
+                <form asp-action="ChangeOrderStatus" method="post" class="seller-order-status-form">
+                    <input type="hidden" name="businessId" value="@Model.BusinessId" />
+                    <input type="hidden" name="orderId" value="@Model.OrderId" />
+                    <select name="status" class="form-select">
+                        <option value="@Model.Status" selected>@StatusLabel(Model.Status)</option>
+                        @foreach (var option in allowedNextStatuses)
+                        {
+                            <option value="@option">@StatusLabel(option)</option>
+                        }
+                    </select>
+                    <button type="submit" class="seller-button seller-button--primary">Змінити статус</button>
+                </form>
+            }
+            else
+            {
+                <p class="seller-order-status-final">Статус замовлення: <strong>@StatusLabel(Model.Status)</strong> (кінцевий, змінити неможливо)</p>
+            }
         </aside>
     </div>
 
