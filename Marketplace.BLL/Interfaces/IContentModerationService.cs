@@ -6,5 +6,6 @@ namespace Marketplace.BLL.Interfaces
     public interface IContentModerationService
     {
         Task<ModerationResult> CheckProductContentAsync(Product product);
+        Task<ModerationResult> CheckBusinessAsync(Business business);
     }
 }
