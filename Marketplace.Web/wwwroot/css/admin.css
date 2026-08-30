@@ -507,6 +507,14 @@
     overflow: hidden;
 }
 
+/* .admin-panel's overflow:hidden (for rounded corners) would otherwise cancel
+   Bootstrap's .table-responsive overflow-x:auto on the same element, since this
+   stylesheet loads after bootstrap.min.css - silently clipping wide admin tables
+   instead of letting them scroll. */
+.admin-panel.table-responsive {
+    overflow-x: auto;
+}
+
 .admin-table {
     margin: 0;
     vertical-align: middle;
