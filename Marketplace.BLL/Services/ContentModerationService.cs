@@ -52,7 +52,7 @@ namespace Marketplace.BLL.Services
                 var apiKey = await GetSettingAsync("ApiKey", _configuration["GoogleAI:ApiKey"] ?? "");
                 if (string.IsNullOrWhiteSpace(apiKey))
                     throw new InvalidOperationException("Gemini API key не налаштований");
-                var model = await GetSettingAsync("Model", _configuration["GoogleAI:Model"] ?? "gemini-3.6-flash");
+                var model = await GetSettingAsync("Model", _configuration["GoogleAI:Model"] ?? "gemini-2.5-flash");
 
                 var url = $"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={apiKey}";
                 var response = await _httpClient.PostAsJsonAsync(url, requestBody);
