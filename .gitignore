@@ -405,3 +405,5 @@ FodyWeavers.xsd
 .env.*
 !.env.example
 
+# Database volume
+mssql/
