@@ -69,7 +69,6 @@ namespace Marketplace.Web.Controllers
             var rawCategories = await _categoryService.GetAllCategories();
 
             var colors = new[] { "blue", "violet", "orange", "green", "teal" };
-            var icons = new[] { "📦", "💻", "👕", "🏠", "📚", "🎮" };
 
             var homeCategories = rawCategories
                 .Select((c, index) => new HomeCategoryViewModel
@@ -77,7 +76,7 @@ namespace Marketplace.Web.Controllers
                     Id = c.Id,
                     Name = c.Name,
                     ColorClass = colors[index % colors.Length],
-                    Icon = icons[index % icons.Length]
+                    Icon = CategoryIcon(c.Name)
                 })
                 .ToList();
 
@@ -178,6 +177,27 @@ namespace Marketplace.Web.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        // Keyword-matched rather than a fixed per-position list, so a category keeps a
+        // sensible icon regardless of the order it comes back in — and admin-created
+        // categories that don't match any keyword still get a reasonable default.
+        private static string CategoryIcon(string categoryName)
+        {
+            var name = categoryName.ToLowerInvariant();
+
+            if (name.Contains("електрон") || name.Contains("технік") || name.Contains("гаджет")) return "💻";
+            if (name.Contains("спорт") || name.Contains("відпочин") || name.Contains("туризм")) return "🏀";
+            if (name.Contains("дом") || name.Contains("кухня") || name.Contains("побут")) return "🏠";
+            if (name.Contains("одяг") || name.Contains("взутт") || name.Contains("мод")) return "👕";
+            if (name.Contains("книг") || name.Contains("канцеляр")) return "📚";
+            if (name.Contains("іграшк") || name.Contains("дит")) return "🧸";
+            if (name.Contains("краса") || name.Contains("косметик") || name.Contains("здоров'я")) return "💄";
+            if (name.Contains("авто") || name.Contains("транспорт")) return "🚗";
+            if (name.Contains("тварин") || name.Contains("зоо")) return "🐾";
+            if (name.Contains("сад") || name.Contains("город") || name.Contains("рослин")) return "🌱";
+
+            return "🛍";
         }
     }
 }
