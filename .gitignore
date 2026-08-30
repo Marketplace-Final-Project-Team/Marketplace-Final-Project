@@ -405,4 +405,3 @@ FodyWeavers.xsd
 .env.*
 !.env.example
 
-devops/mssql/
