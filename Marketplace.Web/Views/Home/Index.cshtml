@@ -130,6 +130,7 @@
                     <a asp-controller="Catalogue" asp-action="Index" asp-route-categoryId="@category.Id" class="category-card category-card--@category.ColorClass">
                         <span class="category-card__icon">@category.Icon</span>
                         <strong>@category.Name</strong>
+                        <small>@category.ProductCount @(category.ProductCount == 1 ? "товар" : category.ProductCount is >= 2 and <= 4 ? "товари" : "товарів")</small>
                     </a>
                 }
             </div>
