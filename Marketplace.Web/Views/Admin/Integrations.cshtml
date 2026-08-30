@@ -48,14 +48,16 @@
                         @foreach (var key in integration.Keys)
                         {
                             <div class="admin-settings-row">
-                                <span class="admin-settings-row__label">
-                                    @key.Label
-                                    @if (key.IsOverridden)
-                                    {
-                                        <small class="admin-settings-row__badge">змінено</small>
-                                    }
-                                </span>
-                                <span class="admin-settings-row__value" title="@key.MaskedValue">@key.MaskedValue</span>
+                                <div class="admin-settings-row__info">
+                                    <span class="admin-settings-row__label">
+                                        @key.Label
+                                        @if (key.IsOverridden)
+                                        {
+                                            <small class="admin-settings-row__badge">змінено</small>
+                                        }
+                                    </span>
+                                    <span class="admin-settings-row__value" title="@key.MaskedValue">@key.MaskedValue</span>
+                                </div>
                                 <form asp-action="UpdateIntegrationKey" method="post" class="admin-settings-row__form">
                                     <input type="hidden" name="category" value="@integration.Category" />
                                     <input type="hidden" name="key" value="@key.Key" />

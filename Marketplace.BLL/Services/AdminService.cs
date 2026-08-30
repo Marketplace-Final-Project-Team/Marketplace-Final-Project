@@ -79,6 +79,21 @@ namespace Marketplace.BLL.Services
                 productsQuery = productsQuery.Where(p => p.Name.Contains(normalizedSearch));
             }
 
+            if (query.MinPrice.HasValue)
+            {
+                productsQuery = productsQuery.Where(p => p.Price >= query.MinPrice.Value);
+            }
+
+            if (query.MaxPrice.HasValue)
+            {
+                productsQuery = productsQuery.Where(p => p.Price <= query.MaxPrice.Value);
+            }
+
+            if (query.InStockOnly == true)
+            {
+                productsQuery = productsQuery.Where(p => p.Quantity > 0);
+            }
+
             switch (query.SortOption)
             {
                 case ProductSortOption.PriceAsc:

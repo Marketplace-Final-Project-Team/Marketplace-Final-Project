@@ -110,6 +110,9 @@ namespace Marketplace.Web.Controllers
             {
                 CategoryId = filter.CategoryId,
                 Search = filter.Search,
+                MinPrice = filter.MinPrice,
+                MaxPrice = filter.MaxPrice,
+                InStockOnly = filter.InStockOnly,
                 SortOption = filter.SortOption,
                 Pagination = new PaginationParams
                 {
@@ -524,8 +527,8 @@ namespace Marketplace.Web.Controllers
             }
 
             return value.Length <= 4
-                ? new string('•', 8)
-                : new string('•', 8) + value[^4..];
+                ? new string('*', 8)
+                : new string('*', 8) + value[^4..];
         }
 
     }
