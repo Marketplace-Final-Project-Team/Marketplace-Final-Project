@@ -7,14 +7,15 @@ namespace Marketplace.Web.Models
     {
         public static CatalogProductViewModel ToCatalogProductViewModel(this Product product)
         {
-            var activeDiscount = product.GetActiveDiscount();
+            var discountPercent = product.GetEffectiveDiscountPercent();
+            var hasDiscount = discountPercent > 0;
 
             return new CatalogProductViewModel
             {
                 Id = product.Id,
                 Name = product.Name,
                 Description = product.Description,
-                Price = activeDiscount != null ? product.GetDiscountedPrice() : product.Price,
+                Price = hasDiscount ? product.GetDiscountedPrice() : product.Price,
                 Quantity = product.Quantity,
                 MainImageUrl = product.MainImageUrl,
                 CategoryName = product.Category?.Name ?? "Без категорії",
@@ -22,8 +23,8 @@ namespace Marketplace.Web.Models
                 StoreLogoUrl = product.Business?.LogoUrl ?? string.Empty,
                 StoreDescription = product.Business?.Description ?? string.Empty,
                 AdditionalImageUrls = product.Images.Select(image => image.ImageUrl).ToList(),
-                OriginalPrice = activeDiscount != null ? product.Price : null,
-                DiscountPercent = activeDiscount?.Percent
+                OriginalPrice = hasDiscount ? product.Price : null,
+                DiscountPercent = hasDiscount ? discountPercent : null
             };
         }
 

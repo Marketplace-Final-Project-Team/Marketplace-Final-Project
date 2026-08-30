@@ -155,7 +155,7 @@ public class ProductsController : Controller
 
         var product = accessible.Product!;
 
-        ViewBag.ActiveDiscount = product.GetActiveDiscount();
+        ViewBag.ActiveDiscount = product.GetActiveProductDiscount();
 
         return View(new ProductEditViewModel
         {

@@ -305,5 +305,14 @@ namespace Marketplace.BLL.Services
             }
             return business.Balance;
         }
+        public async Task<Business> GetByIdAsync(Guid id)
+        {
+            var business = await _businessRepo.GetByIdAsync(id);
+            if (business == null)
+            {
+                throw new Exception("Business not found");
+            }
+            return business;
+        }
     }
 }

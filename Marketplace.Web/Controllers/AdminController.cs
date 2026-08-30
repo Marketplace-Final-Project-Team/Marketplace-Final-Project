@@ -23,6 +23,7 @@ namespace Marketplace.Web.Controllers
         private readonly IMarketplaceBalanceService _marketplaceBalanceService;
         private readonly ICategoryService _categoryService;
         private readonly ISchedulerFactory _schedulerFactory;
+        private readonly IDiscountService _discountService;
 
         public AdminController(
             IAdminService adminService,
@@ -32,7 +33,8 @@ namespace Marketplace.Web.Controllers
             IConfiguration configuration,
             IMarketplaceBalanceService marketplaceBalanceService,
             ICategoryService categoryService,
-            ISchedulerFactory schedulerFactory)
+            ISchedulerFactory schedulerFactory,
+            IDiscountService discountService)
         {
             _adminService = adminService;
             _settingsService = settingsService;
@@ -42,6 +44,7 @@ namespace Marketplace.Web.Controllers
             _marketplaceBalanceService = marketplaceBalanceService;
             _categoryService = categoryService;
             _schedulerFactory = schedulerFactory;
+            _discountService = discountService;
         }
 
         private string? CurrentAdminId => User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -151,20 +154,30 @@ namespace Marketplace.Web.Controllers
                 }
             });
 
+            var items = new List<BusinessItemAdminViewModel>();
+            foreach (var b in result.Items)
+            {
+                var discount = await _discountService.GetBusinessDiscount(b.Id);
+                items.Add(new BusinessItemAdminViewModel
+                {
+                    Id = b.Id,
+                    Name = b.Name,
+                    LogoUrl = b.LogoUrl,
+                    Owner = b.Owner,
+                    Status = b.Status,
+                    CommissionPercent = b.CommissionPercent,
+                    HasActiveDiscount = discount.IsActive,
+                    DiscountPercent = discount.DiscountPercent,
+                    DiscountEndDate = discount.EndDate,
+                });
+            }
+
             return View(new AdminBusinessesPageViewModel
             {
                 Filter = filter,
                 Result = new PagedResult<BusinessItemAdminViewModel>
                 {
-                    Items = result.Items.Select(b => new BusinessItemAdminViewModel
-                    {
-                        Id = b.Id,
-                        Name = b.Name,
-                        LogoUrl = b.LogoUrl,
-                        Owner = b.Owner,
-                        Status = b.Status,
-                        CommissionPercent = b.CommissionPercent,
-                    }).ToList(),
+                    Items = items,
                     TotalItems = result.TotalItems,
                     Page = result.Page,
                     TotalPages = result.TotalPages,

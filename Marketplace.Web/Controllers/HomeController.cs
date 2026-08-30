@@ -45,22 +45,23 @@ namespace Marketplace.Web.Controllers
             var featuredProducts = catalogPage.Items
                 .Select(item =>
                 {
-                    var activeDiscount = item.Product.GetActiveDiscount();
+                    var discountPercent = item.Product.GetEffectiveDiscountPercent();
+                    var hasDiscount = discountPercent > 0;
 
                     return new CatalogProductViewModel
                     {
                         Id = item.Product.Id,
                         Name = item.Product.Name,
                         Description = item.Product.Description,
-                        Price = activeDiscount != null ? item.Product.GetDiscountedPrice() : item.Product.Price,
+                        Price = hasDiscount ? item.Product.GetDiscountedPrice() : item.Product.Price,
                         Quantity = item.Product.Quantity,
                         MainImageUrl = item.Product.MainImageUrl,
                         CategoryName = item.Product.Category?.Name ?? "Без категорії",
                         StoreName = item.Product.Business?.StoreName ?? "Marketplace",
                         AverageRating = item.AverageRating,
                         ReviewCount = item.ReviewCount,
-                        OriginalPrice = activeDiscount != null ? item.Product.Price : null,
-                        DiscountPercent = activeDiscount?.Percent
+                        OriginalPrice = hasDiscount ? item.Product.Price : null,
+                        DiscountPercent = hasDiscount ? discountPercent : null
                     };
                 })
                 .ToList();

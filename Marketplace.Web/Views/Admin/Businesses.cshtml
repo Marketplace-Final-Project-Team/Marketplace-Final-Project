@@ -76,6 +76,7 @@
                                 <th>Власник</th>
                                 <th>Статус</th>
                                 <th>Комісія</th>
+                                <th>Знижка на бізнес</th>
                                 <th class="text-end">Дії</th>
                             </tr>
                         </thead>
@@ -108,6 +109,29 @@
                                             <input type="number" name="commissionPercent" min="0" max="100" step="0.1" value="@business.CommissionPercent.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)" class="admin-inline-form__input" aria-label="Комісія, %" />
                                             <button type="submit" class="btn btn-sm btn-outline-secondary">%</button>
                                         </form>
+                                    </td>
+                                    <td>
+                                        @if (business.HasActiveDiscount)
+                                        {
+                                            <div class="admin-discount-status">
+                                                <span class="admin-status admin-status--active">−@business.DiscountPercent.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)%</span>
+                                                <span class="admin-entity-meta">до @business.DiscountEndDate?.ToLocalTime().ToString("dd.MM HH:mm")</span>
+                                            </div>
+                                            <form asp-controller="Discounts" asp-action="RemoveBusinessDiscount" method="post">
+                                                <input type="hidden" name="businessId" value="@business.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary">Скасувати</button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <form asp-controller="Discounts" asp-action="SetBusinessDiscount" method="post" class="admin-discount-form">
+                                                <input type="hidden" name="businessId" value="@business.Id" />
+                                                <input type="number" name="discountPercent" min="1" max="100" step="1" placeholder="%" class="admin-inline-form__input" required aria-label="Знижка, %" />
+                                                <input type="datetime-local" name="discountStartDate" class="admin-discount-form__date" required value="@DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm")" aria-label="Початок знижки (UTC)" />
+                                                <input type="datetime-local" name="discountEndDate" class="admin-discount-form__date" required value="@DateTime.UtcNow.AddDays(3).ToString("yyyy-MM-ddTHH:mm")" aria-label="Закінчення знижки (UTC)" />
+                                                <button type="submit" class="btn btn-sm btn-outline-primary">Встановити</button>
+                                            </form>
+                                        }
                                     </td>
                                     <td>
                                         <div class="admin-row-actions">

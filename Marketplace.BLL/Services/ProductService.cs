@@ -63,6 +63,7 @@ namespace Marketplace.BLL.Services
                 .Include(p => p.Discounts)
                 .Include(p => p.Category)
                 .Include(p => p.Business)
+                    .ThenInclude(b => b.Discounts)
                 .Where(product => product.Status == ProductStatus.Active && product.Quantity > 0)
                 .ToListAsync();
 
@@ -88,6 +89,7 @@ namespace Marketplace.BLL.Services
                 .Include(p => p.Discounts)
                 .Include(p => p.Category)
                 .Include(p => p.Business)
+                    .ThenInclude(b => b.Discounts)
                 .Include(p => p.Images)
                 .Where(p => p.Status == ProductStatus.Active);
 
@@ -178,6 +180,7 @@ namespace Marketplace.BLL.Services
                 .Include(p => p.Discounts)
                 .Include(p => p.Category)
                 .Include(p => p.Business)
+                    .ThenInclude(b => b.Discounts)
                 .Include(p => p.Images)
                 .FirstOrDefaultAsync(product => product.Id == id
                     && product.Status == ProductStatus.Active
@@ -195,6 +198,7 @@ namespace Marketplace.BLL.Services
                 .Include(p => p.Discounts)
                 .Include(p => p.Category)
                 .Include(p => p.Business)
+                    .ThenInclude(b => b.Discounts)
                 .Include(p => p.Images)
                 .FirstOrDefaultAsync(p => p.Id == id);
         }

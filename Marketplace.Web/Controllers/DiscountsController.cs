@@ -1,5 +1,7 @@
 using Marketplace.BLL.Authorization;
 using Marketplace.BLL.Interfaces;
+using Marketplace.BLL.Services;
+using Marketplace.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -12,17 +14,20 @@ namespace Marketplace.Web.Controllers
         private readonly IDiscountService _discountService;
         private readonly IProductService _productService;
         private readonly IBusinessAccessService _businessAccessService;
+        private readonly IBusinessService _businessService;
         private readonly IActivityLogService _activityLog;
 
         public DiscountsController(
             IDiscountService discountService,
             IProductService productService,
             IBusinessAccessService businessAccessService,
+            IBusinessService businessService,
             IActivityLogService activityLog)
         {
             _discountService = discountService;
             _productService = productService;
             _businessAccessService = businessAccessService;
+            _businessService = businessService;
             _activityLog = activityLog;
         }
 
@@ -31,7 +36,7 @@ namespace Marketplace.Web.Controllers
         // POST: /Discounts/Set
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Set(Guid productId, int percent, DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> Set(Guid productId, decimal percent, DateTime startDate, DateTime endDate)
         {
             var product = await _productService.GetByIdAsync(productId);
             if (product == null) return NotFound();
@@ -73,6 +78,62 @@ namespace Marketplace.Web.Controllers
             TempData["Success"] = "Знижку скасовано.";
 
             return RedirectToAction("Edit", "Products", new { id = productId });
+        }
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetBusinessDiscount(Guid businessId, decimal discountPercent, DateTime discountStartDate, DateTime discountEndDate)
+        {
+            var business = await _businessService.GetByIdAsync(businessId);
+            if (business == null) return NotFound();
+
+            var result = await _discountService.SetBusinessDiscount(businessId, discountPercent, discountStartDate, discountEndDate);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "BusinessDiscountSet",
+                    $"Адміністратор встановив знижку {discountPercent}% на весь бізнес «{business.StoreName}».",
+                    actorUserId: CurrentUserId);
+                TempData["Success"] = result.Message;
+            }
+            else
+            {
+                TempData["Error"] = result.Message;
+            }
+
+            return RedirectToAction("Businesses", "Admin");
+        }
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveBusinessDiscount(Guid businessId)
+        {
+            var business = await _businessService.GetByIdAsync(businessId);
+            if (business == null) return NotFound();
+
+            var result = await _discountService.RemoveBusinessDiscount(businessId);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "BusinessDiscountRemoved",
+                    $"Адміністратор скасував знижку на весь бізнес «{business.StoreName}».",
+                    actorUserId: CurrentUserId);
+                TempData["Success"] = result.Message;
+            }
+            else
+            {
+                TempData["Error"] = result.Message;
+            }
+
+            return RedirectToAction("Businesses", "Admin");
+        }
+        [Authorize(Roles = "Admin")]                                                         
+        [HttpGet]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GetBusinessDiscount(Guid businessId)
+        {
+            var business = await _businessService.GetByIdAsync(businessId);
+            if (business == null) return NotFound();
+            var discount = await _discountService.GetBusinessDiscount(businessId);
+            return Json(discount);
         }
     }
 }
