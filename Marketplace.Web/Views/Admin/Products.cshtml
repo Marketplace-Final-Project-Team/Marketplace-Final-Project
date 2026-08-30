@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.AdminProductsPageViewModel
 
 @{
-    ViewData["Title"] = "Товари — Адмін-панель";
+    ViewData["Title"] = "Товари - Адмін-панель";
     var products = Model.Result.Items;
 }
 
@@ -60,7 +60,7 @@
                 </select>
                 <div class="admin-price-range">
                     <input type="number" class="form-control" name="MinPrice" min="0" step="1" placeholder="Ціна від" aria-label="Ціна від" value="@Model.Filter.MinPrice" />
-                    <span aria-hidden="true">—</span>
+                    <span aria-hidden="true">-</span>
                     <input type="number" class="form-control" name="MaxPrice" min="0" step="1" placeholder="Ціна до" aria-label="Ціна до" value="@Model.Filter.MaxPrice" />
                 </div>
                 <label class="admin-checkbox-filter">

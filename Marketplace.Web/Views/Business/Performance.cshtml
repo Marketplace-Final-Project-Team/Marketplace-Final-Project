@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.Businesses.BusinessPerformanceViewModel
 
 @{
-    ViewData["Title"] = $"Ефективність — {Model.StoreName}";
+    ViewData["Title"] = $"Ефективність - {Model.StoreName}";
     var statusClass = Model.Status.ToString().ToLowerInvariant();
     var statusLabel = Model.Status switch
     {
@@ -23,7 +23,7 @@
     <header class="seller-orders-header">
         <div>
             <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Панель продавця</div>
-            <h1>Ефективність акаунта — @Model.StoreName</h1>
+            <h1>Ефективність акаунта - @Model.StoreName</h1>
             <p>Стан магазину, якість обслуговування та відгуки покупців.</p>
         </div>
     </header>
@@ -38,7 +38,7 @@
     <div class="business-kpis">
         <div class="business-kpi"><span>Рівень скасувань</span><strong>@Model.CancelRatePercent.ToString("0.0")%</strong></div>
         <div class="business-kpi"><span>Скасовано / усього</span><strong>@Model.CanceledOrders / @Model.TotalOrders</strong></div>
-        <div class="business-kpi"><span>Середній рейтинг товарів</span><strong>@(Model.ReviewCount > 0 ? Model.AverageRating.ToString("0.0") : "—")</strong></div>
+        <div class="business-kpi"><span>Середній рейтинг товарів</span><strong>@(Model.ReviewCount > 0 ? Model.AverageRating.ToString("0.0") : "-")</strong></div>
         <div class="business-kpi"><span>Відгуків усього</span><strong>@Model.ReviewCount</strong></div>
     </div>
 
@@ -46,7 +46,7 @@
         <h2>Претензії та повернення</h2>
         <div class="business-note">
             <strong>Обробка вручну</strong>
-            Заявки на повернення та спірні питання наразі опрацьовує команда підтримки маркетплейсу вручну — окрема статистика за цим розділом ще не збирається автоматично.
+            Заявки на повернення та спірні питання наразі опрацьовує команда підтримки маркетплейсу вручну - окрема статистика за цим розділом ще не збирається автоматично.
         </div>
     </section>
 </div>

@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.JobsPageViewModel
 
 @{
-    ViewData["Title"] = "Задачі — Адмін-панель";
+    ViewData["Title"] = "Задачі - Адмін-панель";
 }
 
 @section Styles {
@@ -17,7 +17,7 @@
                 <div>
                     <div class="admin-kicker">Admin</div>
                     <h1 class="admin-title">Фонові задачі</h1>
-                    <p class="admin-subtitle">Автоматична модерація товарів через Quartz.NET — планувальник, черга та журнал рішень.</p>
+                    <p class="admin-subtitle">Автоматична модерація товарів через Quartz.NET - планувальник, черга та журнал рішень.</p>
                 </div>
             </header>
 
@@ -32,7 +32,7 @@
                     <div class="admin-stat-card__body">
                         <span class="admin-stat-card__label">Планувальник Quartz</span>
                         <strong class="admin-stat-card__value">@(Model.IsSchedulerRunning ? "Працює" : "Зупинено")</strong>
-                        <span class="admin-stat-card__hint">ProductModerationJob — модерація товарів через Gemini</span>
+                        <span class="admin-stat-card__hint">ProductModerationJob - модерація товарів через Gemini</span>
                     </div>
                 </div>
                 <div class="admin-stat-card">
@@ -54,7 +54,7 @@
 
             <div class="admin-note">
                 <strong>Як це працює</strong>
-                Після створення або редагування товару система через 5 секунд запускає перевірку тексту й зображень через Gemini AI. Залежно від результату товар отримує статус «Активний» або «Заблокований»; у разі помилки перевірки — лишається «На модерації» для ручного розгляду.
+                Після створення або редагування товару система через 5 секунд запускає перевірку тексту й зображень через Gemini AI. Залежно від результату товар отримує статус «Активний» або «Заблокований»; у разі помилки перевірки - лишається «На модерації» для ручного розгляду.
             </div>
 
             <section class="admin-panel table-responsive">
@@ -79,7 +79,7 @@
                             {
                                 <tr>
                                     <td class="admin-entity-name">@job.ProductName</td>
-                                    <td>@(job.NextRunAtUtc?.ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss") ?? "—")</td>
+                                    <td>@(job.NextRunAtUtc?.ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss") ?? "-")</td>
                                 </tr>
                             }
                         </tbody>

@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.Businesses.BusinessTeamViewModel
 
 @{
-    ViewData["Title"] = $"Команда — {Model.StoreName}";
+    ViewData["Title"] = $"Команда - {Model.StoreName}";
 }
 
 @functions {
@@ -25,7 +25,7 @@
     <header class="seller-orders-header">
         <div>
             <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Панель продавця</div>
-            <h1>Команда — @Model.StoreName</h1>
+            <h1>Команда - @Model.StoreName</h1>
             <p>Хто має доступ до керування цим магазином.</p>
         </div>
         @if (Model.CanManage)

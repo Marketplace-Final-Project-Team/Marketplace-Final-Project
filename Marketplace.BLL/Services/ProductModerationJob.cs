@@ -53,7 +53,7 @@ namespace Marketplace.BLL.Services
             {
                 _logger.LogError(ex, "Помилка модерації продукту {ProductId}", productId);
                 product.Status = ProductStatus.Pending;
-                product.ModerationReason = "Не вдалося автоматично перевірити товар — очікує на ручну модерацію.";
+                product.ModerationReason = "Не вдалося автоматично перевірити товар - очікує на ручну модерацію.";
             }
 
             await _context.SaveChangesAsync();

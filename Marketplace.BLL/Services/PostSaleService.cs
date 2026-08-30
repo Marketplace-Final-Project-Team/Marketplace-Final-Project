@@ -47,7 +47,7 @@ namespace Marketplace.BLL.Services
 
             if (string.IsNullOrWhiteSpace(comment) || comment.Trim().Length < MinCommentLength)
             {
-                return new ServiceResult { Succeeded = false, Message = $"Опишіть ситуацію детальніше — щонайменше {MinCommentLength} символів" };
+                return new ServiceResult { Succeeded = false, Message = $"Опишіть ситуацію детальніше - щонайменше {MinCommentLength} символів" };
             }
 
             var validPhotos = photos?.Where(p => p.Length > 0).ToList() ?? new List<IFormFile>();

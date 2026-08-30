@@ -38,7 +38,7 @@ namespace Marketplace.BLL.Services
             var codeTaken = await _context.PromoCodes.AnyAsync(p => p.Code == normalizedCode);
             if (codeTaken)
             {
-                return new ServiceResult { Succeeded = false, Message = "Такий код уже використовується — оберіть інший." };
+                return new ServiceResult { Succeeded = false, Message = "Такий код уже використовується - оберіть інший." };
             }
 
             var promoCode = new PromoCode

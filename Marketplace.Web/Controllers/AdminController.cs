@@ -506,7 +506,7 @@ namespace Marketplace.Web.Controllers
                     Category = def.Category,
                     DisplayName = def.DisplayName,
                     Description = def.Description,
-                    IsConfigured = keys.Any(k => !string.IsNullOrWhiteSpace(k.MaskedValue) && k.MaskedValue != "—"),
+                    IsConfigured = keys.Any(k => !string.IsNullOrWhiteSpace(k.MaskedValue) && k.MaskedValue != "-"),
                     Keys = keys
                 });
             }
@@ -518,7 +518,7 @@ namespace Marketplace.Web.Controllers
         {
             if (string.IsNullOrEmpty(value))
             {
-                return "—";
+                return "-";
             }
 
             if (!isSecret)
