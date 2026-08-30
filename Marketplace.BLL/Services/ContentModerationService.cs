@@ -52,10 +52,19 @@ namespace Marketplace.BLL.Services
                 var apiKey = await GetSettingAsync("ApiKey", _configuration["GoogleAI:ApiKey"] ?? "");
                 if (string.IsNullOrWhiteSpace(apiKey))
                     throw new InvalidOperationException("Gemini API key не налаштований");
-                var model = await GetSettingAsync("Model", _configuration["GoogleAI:Model"] ?? "gemini-2.5-flash");
+                var model = await GetSettingAsync("Model", _configuration["GoogleAI:Model"] ?? "gemini-3.6-flash");
 
                 var url = $"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={apiKey}";
                 var response = await _httpClient.PostAsJsonAsync(url, requestBody);
+                if (!response.IsSuccessStatusCode)
+                {
+                    // The generic exception ProductModerationJob logs only says "403 Forbidden" -
+                    // the actual reason (bad model name, revoked key, no billing, quota) is in this
+                    // body and otherwise never reaches any log.
+                    var errorBody = await response.Content.ReadAsStringAsync();
+                    _logger.LogWarning("Gemini API повернув {StatusCode} для моделі {Model}: {ErrorBody}",
+                        (int)response.StatusCode, model, errorBody);
+                }
                 response.EnsureSuccessStatusCode();
 
                 var geminiResponse = await response.Content.ReadFromJsonAsync<GeminiResponse>();
