@@ -37,16 +37,33 @@ namespace Marketplace.BLL.Services
             if (existing != null)
                 return new ServiceResult{Succeeded=false, Message="Item already exists in collection"};
 
-            var new_item = new WishlistItem
+            // A product can only ever sit in one place — the base wishlist or a single
+            // collection — never both, so this mirrors RemoveFromCollectionAsync's move
+            // semantics instead of inserting a second row for the same product.
+            var baseWishlistItem = await _context.WishlistItems
+                .Include(i => i.Wishlist)
+                .FirstOrDefaultAsync(i => i.ProductId == productId && !i.IsDeleted
+                    && i.Wishlist != null && i.Wishlist.UserId == userId && !i.Wishlist.IsDeleted);
+
+            if (baseWishlistItem != null)
             {
-                Id = Guid.NewGuid(),
-                ProductId = productId,
-                WishlistCollectionId = collectionId,
-                WishlistId = null,
-                AddedAt = DateTime.UtcNow,
-                IsDeleted = false
-            };
-            await _context.WishlistItems.AddAsync(new_item);
+                baseWishlistItem.WishlistCollectionId = collectionId;
+                baseWishlistItem.WishlistId = null;
+            }
+            else
+            {
+                var new_item = new WishlistItem
+                {
+                    Id = Guid.NewGuid(),
+                    ProductId = productId,
+                    WishlistCollectionId = collectionId,
+                    WishlistId = null,
+                    AddedAt = DateTime.UtcNow,
+                    IsDeleted = false
+                };
+                await _context.WishlistItems.AddAsync(new_item);
+            }
+
             await _context.SaveChangesAsync();
             return new ServiceResult
             {

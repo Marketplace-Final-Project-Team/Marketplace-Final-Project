@@ -1,5 +1,4 @@
 using System.Globalization;
-using CloudinaryDotNet;
 using Marketplace.BLL.Common;
 using Marketplace.BLL.Interfaces;
 using Marketplace.BLL.Services;
@@ -29,16 +28,25 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddQuartz();
+builder.Services.AddQuartz(q =>
+{
+    // Recurring cleanup: cancels orders left Pending too long (see BusinessRules ->
+    // PendingOrderExpiryHours on the admin Business Limits page), restoring their stock.
+    var pendingOrderExpiryJobKey = new JobKey("pending-order-expiry-job", "cleanup");
+    q.AddJob<PendingOrderExpiryJob>(opts => opts.WithIdentity(pendingOrderExpiryJobKey));
+    q.AddTrigger(opts => opts
+        .ForJob(pendingOrderExpiryJobKey)
+        .WithIdentity("pending-order-expiry-trigger", "cleanup")
+        .StartNow()
+        .WithSimpleSchedule(x => x.WithIntervalInHours(1).RepeatForever()));
+});
 
-builder.Services.AddQuartzHostedService(opt => 
+builder.Services.AddQuartzHostedService(opt =>
 {
     opt.WaitForJobsToComplete = true;
 });
 
 builder.Services.AddHttpClient();
-builder.Services.AddSingleton<IContentModerationService, ContentModerationService>();
-
 
 builder.Services
     .AddIdentity<User, IdentityRole>(options =>
@@ -62,13 +70,6 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LogoutPath = "/logout";
     options.AccessDeniedPath = "/forbidden";
 });
-
-var cloudinaryAccount = new Account(
-    builder.Configuration["Cloudinary:CloudName"] ?? "not-configured",
-    builder.Configuration["Cloudinary:ApiKey"] ?? "not-configured",
-    builder.Configuration["Cloudinary:ApiSecret"] ?? "not-configured");
-
-builder.Services.AddSingleton(new Cloudinary(cloudinaryAccount));
 
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();

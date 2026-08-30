@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.AdminProductsPageViewModel
 
 @{
-    ViewData["Title"] = "Товари — Адмін-панель";
+    ViewData["Title"] = "Товари - Адмін-панель";
     var products = Model.Result.Items;
 }
 
@@ -58,6 +58,15 @@
                         <option value="@category.Id" selected="@(Model.Filter.CategoryId == category.Id)">@category.Name</option>
                     }
                 </select>
+                <div class="admin-price-range">
+                    <input type="number" class="form-control" name="MinPrice" min="0" step="1" placeholder="Ціна від" aria-label="Ціна від" value="@Model.Filter.MinPrice" />
+                    <span aria-hidden="true">-</span>
+                    <input type="number" class="form-control" name="MaxPrice" min="0" step="1" placeholder="Ціна до" aria-label="Ціна до" value="@Model.Filter.MaxPrice" />
+                </div>
+                <label class="admin-checkbox-filter">
+                    <input type="checkbox" name="InStockOnly" value="true" checked="@(Model.Filter.InStockOnly == true)" onchange="this.form.submit()" />
+                    Тільки в наявності
+                </label>
                 <select class="form-select" name="SortOption" aria-label="Сортування" onchange="this.form.submit()">
                     @foreach (Marketplace.Domain.Enums.ProductSortOption option in Enum.GetValues(typeof(Marketplace.Domain.Enums.ProductSortOption)))
                     {

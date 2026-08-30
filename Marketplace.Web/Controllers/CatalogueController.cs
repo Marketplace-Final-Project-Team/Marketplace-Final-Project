@@ -20,17 +20,20 @@ public class CatalogueController : Controller
     private readonly IReviewService _reviewService;
     private readonly ICategoryService _categoryService;
     private readonly IWishlistService _wishlistService;
+    private readonly ISystemSettingsService _settingsService;
 
     public CatalogueController(
         IProductService productService,
         IReviewService reviewService,
         ICategoryService categoryService,
-        IWishlistService wishlistService)
+        IWishlistService wishlistService,
+        ISystemSettingsService settingsService)
     {
         _productService = productService;
         _reviewService = reviewService;
         _categoryService = categoryService;
         _wishlistService = wishlistService;
+        _settingsService = settingsService;
     }
 
     [HttpGet]
@@ -88,6 +91,7 @@ public class CatalogueController : Controller
         }
 
         var model = MapProduct(product);
+        model.LowStockThreshold = await _settingsService.GetIntAsync("BusinessRules", "LowStockThreshold", 5);
         var catalog = await _productService.GetCatalogAsync();
         model.EstimatedDeliveryStart = DateTime.Today.AddDays(2);
         model.EstimatedDeliveryEnd = DateTime.Today.AddDays(4);
@@ -213,7 +217,7 @@ public class CatalogueController : Controller
                 Id = product.Id,
                 Name = product.Name,
                 CategoryName = product.Category?.Name ?? "Без категорії",
-                Price = product.GetActiveDiscount() != null ? product.GetDiscountedPrice() : product.Price,
+                Price = product.GetEffectiveDiscountPercent() > 0 ? product.GetDiscountedPrice() : product.Price,
                 ImageUrl = product.MainImageUrl
             }).ToList()
         });
@@ -246,14 +250,15 @@ public class CatalogueController : Controller
 
     private static CatalogProductViewModel MapProduct(Marketplace.Domain.Entities.Product product, double averageRating = 0, int reviewCount = 0)
     {
-        var activeDiscount = product.GetActiveDiscount();
+        var discountPercent = product.GetEffectiveDiscountPercent();
+        var hasDiscount = discountPercent > 0;
 
         return new CatalogProductViewModel
         {
             Id = product.Id,
             Name = product.Name,
             Description = product.Description,
-            Price = activeDiscount != null ? product.GetDiscountedPrice() : product.Price,
+            Price = hasDiscount ? product.GetDiscountedPrice() : product.Price,
             Quantity = product.Quantity,
             CreatedAt = product.CreatedAt,
             MainImageUrl = product.MainImageUrl,
@@ -264,8 +269,8 @@ public class CatalogueController : Controller
             AdditionalImageUrls = product.Images.Select(image => image.ImageUrl).ToList(),
             AverageRating = averageRating,
             ReviewCount = reviewCount,
-            OriginalPrice = activeDiscount != null ? product.Price : null,
-            DiscountPercent = activeDiscount?.Percent,
+            OriginalPrice = hasDiscount ? product.Price : null,
+            DiscountPercent = hasDiscount ? discountPercent : null,
         };
     }
 }

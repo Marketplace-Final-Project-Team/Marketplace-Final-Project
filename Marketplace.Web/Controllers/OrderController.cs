@@ -176,7 +176,7 @@ public class OrderController : Controller
         }
 
         TempData["Success"] = model.PaymentMethod == PaymentMethods.CashOnDelivery
-            ? "Замовлення оформлено. Оплата — при отриманні."
+            ? "Замовлення оформлено. Оплата - при отриманні."
             : "Замовлення успішно оформлено.";
         return RedirectToAction(nameof(Details), new { id = result.OrderId });
     }
@@ -228,9 +228,9 @@ public class OrderController : Controller
 
         var label = model.DeliveryCarrier switch
         {
-            DeliveryCarriers.NovaPoshta => $"Нова пошта — {model.NovaPoshtaBranchName}, {model.NovaPoshtaCityName}",
+            DeliveryCarriers.NovaPoshta => $"Нова пошта - {model.NovaPoshtaBranchName}, {model.NovaPoshtaCityName}",
             DeliveryCarriers.Ukrposhta or DeliveryCarriers.Meest =>
-                $"{DeliveryCarriers.Label(model.DeliveryCarrier)} — {model.DeliveryCity}, {model.DeliveryStreet}",
+                $"{DeliveryCarriers.Label(model.DeliveryCarrier)} - {model.DeliveryCity}, {model.DeliveryStreet}",
             _ => DeliveryCarriers.Label(model.DeliveryCarrier)
         };
 

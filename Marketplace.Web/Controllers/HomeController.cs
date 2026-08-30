@@ -45,22 +45,23 @@ namespace Marketplace.Web.Controllers
             var featuredProducts = catalogPage.Items
                 .Select(item =>
                 {
-                    var activeDiscount = item.Product.GetActiveDiscount();
+                    var discountPercent = item.Product.GetEffectiveDiscountPercent();
+                    var hasDiscount = discountPercent > 0;
 
                     return new CatalogProductViewModel
                     {
                         Id = item.Product.Id,
                         Name = item.Product.Name,
                         Description = item.Product.Description,
-                        Price = activeDiscount != null ? item.Product.GetDiscountedPrice() : item.Product.Price,
+                        Price = hasDiscount ? item.Product.GetDiscountedPrice() : item.Product.Price,
                         Quantity = item.Product.Quantity,
                         MainImageUrl = item.Product.MainImageUrl,
                         CategoryName = item.Product.Category?.Name ?? "Без категорії",
                         StoreName = item.Product.Business?.StoreName ?? "Marketplace",
                         AverageRating = item.AverageRating,
                         ReviewCount = item.ReviewCount,
-                        OriginalPrice = activeDiscount != null ? item.Product.Price : null,
-                        DiscountPercent = activeDiscount?.Percent
+                        OriginalPrice = hasDiscount ? item.Product.Price : null,
+                        DiscountPercent = hasDiscount ? discountPercent : null
                     };
                 })
                 .ToList();
@@ -68,7 +69,6 @@ namespace Marketplace.Web.Controllers
             var rawCategories = await _categoryService.GetAllCategories();
 
             var colors = new[] { "blue", "violet", "orange", "green", "teal" };
-            var icons = new[] { "📦", "💻", "👕", "🏠", "📚", "🎮" };
 
             var homeCategories = rawCategories
                 .Select((c, index) => new HomeCategoryViewModel
@@ -76,7 +76,8 @@ namespace Marketplace.Web.Controllers
                     Id = c.Id,
                     Name = c.Name,
                     ColorClass = colors[index % colors.Length],
-                    Icon = icons[index % icons.Length]
+                    Icon = CategoryIcon(c.Name),
+                    ProductCount = c.ActiveProductCount
                 })
                 .ToList();
 
@@ -177,6 +178,27 @@ namespace Marketplace.Web.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        // Keyword-matched rather than a fixed per-position list, so a category keeps a
+        // sensible icon regardless of the order it comes back in — and admin-created
+        // categories that don't match any keyword still get a reasonable default.
+        private static string CategoryIcon(string categoryName)
+        {
+            var name = categoryName.ToLowerInvariant();
+
+            if (name.Contains("електрон") || name.Contains("технік") || name.Contains("гаджет")) return "💻";
+            if (name.Contains("спорт") || name.Contains("відпочин") || name.Contains("туризм")) return "🏀";
+            if (name.Contains("дом") || name.Contains("кухня") || name.Contains("побут")) return "🏠";
+            if (name.Contains("одяг") || name.Contains("взутт") || name.Contains("мод")) return "👕";
+            if (name.Contains("книг") || name.Contains("канцеляр")) return "📚";
+            if (name.Contains("іграшк") || name.Contains("дит")) return "🧸";
+            if (name.Contains("краса") || name.Contains("косметик") || name.Contains("здоров'я")) return "💄";
+            if (name.Contains("авто") || name.Contains("транспорт")) return "🚗";
+            if (name.Contains("тварин") || name.Contains("зоо")) return "🐾";
+            if (name.Contains("сад") || name.Contains("город") || name.Contains("рослин")) return "🌱";
+
+            return "🛍";
         }
     }
 }

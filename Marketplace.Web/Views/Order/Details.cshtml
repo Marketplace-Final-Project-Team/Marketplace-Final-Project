@@ -17,7 +17,7 @@
 
     private static string PostSaleStatusLabel(Marketplace.Domain.Enums.PostSaleRequestStatus status) => status switch
     {
-        Marketplace.Domain.Enums.PostSaleRequestStatus.Approved => "Повернення підтверджено — кошти повернуто",
+        Marketplace.Domain.Enums.PostSaleRequestStatus.Approved => "Повернення підтверджено - кошти повернуто",
         Marketplace.Domain.Enums.PostSaleRequestStatus.Rejected => "У поверненні відмовлено",
         _ => "Заявку на повернення подано · очікує розгляду"
     };
@@ -142,7 +142,7 @@
                 <span class="postsale-protection__icon" aria-hidden="true">🛡</span>
                 <div>
                     <strong>Захист покупця</strong>
-                    <span>Кошти продавцю переказуються лише після підтвердження отримання товару. Повернення можливе протягом 14 днів з дати доставки — окремо на кожен товар.</span>
+                    <span>Кошти продавцю переказуються лише після підтвердження отримання товару. Повернення можливе протягом 14 днів з дати доставки - окремо на кожен товар.</span>
                 </div>
             </div>
         </section>
@@ -174,7 +174,7 @@
                 <textarea class="form-control" name="comment" rows="3" minlength="10" placeholder="Розкажіть детальніше, що не так із товаром (мінімум 10 символів)..." required></textarea>
                 <label class="form-label mt-3">Фото товару</label>
                 <input type="file" class="form-control" name="photos" accept="image/*" multiple required />
-                <div class="form-text">Додайте від 1 до 5 фото — це підтвердження стану товару для продавця.</div>
+                <div class="form-text">Додайте від 1 до 5 фото - це підтвердження стану товару для продавця.</div>
                 <button type="submit" class="btn btn-primary mt-3 w-100">Надіслати заявку</button>
             </form>
         </div>

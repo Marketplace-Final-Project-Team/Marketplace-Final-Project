@@ -86,8 +86,21 @@ namespace Marketplace.Web.Controllers
         {
             var business = await _businessService.GetByIdAsync(businessId);
             if (business == null) return NotFound();
+
             var result = await _discountService.SetBusinessDiscount(businessId, discountPercent, discountStartDate, discountEndDate);
-            return RedirectToAction("Businesses");
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "BusinessDiscountSet",
+                    $"Адміністратор встановив знижку {discountPercent}% на весь бізнес «{business.StoreName}».",
+                    actorUserId: CurrentUserId);
+                TempData["Success"] = result.Message;
+            }
+            else
+            {
+                TempData["Error"] = result.Message;
+            }
+
+            return RedirectToAction("Businesses", "Admin");
         }
         [Authorize(Roles = "Admin")]
         [HttpPost]
@@ -96,8 +109,21 @@ namespace Marketplace.Web.Controllers
         {
             var business = await _businessService.GetByIdAsync(businessId);
             if (business == null) return NotFound();
+
             var result = await _discountService.RemoveBusinessDiscount(businessId);
-            return RedirectToAction("Businesses");
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "BusinessDiscountRemoved",
+                    $"Адміністратор скасував знижку на весь бізнес «{business.StoreName}».",
+                    actorUserId: CurrentUserId);
+                TempData["Success"] = result.Message;
+            }
+            else
+            {
+                TempData["Error"] = result.Message;
+            }
+
+            return RedirectToAction("Businesses", "Admin");
         }
         [Authorize(Roles = "Admin")]                                                         
         [HttpGet]

@@ -277,6 +277,9 @@ namespace Marketplace.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("BusinessId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -286,10 +289,10 @@ namespace Marketplace.DAL.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("Percent")
-                        .HasColumnType("int");
+                    b.Property<decimal>("Percent")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid>("ProductId")
+                    b.Property<Guid?>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("StartDate")
@@ -299,6 +302,8 @@ namespace Marketplace.DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BusinessId");
 
                     b.HasIndex("ProductId");
 
@@ -523,6 +528,9 @@ namespace Marketplace.DAL.Migrations
 
                     b.Property<string>("MainImageUrl")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ModerationReason")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -1110,11 +1118,17 @@ namespace Marketplace.DAL.Migrations
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Discount", b =>
                 {
+                    b.HasOne("Marketplace.Domain.Entities.Business", "Business")
+                        .WithMany("Discounts")
+                        .HasForeignKey("BusinessId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("Marketplace.Domain.Entities.Product", "Product")
                         .WithMany("Discounts")
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Business");
 
                     b.Navigation("Product");
                 });
@@ -1347,6 +1361,8 @@ namespace Marketplace.DAL.Migrations
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Business", b =>
                 {
+                    b.Navigation("Discounts");
+
                     b.Navigation("Members");
 
                     b.Navigation("Products");

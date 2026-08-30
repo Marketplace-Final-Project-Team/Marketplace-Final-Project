@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.Businesses.BusinessSettingsViewModel
 
 @{
-    ViewData["Title"] = $"Налаштування — {Model.StoreName}";
+    ViewData["Title"] = $"Налаштування - {Model.StoreName}";
 }
 
 @section Styles {
@@ -13,8 +13,8 @@
 
     <header class="seller-orders-header">
         <div>
-            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Seller workspace</div>
-            <h1>Налаштування — @Model.StoreName</h1>
+            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Панель продавця</div>
+            <h1>Налаштування - @Model.StoreName</h1>
             <p>Інформація про компанію, платежі та доступи.</p>
         </div>
     </header>
@@ -57,7 +57,7 @@
     <section class="business-panel" data-local-settings data-business-id="@Model.BusinessId">
         <h2>Юридичні та платіжні дані <span class="business-local-badge">Зберігається локально</span></h2>
         <p class="business-panel__lead">
-            Ці поля ще не підключені до бази даних платформи — значення зберігаються лише в цьому браузері,
+            Ці поля ще не підключені до бази даних платформи - значення зберігаються лише в цьому браузері,
             щоб продемонструвати майбутній інтерфейс налаштувань.
         </p>
 

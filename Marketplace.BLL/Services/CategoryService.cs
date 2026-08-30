@@ -2,8 +2,10 @@
 using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
 using Marketplace.Domain.Entities;
+using Marketplace.Domain.Enums;
 using Marketplace.Domain.Interfaces;
 using Marketplace.BLL.DTOs;
+using Microsoft.EntityFrameworkCore;
 
 namespace Marketplace.BLL.Services
 {
@@ -33,12 +35,14 @@ namespace Marketplace.BLL.Services
 
         public async Task<IReadOnlyList<CategoryDto>> GetAllCategories()
         {
-            var categories = await _categoryRepository.GetAllAsync();
-
-            return categories.Select(c => new CategoryDto {
-                Id = c.Id,
-                Name = c.Name,
-            }).ToList();
+            return await _categoryRepository.GetQueryable()
+                .Select(c => new CategoryDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    ActiveProductCount = c.Products.Count(p => !p.IsDeleted && p.Status == ProductStatus.Active)
+                })
+                .ToListAsync();
         }
 
         public async Task<ServiceResult> UpdateCategory(string newCategoryName, Guid categoryId)

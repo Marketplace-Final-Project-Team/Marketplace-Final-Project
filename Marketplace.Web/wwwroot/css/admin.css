@@ -13,6 +13,18 @@
     padding: 1.25rem 0 3rem;
 }
 
+/* Breaks out of the site-wide Bootstrap .container's max-width for admin pages
+   whose table has too many columns (with inline forms) to fit alongside the
+   sidebar otherwise - e.g. Businesses' commission/discount/action columns. */
+.admin-page--wide {
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    max-width: none;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    width: 100vw;
+}
+
 .admin-page .btn {
     border-radius: 0.7rem;
     font-weight: 600;
@@ -207,10 +219,81 @@
 }
 
 .admin-title {
+    align-items: center;
+    display: flex;
     font-size: clamp(1.6rem, 3.4vw, 2.15rem);
     font-weight: 750;
+    gap: 0.6rem;
     letter-spacing: -0.03em;
     margin: 0;
+}
+
+.admin-info-btn {
+    align-items: center;
+    background: var(--admin-soft);
+    border: 1px solid var(--admin-line);
+    border-radius: 50%;
+    color: var(--admin-primary);
+    cursor: pointer;
+    display: inline-flex;
+    flex-shrink: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.85rem;
+    font-style: italic;
+    font-weight: 700;
+    height: 1.6rem;
+    justify-content: center;
+    line-height: 1;
+    width: 1.6rem;
+}
+
+.admin-info-btn:hover {
+    background: var(--admin-line);
+}
+
+.admin-info-modal {
+    align-items: center;
+    background: rgba(23, 32, 51, 0.45);
+    display: flex;
+    inset: 0;
+    justify-content: center;
+    padding: 1rem;
+    position: fixed;
+    z-index: 1050;
+}
+
+.admin-info-modal__card {
+    background: var(--admin-surface);
+    border-radius: 1.1rem;
+    max-width: 32rem;
+    padding: 1.75rem;
+    position: relative;
+    width: 100%;
+}
+
+.admin-info-modal__card h3 {
+    color: var(--admin-ink);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 0.6rem;
+}
+
+.admin-info-modal__card p {
+    color: var(--admin-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.admin-info-modal__close {
+    background: none;
+    border: none;
+    color: var(--admin-muted);
+    font-size: 1.4rem;
+    line-height: 1;
+    position: absolute;
+    right: 0.85rem;
+    top: 0.7rem;
 }
 
 .admin-subtitle {
@@ -380,6 +463,35 @@
     padding: 0.5rem 0.75rem;
 }
 
+.admin-price-range {
+    align-items: center;
+    display: flex;
+    gap: 0.4rem;
+}
+
+.admin-price-range input {
+    background-color: var(--admin-surface);
+    border: 1px solid var(--admin-line);
+    border-radius: 0.6rem;
+    color: var(--admin-ink);
+    font-size: 0.85rem;
+    padding: 0.5rem 0.6rem;
+    width: 6rem;
+}
+
+.admin-price-range span {
+    color: var(--admin-muted);
+}
+
+.admin-checkbox-filter {
+    align-items: center;
+    color: var(--admin-ink);
+    display: flex;
+    font-size: 0.85rem;
+    gap: 0.45rem;
+    white-space: nowrap;
+}
+
 .admin-search-wrap {
     margin-bottom: 1rem;
     max-width: 24rem;
@@ -405,6 +517,14 @@
     border-radius: 1rem;
     box-shadow: 0 0.35rem 1.3rem rgba(23, 32, 51, 0.055);
     overflow: hidden;
+}
+
+/* .admin-panel's overflow:hidden (for rounded corners) would otherwise cancel
+   Bootstrap's .table-responsive overflow-x:auto on the same element, since this
+   stylesheet loads after bootstrap.min.css - silently clipping wide admin tables
+   instead of letting them scroll. */
+.admin-panel.table-responsive {
+    overflow-x: auto;
 }
 
 .admin-table {
@@ -607,6 +727,29 @@
     width: 4.5rem;
 }
 
+.admin-discount-status {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    margin-bottom: 0.4rem;
+}
+
+.admin-discount-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 11rem;
+}
+
+.admin-discount-form__date {
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-line);
+    border-radius: 0.5rem;
+    color: var(--admin-ink);
+    font-size: 0.78rem;
+    padding: 0.3rem 0.45rem;
+}
+
 /* ---------- Integrations / Settings cards ---------- */
 
 .admin-integration-grid {
@@ -645,16 +788,24 @@
 }
 
 .admin-settings-row {
-    border-top: 1px solid var(--admin-line);
-    display: grid;
-    gap: 0.6rem 1rem;
-    grid-template-columns: 9rem 1fr auto;
     align-items: center;
+    border-top: 1px solid var(--admin-line);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1rem;
     padding: 0.85rem 1.25rem;
 }
 
 .admin-settings-row:first-of-type {
     border-top: 0;
+}
+
+.admin-settings-row__info {
+    display: flex;
+    flex: 1 1 10rem;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
 }
 
 .admin-settings-row__label {
@@ -688,6 +839,7 @@
 .admin-settings-row__form {
     align-items: center;
     display: flex;
+    flex: 0 0 auto;
     gap: 0.5rem;
 }
 

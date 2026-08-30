@@ -103,15 +103,15 @@
         if (carrier === "NovaPoshta") {
             const cityName = form.querySelector("[data-np-city-name]")?.value;
             const branchName = form.querySelector("[data-np-branch-name]")?.value;
-            return cityName && branchName ? `Нова пошта — ${branchName}, ${cityName}` : "Нова пошта";
+            return cityName && branchName ? `Нова пошта - ${branchName}, ${cityName}` : "Нова пошта";
         }
         if (carrier === "Ukrposhta" || carrier === "Meest") {
             const label = carrier === "Ukrposhta" ? "Укрпошта" : "Meest Express";
             const city = form.querySelector('[name="DeliveryCity"]')?.value;
             const street = form.querySelector('[name="DeliveryStreet"]')?.value;
-            return city && street ? `${label} — ${city}, ${street}` : label;
+            return city && street ? `${label} - ${city}, ${street}` : label;
         }
-        return "—";
+        return "-";
     };
 
     const updateReviewCarrier = () => {
@@ -250,7 +250,7 @@
                                 const id = branch.id || branch.Id;
                                 const name = branch.name || branch.Name;
                                 const address = branch.address || branch.Address || "";
-                                return `<option value="${escapeHtml(id)}" data-name="${escapeHtml(name)}">${escapeHtml(name)}${address ? " — " + escapeHtml(address) : ""}</option>`;
+                                return `<option value="${escapeHtml(id)}" data-name="${escapeHtml(name)}">${escapeHtml(name)}${address ? " - " + escapeHtml(address) : ""}</option>`;
                             })
                             .join("");
                     branchSelect.disabled = false;

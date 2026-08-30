@@ -15,7 +15,7 @@
     <a asp-controller="Cart" asp-action="Index" class="shop-back">← Назад до кошика</a>
     <header class="shop-header">
         <div>
-            <div class="shop-kicker">Checkout</div>
+            <div class="shop-kicker">Оформлення</div>
             <h1 class="shop-title">Оформлення замовлення</h1>
             <p class="shop-subtitle">Оберіть адресу, перевірте доставку й оплату, підтвердіть замовлення.</p>
         </div>
@@ -145,12 +145,12 @@
 
                         <div class="checkout-info-card" data-carrier-panel="Ukrposhta" hidden>
                             <strong>Укрпошта</strong>
-                            <span>Кур'єрська доставка. Орієнтовний термін — 3–5 робочих днів.</span>
+                            <span>Кур'єрська доставка. Орієнтовний термін - 3–5 робочих днів.</span>
                         </div>
 
                         <div class="checkout-info-card" data-carrier-panel="Meest" hidden>
                             <strong>Meest Express</strong>
-                            <span>Кур'єрська доставка. Орієнтовний термін — 2–4 робочі дні.</span>
+                            <span>Кур'єрська доставка. Орієнтовний термін - 2–4 робочі дні.</span>
                         </div>
 
                         <div class="checkout-nova-poshta" data-carrier-panel="Ukrposhta,Meest" hidden>
@@ -193,14 +193,14 @@
 
                         <div class="checkout-review-block">
                             <h3>Адреса доставки</h3>
-                            <p data-review-address>—</p>
+                            <p data-review-address>-</p>
                         </div>
 
                         <div class="checkout-review-block">
                             <h3>Доставка та оплата</h3>
                             <dl>
-                                <div class="checkout-review-row"><dt>Спосіб доставки</dt><dd data-review-carrier>—</dd></div>
-                                <div class="checkout-review-row"><dt>Спосіб оплати</dt><dd data-review-payment>—</dd></div>
+                                <div class="checkout-review-row"><dt>Спосіб доставки</dt><dd data-review-carrier>-</dd></div>
+                                <div class="checkout-review-row"><dt>Спосіб оплати</dt><dd data-review-payment>-</dd></div>
                             </dl>
                         </div>
 
@@ -220,7 +220,7 @@
                             {
                                 <p class="cart-sellers-note">
                                     <span aria-hidden="true">ⓘ</span>
-                                    Товари від @Model.SellerGroups.Count продавців — оформлюються одним замовленням.
+                                    Товари від @Model.SellerGroups.Count продавців - оформлюються одним замовленням.
                                 </p>
                             }
                             @foreach (var group in Model.SellerGroups)

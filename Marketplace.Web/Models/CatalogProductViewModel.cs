@@ -7,6 +7,7 @@ public class CatalogProductViewModel
     public string Description { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public int Quantity { get; set; }
+    public int LowStockThreshold { get; set; } = 5;
     public DateTime CreatedAt { get; set; }
     public string MainImageUrl { get; set; } = string.Empty;
     public string CategoryName { get; set; } = string.Empty;

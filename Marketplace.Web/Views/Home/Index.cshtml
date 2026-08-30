@@ -14,7 +14,7 @@
     <section class="home-hero">
         <div class="home-hero__content">
             <div class="home-pill"><span></span> Покупки без зайвих кроків</div>
-            <h1>Усе потрібне — <em>в одному місці</em></h1>
+            <h1>Усе потрібне - <em>в одному місці</em></h1>
             <p>Знаходьте товари для роботи, дому й відпочинку. Порівнюйте пропозиції, додавайте до кошика та стежте за доставкою.</p>
 
             <form asp-controller="Catalog" asp-action="Index" method="get" class="home-search" role="search" data-search-wrapper>
@@ -67,7 +67,7 @@
                     {
                         <small>@topProduct.CategoryName</small>
                         <strong>
-                            @topProduct.Name — @topProduct.Price.ToString("N0") ₴
+                            @topProduct.Name - @topProduct.Price.ToString("N0") ₴
                             @if (topProduct.OriginalPrice.HasValue && topProduct.OriginalPrice.Value > topProduct.Price)
                             {
                                 <span class="text-muted text-decoration-line-through small ms-1">@topProduct.OriginalPrice.Value.ToString("N0") ₴</span>
@@ -130,6 +130,7 @@
                     <a asp-controller="Catalogue" asp-action="Index" asp-route-categoryId="@category.Id" class="category-card category-card--@category.ColorClass">
                         <span class="category-card__icon">@category.Icon</span>
                         <strong>@category.Name</strong>
+                        <small>@category.ProductCount @(category.ProductCount == 1 ? "товар" : category.ProductCount is >= 2 and <= 4 ? "товари" : "товарів")</small>
                     </a>
                 }
             </div>

@@ -10,10 +10,12 @@ namespace Marketplace.BLL.Services
     public class PromoCodeService : IPromoCodeService
     {
         private readonly AppDbContext _context;
+        private readonly ISystemSettingsService _settingsService;
 
-        public PromoCodeService(AppDbContext context)
+        public PromoCodeService(AppDbContext context, ISystemSettingsService settingsService)
         {
             _context = context;
+            _settingsService = settingsService;
         }
 
         public async Task<ServiceResult> CreateAsync(Guid businessId, string code, int percent, DateTime startDate, DateTime endDate)
@@ -25,9 +27,10 @@ namespace Marketplace.BLL.Services
                 return new ServiceResult { Succeeded = false, Message = "Код має містити від 3 до 30 символів." };
             }
 
-            if (percent is < 1 or > 99)
+            var maxPromoCodePercent = await _settingsService.GetIntAsync("BusinessRules", "MaxPromoCodePercent", 90);
+            if (percent < 1 || percent > maxPromoCodePercent)
             {
-                return new ServiceResult { Succeeded = false, Message = "Знижка має бути від 1% до 99%." };
+                return new ServiceResult { Succeeded = false, Message = $"Знижка має бути від 1% до {maxPromoCodePercent}%." };
             }
 
             if (endDate <= startDate)
@@ -38,7 +41,16 @@ namespace Marketplace.BLL.Services
             var codeTaken = await _context.PromoCodes.AnyAsync(p => p.Code == normalizedCode);
             if (codeTaken)
             {
-                return new ServiceResult { Succeeded = false, Message = "Такий код уже використовується — оберіть інший." };
+                return new ServiceResult { Succeeded = false, Message = "Такий код уже використовується - оберіть інший." };
+            }
+
+            var maxActivePromoCodes = await _settingsService.GetIntAsync("BusinessRules", "MaxActivePromoCodesPerBusiness", 20);
+            var now = DateTime.UtcNow;
+            var activePromoCodeCount = await _context.PromoCodes
+                .CountAsync(p => p.BusinessId == businessId && p.StartDate <= now && p.EndDate >= now);
+            if (activePromoCodeCount >= maxActivePromoCodes)
+            {
+                return new ServiceResult { Succeeded = false, Message = $"Досягнуто максимальної кількості активних промокодів ({maxActivePromoCodes})." };
             }
 
             var promoCode = new PromoCode
