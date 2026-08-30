@@ -13,6 +13,18 @@
     padding: 1.25rem 0 3rem;
 }
 
+/* Breaks out of the site-wide Bootstrap .container's max-width for admin pages
+   whose table has too many columns (with inline forms) to fit alongside the
+   sidebar otherwise - e.g. Businesses' commission/discount/action columns. */
+.admin-page--wide {
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    max-width: none;
+    padding-left: max(1rem, calc(50vw - 50% + 1rem));
+    padding-right: max(1rem, calc(50vw - 50% + 1rem));
+    width: 100vw;
+}
+
 .admin-page .btn {
     border-radius: 0.7rem;
     font-weight: 600;
