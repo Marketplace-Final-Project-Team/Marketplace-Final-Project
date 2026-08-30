@@ -11,7 +11,7 @@ services:
       ports:
         - "${DB_PORT}:1433"
       volumes:
-        - /opt/marketplace/devops/mssql:/var/opt/mssql
+        - /opt/marketplace/marketplace-data/mssql:/var/opt/mssql
       restart: unless-stopped
 
   # ===== Backend and Frontend =====
