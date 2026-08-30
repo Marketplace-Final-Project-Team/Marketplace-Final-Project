@@ -20,17 +20,20 @@ public class ProductsController : Controller
     private readonly IGenericRepository<Category> _categoryRepository;
     private readonly IBusinessAccessService _businessAccessService;
     private readonly IActivityLogService _activityLog;
+    private readonly ISystemSettingsService _settingsService;
 
     public ProductsController(
         IProductService productService,
         IGenericRepository<Category> categoryRepository,
         IBusinessAccessService businessAccessService,
-        IActivityLogService activityLog)
+        IActivityLogService activityLog,
+        ISystemSettingsService settingsService)
     {
         _productService = productService;
         _categoryRepository = categoryRepository;
         _businessAccessService = businessAccessService;
         _activityLog = activityLog;
+        _settingsService = settingsService;
     }
 
     public async Task<IActionResult> Index(Guid? businessId)
@@ -120,6 +123,13 @@ public class ProductsController : Controller
         if (!await _categoryRepository.ExistsAsync(category => category.Id == model.CategoryId))
         {
             ModelState.AddModelError(nameof(model.CategoryId), "Оберіть доступну категорію.");
+        }
+
+        var maxProducts = await _settingsService.GetIntAsync("BusinessRules", "MaxProductsPerBusiness", 200);
+        var currentProductCount = (await _productService.GetByBusinessAsync(model.BusinessId)).Count;
+        if (currentProductCount >= maxProducts)
+        {
+            ModelState.AddModelError(string.Empty, $"Досягнуто максимальної кількості товарів для одного бізнесу ({maxProducts}).");
         }
 
         if (!ModelState.IsValid)

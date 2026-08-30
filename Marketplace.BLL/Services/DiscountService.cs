@@ -12,17 +12,20 @@ namespace Marketplace.BLL.Services
     {
         private readonly AppDbContext _context;
         private readonly IBusinessRepository _businessRepo;
+        private readonly ISystemSettingsService _settingsService;
 
-        public DiscountService(AppDbContext context, IBusinessRepository businessRepo)
+        public DiscountService(AppDbContext context, IBusinessRepository businessRepo, ISystemSettingsService settingsService)
         {
             _context = context;
             _businessRepo = businessRepo;
+            _settingsService = settingsService;
         }
 
         public async Task SetDiscountAsync(Guid productId, decimal percent, DateTime startDate, DateTime endDate)
         {
-            if (percent is < 1 or > 99)
-                throw new ArgumentOutOfRangeException(nameof(percent), "Знижка має бути від 1% до 99%.");
+            var maxDiscountPercent = await _settingsService.GetIntAsync("BusinessRules", "MaxDiscountPercent", 90);
+            if (percent < 1 || percent > maxDiscountPercent)
+                throw new ArgumentOutOfRangeException(nameof(percent), $"Знижка має бути від 1% до {maxDiscountPercent}%.");
 
             if (endDate <= startDate)
                 throw new ArgumentException("Дата закінчення має бути пізніше дати початку.");
@@ -90,12 +93,13 @@ namespace Marketplace.BLL.Services
                     Message = "Неможливо встановити знижку для бізнесу, поки існує активна знижка для цього бізнесу"
                 };
             }
-            if (percent < 0 || percent > 100)
+            var maxDiscountPercent = await _settingsService.GetIntAsync("BusinessRules", "MaxDiscountPercent", 90);
+            if (percent < 0 || percent > maxDiscountPercent)
             {
                 return new ServiceResult
                 {
                     Succeeded = false,
-                    Message = "Знижка повинна бути в межах від 0 до 100"
+                    Message = $"Знижка повинна бути в межах від 0 до {maxDiscountPercent}"
                 };
             }
             if (startDate >= endDate)

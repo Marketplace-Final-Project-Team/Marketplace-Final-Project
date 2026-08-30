@@ -231,9 +231,10 @@ namespace Marketplace.Web.Controllers
         }
 
         // Integrations / BusinessLimits are backed by the real SystemSettings
-        // table (see ISystemSettingsService) — saved values persist for real. They just don't
-        // yet drive LiqPay/NovaPoshta/Cloudinary/Email/Discount/PromoCode behaviour, since that
-        // would mean editing the existing services that already implement those integrations.
+        // table (see ISystemSettingsService) — saved values persist for real and drive
+        // live behaviour (LiqPay/NovaPoshta/Cloudinary/Email/GoogleAI integrations,
+        // and the BusinessRules caps enforced in DiscountService/PromoCodeService/
+        // ProductsController plus the PendingOrderExpiryJob and the catalog low-stock badge).
 
         [HttpGet]
         public async Task<IActionResult> Integrations()
@@ -476,6 +477,11 @@ namespace Marketplace.Web.Controllers
                     ("Password", "Password", true),
                     ("FromEmail", "From Email", false),
                     ("FromName", "From Name", false),
+                }),
+                ("GoogleAI", "Google AI (Gemini)", "Автоматична модерація товарів (текст і зображення).", "GoogleAI", new[]
+                {
+                    ("ApiKey", "API Key", true),
+                    ("Model", "Model", false),
                 }),
             };
 

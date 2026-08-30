@@ -7,7 +7,7 @@
     var productInitial = string.IsNullOrWhiteSpace(Model.Name) ? "M" : Model.Name[..1].ToUpperInvariant();
     var storeInitial = string.IsNullOrWhiteSpace(Model.StoreName) ? "M" : Model.StoreName[..1].ToUpperInvariant();
     var productCode = Model.Id.ToString()[..8].ToUpperInvariant();
-    var isLowStock = Model.Quantity <= 5;
+    var isLowStock = Model.Quantity <= Model.LowStockThreshold;
     var isNew = Model.CreatedAt >= DateTime.UtcNow.AddDays(-14);
 }
 

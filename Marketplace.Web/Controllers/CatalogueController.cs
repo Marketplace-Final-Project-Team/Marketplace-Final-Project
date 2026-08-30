@@ -20,17 +20,20 @@ public class CatalogueController : Controller
     private readonly IReviewService _reviewService;
     private readonly ICategoryService _categoryService;
     private readonly IWishlistService _wishlistService;
+    private readonly ISystemSettingsService _settingsService;
 
     public CatalogueController(
         IProductService productService,
         IReviewService reviewService,
         ICategoryService categoryService,
-        IWishlistService wishlistService)
+        IWishlistService wishlistService,
+        ISystemSettingsService settingsService)
     {
         _productService = productService;
         _reviewService = reviewService;
         _categoryService = categoryService;
         _wishlistService = wishlistService;
+        _settingsService = settingsService;
     }
 
     [HttpGet]
@@ -88,6 +91,7 @@ public class CatalogueController : Controller
         }
 
         var model = MapProduct(product);
+        model.LowStockThreshold = await _settingsService.GetIntAsync("BusinessRules", "LowStockThreshold", 5);
         var catalog = await _productService.GetCatalogAsync();
         model.EstimatedDeliveryStart = DateTime.Today.AddDays(2);
         model.EstimatedDeliveryEnd = DateTime.Today.AddDays(4);
