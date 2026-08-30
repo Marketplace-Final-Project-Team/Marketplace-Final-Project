@@ -364,6 +364,59 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Categories()
+        {
+            var categories = await _categoryService.GetAllCategories();
+            return View(categories);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateCategory(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                TempData["Error"] = "Назва категорії не може бути порожньою.";
+                return RedirectToAction("Categories");
+            }
+
+            var result = await _categoryService.CreateCategory(name.Trim());
+            if (result.Succeeded)
+            {
+                TempData["Success"] = $"Категорію «{name}» створено.";
+            }
+            else
+            {
+                TempData["Error"] = result.Message;
+            }
+
+            return RedirectToAction("Categories");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateCategory(Guid categoryId, string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                TempData["Error"] = "Назва категорії не може бути порожньою.";
+                return RedirectToAction("Categories");
+            }
+
+            var result = await _categoryService.UpdateCategory(name.Trim(), categoryId);
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded ? "Категорію оновлено." : result.Message;
+
+            return RedirectToAction("Categories");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteCategory(Guid categoryId)
+        {
+            var result = await _categoryService.DeleteCategory(categoryId);
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded ? "Категорію видалено." : result.Message;
+
+            return RedirectToAction("Categories");
+        }
+
+        [HttpGet]
         public async Task<IActionResult> UserActivityLog()
         {
             var logs = await _activityLog.GetRecentUserActionsAsync();
