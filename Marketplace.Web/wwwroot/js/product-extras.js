@@ -1,40 +1,4 @@
 (() => {
-    // ---------- Variant swatches/chips (visual selection only) ----------
-    document.querySelectorAll("[data-variant-group]").forEach((group) => {
-        group.querySelectorAll("[data-variant-option]").forEach((option) => {
-            option.addEventListener("click", () => {
-                group.querySelectorAll("[data-variant-option]").forEach((o) => {
-                    o.classList.remove("is-selected");
-                    o.setAttribute("aria-pressed", "false");
-                });
-                option.classList.add("is-selected");
-                option.setAttribute("aria-pressed", "true");
-            });
-        });
-    });
-
-    // ---------- Size guide modal ----------
-    const sizeGuide = document.querySelector("[data-size-guide]");
-    if (sizeGuide) {
-        document.querySelectorAll("[data-open-size-guide]").forEach((btn) => {
-            btn.addEventListener("click", () => {
-                sizeGuide.hidden = false;
-            });
-        });
-
-        sizeGuide.querySelectorAll("[data-close-size-guide]").forEach((btn) => {
-            btn.addEventListener("click", () => {
-                sizeGuide.hidden = true;
-            });
-        });
-
-        sizeGuide.addEventListener("click", (event) => {
-            if (event.target === sizeGuide) {
-                sizeGuide.hidden = true;
-            }
-        });
-    }
-
     // ---------- Product Q&A (stored locally per-browser, no backend) ----------
     const qaSection = document.querySelector("[data-qa-section]");
     if (!qaSection) {

@@ -8,17 +8,58 @@ using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
+using Marketplace.Domain.Interfaces;
+using Quartz;
 using AdultContentStatus = Marketplace.Domain.Entities.AdultContentStatus;
 
 namespace Marketplace.BLL.Services;
 
 public class ProductService : IProductService
 {
+    private readonly IGenericRepository<Product> _productRepository;
+    private readonly IImageStorageService _imageStorageService;
     private readonly AppDbContext _context;
+    private readonly ISchedulerFactory _schedulerFactory;
 
-    public ProductService(AppDbContext context)
+    public ProductService(
+        IGenericRepository<Product> productRepository,
+        IImageStorageService imageStorageService,
+        AppDbContext context,
+        ISchedulerFactory schedulerFactory)
     {
+        _productRepository = productRepository;
+        _imageStorageService = imageStorageService;
         _context = context;
+        _schedulerFactory = schedulerFactory;
+    }
+
+    private async Task ScheduleModerationJobAsync(Guid productId)
+    {
+        var scheduler = await _schedulerFactory.GetScheduler();
+
+        var jobKey = new JobKey($"moderation-job-{productId}", "moderation");
+
+        if (await scheduler.CheckExists(jobKey))
+        {
+            await scheduler.DeleteJob(jobKey);
+        }
+
+        var jobData = new JobDataMap
+        {
+            { "ProductId", productId }
+        };
+
+        var job = JobBuilder.Create<ProductModerationJob>()
+            .WithIdentity(jobKey)
+            .UsingJobData(jobData)
+            .Build();
+
+        var trigger = TriggerBuilder.Create()
+            .WithIdentity($"moderation-trigger-{productId}", "moderation")
+            .StartAt(DateBuilder.FutureDate(5, IntervalUnit.Second))
+            .Build();
+
+        await scheduler.ScheduleJob(job, trigger);
     }
 
     public async Task<IReadOnlyList<Product>> GetCatalogAsync(string? search = null, bool allowAdultContent = false)
@@ -214,11 +255,14 @@ public class ProductService : IProductService
             Quantity = dto.Quantity,
             IsAdultOnly = dto.IsAdultOnly,
             Status = ProductStatus.Pending,
+            ModerationReason = null,
             CreatedAt = DateTime.UtcNow
         };
 
-        _context.Products.Add(product);
+        await _productRepository.AddAsync(product);
         await _context.SaveChangesAsync();
+
+        await ScheduleModerationJobAsync(product.Id);
 
         return product;
     }
@@ -239,8 +283,12 @@ public class ProductService : IProductService
         product.Quantity = dto.Quantity;
         product.IsAdultOnly = dto.IsAdultOnly;
         product.Status = ProductStatus.Pending;
+        product.ModerationReason = null;
 
         await _context.SaveChangesAsync();
+
+        await ScheduleModerationJobAsync(product.Id);
+
         return product;
     }
 

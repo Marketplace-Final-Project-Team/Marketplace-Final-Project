@@ -1,8 +1,8 @@
-@model IEnumerable<Marketplace.Web.Models.ProductItemAdminViewModel>
+@model Marketplace.Web.Models.AdminProductsPageViewModel
 
 @{
-    ViewData["Title"] = "Товари — Адмін-панель";
-    var products = Model.ToList();
+    ViewData["Title"] = "Товари - Адмін-панель";
+    var products = Model.Result.Items;
 }
 
 @section Styles {
@@ -17,99 +17,140 @@
         Marketplace.Domain.Enums.ProductStatus.Banned => "Заблокований",
         _ => status.ToString()
     };
+
+    private static string SortLabel(Marketplace.Domain.Enums.ProductSortOption option) => option switch
+    {
+        Marketplace.Domain.Enums.ProductSortOption.PriceAsc => "Ціна: зростання",
+        Marketplace.Domain.Enums.ProductSortOption.PriceDesc => "Ціна: спадання",
+        Marketplace.Domain.Enums.ProductSortOption.CreatedAtAsc => "Спочатку старі",
+        Marketplace.Domain.Enums.ProductSortOption.CreatedAtDesc => "Спочатку нові",
+        Marketplace.Domain.Enums.ProductSortOption.PopularityAsc => "Популярність: за зростанням",
+        Marketplace.Domain.Enums.ProductSortOption.PopularityDesc => "Популярність: за спаданням",
+        _ => option.ToString()
+    };
 }
 
 <div class="admin-page">
-    <header class="admin-header">
-        <div>
-            <div class="admin-kicker">Admin</div>
-            <h1 class="admin-title">Товари</h1>
-            <p class="admin-subtitle">Усього товарів у каталозі: <strong>@products.Count</strong>.</p>
-        </div>
-    </header>
+    <div class="admin-shell">
+        <partial name="_AdminNav" />
 
-    <partial name="_AdminNav" />
+        <div class="admin-content">
+            <header class="admin-header">
+                <div>
+                    <div class="admin-kicker">Admin</div>
+                    <h1 class="admin-title">Товари</h1>
+                    <p class="admin-subtitle">Знайдено <strong>@Model.Result.TotalItems</strong> товарів.</p>
+                </div>
+            </header>
 
-    @if (products.Count == 0)
-    {
-        <div class="admin-panel">
-            <p class="admin-empty">Товарів поки немає.</p>
-        </div>
-    }
-    else
-    {
-        <input type="search" class="form-control admin-search" placeholder="Пошук за назвою..."
-               data-admin-search="#products-table" aria-label="Пошук товарів" />
-        <p class="admin-empty" data-admin-search-empty hidden>Нічого не знайдено за цим запитом.</p>
-
-        <div class="admin-panel table-responsive">
-            <table class="table admin-table" id="products-table">
-                <thead>
-                    <tr>
-                        <th>Товар</th>
-                        <th>Ціна</th>
-                        <th>Статус</th>
-                        <th class="text-end">Дії</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var product in products)
+            <form method="get" asp-action="Products" class="admin-toolbar">
+                <div class="admin-search-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                    </svg>
+                    <input type="search" class="form-control admin-search" name="Search" value="@Model.Filter.Search" placeholder="Пошук за назвою..." aria-label="Пошук товарів" />
+                </div>
+                <select class="form-select" name="CategoryId" aria-label="Фільтр за категорією" onchange="this.form.submit()">
+                    <option value="">Усі категорії</option>
+                    @foreach (var category in Model.Categories)
                     {
-                        var statusClass = product.Status.ToString().ToLowerInvariant();
-                        var productInitial = string.IsNullOrWhiteSpace(product.Name) ? "?" : product.Name[..1].ToUpperInvariant();
-
-                        <tr>
-                            <td>
-                                <div class="admin-entity-cell">
-                                    @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
-                                    {
-                                        <img class="admin-entity-thumb" src="@product.ImageUrl" alt="@product.Name" />
-                                    }
-                                    else
-                                    {
-                                        <div class="admin-entity-placeholder" aria-hidden="true">@productInitial</div>
-                                    }
-                                    <span class="admin-entity-name">@product.Name</span>
-                                </div>
-                            </td>
-                            <td class="fw-semibold">@product.Price.ToString("N2") ₴</td>
-                            <td><span class="admin-status admin-status--@statusClass">@StatusLabel(product.Status)</span></td>
-                            <td>
-                                <div class="admin-row-actions">
-                                    @if (product.Status != Marketplace.Domain.Enums.ProductStatus.Active)
-                                    {
-                                        <form asp-action="ChangeProductStatus" method="post">
-                                            <input type="hidden" name="productId" value="@product.Id" />
-                                            <input type="hidden" name="status" value="Active" />
-                                            <button type="submit" class="btn btn-sm btn-outline-success">Активувати</button>
-                                        </form>
-                                    }
-                                    @if (product.Status != Marketplace.Domain.Enums.ProductStatus.Pending)
-                                    {
-                                        <form asp-action="ChangeProductStatus" method="post">
-                                            <input type="hidden" name="productId" value="@product.Id" />
-                                            <input type="hidden" name="status" value="Pending" />
-                                            <button type="submit" class="btn btn-sm btn-outline-secondary">На модерацію</button>
-                                        </form>
-                                    }
-                                    @if (product.Status != Marketplace.Domain.Enums.ProductStatus.Banned)
-                                    {
-                                        <form asp-action="ChangeProductStatus" method="post">
-                                            <input type="hidden" name="productId" value="@product.Id" />
-                                            <input type="hidden" name="status" value="Banned" />
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">Заблокувати</button>
-                                        </form>
-                                    }
-                                </div>
-                            </td>
-                        </tr>
+                        <option value="@category.Id" selected="@(Model.Filter.CategoryId == category.Id)">@category.Name</option>
                     }
-                </tbody>
-            </table>
-        </div>
-    }
-</div>
+                </select>
+                <div class="admin-price-range">
+                    <input type="number" class="form-control" name="MinPrice" min="0" step="1" placeholder="Ціна від" aria-label="Ціна від" value="@Model.Filter.MinPrice" />
+                    <span aria-hidden="true">-</span>
+                    <input type="number" class="form-control" name="MaxPrice" min="0" step="1" placeholder="Ціна до" aria-label="Ціна до" value="@Model.Filter.MaxPrice" />
+                </div>
+                <label class="admin-checkbox-filter">
+                    <input type="checkbox" name="InStockOnly" value="true" checked="@(Model.Filter.InStockOnly == true)" onchange="this.form.submit()" />
+                    Тільки в наявності
+                </label>
+                <select class="form-select" name="SortOption" aria-label="Сортування" onchange="this.form.submit()">
+                    @foreach (Marketplace.Domain.Enums.ProductSortOption option in Enum.GetValues(typeof(Marketplace.Domain.Enums.ProductSortOption)))
+                    {
+                        <option value="@option" selected="@(Model.Filter.SortOption == option)">@SortLabel(option)</option>
+                    }
+                </select>
+                <button type="submit" class="btn btn-outline-secondary">Застосувати</button>
+            </form>
 
-@section Scripts {
-    <script src="~/js/admin-search.js" asp-append-version="true"></script>
-}
+            @if (products.Count == 0)
+            {
+                <div class="admin-panel">
+                    <p class="admin-empty">Нічого не знайдено за цим запитом.</p>
+                </div>
+            }
+            else
+            {
+                <div class="admin-panel table-responsive">
+                    <table class="table admin-table" id="products-table">
+                        <thead>
+                            <tr>
+                                <th>Товар</th>
+                                <th>Ціна</th>
+                                <th>Статус</th>
+                                <th class="text-end">Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var product in products)
+                            {
+                                var statusClass = product.Status.ToString().ToLowerInvariant();
+                                var productInitial = string.IsNullOrWhiteSpace(product.Name) ? "?" : product.Name[..1].ToUpperInvariant();
+
+                                <tr>
+                                    <td>
+                                        <div class="admin-entity-cell">
+                                            @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
+                                            {
+                                                <img class="admin-entity-thumb" src="@product.ImageUrl" alt="@product.Name" />
+                                            }
+                                            else
+                                            {
+                                                <div class="admin-entity-placeholder" aria-hidden="true">@productInitial</div>
+                                            }
+                                            <span class="admin-entity-name">@product.Name</span>
+                                        </div>
+                                    </td>
+                                    <td class="fw-semibold">@product.Price.ToString("N2") ₴</td>
+                                    <td><span class="admin-status admin-status--@statusClass">@StatusLabel(product.Status)</span></td>
+                                    <td>
+                                        <div class="admin-row-actions">
+                                            @if (product.Status != Marketplace.Domain.Enums.ProductStatus.Active)
+                                            {
+                                                <form asp-action="ChangeProductStatus" method="post">
+                                                    <input type="hidden" name="productId" value="@product.Id" />
+                                                    <input type="hidden" name="status" value="Active" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-success">Активувати</button>
+                                                </form>
+                                            }
+                                            @if (product.Status != Marketplace.Domain.Enums.ProductStatus.Pending)
+                                            {
+                                                <form asp-action="ChangeProductStatus" method="post">
+                                                    <input type="hidden" name="productId" value="@product.Id" />
+                                                    <input type="hidden" name="status" value="Pending" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-secondary">На модерацію</button>
+                                                </form>
+                                            }
+                                            @if (product.Status != Marketplace.Domain.Enums.ProductStatus.Banned)
+                                            {
+                                                <form asp-action="ChangeProductStatus" method="post">
+                                                    <input type="hidden" name="productId" value="@product.Id" />
+                                                    <input type="hidden" name="status" value="Banned" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Заблокувати</button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <partial name="_AdminPagination" model="new Marketplace.Web.Models.AdminPaginationViewModel { Page = Model.Result.Page, TotalPages = Model.Result.TotalPages }" />
+                </div>
+            }
+        </div>
+    </div>
+</div>

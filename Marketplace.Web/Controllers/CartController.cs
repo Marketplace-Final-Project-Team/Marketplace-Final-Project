@@ -1,5 +1,6 @@
 using Marketplace.BLL.Interfaces;
 using Marketplace.Domain.Entities;
+using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,11 +11,13 @@ namespace Marketplace.Web.Controllers;
 public class CartController : Controller
 {
     private readonly ICartService _cartService;
+    private readonly IProductService _productService;
     private readonly UserManager<User> _userManager;
 
-    public CartController(ICartService cartService, UserManager<User> userManager)
+    public CartController(ICartService cartService, IProductService productService, UserManager<User> userManager)
     {
         _cartService = cartService;
+        _productService = productService;
         _userManager = userManager;
     }
 
@@ -22,7 +25,8 @@ public class CartController : Controller
     public async Task<IActionResult> Index()
     {
         var items = await _cartService.GetCartItems(GetUserId());
-        return View(items);
+        var sellerGroups = await CartGrouping.GroupBySellerAsync(items, _productService);
+        return View(new CartPageViewModel { SellerGroups = sellerGroups });
     }
 
     [HttpPost]

@@ -1,0 +1,120 @@
+@model Marketplace.Web.Models.Businesses.BusinessPromoCodesPageViewModel
+
+@{
+    ViewData["Title"] = $"Промокоди - {Model.StoreName}";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/business.css" asp-append-version="true" />
+}
+
+<div class="seller-dashboard">
+    <a asp-action="Index" class="seller-order-back">← До панелі продавця</a>
+
+    <header class="seller-orders-header">
+        <div>
+            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Панель продавця</div>
+            <h1>Промокоди - @Model.StoreName</h1>
+            <p>Створюйте промокоди зі знижкою - покупці зможуть застосувати їх при оформленні замовлення.</p>
+        </div>
+    </header>
+
+    <partial name="_BusinessNav" model="Model.BusinessId" />
+
+    @if (TempData["Success"] is string success)
+    {
+        <div class="seller-alert"><span>✓</span><p>@success</p></div>
+    }
+    @if (TempData["Error"] is string error)
+    {
+        <div class="seller-state-note seller-state-note--rejected"><span class="seller-state-note__icon">!</span><p>@error</p></div>
+    }
+
+    <section class="business-panel">
+        <h2>Новий промокод</h2>
+        <p class="business-panel__lead">Код буде приведено до верхнього регістру. Покупець отримає знижку лише на товари вашого магазину в замовленні.</p>
+
+        <form asp-action="CreatePromoCode" method="post" class="business-settings-form">
+            <input type="hidden" name="businessId" value="@Model.BusinessId" />
+
+            <div>
+                <label for="code">Код промокоду</label>
+                <input type="text" id="code" name="code" maxlength="30" placeholder="Наприклад, SALE20" required />
+            </div>
+
+            <div>
+                <label for="percent">Знижка, %</label>
+                <input type="number" id="percent" name="percent" min="1" max="99" required />
+            </div>
+
+            <div>
+                <label for="startDate">Діє з</label>
+                <input type="datetime-local" id="startDate" name="startDate" required />
+            </div>
+
+            <div>
+                <label for="endDate">Діє до</label>
+                <input type="datetime-local" id="endDate" name="endDate" required />
+            </div>
+
+            <div>
+                <button type="submit" class="seller-button seller-button--primary">Створити промокод</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="business-panel">
+        <h2>Активні та минулі промокоди</h2>
+
+        @if (!Model.PromoCodes.Any())
+        {
+            <p class="business-empty">Ви ще не створили жодного промокоду.</p>
+        }
+        else
+        {
+            <table class="business-table">
+                <thead>
+                    <tr>
+                        <th>Код</th>
+                        <th>Знижка</th>
+                        <th>Діє з</th>
+                        <th>Діє до</th>
+                        <th>Статус</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var promo in Model.PromoCodes)
+                    {
+                        <tr>
+                            <td><strong>@promo.Code</strong></td>
+                            <td>@promo.Percent%</td>
+                            <td>@promo.StartDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@promo.EndDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>
+                                @if (promo.IsActive)
+                                {
+                                    <span class="seller-status seller-status--active"><span></span> Активний</span>
+                                }
+                                else
+                                {
+                                    <span class="seller-status seller-status--suspended"><span></span> Неактивний</span>
+                                }
+                            </td>
+                            <td>
+                                @if (promo.IsActive)
+                                {
+                                    <form asp-action="DeactivatePromoCode" method="post" onsubmit="return confirm('Деактивувати цей промокод?');">
+                                        <input type="hidden" name="businessId" value="@Model.BusinessId" />
+                                        <input type="hidden" name="promoCodeId" value="@promo.Id" />
+                                        <button type="submit" class="seller-button seller-button--secondary">Деактивувати</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </section>
+</div>

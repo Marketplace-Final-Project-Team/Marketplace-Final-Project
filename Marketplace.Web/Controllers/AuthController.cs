@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.Domain.Entities;
@@ -14,17 +15,20 @@ public class AuthController : Controller
     private readonly IEmailSender _emailSender;
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
+    private readonly IActivityLogService _activityLog;
 
     public AuthController(
         IAuthService authService,
         IEmailSender emailSender,
         UserManager<User> userManager,
-        SignInManager<User> signInManager)
+        SignInManager<User> signInManager,
+        IActivityLogService activityLog)
     {
         _authService = authService;
         _emailSender = emailSender;
         _userManager = userManager;
         _signInManager = signInManager;
+        _activityLog = activityLog;
     }
 
     [AllowAnonymous]
@@ -71,6 +75,7 @@ public class AuthController : Controller
 
         if (result.Succeeded)
         {
+            await _activityLog.LogUserActionAsync(user.Id, "LoggedIn", "Успішний вхід у систему.");
             return LocalRedirect(model.ReturnUrl!);
         }
 
@@ -121,6 +126,8 @@ public class AuthController : Controller
             ModelState.AddModelError(string.Empty, result.Message);
             return View(model);
         }
+
+        await _activityLog.LogUserActionAsync(result.UserId!, "Registered", $"Реєстрація нового користувача ({model.Email.Trim()}).");
 
         var confirmationLink = Url.Action(
             nameof(ConfirmEmail),
@@ -241,7 +248,17 @@ public class AuthController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
+        // The NameIdentifier claim disappears once SignOutAsync runs, so it must be
+        // captured before signing out if we want to log who logged out.
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
         await _signInManager.SignOutAsync();
+
+        if (!string.IsNullOrWhiteSpace(userId))
+        {
+            await _activityLog.LogUserActionAsync(userId, "LoggedOut", "Вихід із системи.");
+        }
+
         return RedirectToAction(nameof(SignIn));
     }
 

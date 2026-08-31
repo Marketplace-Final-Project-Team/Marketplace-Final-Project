@@ -24,8 +24,20 @@ namespace Marketplace.DAL.Data
         public DbSet<Wishlist> Wishlists { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
 
-  
+        public DbSet<WishlistCollection> WishlistCollections { get; set; }
+
+
         public DbSet<Discount> Discounts { get; set; }
+
+        public DbSet<PostSaleRequest> PostSaleRequests { get; set; }
+        public DbSet<PostSaleRequestImage> PostSaleRequestImages { get; set; }
+
+        public DbSet<PromoCode> PromoCodes { get; set; }
+
+        public DbSet<SystemSetting> SystemSettings { get; set; }
+        public DbSet<UserActionLog> UserActionLogs { get; set; }
+        public DbSet<BusinessActionLog> BusinessActionLogs { get; set; }
+        public DbSet<MarketplaceBalance> MarketplaceBalances { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -47,6 +59,12 @@ namespace Marketplace.DAL.Data
             builder.Entity<Review>().HasQueryFilter(r => !r.IsDeleted);
 
             builder.Entity<Discount>().HasQueryFilter(d => !d.IsDeleted);
+            builder.Entity<PostSaleRequest>().HasQueryFilter(psr => !psr.IsDeleted);
+            builder.Entity<PostSaleRequestImage>().HasQueryFilter(psi => !psi.IsDeleted);
+            builder.Entity<PromoCode>().HasQueryFilter(pc => !pc.IsDeleted);
+            builder.Entity<SystemSetting>().HasQueryFilter(s => !s.IsDeleted);
+            builder.Entity<MarketplaceBalance>().HasQueryFilter(mb => !mb.IsDeleted);
+            // UserActionLog / BusinessActionLog are append-only audit trails — no soft-delete filter.
 
 
             builder.Entity<Business>()
@@ -117,7 +135,7 @@ namespace Marketplace.DAL.Data
 
             builder.Entity<OrderItem>()
                 .HasOne(oi => oi.Product)
-                .WithMany()
+                .WithMany(p => p.OrderItems)
                 .HasForeignKey(oi => oi.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -137,7 +155,7 @@ namespace Marketplace.DAL.Data
                 .HasOne(wi => wi.Wishlist)
                 .WithMany(w => w.WishlistItems)
                 .HasForeignKey(wi => wi.WishlistId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<WishlistItem>()
                 .HasOne(wi => wi.Product)
@@ -162,6 +180,73 @@ namespace Marketplace.DAL.Data
                 .WithMany(p => p.Discounts)
                 .HasForeignKey(d => d.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Discount>()
+                .HasOne(d => d.Business)
+                .WithMany(b => b.Discounts)
+                .HasForeignKey(d => d.BusinessId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<WishlistCollection>()
+                .HasOne(wc => wc.User)
+                .WithMany(u => u.WishlistCollections)
+                .HasForeignKey(wc => wc.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<WishlistCollection>()
+                .HasMany(wc => wc.Items)
+                .WithOne(wi => wi.WishlistCollection)
+                .HasForeignKey(wi => wi.WishlistCollectionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<PostSaleRequest>()
+                .HasOne(psr => psr.Order)
+                .WithMany()
+                .HasForeignKey(psr => psr.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<PostSaleRequest>()
+                .HasOne(psr => psr.Buyer)
+                .WithMany()
+                .HasForeignKey(psr => psr.BuyerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Restrict (not Cascade) — PostSaleRequest already cascades via Order, and SQL
+            // Server rejects a second cascade path to the same table through OrderItem.
+            builder.Entity<PostSaleRequest>()
+                .HasOne(psr => psr.OrderItem)
+                .WithMany()
+                .HasForeignKey(psr => psr.OrderItemId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<PostSaleRequestImage>()
+                .HasOne(psi => psi.PostSaleRequest)
+                .WithMany(psr => psr.Images)
+                .HasForeignKey(psi => psi.PostSaleRequestId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<PromoCode>()
+                .HasOne(pc => pc.Business)
+                .WithMany()
+                .HasForeignKey(pc => pc.BusinessId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<PromoCode>()
+                .HasIndex(pc => pc.Code)
+                .IsUnique();
+
+            builder.Entity<SystemSetting>()
+                .HasIndex(s => new { s.Category, s.Key })
+                .IsUnique();
+
+            builder.Entity<BusinessActionLog>()
+                .HasOne<Business>()
+                .WithMany()
+                .HasForeignKey(bal => bal.BusinessId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // UserActionLog.UserId intentionally has no FK constraint — the trail must
+            // survive even if the referenced user is later removed from Identity.
 
             builder.Entity<Product>().Navigation(p => p.Category).AutoInclude();
             builder.Entity<Product>().Navigation(p => p.Images).AutoInclude();

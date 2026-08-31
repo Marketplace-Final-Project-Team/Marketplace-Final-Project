@@ -20,7 +20,7 @@
             return `«${file.name}» має непідтримуваний формат. Оберіть JPG, PNG або WEBP.`;
         }
         if (file.size === 0) return `«${file.name}» порожній і не може бути завантажений.`;
-        if (file.size > MAX_FILE_SIZE) return `«${file.name}» завеликий (${formatBytes(file.size)}). Максимум — 5 МБ.`;
+        if (file.size > MAX_FILE_SIZE) return `«${file.name}» завеликий (${formatBytes(file.size)}). Максимум - 5 МБ.`;
         return null;
     };
 

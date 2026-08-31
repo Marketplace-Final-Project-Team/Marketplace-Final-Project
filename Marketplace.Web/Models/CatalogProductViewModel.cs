@@ -7,6 +7,8 @@ public class CatalogProductViewModel
     public string Description { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public int Quantity { get; set; }
+    public int LowStockThreshold { get; set; } = 5;
+    public DateTime CreatedAt { get; set; }
     public string MainImageUrl { get; set; } = string.Empty;
     public string CategoryName { get; set; } = string.Empty;
     public string StoreName { get; set; } = string.Empty;
@@ -31,7 +33,7 @@ public class CatalogProductViewModel
             : null;
 
     public decimal? OriginalPrice { get; set; }
-    public int? DiscountPercent { get; set; }
+    public decimal? DiscountPercent { get; set; }
     public bool HasDiscount => OriginalPrice.HasValue && DiscountPercent.HasValue;
 
     public IReadOnlyList<string> GalleryImageUrls => new[] { MainImageUrl }

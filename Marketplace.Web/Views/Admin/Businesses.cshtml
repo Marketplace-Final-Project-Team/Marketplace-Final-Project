@@ -1,8 +1,8 @@
-@model IEnumerable<Marketplace.Web.Models.BusinessItemAdminViewModel>
+@model Marketplace.Web.Models.AdminBusinessesPageViewModel
 
 @{
-    ViewData["Title"] = "Бізнеси — Адмін-панель";
-    var businesses = Model.ToList();
+    ViewData["Title"] = "Бізнеси - Адмін-панель";
+    var businesses = Model.Result.Items;
 }
 
 @section Styles {
@@ -20,98 +20,154 @@
     };
 }
 
-<div class="admin-page">
-    <header class="admin-header">
-        <div>
-            <div class="admin-kicker">Admin</div>
-            <h1 class="admin-title">Бізнеси</h1>
-            <p class="admin-subtitle">Усього магазинів на платформі: <strong>@businesses.Count</strong>.</p>
-        </div>
-    </header>
+<div class="admin-page admin-page--wide">
+    <div class="admin-shell">
+        <partial name="_AdminNav" />
 
-    <partial name="_AdminNav" />
+        <div class="admin-content">
+            <header class="admin-header">
+                <div>
+                    <div class="admin-kicker">Admin</div>
+                    <h1 class="admin-title">Бізнеси</h1>
+                    <p class="admin-subtitle">Знайдено <strong>@Model.Result.TotalItems</strong> магазинів.</p>
+                </div>
+            </header>
 
-    @if (businesses.Count == 0)
-    {
-        <div class="admin-panel">
-            <p class="admin-empty">Магазинів поки немає.</p>
-        </div>
-    }
-    else
-    {
-        <input type="search" class="form-control admin-search" placeholder="Пошук за назвою чи власником..."
-               data-admin-search="#businesses-table" aria-label="Пошук магазинів" />
-        <p class="admin-empty" data-admin-search-empty hidden>Нічого не знайдено за цим запитом.</p>
+            @if (TempData["Error"] is string error)
+            {
+                <div class="admin-alert admin-alert--error"><span>!</span><p>@error</p></div>
+            }
 
-        <div class="admin-panel table-responsive">
-            <table class="table admin-table" id="businesses-table">
-                <thead>
-                    <tr>
-                        <th>Магазин</th>
-                        <th>Власник</th>
-                        <th>Статус</th>
-                        <th class="text-end">Дії</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var business in businesses)
-                    {
-                        var statusClass = business.Status.ToString().ToLowerInvariant();
-                        var name = string.IsNullOrWhiteSpace(business.Name) ? "Без назви" : business.Name;
-                        var businessInitial = name[..1].ToUpperInvariant();
+            <form method="get" asp-action="Businesses" class="admin-toolbar">
+                <div class="admin-search-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                    </svg>
+                    <input type="search" class="form-control admin-search" name="Search" value="@Model.Filter.Search" placeholder="Пошук за назвою..." aria-label="Пошук магазинів" />
+                </div>
+                <select class="form-select" name="Status" aria-label="Фільтр за статусом" onchange="this.form.submit()">
+                    <option value="">Усі статуси</option>
+                    <option value="Active" selected="@(Model.Filter.Status == Marketplace.Domain.Enums.BusinessStatus.Active)">Активний</option>
+                    <option value="Pending" selected="@(Model.Filter.Status == Marketplace.Domain.Enums.BusinessStatus.Pending)">На перевірці</option>
+                    <option value="Suspended" selected="@(Model.Filter.Status == Marketplace.Domain.Enums.BusinessStatus.Suspended)">Призупинений</option>
+                    <option value="Rejected" selected="@(Model.Filter.Status == Marketplace.Domain.Enums.BusinessStatus.Rejected)">Відхилений</option>
+                </select>
+                <select class="form-select" name="SortDescending" aria-label="Сортування" onchange="this.form.submit()">
+                    <option value="true" selected="@(Model.Filter.SortDescending != false)">Спочатку нові</option>
+                    <option value="false" selected="@(Model.Filter.SortDescending == false)">Спочатку старі</option>
+                </select>
+                <button type="submit" class="btn btn-outline-secondary">Застосувати</button>
+            </form>
 
-                        <tr>
-                            <td>
-                                <div class="admin-entity-cell">
-                                    @if (!string.IsNullOrWhiteSpace(business.LogoUrl))
-                                    {
-                                        <img class="admin-entity-thumb" src="@business.LogoUrl" alt="@name" />
-                                    }
-                                    else
-                                    {
-                                        <div class="admin-entity-placeholder" aria-hidden="true">@businessInitial</div>
-                                    }
-                                    <span class="admin-entity-name">@name</span>
-                                </div>
-                            </td>
-                            <td class="admin-entity-meta">@business.Owner</td>
-                            <td><span class="admin-status admin-status--@statusClass">@StatusLabel(business.Status)</span></td>
-                            <td>
-                                <div class="admin-row-actions">
-                                    @if (business.Status != Marketplace.Domain.Enums.BusinessStatus.Active)
-                                    {
-                                        <form asp-action="ChangeBusinessStatus" method="post">
+            @if (businesses.Count == 0)
+            {
+                <div class="admin-panel">
+                    <p class="admin-empty">Нічого не знайдено за цим запитом.</p>
+                </div>
+            }
+            else
+            {
+                <div class="admin-panel table-responsive">
+                    <table class="table admin-table" id="businesses-table">
+                        <thead>
+                            <tr>
+                                <th>Магазин</th>
+                                <th>Власник</th>
+                                <th>Статус</th>
+                                <th>Комісія</th>
+                                <th>Знижка на бізнес</th>
+                                <th class="text-end">Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var business in businesses)
+                            {
+                                var statusClass = business.Status.ToString().ToLowerInvariant();
+                                var name = string.IsNullOrWhiteSpace(business.Name) ? "Без назви" : business.Name;
+                                var businessInitial = name[..1].ToUpperInvariant();
+
+                                <tr>
+                                    <td>
+                                        <div class="admin-entity-cell">
+                                            @if (!string.IsNullOrWhiteSpace(business.LogoUrl))
+                                            {
+                                                <img class="admin-entity-thumb" src="@business.LogoUrl" alt="@name" />
+                                            }
+                                            else
+                                            {
+                                                <div class="admin-entity-placeholder" aria-hidden="true">@businessInitial</div>
+                                            }
+                                            <span class="admin-entity-name">@name</span>
+                                        </div>
+                                    </td>
+                                    <td class="admin-entity-meta">@business.Owner</td>
+                                    <td><span class="admin-status admin-status--@statusClass">@StatusLabel(business.Status)</span></td>
+                                    <td>
+                                        <form asp-action="ChangeBusinessCommission" method="post" class="admin-inline-form">
                                             <input type="hidden" name="businessId" value="@business.Id" />
-                                            <input type="hidden" name="status" value="Active" />
-                                            <button type="submit" class="btn btn-sm btn-outline-success">Активувати</button>
+                                            <input type="number" name="commissionPercent" min="0" max="100" step="0.1" value="@business.CommissionPercent.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)" class="admin-inline-form__input" aria-label="Комісія, %" />
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary">%</button>
                                         </form>
-                                    }
-                                    @if (business.Status != Marketplace.Domain.Enums.BusinessStatus.Suspended)
-                                    {
-                                        <form asp-action="ChangeBusinessStatus" method="post">
-                                            <input type="hidden" name="businessId" value="@business.Id" />
-                                            <input type="hidden" name="status" value="Suspended" />
-                                            <button type="submit" class="btn btn-sm btn-outline-secondary">Призупинити</button>
-                                        </form>
-                                    }
-                                    @if (business.Status != Marketplace.Domain.Enums.BusinessStatus.Rejected)
-                                    {
-                                        <form asp-action="ChangeBusinessStatus" method="post">
-                                            <input type="hidden" name="businessId" value="@business.Id" />
-                                            <input type="hidden" name="status" value="Rejected" />
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">Відхилити</button>
-                                        </form>
-                                    }
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                                    </td>
+                                    <td>
+                                        @if (business.HasActiveDiscount)
+                                        {
+                                            <div class="admin-discount-status">
+                                                <span class="admin-status admin-status--active">−@business.DiscountPercent.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)%</span>
+                                                <span class="admin-entity-meta">до @business.DiscountEndDate?.ToLocalTime().ToString("dd.MM HH:mm")</span>
+                                            </div>
+                                            <form asp-controller="Discounts" asp-action="RemoveBusinessDiscount" method="post">
+                                                <input type="hidden" name="businessId" value="@business.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary">Скасувати</button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <form asp-controller="Discounts" asp-action="SetBusinessDiscount" method="post" class="admin-discount-form">
+                                                <input type="hidden" name="businessId" value="@business.Id" />
+                                                <input type="number" name="discountPercent" min="1" max="100" step="1" placeholder="%" class="admin-inline-form__input" required aria-label="Знижка, %" />
+                                                <input type="datetime-local" name="discountStartDate" class="admin-discount-form__date" required value="@DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm")" aria-label="Початок знижки (UTC)" />
+                                                <input type="datetime-local" name="discountEndDate" class="admin-discount-form__date" required value="@DateTime.UtcNow.AddDays(3).ToString("yyyy-MM-ddTHH:mm")" aria-label="Закінчення знижки (UTC)" />
+                                                <button type="submit" class="btn btn-sm btn-outline-primary">Встановити</button>
+                                            </form>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="admin-row-actions">
+                                            @if (business.Status != Marketplace.Domain.Enums.BusinessStatus.Active)
+                                            {
+                                                <form asp-action="ChangeBusinessStatus" method="post">
+                                                    <input type="hidden" name="businessId" value="@business.Id" />
+                                                    <input type="hidden" name="status" value="Active" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-success">Активувати</button>
+                                                </form>
+                                            }
+                                            @if (business.Status != Marketplace.Domain.Enums.BusinessStatus.Suspended)
+                                            {
+                                                <form asp-action="ChangeBusinessStatus" method="post">
+                                                    <input type="hidden" name="businessId" value="@business.Id" />
+                                                    <input type="hidden" name="status" value="Suspended" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-secondary">Призупинити</button>
+                                                </form>
+                                            }
+                                            @if (business.Status != Marketplace.Domain.Enums.BusinessStatus.Rejected)
+                                            {
+                                                <form asp-action="ChangeBusinessStatus" method="post">
+                                                    <input type="hidden" name="businessId" value="@business.Id" />
+                                                    <input type="hidden" name="status" value="Rejected" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Відхилити</button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <partial name="_AdminPagination" model="new Marketplace.Web.Models.AdminPaginationViewModel { Page = Model.Result.Page, TotalPages = Model.Result.TotalPages }" />
+                </div>
+            }
         </div>
-    }
+    </div>
 </div>
-
-@section Scripts {
-    <script src="~/js/admin-search.js" asp-append-version="true"></script>
-}

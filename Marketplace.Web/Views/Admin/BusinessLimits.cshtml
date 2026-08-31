@@ -1,0 +1,74 @@
+@model Marketplace.Web.Models.BusinessLimitsViewModel
+
+@{
+    ViewData["Title"] = "Ліміти бізнесу - Адмін-панель";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+}
+
+<div class="admin-page">
+    <div class="admin-shell">
+        <partial name="_AdminNav" />
+
+        <div class="admin-content">
+            <header class="admin-header">
+                <div>
+                    <div class="admin-kicker">Admin</div>
+                    <h1 class="admin-title">Ліміти бізнесу</h1>
+                    <p class="admin-subtitle">Правила, які обмежують продавців на платформі - застосовуються до всіх бізнесів однаково.</p>
+                </div>
+            </header>
+
+            @if (TempData["Success"] is string success)
+            {
+                <div class="admin-alert"><span>✓</span><p>@success</p></div>
+            }
+            @if (TempData["Error"] is string error)
+            {
+                <div class="admin-alert admin-alert--error"><span>!</span><p>@error</p></div>
+            }
+
+            <div class="admin-note">
+                <strong>Значення зберігаються реально</strong>
+                Ліміти зберігаються в таблиці <code>SystemSettings</code> і застосовуються одразу: обмежують знижки на товар і за промокодом, кількість товарів та активних промокодів на бізнес, а також автоматично скасовують прострочені замовлення «Очікує».
+            </div>
+
+            <div class="admin-panel">
+                <form asp-action="BusinessLimits" method="post" class="admin-limits-form">
+                    <div class="admin-limits-form__field">
+                        <label for="maxProducts">Макс. товарів на бізнес</label>
+                        <input type="number" id="maxProducts" name="MaxProductsPerBusiness" min="1" value="@Model.MaxProductsPerBusiness" />
+                    </div>
+                    <div class="admin-limits-form__field">
+                        <label for="maxDiscount">Макс. знижка на товар, %</label>
+                        <input type="number" id="maxDiscount" name="MaxDiscountPercent" min="1" max="100" value="@Model.MaxDiscountPercent" />
+                    </div>
+                    <div class="admin-limits-form__field">
+                        <label for="maxPromo">Макс. знижка за промокодом, %</label>
+                        <input type="number" id="maxPromo" name="MaxPromoCodePercent" min="1" max="100" value="@Model.MaxPromoCodePercent" />
+                    </div>
+                    <div class="admin-limits-form__field">
+                        <label for="maxActivePromo">Макс. активних промокодів на бізнес</label>
+                        <input type="number" id="maxActivePromo" name="MaxActivePromoCodesPerBusiness" min="1" value="@Model.MaxActivePromoCodesPerBusiness" />
+                    </div>
+                    <div class="admin-limits-form__field">
+                        <label for="pendingExpiry">Термін дії замовлення «Очікує», год.</label>
+                        <input type="number" id="pendingExpiry" name="PendingOrderExpiryHours" min="1" value="@Model.PendingOrderExpiryHours" />
+                        <small>Після цього часу замовлення автоматично скасовується (задача «Скасування прострочених замовлень»).</small>
+                    </div>
+                    <div class="admin-limits-form__field">
+                        <label for="lowStock">Поріг низького залишку, шт.</label>
+                        <input type="number" id="lowStock" name="LowStockThreshold" min="0" value="@Model.LowStockThreshold" />
+                        <small>Нижче цього значення на сторінці товару з'являється позначка «мало на складі».</small>
+                    </div>
+
+                    <div class="admin-limits-form__actions">
+                        <button type="submit" class="btn btn-primary">Зберегти ліміти</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

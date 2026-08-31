@@ -7,20 +7,20 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/search-autocomplete.css" asp-append-version="true" />
 }
 
 <div class="home-page">
     <section class="home-hero">
         <div class="home-hero__content">
             <div class="home-pill"><span></span> Покупки без зайвих кроків</div>
-            <h1>Усе потрібне — <em>в одному місці</em></h1>
+            <h1>Усе потрібне - <em>в одному місці</em></h1>
             <p>Знаходьте товари для роботи, дому й відпочинку. Порівнюйте пропозиції, додавайте до кошика та стежте за доставкою.</p>
 
-            <form asp-controller="Catalogue" asp-action="Index" method="get" class="home-search position-relative" role="search">
+            <form asp-controller="Catalog" asp-action="Index" method="get" class="home-search" role="search" data-search-wrapper>
                 <span aria-hidden="true">⌕</span>
-                <input name="search" id="homeSearchInput" placeholder="Що ви шукаєте?" aria-label="Пошук товарів" autocomplete="off" />
+                <input name="Search" id="homeSearchInput" placeholder="Що ви шукаєте?" aria-label="Пошук товарів" data-search-autocomplete autocomplete="off" />
                 <button type="submit">Знайти</button>
-                <div id="searchSuggestionsList" class="dropdown-menu w-100 shadow-sm mt-1" style="display: none; position: absolute; top: 100%; left: 0; z-index: 1000;"></div>
             </form>
 
             <div class="home-hero__actions">
@@ -36,9 +36,6 @@
             </div>
 
             <div class="home-hero__proof">
-                <div class="home-avatars" aria-hidden="true">
-                    <span>А</span><span>М</span><span>О</span>
-                </div>
                 <div><strong>Зручно для кожного</strong><small>від пошуку до доставки</small></div>
             </div>
         </div>
@@ -78,14 +75,14 @@
                     {
                         <small>@topProduct.CategoryName</small>
                         <strong>
-                            @topProduct.Name — @topProduct.Price.ToString("N0") ₴
+                            @topProduct.Name - @topProduct.Price.ToString("N0") ₴
                             @if (topProduct.OriginalPrice.HasValue && topProduct.OriginalPrice.Value > topProduct.Price)
                             {
                                 <span class="text-muted text-decoration-line-through small ms-1">@topProduct.OriginalPrice.Value.ToString("N0") ₴</span>
                             }
                         </strong>
                         <button type="button" class="btn btn-link p-0 text-start text-decoration-none" 
-                                onclick="checkAgeAndAction(@topProduct.Id, @topProduct.IsAgeRestricted.ToString().ToLower())">
+                                onclick="checkAgeAndAction('@topProduct.Id', @topProduct.IsAgeRestricted.ToString().ToLower())">
                             Переглянути товар →
                         </button>
                     }
@@ -144,6 +141,7 @@
                     <a asp-controller="Catalogue" asp-action="Index" asp-route-categoryId="@category.Id" class="category-card category-card--@category.ColorClass">
                         <span class="category-card__icon">@category.Icon</span>
                         <strong>@category.Name</strong>
+                        <small>@category.ProductCount @(category.ProductCount == 1 ? "товар" : category.ProductCount is >= 2 and <= 4 ? "товари" : "товарів")</small>
                     </a>
                 }
             </div>
@@ -177,7 +175,7 @@
                         }
 
                         <button type="button" class="home-product__media home-product__media--@colorClass border-0 w-100 text-start" 
-                                onclick="checkAgeAndAction(@product.Id, @product.IsAgeRestricted.ToString().ToLower())">
+                                onclick="checkAgeAndAction('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
                             @if (!string.IsNullOrWhiteSpace(product.MainImageUrl))
                             {
                                 <img src="@product.MainImageUrl" alt="@product.Name" />
@@ -186,12 +184,13 @@
                             {
                                 <span>@product.Name[..1].ToUpperInvariant()</span>
                             }
-                            <small>В наявності</small>
+                            <small>@(product.Quantity > 0 ? "В наявності" : "Немає в наявності")</small>
                         </button>
+
                         <div class="home-product__body">
                             <div class="home-product__category">@product.CategoryName</div>
                             <button type="button" class="home-product__name border-0 bg-transparent p-0 text-start" 
-                                    onclick="checkAgeAndAction(@product.Id, @product.IsAgeRestricted.ToString().ToLower())">
+                                    onclick="checkAgeAndAction('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
                                 @product.Name
                             </button>
                             @if (product.ReviewCount > 0)
@@ -227,17 +226,45 @@
         </section>
     }
 
-    <section class="home-section" data-recently-viewed-section hidden>
-        <div class="home-section__heading">
-            <div>
-                <span class="home-section__kicker">Ваша історія</span>
-                <h2>Нещодавно переглянуті</h2>
+    @if (Model.RecentlyViewed.Count > 0)
+    {
+        <section class="home-section">
+            <div class="home-section__heading">
+                <div>
+                    <span class="home-section__kicker">Ваша історія</span>
+                    <h2>Нещодавно переглянуті</h2>
+                </div>
+                <a asp-controller="Catalog" asp-action="Index">Увесь каталог →</a>
             </div>
-            <a asp-controller="Catalogue" asp-action="Index">Увесь каталог →</a>
-        </div>
-
-        <div class="home-products" data-recently-viewed-list></div>
-    </section>
+            <div class="home-products">
+                @for (var index = 0; index < Model.RecentlyViewed.Count; index++)
+                {
+                    var product = Model.RecentlyViewed[index];
+                    var colorClass = index % 3 == 0 ? "blue" : index % 3 == 1 ? "violet" : "orange";
+                    <article class="home-product">
+                        <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="home-product__media home-product__media--@colorClass">
+                            @if (!string.IsNullOrWhiteSpace(product.MainImageUrl))
+                            {
+                                <img src="@product.MainImageUrl" alt="@product.Name" />
+                            }
+                            else
+                            {
+                                <span>@product.Name[..1].ToUpperInvariant()</span>
+                            }
+                            <small>Переглянуто</small>
+                        </a>
+                        <div class="home-product__body">
+                            <div class="home-product__category">@product.CategoryName</div>
+                            <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="home-product__name">@product.Name</a>
+                            <div class="home-product__bottom">
+                                <strong>@product.Price.ToString("N2") ₴</strong>
+                            </div>
+                        </div>
+                    </article>
+                }
+            </div>
+        </section>
+    }
 
     <section class="home-promo">
         <div class="home-promo__content">
@@ -285,60 +312,8 @@
 </div>
 
 @section Scripts {
-    <script src="~/js/recently-viewed.js" asp-append-version="true"></script>
+    <script src="~/js/search-autocomplete.js" asp-append-version="true"></script>
     <script>
-        // --- Логіка пошуку ---
-        document.addEventListener("DOMContentLoaded", function () {
-            const input = document.getElementById("homeSearchInput");
-            const suggestionsBox = document.getElementById("searchSuggestionsList");
-            let timeoutId = null;
-
-            if (!input || !suggestionsBox) return;
-
-            input.addEventListener("input", function () {
-                clearTimeout(timeoutId);
-                const query = this.value.trim();
-
-                if (query.length < 2) {
-                    suggestionsBox.style.display = "none";
-                    suggestionsBox.innerHTML = "";
-                    return;
-                }
-
-                timeoutId = setTimeout(async () => {
-                    try {
-                        const response = await fetch(`/Catalogue/SearchSuggestions?term=${encodeURIComponent(query)}`);
-                        if (!response.ok) return;
-
-                        const items = await response.json();
-
-                        if (!items || items.length === 0) {
-                            suggestionsBox.style.display = "none";
-                            suggestionsBox.innerHTML = "";
-                            return;
-                        }
-
-                        suggestionsBox.innerHTML = items.map(item => `
-                            <a href="javascript:void(0)" onclick="checkAgeAndAction(${item.id}, ${item.isAgeRestricted})" class="dropdown-item d-flex justify-content-between align-items-center py-2 px-3 text-decoration-none border-bottom">
-                                <span class="fw-medium text-dark">${item.name} ${item.isAgeRestricted ? '<span class="text-danger fw-bold ms-1">18+</span>' : ''}</span>
-                                <span class="badge bg-light text-primary border ms-2">${item.price.toLocaleString('uk-UA')} ₴</span>
-                            </a>
-                        `).join('');
-
-                        suggestionsBox.style.display = "block";
-                    } catch (err) {
-                        console.error("Помилка завантаження підказок:", err);
-                    }
-                }, 300);
-            });
-
-            document.addEventListener("click", function (e) {
-                if (!input.contains(e.target) && !suggestionsBox.contains(e.target)) {
-                    suggestionsBox.style.display = "none";
-                }
-            });
-        });
-
         let pendingTargetUrl = null;
         const modal = document.getElementById('ageVerificationModal');
 
@@ -367,4 +342,5 @@
             }
         }
     </script>
+    
 }

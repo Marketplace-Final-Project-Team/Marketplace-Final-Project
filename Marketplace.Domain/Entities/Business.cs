@@ -13,6 +13,9 @@ namespace Marketplace.Domain.Entities
         public string LogoUrl { get; set; } = string.Empty;
         public string BannerUrl { get; set; } = string.Empty;
 
+        public decimal Balance { get; set; } = 0;
+        public decimal CommissionPercent {  get; set; } = 0;
+
         public BusinessStatus Status { get; set; } = BusinessStatus.Pending;
 
         public AdultContentStatus AdultStatus { get; set; } = AdultContentStatus.None;
@@ -20,6 +23,9 @@ namespace Marketplace.Domain.Entities
 
         public ICollection<BusinessMember> Members { get; set; } = new List<BusinessMember>();
         public ICollection<Product> Products { get; set; } = new List<Product>();
+        public ICollection<Discount> Discounts { get; set; } = new List<Discount>();
+
+
     }
 
     public enum AdultContentStatus

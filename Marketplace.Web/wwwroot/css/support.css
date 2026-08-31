@@ -91,9 +91,28 @@ button.support-contact-card:hover {
     font-size: 0.88rem;
 }
 
+.support-section {
+    margin-bottom: 2rem;
+}
+
 .support-section h2 {
     font-weight: 700;
     margin-bottom: 1rem;
+}
+
+.support-section__lead {
+    color: var(--support-muted);
+    margin-bottom: 1.1rem;
+    max-width: 42rem;
+}
+
+.support-section table {
+    background: #fff;
+}
+
+.support-section table code {
+    color: var(--support-primary);
+    font-size: 0.85rem;
 }
 
 .support-faq-item {

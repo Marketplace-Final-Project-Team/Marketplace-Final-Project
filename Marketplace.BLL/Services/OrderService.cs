@@ -21,28 +21,36 @@ namespace Marketplace.BLL.Services
         private readonly IGenericRepository<Product> _productRepository;
         private readonly AppDbContext _context;
         private readonly IPaymentService _paymentService;
+        private readonly IPromoCodeService _promoCodeService;
+        private readonly IMarketplaceBalanceService _marketplaceBalanceService;
         public readonly IOptions<LiqPayOptions> _options;
 
+        public readonly IGenericRepository<Business> _businessRepository;
 
-        public OrderService(IGenericRepository<Order> orerRepository, ICartItemRepository cartItemRepository, IGenericRepository<Address> addressRepository, IGenericRepository<Product> productRepository, AppDbContext context, IPaymentService paymentService, IOptions<LiqPayOptions> options)
+        public OrderService(IGenericRepository<Order> orerRepository, ICartItemRepository cartItemRepository, IGenericRepository<Address> addressRepository, IGenericRepository<Product> productRepository, AppDbContext context, IPaymentService paymentService, IPromoCodeService promoCodeService, IMarketplaceBalanceService marketplaceBalanceService, IOptions<LiqPayOptions> options,IGenericRepository<Business> businessRepository)
         {
             _orerRepository = orerRepository;
             _cartItemRepository = cartItemRepository;
             _addressRepository = addressRepository;
             _productRepository = productRepository;
             _paymentService = paymentService;
+            _promoCodeService = promoCodeService;
+            _marketplaceBalanceService = marketplaceBalanceService;
             _context = context;
             _options = options;
+            _businessRepository = businessRepository;
         }
 
         public async Task<OrderResultDto> CreateOrder(string userId, OrderCreateDto dto)
         {
             var cartItems = await _cartItemRepository.GetCartItemsByUserIdAsync(userId);
-
+            
             if (cartItems == null || !cartItems.Any())
             {
                 return new OrderResultDto { Succeeded = false, Message = "Кошик пустий." };
             }
+            
+            
 
             var address = await _addressRepository.FirstOrDefaultAsync(a => a.Id == dto.AddressId && a.UserId == userId);
 
@@ -53,9 +61,15 @@ namespace Marketplace.BLL.Services
 
             var orderItems = new List<OrderItem>();
 
+            // A promo code belongs to one business — it only discounts that business's
+            // line items in the (possibly multi-seller) cart, never the whole order.
+            var promoCode = !string.IsNullOrWhiteSpace(dto.PromoCode)
+                ? await _promoCodeService.FindActiveAsync(dto.PromoCode)
+                : null;
+
             foreach (var cartItem in cartItems)
             {
-
+                
                 if (cartItem.Product.Status != ProductStatus.Active)
                 {
                     return new OrderResultDto
@@ -71,12 +85,30 @@ namespace Marketplace.BLL.Services
                     return new OrderResultDto { Succeeded = false, Message = "Недостатньо товару на складі." };
                 }
 
+                var business = await _businessRepository.FirstOrDefaultAsync(b => b.Id == cartItem.Product.BusinessId);
+
                 var now = DateTime.UtcNow;
-                var activeDiscount = cartItem.Product.Discounts?
+                var productDiscount = cartItem.Product.Discounts?
                     .FirstOrDefault(d => d.StartDate <= now && d.EndDate >= now);
 
-                var unitPrice = activeDiscount != null
-                    ? cartItem.Product.Price - (cartItem.Product.Price * activeDiscount.Percent / 100m)
+                var businessDiscount = business?.Discounts?
+                    .FirstOrDefault(d => d.StartDate <= now && d.EndDate >= now);
+
+                // A business-wide sale is dominant over the product's own sale — it replaces
+                // it rather than stacking with it. A matching promo code still stacks on top
+                // of whichever one of those applies.
+                var saleDiscountPercent = businessDiscount?.Percent ?? productDiscount?.Percent ?? 0;
+                var promoPercent = promoCode is not null && promoCode.BusinessId == cartItem.Product.BusinessId
+                    ? promoCode.Percent
+                    : 0;
+                var effectivePercent = saleDiscountPercent + promoPercent;
+                if (effectivePercent > 100)
+                {
+                    effectivePercent = 100;
+                }
+
+                var unitPrice = effectivePercent > 0
+                    ? cartItem.Product.Price * (1 - effectivePercent / 100m)
                     : cartItem.Product.Price;
 
                 var orderItem = new OrderItem
@@ -131,15 +163,139 @@ namespace Marketplace.BLL.Services
 
         public async Task<ServiceResult> ChangeOrderStatus(Guid orderId, OrderStatus status)
         {
-            var order = await _orerRepository.FirstOrDefaultAsync(o => o.Id == orderId);
+            var order = await _context.Orders
+                .Include(o => o.Items)
+                .ThenInclude(i => i.Product)
+                .ThenInclude(p => p.Business)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+
 
             if (order == null)
             {
                 return new ServiceResult { Succeeded = false, Message = "Замовлення не знайдено." };
             }
 
+            // Commission/balance is credited exactly once, the moment an order first becomes
+            // Confirmed, and reversed exactly once when a credited order is cancelled (see
+            // below). Without restricting which status can follow which, a seller could
+            // toggle Confirmed -> Pending -> Confirmed to re-trigger that credit indefinitely,
+            // or skip Pending -> Shipped/Delivered to dodge it entirely and then have Cancel
+            // claw back money that was never actually paid out.
+            if (status != order.Status && !OrderStatusTransitions.GetAllowedNext(order.Status).Contains(status))
+            {
+                return new ServiceResult { Succeeded = false, Message = $"Неможливо змінити статус замовлення з «{order.Status}» на «{status}»." };
+            }
+
+            if (status == OrderStatus.Confirmed && order.Status != OrderStatus.Confirmed) {
+                // Commission is captured per line item at the moment of confirmation (see
+                // OrderItem.CommissionAmount) so a later change to a business's commission
+                // rate can never retroactively change what a past order already settled.
+                var marketplaceBalance = await _marketplaceBalanceService.GetOrCreateTrackedAsync();
+
+                foreach (var item in order.Items) {
+                    if (item.Product.Business != null)
+                    {
+                        var business = item.Product.Business;
+                        if (business == null)
+                        {
+                            return new ServiceResult { Succeeded = false, Message = "Бізнес не знайдено." };
+                        }
+                        var amount = item.UnitPrice * item.Quantity;
+                        var commission = Math.Round(amount * business.CommissionPercent / 100m, 2);
+                        var netAmount = amount - commission;
+
+                        item.CommissionAmount = commission;
+                        business.Balance += netAmount;
+                        marketplaceBalance.Balance += commission;
+                    }
+                }
+            }
+
+            // Stock was decremented when the order was created (see CreateOrder) — cancelling
+            // must give it back, or the item stays under-counted in inventory forever.
+            if (status == OrderStatus.Canceled && order.Status != OrderStatus.Canceled)
+            {
+                foreach (var item in order.Items)
+                {
+                    if (item.Product != null)
+                    {
+                        item.Product.Quantity += item.Quantity;
+                    }
+                }
+
+                // Balance is credited exactly once, the moment an order first becomes Confirmed
+                // (see above). If the order already passed through that state — Confirmed,
+                // Shipped, or Delivered — cancelling it now must reverse that credit, the same
+                // way a refund claws back a seller's earnings on a real marketplace.
+                if (order.Status is OrderStatus.Confirmed or OrderStatus.Shipped or OrderStatus.Delivered)
+                {
+                    var marketplaceBalance = await _marketplaceBalanceService.GetOrCreateTrackedAsync();
+
+                    foreach (var item in order.Items)
+                    {
+                        if (item.Product?.Business != null)
+                        {
+                            var amount = item.UnitPrice * item.Quantity;
+                            var netAmount = amount - item.CommissionAmount;
+
+                            item.Product.Business.Balance -= netAmount;
+                            marketplaceBalance.Balance -= item.CommissionAmount;
+                        }
+                    }
+                }
+            }
+
             order.Status = status;
             _orerRepository.Update(order);
+            await _context.SaveChangesAsync();
+
+            return new ServiceResult { Succeeded = true, Message = string.Empty };
+        }
+
+        // Refunds a single line item — used when a seller approves a return for one product
+        // in an order that may contain items from other sellers too. Mirrors the reversal
+        // math in ChangeOrderStatus's Canceled branch, but scoped to one OrderItem instead of
+        // the whole order, so the other sellers' balances/stock are never touched.
+        public async Task<ServiceResult> RefundOrderItemAsync(Guid orderItemId)
+        {
+            var item = await _context.OrderItems
+                .Include(i => i.Order)
+                .Include(i => i.Product)
+                    .ThenInclude(p => p.Business)
+                .FirstOrDefaultAsync(i => i.Id == orderItemId);
+
+            if (item is null)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Позицію замовлення не знайдено." };
+            }
+
+            if (item.IsReturned)
+            {
+                return new ServiceResult { Succeeded = false, Message = "За цей товар уже оформлено повернення." };
+            }
+
+            if (item.Order.Status is not (OrderStatus.Confirmed or OrderStatus.Shipped or OrderStatus.Delivered))
+            {
+                return new ServiceResult { Succeeded = false, Message = "Повернення можливе лише для підтвердженого або доставленого замовлення." };
+            }
+
+            if (item.Product != null)
+            {
+                item.Product.Quantity += item.Quantity;
+
+                if (item.Product.Business != null)
+                {
+                    var amount = item.UnitPrice * item.Quantity;
+                    var netAmount = amount - item.CommissionAmount;
+                    var marketplaceBalance = await _marketplaceBalanceService.GetOrCreateTrackedAsync();
+
+                    item.Product.Business.Balance -= netAmount;
+                    marketplaceBalance.Balance -= item.CommissionAmount;
+                }
+            }
+
+            item.IsReturned = true;
             await _context.SaveChangesAsync();
 
             return new ServiceResult { Succeeded = true, Message = string.Empty };

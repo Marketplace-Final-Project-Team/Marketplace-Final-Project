@@ -126,7 +126,24 @@ namespace Marketplace.Web.Controllers
         {
             var userId = _userManager.GetUserId(User)!;
             var wishlist = await _wishlistService.GetWishlistAsync(userId);
-            return View(wishlist);
+
+            var items = new List<WishlistItemViewModel>();
+            foreach (var item in wishlist.Items)
+            {
+                // Raw lookup (no Active/Quantity filter) so we can tell "out of stock" apart
+                // from "still active but temporarily at 0" — both are real, current DB state.
+                var product = await _productService.GetByIdAsync(item.ProductId);
+                items.Add(new WishlistItemViewModel
+                {
+                    ProductId = item.ProductId,
+                    ProductName = item.ProductName,
+                    Price = item.Price,
+                    MainImageUrl = item.MainImageUrl,
+                    InStock = product is not null && product.Quantity > 0
+                });
+            }
+
+            return View(new WishlistPageViewModel { Id = wishlist.Id, Items = items });
         }
 
         [HttpPost]

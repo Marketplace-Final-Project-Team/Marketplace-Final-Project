@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
+using Marketplace.Web.Infrastructure;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,17 +20,20 @@ public class CatalogueController : Controller
     private readonly IReviewService _reviewService;
     private readonly ICategoryService _categoryService;
     private readonly IWishlistService _wishlistService;
+    private readonly ISystemSettingsService _settingsService;
 
     public CatalogueController(
         IProductService productService,
         IReviewService reviewService,
         ICategoryService categoryService,
-        IWishlistService wishlistService)
+        IWishlistService wishlistService,
+        ISystemSettingsService settingsService)
     {
         _productService = productService;
         _reviewService = reviewService;
         _categoryService = categoryService;
         _wishlistService = wishlistService;
+        _settingsService = settingsService;
     }
 
     [HttpGet]
@@ -99,8 +103,8 @@ public class CatalogueController : Controller
         }
 
         var model = MapProduct(product);
+        model.LowStockThreshold = await _settingsService.GetIntAsync("BusinessRules", "LowStockThreshold", 5);
         var catalog = await _productService.GetCatalogAsync(allowAdultContent: allowAdultContent);
-
         model.EstimatedDeliveryStart = DateTime.Today.AddDays(2);
         model.EstimatedDeliveryEnd = DateTime.Today.AddDays(4);
         model.RelatedProducts = catalog
@@ -130,6 +134,8 @@ public class CatalogueController : Controller
             model.IsInWishlist = wishlist.Items.Any(item => item.ProductId == id);
         }
 
+        RecordRecentlyViewed(id);
+
         return View("~/Views/Catalog/Details.cshtml", model);
     }
 
@@ -158,13 +164,39 @@ public class CatalogueController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    private void RecordRecentlyViewed(Guid productId)
+    {
+        if (!CookieConsent.IsAccepted(Request.Cookies))
+        {
+            return;
+        }
+
+        Request.Cookies.TryGetValue(RecentlyViewedCookie.Name, out var raw);
+        var ids = RecentlyViewedCookie.Parse(raw);
+
+        ids.RemoveAll(existingId => existingId == productId);
+        ids.Insert(0, productId);
+        if (ids.Count > RecentlyViewedCookie.MaxItems)
+        {
+            ids = ids.Take(RecentlyViewedCookie.MaxItems).ToList();
+        }
+
+        Response.Cookies.Append(RecentlyViewedCookie.Name, RecentlyViewedCookie.Serialize(ids), new CookieOptions
+        {
+            Expires = DateTimeOffset.UtcNow.Add(RecentlyViewedCookie.Lifetime),
+            HttpOnly = true,
+            SameSite = SameSiteMode.Lax,
+            IsEssential = false
+        });
+    }
+
     [HttpGet]
     [Route("SearchSuggestions")]
-    public async Task<IActionResult> SearchSuggestions(string term)
+    public async Task<IActionResult> SearchSuggestions(string? term)
     {
-        if (string.IsNullOrWhiteSpace(term) || term.Length < 2)
+        if (string.IsNullOrWhiteSpace(term) || term.Trim().Length < 2)
         {
-            return Json(Array.Empty<object>());
+            return Json(new SearchSuggestionsResultViewModel());
         }
 
         bool allowAdultContent = Request.Cookies["AdultConfirmed"] == "true";
@@ -174,20 +206,102 @@ public class CatalogueController : Controller
             allowAdultContent: allowAdultContent
         );
 
-        return Json(suggestions);
+        var normalized = term.Trim();
+        var catalog = await _productService.GetCatalogAsync(allowAdultContent: allowAdultContent);
+
+        var matches = catalog
+            .Where(product =>
+                product.Name.Contains(normalized, StringComparison.OrdinalIgnoreCase)
+                || (product.Category?.Name.Contains(normalized, StringComparison.OrdinalIgnoreCase) ?? false))
+            .OrderByDescending(product => product.Name.StartsWith(normalized, StringComparison.OrdinalIgnoreCase))
+            .ThenByDescending(product => product.CreatedAt)
+            .Take(6)
+            .ToList();
+
+        string? correctedTerm = null;
+
+        if (matches.Count == 0)
+        {
+            var threshold = Math.Max(1, normalized.Length / 3);
+            var fuzzy = catalog
+                .Select(product => new
+                {
+                    Product = product,
+                    Distance = product.Name
+                        .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                        .Select(word => LevenshteinDistance(normalized, word))
+                        .DefaultIfEmpty(int.MaxValue)
+                        .Min()
+                })
+                .Where(candidate => candidate.Distance <= threshold)
+                .OrderBy(candidate => candidate.Distance)
+                .ThenByDescending(candidate => candidate.Product.CreatedAt)
+                .Take(6)
+                .ToList();
+
+            if (fuzzy.Count > 0)
+            {
+                matches = fuzzy.Select(candidate => candidate.Product).ToList();
+                correctedTerm = fuzzy[0].Product.Name
+                    .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                    .OrderBy(word => LevenshteinDistance(normalized, word))
+                    .First();
+            }
+        }
+
+        return Json(new SearchSuggestionsResultViewModel
+        {
+            Term = normalized,
+            CorrectedTerm = correctedTerm,
+            Items = matches.Select(product => new SearchSuggestionItemViewModel
+            {
+                Id = product.Id,
+                Name = product.Name,
+                CategoryName = product.Category?.Name ?? "Без категорії",
+                Price = product.GetEffectiveDiscountPercent() > 0 ? product.GetDiscountedPrice() : product.Price,
+                ImageUrl = product.MainImageUrl
+            }).ToList()
+        });
+    }
+
+    private static int LevenshteinDistance(string a, string b)
+    {
+        a = a.ToLowerInvariant();
+        b = b.ToLowerInvariant();
+        var rows = a.Length + 1;
+        var cols = b.Length + 1;
+        var distance = new int[rows, cols];
+
+        for (var i = 0; i < rows; i++) distance[i, 0] = i;
+        for (var j = 0; j < cols; j++) distance[0, j] = j;
+
+        for (var i = 1; i < rows; i++)
+        {
+            for (var j = 1; j < cols; j++)
+            {
+                var cost = a[i - 1] == b[j - 1] ? 0 : 1;
+                distance[i, j] = Math.Min(
+                    Math.Min(distance[i - 1, j] + 1, distance[i, j - 1] + 1),
+                    distance[i - 1, j - 1] + cost);
+            }
+        }
+
+        return distance[rows - 1, cols - 1];
     }
 
     private static CatalogProductViewModel MapProduct(Marketplace.Domain.Entities.Product product, double averageRating = 0, int reviewCount = 0)
     {
-        var activeDiscount = product.GetActiveDiscount();
+        var discountPercent = product.GetEffectiveDiscountPercent();
+        var hasDiscount = discountPercent > 0;
 
         return new CatalogProductViewModel
         {
             Id = product.Id,
             Name = product.Name,
             Description = product.Description,
-            Price = activeDiscount != null ? product.GetDiscountedPrice() : product.Price,
+            Price = hasDiscount ? product.GetDiscountedPrice() : product.Price,
             Quantity = product.Quantity,
+            CreatedAt = product.CreatedAt,
             MainImageUrl = product.MainImageUrl,
             CategoryName = product.Category?.Name ?? "Без категорії",
             StoreName = product.Business?.StoreName ?? "Marketplace",
@@ -196,8 +310,8 @@ public class CatalogueController : Controller
             AdditionalImageUrls = product.Images.Select(image => image.ImageUrl).ToList(),
             AverageRating = averageRating,
             ReviewCount = reviewCount,
-            OriginalPrice = activeDiscount != null ? product.Price : null,
-            DiscountPercent = activeDiscount?.Percent,
+            OriginalPrice = hasDiscount ? product.Price : null,
+            DiscountPercent = hasDiscount ? discountPercent : null,
             IsAgeRestricted = product.IsAdultOnly
         };
     }

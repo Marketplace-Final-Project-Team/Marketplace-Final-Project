@@ -1,0 +1,85 @@
+@model List<Marketplace.Web.Models.IntegrationSettingViewModel>
+
+@{
+    ViewData["Title"] = "Інтеграції - Адмін-панель";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+}
+
+<div class="admin-page">
+    <div class="admin-shell">
+        <partial name="_AdminNav" />
+
+        <div class="admin-content">
+            <header class="admin-header">
+                <div>
+                    <div class="admin-kicker">Admin</div>
+                    <h1 class="admin-title">
+                        Інтеграції та ключі
+                        <button type="button" class="admin-info-btn" data-info-open="integrations-note" aria-label="Пояснення">i</button>
+                    </h1>
+                    <p class="admin-subtitle">Ключі зовнішніх сервісів, які використовує маркетплейс. Секретні значення ніколи не показуються повторно - лише перезаписуються.</p>
+                </div>
+            </header>
+
+            @if (TempData["Success"] is string success)
+            {
+                <div class="admin-alert"><span>✓</span><p>@success</p></div>
+            }
+
+            <div class="admin-info-modal" data-info-modal="integrations-note" hidden>
+                <div class="admin-info-modal__card">
+                    <button type="button" class="admin-info-modal__close" aria-label="Закрити" data-info-close>×</button>
+                    <h3>Значення зберігаються реально</h3>
+                    <p>Кожне збережене тут значення записується в таблицю <code>SystemSettings</code> (зашифроване для секретних полів) і одразу впливає на реальну поведінку - оплати через LiqPay, доставку через Nova Poshta, збереження зображень у Cloudinary, надсилання листів і модерацію товарів через Gemini. Поки без позначки «змінено» - це поточне значення з <code>appsettings.json</code>.</p>
+                </div>
+            </div>
+
+            <div class="admin-integration-grid">
+                @foreach (var integration in Model)
+                {
+                    <div class="admin-integration-card">
+                        <div class="admin-integration-card__header">
+                            <div>
+                                <h2>@integration.DisplayName</h2>
+                                <p>@integration.Description</p>
+                            </div>
+                            <span class="admin-status admin-status--@(integration.IsConfigured ? "active" : "pending")">
+                                @(integration.IsConfigured ? "Налаштовано" : "Не налаштовано")
+                            </span>
+                        </div>
+
+                        @foreach (var key in integration.Keys)
+                        {
+                            <div class="admin-settings-row">
+                                <div class="admin-settings-row__info">
+                                    <span class="admin-settings-row__label">
+                                        @key.Label
+                                        @if (key.IsOverridden)
+                                        {
+                                            <small class="admin-settings-row__badge">змінено</small>
+                                        }
+                                    </span>
+                                    <span class="admin-settings-row__value" title="@key.MaskedValue">@key.MaskedValue</span>
+                                </div>
+                                <form asp-action="UpdateIntegrationKey" method="post" class="admin-settings-row__form">
+                                    <input type="hidden" name="category" value="@integration.Category" />
+                                    <input type="hidden" name="key" value="@key.Key" />
+                                    <input type="hidden" name="isSecret" value="@key.IsSecret" />
+                                    <input type="@(key.IsSecret ? "password" : "text")" name="value" placeholder="Нове значення" autocomplete="off" />
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">Зберегти</button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/admin-info-modal.js" asp-append-version="true"></script>
+}

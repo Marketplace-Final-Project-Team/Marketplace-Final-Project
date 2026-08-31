@@ -20,9 +20,12 @@ namespace Marketplace.Web.Controllers
         private readonly IProductService _productService;
         private readonly IOrderService _orderService;
         private readonly IReviewService _reviewService;
+        private readonly IPostSaleService _postSaleService;
+        private readonly IPromoCodeService _promoCodeService;
         private readonly UserManager<User> _userManager;
         private readonly IEmailSender _emailSender;
         private readonly AppDbContext _context;
+        private readonly IActivityLogService _activityLog;
 
         public BusinessController(
             IBusinessService businessService,
@@ -30,18 +33,24 @@ namespace Marketplace.Web.Controllers
             IProductService productService,
             IOrderService orderService,
             IReviewService reviewService,
+            IPostSaleService postSaleService,
+            IPromoCodeService promoCodeService,
             UserManager<User> userManager,
             IEmailSender emailSender,
-            AppDbContext context)
+            AppDbContext context,
+            IActivityLogService activityLog)
         {
             _businessService = businessService;
             _businessAccessService = businessAccessService;
             _productService = productService;
             _orderService = orderService;
             _reviewService = reviewService;
+            _postSaleService = postSaleService;
+            _promoCodeService = promoCodeService;
             _userManager = userManager;
             _emailSender = emailSender;
             _context = context;
+            _activityLog = activityLog;
         }
 
         [HttpGet]
@@ -168,6 +177,8 @@ namespace Marketplace.Web.Controllers
                 return NotFound();
             }
 
+            var postSaleRequests = await _postSaleService.GetRequestsForOrderAsync(orderId);
+
             return View(new BusinessOrderDetailsViewModel
             {
                 BusinessId = businessId,
@@ -190,8 +201,58 @@ namespace Marketplace.Web.Controllers
                     UnitPrice = item.UnitPrice,
                     Quantity = item.Quantity,
                     BelongsToBusiness = item.BelongsToBusiness
+                }).ToList(),
+                PostSaleRequests = postSaleRequests.Select(r => new BusinessPostSaleRequestViewModel
+                {
+                    Id = r.Id,
+                    ProductName = r.ProductName,
+                    ImageUrl = r.ImageUrl,
+                    Reason = r.Reason,
+                    Comment = r.Comment,
+                    PhotoUrls = r.PhotoUrls,
+                    Status = r.Status,
+                    SellerResponse = r.SellerResponse,
+                    CreatedAt = r.CreatedAt
                 }).ToList()
             });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResolvePostSaleRequest(Guid businessId, Guid orderId, Guid requestId, PostSaleRequestStatus decision, string? sellerResponse)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var result = await _postSaleService.ResolveRequestAsync(requestId, businessId, decision, sellerResponse);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "PostSaleRequestResolved",
+                    $"Заявку на повернення вирішено: {decision}.",
+                    actorUserId: _userManager.GetUserId(User), relatedEntityId: requestId);
+
+                if (decision == PostSaleRequestStatus.Approved && result.EntityId.HasValue)
+                {
+                    // Approving a return refunds just that one line item — restores its stock,
+                    // gives back the seller's net share, and reverses the marketplace's
+                    // commission at the rate that applied when the order was confirmed. Other
+                    // items in the same (possibly multi-seller) order are untouched.
+                    var refundResult = await _orderService.RefundOrderItemAsync(result.EntityId.Value);
+                    if (!refundResult.Succeeded)
+                    {
+                        TempData["Error"] = $"Заявку підтверджено, але не вдалось повернути кошти: {refundResult.Message}";
+                        return RedirectToAction(nameof(OrderDetails), new { businessId, orderId });
+                    }
+                }
+            }
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded
+                ? "Рішення щодо заявки збережено."
+                : result.Message;
+
+            return RedirectToAction(nameof(OrderDetails), new { businessId, orderId });
         }
 
         [HttpPost]
@@ -218,6 +279,9 @@ namespace Marketplace.Web.Controllers
             }
             else
             {
+                await _activityLog.LogBusinessActionAsync(businessId, "OrderStatusChanged",
+                    $"Статус замовлення змінено на «{status}».",
+                    actorUserId: _userManager.GetUserId(User), relatedEntityId: orderId);
                 TempData["Success"] = "Статус замовлення оновлено.";
             }
 
@@ -353,6 +417,69 @@ namespace Marketplace.Web.Controllers
                 ReviewCount = allRatings.Count,
                 ProductCount = products.Count
             });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> PromoCodes(Guid businessId)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var promoCodes = await _promoCodeService.GetForBusinessAsync(businessId);
+
+            return View(new BusinessPromoCodesPageViewModel
+            {
+                BusinessId = businessId,
+                StoreName = business.StoreName,
+                PromoCodes = promoCodes
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreatePromoCode(Guid businessId, string code, int percent, DateTime startDate, DateTime endDate)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var result = await _promoCodeService.CreateAsync(businessId, code, percent, startDate, endDate);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "PromoCodeCreated",
+                    $"Створено промокод «{code}» (знижка {percent}%).",
+                    actorUserId: _userManager.GetUserId(User), relatedEntityId: result.EntityId);
+            }
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+
+            return RedirectToAction(nameof(PromoCodes), new { businessId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeactivatePromoCode(Guid businessId, Guid promoCodeId)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var result = await _promoCodeService.DeactivateAsync(businessId, promoCodeId);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "PromoCodeDeactivated",
+                    "Промокод деактивовано.",
+                    actorUserId: _userManager.GetUserId(User), relatedEntityId: promoCodeId);
+            }
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+
+            return RedirectToAction(nameof(PromoCodes), new { businessId });
         }
 
         [HttpGet]
@@ -570,6 +697,19 @@ namespace Marketplace.Web.Controllers
             }
 
             return RedirectToAction("Settings", new { businessId = businessId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetBusinessBalance(Guid businessId)
+        {
+            var hasAccess = await _businessAccessService.HasAccessAsync(businessId, _userManager.GetUserId(User)!, BusinessMemberRole.Owner);
+            if (!hasAccess)
+            {
+                return Forbid();
+            }
+
+            var balance = await _businessService.GetBusinessBalance(businessId);
+            return Json(new { businessId, balance });
         }
     }
 }

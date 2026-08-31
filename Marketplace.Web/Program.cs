@@ -1,6 +1,7 @@
 using System.Globalization;
 using CloudinaryDotNet;
 using Marketplace.BLL.Common;
+using Marketplace.BLL.Configs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.BLL.Services;
 using Marketplace.DAL.Data;
@@ -10,21 +11,12 @@ using Marketplace.Domain.Entities;
 using Marketplace.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
-using Marketplace.BLL.Configs;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi;
+using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
-
-// 1. Конфігурація Swagger
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Marketplace API", Version = "v1" });
-});
-
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -38,6 +30,24 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+// Quartz
+builder.Services.AddQuartz(q =>
+{
+    var pendingOrderExpiryJobKey = new JobKey("pending-order-expiry-job", "cleanup");
+    q.AddJob<PendingOrderExpiryJob>(opts => opts.WithIdentity(pendingOrderExpiryJobKey));
+    q.AddTrigger(opts => opts
+        .ForJob(pendingOrderExpiryJobKey)
+        .WithIdentity("pending-order-expiry-trigger", "cleanup")
+        .StartNow()
+        .WithSimpleSchedule(x => x.WithIntervalInHours(1).RepeatForever()));
+});
+
+builder.Services.AddQuartzHostedService(opt =>
+{
+    opt.WaitForJobsToComplete = true;
+});
+
+builder.Services.AddHttpClient();
 builder.Services
     .AddIdentity<User, IdentityRole>(options =>
     {
@@ -61,13 +71,14 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/forbidden";
 });
 
+// Cloudinary
 var cloudinaryAccount = new Account(
     builder.Configuration["Cloudinary:CloudName"] ?? "not-configured",
     builder.Configuration["Cloudinary:ApiKey"] ?? "not-configured",
     builder.Configuration["Cloudinary:ApiSecret"] ?? "not-configured");
-
 builder.Services.AddSingleton(new Cloudinary(cloudinaryAccount));
 
+// Repositories & Services
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
 builder.Services.AddScoped<IBusinessRepository, BusinessRepository>();
@@ -85,6 +96,15 @@ builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IWishlistCollectionService, WishlistCollectionService>();
+builder.Services.AddScoped<IPostSaleService, PostSaleService>();
+builder.Services.AddScoped<IPromoCodeService, PromoCodeService>();
+
+builder.Services.AddMemoryCache();
+builder.Services.AddDataProtection();
+builder.Services.AddScoped<ISystemSettingsService, SystemSettingsService>();
+builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
+builder.Services.AddScoped<IMarketplaceBalanceService, MarketplaceBalanceService>();
 
 // LiqPay configuration
 builder.Services.Configure<LiqPayOptions>(builder.Configuration.GetSection("LiqPay"));
@@ -104,17 +124,7 @@ using (var scope = app.Services.CreateScope())
     await Marketplace.DAL.Seed.DbSeeder.SeedAsync(scope.ServiceProvider);
 }
 
-// 2. Swagger Middleware
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Marketplace API v1");
-        c.RoutePrefix = "swagger";
-    });
-}
-else
+if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
@@ -142,9 +152,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
-
 app.MapControllers();
-
 app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}")

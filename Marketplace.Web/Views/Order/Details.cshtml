@@ -14,6 +14,13 @@
         Marketplace.Domain.Enums.OrderStatus.Canceled => "Скасовано",
         _ => status.ToString()
     };
+
+    private static string PostSaleStatusLabel(Marketplace.Domain.Enums.PostSaleRequestStatus status) => status switch
+    {
+        Marketplace.Domain.Enums.PostSaleRequestStatus.Approved => "Повернення підтверджено - кошти повернуто",
+        Marketplace.Domain.Enums.PostSaleRequestStatus.Rejected => "У поверненні відмовлено",
+        _ => "Заявку на повернення подано · очікує розгляду"
+    };
 }
 
 @section Styles {
@@ -35,6 +42,10 @@
     @if (TempData["Success"] is string success)
     {
         <div class="alert alert-success" role="alert">@success</div>
+    }
+    @if (TempData["Error"] is string error)
+    {
+        <div class="alert alert-warning" role="alert">@error</div>
     }
 
     <div class="order-details-layout">
@@ -61,6 +72,37 @@
                         </div>
                         <div class="order-line__total">@item.LineTotal.ToString("N2") ₴</div>
                     </div>
+                    @if (Model.Status is Marketplace.Domain.Enums.OrderStatus.Delivered)
+                    {
+                        @if (item.ReturnRequest is null)
+                        {
+                            <button type="button" class="btn btn-sm btn-outline-secondary order-line__return-btn" data-postsale-open="return" data-order-item-id="@item.Id">Оформити повернення</button>
+                        }
+                        else
+                        {
+                            <div class="postsale-status postsale-status--@item.ReturnRequest.Status.ToString().ToLowerInvariant()">
+                                <strong>@PostSaleStatusLabel(item.ReturnRequest.Status)</strong>
+                                <span>@item.ReturnRequest.SubmittedAtUtc.ToLocalTime().ToString("dd MMMM yyyy, HH:mm") · @item.ReturnRequest.Reason</span>
+                                @if (!string.IsNullOrWhiteSpace(item.ReturnRequest.Comment))
+                                {
+                                    <span>«@item.ReturnRequest.Comment»</span>
+                                }
+                                @if (item.ReturnRequest.PhotoUrls.Any())
+                                {
+                                    <div class="postsale-photos">
+                                        @foreach (var url in item.ReturnRequest.PhotoUrls)
+                                        {
+                                            <a href="@url" target="_blank" rel="noopener"><img src="@url" alt="Фото до заявки" /></a>
+                                        }
+                                    </div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(item.ReturnRequest.SellerResponse))
+                                {
+                                    <span>Відповідь продавця: @item.ReturnRequest.SellerResponse</span>
+                                }
+                            </div>
+                        }
+                    }
                 }
             </div>
         </section>
@@ -77,8 +119,12 @@
                     <dd>@Model.ShippingCountry, @Model.ShippingCity,<br />@Model.ShippingStreet</dd>
                 </div>
                 <div class="order-info__row">
+                    <dt>Доставка</dt>
+                    <dd>@(Model.DeliveryMethodLabel ?? "Кур'єром на вказану адресу")</dd>
+                </div>
+                <div class="order-info__row">
                     <dt>Оплата</dt>
-                    <dd>При отриманні</dd>
+                    <dd>@(Model.PaymentMethodLabel ?? "LiqPay (онлайн)")</dd>
                 </div>
                 <div class="order-info__row">
                     <dt>Разом</dt>
@@ -96,69 +142,44 @@
                 <span class="postsale-protection__icon" aria-hidden="true">🛡</span>
                 <div>
                     <strong>Захист покупця</strong>
-                    <span>Кошти продавцю переказуються лише після підтвердження отримання товару. Повернення можливе протягом 14 днів з дати доставки.</span>
+                    <span>Кошти продавцю переказуються лише після підтвердження отримання товару. Повернення можливе протягом 14 днів з дати доставки - окремо на кожен товар.</span>
                 </div>
-            </div>
-            <div class="postsale-actions">
-                <button type="button" class="btn btn-outline-secondary" data-postsale-open="return">Оформити повернення</button>
-                <button type="button" class="btn btn-outline-secondary" data-postsale-open="dispute">Відкрити спір</button>
             </div>
         </section>
     }
 </div>
 
-<div class="postsale-modal" data-postsale-modal="return" hidden>
-    <div class="postsale-modal__card">
-        <button type="button" class="postsale-modal__close" aria-label="Закрити" data-postsale-close>×</button>
-        <div data-postsale-form>
-            <h3>Оформлення повернення</h3>
-            <p>Замовлення #@Model.Id.ToString()[..8].ToUpperInvariant()</p>
-            <label class="form-label mt-2">Причина повернення</label>
-            <select class="form-select">
-                <option>Товар не підійшов за розміром</option>
-                <option>Товар не відповідає опису</option>
-                <option>Отримано пошкоджений товар</option>
-                <option>Передумав(-ла)</option>
-                <option>Інше</option>
-            </select>
-            <label class="form-label mt-3">Коментар (необов'язково)</label>
-            <textarea class="form-control" rows="3" placeholder="Розкажіть детальніше..."></textarea>
-            <button type="button" class="btn btn-primary mt-3 w-100" data-postsale-submit="return">Надіслати заявку</button>
-        </div>
-        <div class="postsale-modal__success" data-postsale-success hidden>
-            <span aria-hidden="true">✓</span>
-            <h3>Заявку прийнято</h3>
-            <p>Ми надіслали інструкції з поверненням на вашу пошту. Очікуйте на зворотний зв'язок протягом 1–2 робочих днів.</p>
-            <button type="button" class="btn btn-outline-secondary" data-postsale-close>Закрити</button>
-        </div>
-    </div>
-</div>
-
-<div class="postsale-modal" data-postsale-modal="dispute" hidden>
-    <div class="postsale-modal__card">
-        <button type="button" class="postsale-modal__close" aria-label="Закрити" data-postsale-close>×</button>
-        <div data-postsale-form>
-            <h3>Центр вирішення спірних питань</h3>
-            <p>Замовлення #@Model.Id.ToString()[..8].ToUpperInvariant()</p>
-            <label class="form-label mt-2">Тип проблеми</label>
-            <select class="form-select">
-                <option>Товар не прийшов</option>
-                <option>Товар не відповідає опису</option>
-                <option>Продавець не виходить на зв'язок</option>
-                <option>Інше</option>
-            </select>
-            <label class="form-label mt-3">Опишіть ситуацію</label>
-            <textarea class="form-control" rows="3" placeholder="Що сталося?"></textarea>
-            <button type="button" class="btn btn-primary mt-3 w-100" data-postsale-submit="dispute">Відкрити спір</button>
-        </div>
-        <div class="postsale-modal__success" data-postsale-success hidden>
-            <span aria-hidden="true">✓</span>
-            <h3>Спір відкрито</h3>
-            <p>Підтримка маркетплейсу підключиться до вирішення ситуації та зв'яжеться з вами протягом 24 годин.</p>
-            <button type="button" class="btn btn-outline-secondary" data-postsale-close>Закрити</button>
+@if (Model.Status is Marketplace.Domain.Enums.OrderStatus.Delivered && Model.Items.Any(i => i.ReturnRequest is null))
+{
+    <div class="postsale-modal" data-postsale-modal="return" hidden>
+        <div class="postsale-modal__card">
+            <button type="button" class="postsale-modal__close" aria-label="Закрити" data-postsale-close>×</button>
+            <form asp-controller="Order" asp-action="RequestReturn" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="orderId" value="@Model.Id" />
+                <input type="hidden" name="orderItemId" data-postsale-item-id-field />
+                <h3>Оформлення повернення</h3>
+                <p>Замовлення #@Model.Id.ToString()[..8].ToUpperInvariant()</p>
+                <label class="form-label mt-2">Причина повернення</label>
+                <select class="form-select" name="reason" required>
+                    <option value="">Оберіть причину</option>
+                    <option>Товар пошкоджений або несправний</option>
+                    <option>Товар не відповідає опису</option>
+                    <option>Отримано не той товар</option>
+                    <option>Не підійшов розмір або колір</option>
+                    <option>Передумав(-ла)</option>
+                    <option>Інше</option>
+                </select>
+                <label class="form-label mt-3">Опишіть ситуацію</label>
+                <textarea class="form-control" name="comment" rows="3" minlength="10" placeholder="Розкажіть детальніше, що не так із товаром (мінімум 10 символів)..." required></textarea>
+                <label class="form-label mt-3">Фото товару</label>
+                <input type="file" class="form-control" name="photos" accept="image/*" multiple required />
+                <div class="form-text">Додайте від 1 до 5 фото - це підтвердження стану товару для продавця.</div>
+                <button type="submit" class="btn btn-primary mt-3 w-100">Надіслати заявку</button>
+            </form>
         </div>
     </div>
-</div>
+}
 
 @section Scripts {
     <script src="~/js/postsale.js" asp-append-version="true"></script>

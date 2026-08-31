@@ -64,5 +64,19 @@ namespace Marketplace.Web.Models.Businesses
         public string ShippingCity { get; set; } = string.Empty;
         public string ShippingStreet { get; set; } = string.Empty;
         public List<BusinessOrderLineViewModel> Items { get; set; } = new();
+        public List<BusinessPostSaleRequestViewModel> PostSaleRequests { get; set; } = new();
+    }
+
+    public class BusinessPostSaleRequestViewModel
+    {
+        public Guid Id { get; set; }
+        public string ProductName { get; set; } = string.Empty;
+        public string ImageUrl { get; set; } = string.Empty;
+        public string Reason { get; set; } = string.Empty;
+        public string? Comment { get; set; }
+        public List<string> PhotoUrls { get; set; } = new();
+        public PostSaleRequestStatus Status { get; set; }
+        public string? SellerResponse { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

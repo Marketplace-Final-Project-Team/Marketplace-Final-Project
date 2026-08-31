@@ -7,9 +7,8 @@
     var productInitial = string.IsNullOrWhiteSpace(Model.Name) ? "M" : Model.Name[..1].ToUpperInvariant();
     var storeInitial = string.IsNullOrWhiteSpace(Model.StoreName) ? "M" : Model.StoreName[..1].ToUpperInvariant();
     var productCode = Model.Id.ToString()[..8].ToUpperInvariant();
-    var isLowStock = Model.Quantity <= 5;
-    var variantCategories = new[] { "Одяг", "Спорт і відпочинок" };
-    var showVariants = variantCategories.Contains(Model.CategoryName, StringComparer.OrdinalIgnoreCase);
+    var isLowStock = Model.Quantity <= Model.LowStockThreshold;
+    var isNew = Model.CreatedAt >= DateTime.UtcNow.AddDays(-14);
 }
 
 @section Styles {
@@ -45,10 +44,13 @@
     <article class="product-hero">
         <section class="product-gallery" aria-label="Галерея товару @Model.Name">
             <div class="product-gallery__stage">
-                <span class="product-gallery__badge">Новинка</span>
+                @if (isNew)
+                {
+                    <span class="product-gallery__badge">Новинка</span>
+                }
                 @if (!string.IsNullOrWhiteSpace(mainImage))
                 {
-                    <img src="@mainImage" alt="@Model.Name — основне зображення" data-gallery-main />
+                    <img src="@mainImage" alt="@Model.Name - основне зображення" data-gallery-main />
                 }
                 else
                 {
@@ -73,7 +75,7 @@
                                 class="product-gallery__thumb @(index == 0 ? "is-active" : null)"
                                 data-gallery-thumb
                                 data-image-url="@imageUrl"
-                                data-image-alt="@Model.Name — зображення @(index + 1)"
+                                data-image-alt="@Model.Name - зображення @(index + 1)"
                                 data-image-index="@(index + 1)"
                                 aria-label="Показати зображення @(index + 1)"
                                 aria-pressed="@(index == 0 ? "true" : "false")">
@@ -111,31 +113,6 @@
                     @(isLowStock ? "Рекомендуємо не відкладати замовлення" : $"Доступно до замовлення: {Model.Quantity} шт.")
                 </p>
             </div>
-
-            @if (showVariants)
-            {
-                <div class="product-variants">
-                    <div class="product-variants__row">
-                        <span class="product-variants__label">Колір</span>
-                        <div class="product-variants__options" data-variant-group="color">
-                            <button type="button" class="product-variant-swatch is-selected" style="--swatch: #172033" data-variant-option aria-pressed="true" title="Чорний"></button>
-                            <button type="button" class="product-variant-swatch" style="--swatch: #667085" data-variant-option aria-pressed="false" title="Сірий"></button>
-                            <button type="button" class="product-variant-swatch" style="--swatch: #3157d7" data-variant-option aria-pressed="false" title="Синій"></button>
-                        </div>
-                    </div>
-                    <div class="product-variants__row">
-                        <span class="product-variants__label">Розмір</span>
-                        <div class="product-variants__options" data-variant-group="size">
-                            @foreach (var size in new[] { "XS", "S", "M", "L", "XL" })
-                            {
-                                <button type="button" class="product-variant-chip @(size == "M" ? "is-selected" : null)" data-variant-option aria-pressed="@(size == "M" ? "true" : "false")">@size</button>
-                            }
-                        </div>
-                        <button type="button" class="product-variants__size-guide" data-open-size-guide>Таблиця розмірів</button>
-                    </div>
-                    <p class="product-variants__hint">Приклад інтерфейсу вибору варіанту — наразі товар продається в єдиній базовій комплектації.</p>
-                </div>
-            }
 
             <div class="product-buybox">
                 @if (User.Identity?.IsAuthenticated == true)
@@ -221,29 +198,6 @@
         </section>
     </article>
 
-    @if (showVariants)
-    {
-        <div class="size-guide-modal" data-size-guide hidden>
-            <div class="size-guide-modal__card">
-                <button type="button" class="size-guide-modal__close" aria-label="Закрити" data-close-size-guide>×</button>
-                <h3>Загальна таблиця розмірів</h3>
-                <p class="size-guide-modal__note">Орієнтовна відповідність — точні мірки можуть відрізнятися залежно від бренду.</p>
-                <table class="size-guide-table">
-                    <thead>
-                        <tr><th>Розмір</th><th>Груди, см</th><th>Талія, см</th><th>Стегна, см</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>XS</td><td>82–86</td><td>62–66</td><td>88–92</td></tr>
-                        <tr><td>S</td><td>86–90</td><td>66–70</td><td>92–96</td></tr>
-                        <tr><td>M</td><td>90–96</td><td>70–76</td><td>96–102</td></tr>
-                        <tr><td>L</td><td>96–102</td><td>76–82</td><td>102–108</td></tr>
-                        <tr><td>XL</td><td>102–110</td><td>82–90</td><td>108–116</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    }
-
     <div class="product-information">
         <section class="product-content-card product-description-card">
             <span class="product-section-kicker">Про товар</span>
@@ -275,7 +229,7 @@
 
         <div class="product-reviews__summary">
             <div class="product-reviews__score">
-                <strong>@(Model.ReviewCount > 0 ? Model.AverageRating.ToString("0.0") : "—")</strong>
+                <strong>@(Model.ReviewCount > 0 ? Model.AverageRating.ToString("0.0") : "-")</strong>
                 <span>@(Model.ReviewCount > 0 ? $"на основі {Model.ReviewCount} відгуків" : "поки без відгуків")</span>
             </div>
 
@@ -394,7 +348,7 @@
                             {
                                 <span aria-hidden="true">@relatedInitial</span>
                             }
-                            <small>В наявності</small>
+                            <small>@(related.Quantity > 0 ? "В наявності" : "Немає в наявності")</small>
                         </a>
                         <div class="related-card__body">
                             <span>@related.CategoryName</span>
@@ -407,19 +361,9 @@
         </section>
     }
 
-    <script type="application/json" id="current-product-data">
-        {
-            "id": "@Model.Id",
-            "name": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Name)),
-            "categoryName": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategoryName)),
-            "imageUrl": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MainImageUrl)),
-            "price": @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Price.ToString("N2") + " ₴"))
-        }
-    </script>
 </div>
 
 @section Scripts {
     <script src="~/js/product-details.js" asp-append-version="true"></script>
-    <script src="~/js/recently-viewed.js" asp-append-version="true"></script>
     <script src="~/js/product-extras.js" asp-append-version="true"></script>
 }

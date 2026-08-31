@@ -19,6 +19,7 @@
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/cookie-consent.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Marketplace.Web.styles.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -120,13 +121,25 @@
 
     <footer class="border-top footer text-muted">
         <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
-            <span>&copy; 2026 MarketPlace — навчальний маркетплейс</span>
-            <a asp-controller="Home" asp-action="Support" class="text-muted">Підтримка</a>
+            <span>&copy; 2026 MarketPlace - навчальний маркетплейс</span>
+            <div class="d-flex flex-wrap gap-3">
+                <a asp-controller="Home" asp-action="Privacy" class="text-muted">Конфіденційність</a>
+                <a asp-controller="Home" asp-action="Terms" class="text-muted">Умови використання</a>
+                <a asp-controller="Home" asp-action="CookiePolicy" class="text-muted">Політика кукі</a>
+                <a asp-controller="Home" asp-action="ReturnsPolicy" class="text-muted">Повернення та обмін</a>
+                <a asp-controller="Home" asp-action="ShippingPolicy" class="text-muted">Доставка</a>
+                <a asp-controller="Home" asp-action="SellerRules" class="text-muted">Для продавців</a>
+                <a asp-controller="Home" asp-action="Support" class="text-muted">Підтримка</a>
+            </div>
         </div>
     </footer>
+
+    <partial name="_CookieConsent" />
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/cookie-consent.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
 

@@ -34,7 +34,7 @@
 
     <div class="profile-summary">
         <h1>Сповіщення</h1>
-        <p>Статус замовлень, нові товари та підбірки для вас — в одному місці.</p>
+        <p>Статус замовлень, нові товари та підбірки для вас - в одному місці.</p>
     </div>
 
     <div class="notif-tabs" role="tablist" aria-label="Категорії сповіщень">
@@ -55,7 +55,7 @@
 
     <section class="notif-panel" data-notif-panel="orders">
         <p class="activity-note">
-            Це стрічка поточних статусів ваших замовлень — історія проміжних змін статусу не зберігається.
+            Це стрічка поточних статусів ваших замовлень - історія проміжних змін статусу не зберігається.
         </p>
 
         @if (Model.OrderActivity.Count == 0)
@@ -80,7 +80,7 @@
                                     <a asp-controller="Order" asp-action="Details" asp-route-id="@item.OrderId">
                                         Замовлення #@item.OrderId.ToString()[..8].ToUpperInvariant()
                                     </a>
-                                    — @StatusLabel(item.Status)
+                                    - @StatusLabel(item.Status)
                                 </strong>
                                 <span>@item.Timestamp.ToLocalTime().ToString("dd.MM.yyyy HH:mm") · @item.TotalAmount.ToString("N2") ₴</span>
                             </div>
@@ -92,7 +92,7 @@
     </section>
 
     <section class="notif-panel" data-notif-panel="new" hidden>
-        <p class="activity-note">Щойно з'явилися в каталозі — можливо, саме те, що ви шукали.</p>
+        <p class="activity-note">Щойно з'явилися в каталозі - можливо, саме те, що ви шукали.</p>
 
         @if (Model.NewProducts.Count == 0)
         {

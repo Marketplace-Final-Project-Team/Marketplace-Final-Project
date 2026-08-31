@@ -36,6 +36,8 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/search-autocomplete.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/saved-searches.css" asp-append-version="true" />
 }
 
 <div class="shop-page">
@@ -62,9 +64,11 @@
 
     <form asp-action="Index" method="get" class="catalog-filters" role="search" aria-label="Фільтри каталогу">
         <div class="catalog-filters__grid">
-            <div class="catalog-filters__field" style="grid-column: 1 / -1;">
+            <div class="catalog-filters__field" style="grid-column: 1 / -1;" data-search-wrapper>
                 <label for="filter-search">Пошук</label>
-                <input id="filter-search" name="Search" value="@filter.Search" class="form-control" placeholder="Назва, опис або категорія" />
+                <div class="catalog-filters__search-row">
+                    <input id="filter-search" name="Search" value="@filter.Search" class="form-control" placeholder="Назва, опис або категорія" data-search-autocomplete autocomplete="off" />
+                </div>
             </div>
 
             <div class="catalog-filters__field">
@@ -82,7 +86,7 @@
                 <label>Ціна, ₴</label>
                 <div class="catalog-filters__price">
                     <input type="number" min="0" step="1" name="MinPrice" value="@filter.MinPrice" class="form-control" placeholder="від" aria-label="Мінімальна ціна" />
-                    <span>—</span>
+                    <span>-</span>
                     <input type="number" min="0" step="1" name="MaxPrice" value="@filter.MaxPrice" class="form-control" placeholder="до" aria-label="Максимальна ціна" />
                 </div>
             </div>
@@ -114,7 +118,7 @@
             </div>
         </div>
 
-        <div class="catalog-filters__actions d-flex justify-content-between align-items-center mt-3">
+        <div class="catalog-filters__actions d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
             <div>
                 @if (!isAdultConfirmed)
                 {
@@ -128,15 +132,24 @@
                 }
             </div>
 
-            <div class="d-flex gap-2">
+            <div class="d-flex gap-2 flex-wrap">
                 @if (filter.HasActiveFilters)
                 {
                     <a asp-action="Index" class="btn btn-outline-secondary">Скинути фільтри</a>
+                    <button type="button" class="btn btn-outline-primary" data-save-search>☆ Зберегти пошук</button>
                 }
                 <button type="submit" class="btn btn-primary">Застосувати</button>
             </div>
         </div>
     </form>
+
+    <section class="saved-searches" data-saved-searches hidden>
+        <div class="saved-searches__heading">
+            <span class="saved-searches__kicker">Збережені запити</span>
+            <p>Швидко повертайтесь до пошуків, що вас цікавлять - нові товари з часу останнього перегляду позначені міткою «Нове».</p>
+        </div>
+        <div class="saved-searches__list" data-saved-searches-list></div>
+    </section>
 
     <div class="catalog-meta">Знайдено товарів: <strong>@Model.TotalCount</strong></div>
 
@@ -154,8 +167,9 @@
         <div class="catalog-grid">
             @foreach (var product in Model.Products)
             {
-                <article class="catalog-card position-relative">
-                    
+                <article class="catalog-card position-relative" data-product-id="@product.Id">
+                    <span class="catalog-card__new-badge" data-new-badge hidden>Нове</span>
+
                     @if (product.IsAgeRestricted)
                     {
                         <span class="position-absolute top-0 end-0 bg-danger text-white text-xs fw-bold px-2 py-1 rounded-pill z-1 m-2 shadow">
@@ -164,7 +178,7 @@
                     }
 
                     <button type="button" 
-                            class="catalog-card__media border-0 p-0 text-start bg-transparent w-100" 
+                            class="catalog-card__media border-0 p-0 text-start bg-transparent w-100 position-relative" 
                             aria-label="Переглянути @product.Name"
                             onclick="checkAgeAndNavigate('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
                         @if (!string.IsNullOrWhiteSpace(product.MainImageUrl))
@@ -193,7 +207,7 @@
                         }
                         
                         <button type="button" 
-                                class="catalog-card__title border-0 p-0 text-start bg-transparent text-primary" 
+                                class="catalog-card__title border-0 p-0 text-start bg-transparent text-primary fw-semibold w-100" 
                                 onclick="checkAgeAndNavigate('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
                             @product.Name
                         </button>
@@ -307,6 +321,8 @@
 </div>
 
 @section Scripts {
+    <script src="~/js/search-autocomplete.js" asp-append-version="true"></script>
+    <script src="~/js/saved-searches.js" asp-append-version="true"></script>
     <script>
         const isAdultConfirmedServer = @(isAdultConfirmed.ToString().ToLower());
         const ageModal = document.getElementById('ageVerificationModal');

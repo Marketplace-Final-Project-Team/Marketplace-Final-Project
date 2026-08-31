@@ -1,0 +1,61 @@
+.cookie-consent {
+    align-items: flex-end;
+    background: rgba(23, 32, 51, 0.45);
+    display: flex;
+    inset: 0;
+    justify-content: center;
+    padding: 1.25rem;
+    position: fixed;
+    z-index: 1100;
+}
+
+.cookie-consent__card {
+    background: #fff;
+    border-radius: 1.1rem;
+    box-shadow: 0 1rem 3rem rgba(23, 32, 51, 0.25);
+    max-width: 30rem;
+    padding: 1.75rem;
+    text-align: center;
+}
+
+.cookie-consent__icon {
+    display: block;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.cookie-consent__card h2 {
+    font-size: 1.15rem;
+    font-weight: 750;
+    margin-bottom: 0.6rem;
+}
+
+.cookie-consent__card p {
+    color: #667085;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.cookie-consent__card a {
+    color: #3157d7;
+    font-weight: 650;
+}
+
+.cookie-consent__actions {
+    display: flex;
+    gap: 0.6rem;
+    justify-content: center;
+    margin-top: 1.25rem;
+}
+
+.cookie-consent__actions .btn {
+    border-radius: 0.7rem;
+    flex: 1;
+    font-weight: 650;
+}
+
+@media (max-width: 480px) {
+    .cookie-consent {
+        align-items: center;
+    }
+}

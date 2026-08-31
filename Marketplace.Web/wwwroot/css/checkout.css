@@ -214,3 +214,92 @@
     font-size: 0.8rem;
     margin: 0.6rem 0 0;
 }
+
+/* ---------- Delivery carrier selection ---------- */
+
+.checkout-carrier-options {
+    display: grid;
+    gap: 0.65rem;
+    margin-bottom: 1.1rem;
+}
+
+.checkout-carrier-option {
+    align-items: center;
+    border: 1px solid var(--shop-line);
+    border-radius: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.checkout-carrier-option:hover {
+    border-color: var(--shop-primary);
+}
+
+.checkout-carrier-option:has(input:checked) {
+    background: var(--shop-soft);
+    border-color: var(--shop-primary);
+}
+
+.checkout-carrier-option__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.checkout-carrier-option__body span {
+    color: var(--shop-muted);
+    font-size: 0.82rem;
+}
+
+.checkout-nova-poshta[hidden] {
+    display: none;
+}
+
+.checkout-np-suggest {
+    background: #fff;
+    border: 1px solid var(--shop-line);
+    border-radius: 0.75rem;
+    box-shadow: 0 0.65rem 1.6rem rgba(23, 32, 51, 0.12);
+    margin-top: 0.35rem;
+    max-height: 14rem;
+    overflow-y: auto;
+    position: absolute;
+    width: 100%;
+    z-index: 40;
+}
+
+.checkout-np-suggest button {
+    background: none;
+    border: none;
+    display: block;
+    font-size: 0.88rem;
+    padding: 0.55rem 0.8rem;
+    text-align: left;
+    width: 100%;
+}
+
+.checkout-np-suggest button:hover {
+    background: var(--shop-soft);
+}
+
+.checkout-np-suggest__empty {
+    color: var(--shop-muted);
+    font-size: 0.85rem;
+    padding: 0.6rem 0.8rem;
+}
+
+.checkout-review-seller {
+    color: var(--shop-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin: 1rem 0 0.4rem;
+    text-transform: uppercase;
+}
+
+.checkout-review-seller:first-of-type {
+    margin-top: 0;
+}
