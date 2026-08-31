@@ -1,7 +1,6 @@
 ﻿using Marketplace.BLL.Common;
 using Marketplace.BLL.DTOs;
 using Marketplace.Domain.Enums;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Marketplace.BLL.Interfaces
 {
@@ -23,5 +22,7 @@ namespace Marketplace.BLL.Interfaces
         Task<ServiceResult> ApproveAdultStatusAsync(Guid businessId);
         Task<ServiceResult> RejectAdultStatusAsync(Guid businessId, string reason);
         Task<ServiceResult> ChangeBusinessComission(Guid businessId, decimal commissionPercent);
+        Task<DataResult<AdminCommissionStatsDto>> GetCommissionStatsByPeriodAsync(DateTime? startDate, DateTime? endDate);
+        Task<decimal> GetTotalCommissionAsync();
     }
 }

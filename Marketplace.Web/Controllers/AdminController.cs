@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+﻿ using System.Security.Claims;
 using Marketplace.BLL.Interfaces;
 using Marketplace.BLL.Services;
 using Marketplace.Domain.Enums;
@@ -133,6 +133,7 @@ namespace Marketplace.Web.Controllers
                         Name = p.Name,
                         ImageUrl = p.ImageUrl,
                         Price = p.Price,
+                        Business = p.Business,
                         Status = p.Status,
                     }).ToList(),
                     TotalItems = result.TotalItems,
@@ -149,7 +150,7 @@ namespace Marketplace.Web.Controllers
             {
                 Search = filter.Search,
                 Status = filter.Status,
-                SortDescending = filter.SortDescending,
+                SortOption = filter.SortOption,
                 Pagination = new PaginationParams
                 {
                     Page = filter.Page,
@@ -533,6 +534,33 @@ namespace Marketplace.Web.Controllers
             return value.Length <= 4
                 ? new string('*', 8)
                 : new string('*', 8) + value[^4..];
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetTotalCommissionsAsync() 
+        {
+            var totalCommission = await _adminService.GetTotalCommissionAsync();
+
+            return View(totalCommission);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetCommissionsStatsByPeriodAsync(CommissionStatsQueryViewModel query) 
+        {
+            var res = await _adminService.GetCommissionStatsByPeriodAsync(query.StartDate, query.EndDate);
+
+            if(!res.Succeeded) 
+            {
+                return NotFound();
+            }
+
+            return View(new CommissionStatsAdminViewModel
+            {
+                Daily = res.Data!.Daily,
+                ByBusiness = res.Data!.ByBusiness,
+                TotalCommissionByPeriod = res.Data!.TotalCommissionByPeriod,
+            });
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Marketplace.BLL.DTOs
     {
         public string? Search { get; set; }
         public BusinessStatus? Status { get; set; }
-        public bool? SortDescending { get; set; }
+        public BusinessSortOption SortOption { get; set; } = BusinessSortOption.CreatedAtDesc;
         public PaginationParams Pagination { get; set; } = new PaginationParams();
     }
 }
