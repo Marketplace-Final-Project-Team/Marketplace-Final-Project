@@ -405,5 +405,8 @@ FodyWeavers.xsd
 .env.*
 !.env.example
 
-# Database volume
-mssql/
+# Database data
+/opt/marketplace-data/mssql/
+
+# HTTPS certificates
+devops/nginx/ssl/
