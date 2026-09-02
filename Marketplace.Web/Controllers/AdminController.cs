@@ -22,7 +22,6 @@ namespace Marketplace.Web.Controllers
         private readonly IMarketplaceBalanceService _marketplaceBalanceService;
         private readonly ICategoryService _categoryService;
         private readonly ISchedulerFactory _schedulerFactory;
-        private readonly IDiscountService _discountService;
 
         public AdminController(
             IAdminService adminService,
@@ -31,8 +30,7 @@ namespace Marketplace.Web.Controllers
             IProductService productService,
             IMarketplaceBalanceService marketplaceBalanceService,
             ICategoryService categoryService,
-            ISchedulerFactory schedulerFactory,
-            IDiscountService discountService)
+            ISchedulerFactory schedulerFactory)
         {
             _adminService = adminService;
             _settingsService = settingsService;
@@ -41,7 +39,6 @@ namespace Marketplace.Web.Controllers
             _marketplaceBalanceService = marketplaceBalanceService;
             _categoryService = categoryService;
             _schedulerFactory = schedulerFactory;
-            _discountService = discountService;
         }
 
         private string? CurrentAdminId => User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -154,23 +151,15 @@ namespace Marketplace.Web.Controllers
                 }
             });
 
-            var items = new List<BusinessItemAdminViewModel>();
-            foreach (var b in result.Items)
+            var items = result.Items.Select(b => new BusinessItemAdminViewModel
             {
-                var discount = await _discountService.GetBusinessDiscount(b.Id);
-                items.Add(new BusinessItemAdminViewModel
-                {
-                    Id = b.Id,
-                    Name = b.Name,
-                    LogoUrl = b.LogoUrl,
-                    Owner = b.Owner,
-                    Status = b.Status,
-                    CommissionPercent = b.CommissionPercent,
-                    HasActiveDiscount = discount.IsActive,
-                    DiscountPercent = discount.DiscountPercent,
-                    DiscountEndDate = discount.EndDate,
-                });
-            }
+                Id = b.Id,
+                Name = b.Name,
+                LogoUrl = b.LogoUrl,
+                Owner = b.Owner,
+                Status = b.Status,
+                CommissionPercent = b.CommissionPercent,
+            }).ToList();
 
             return View(new AdminBusinessesPageViewModel
             {

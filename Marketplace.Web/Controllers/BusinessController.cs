@@ -22,6 +22,7 @@ namespace Marketplace.Web.Controllers
         private readonly IReviewService _reviewService;
         private readonly IPostSaleService _postSaleService;
         private readonly IPromoCodeService _promoCodeService;
+        private readonly IDiscountService _discountService;
         private readonly UserManager<User> _userManager;
         private readonly IEmailSender _emailSender;
         private readonly AppDbContext _context;
@@ -35,6 +36,7 @@ namespace Marketplace.Web.Controllers
             IReviewService reviewService,
             IPostSaleService postSaleService,
             IPromoCodeService promoCodeService,
+            IDiscountService discountService,
             UserManager<User> userManager,
             IEmailSender emailSender,
             AppDbContext context,
@@ -47,6 +49,7 @@ namespace Marketplace.Web.Controllers
             _reviewService = reviewService;
             _postSaleService = postSaleService;
             _promoCodeService = promoCodeService;
+            _discountService = discountService;
             _userManager = userManager;
             _emailSender = emailSender;
             _context = context;
@@ -431,13 +434,59 @@ namespace Marketplace.Web.Controllers
             }
 
             var promoCodes = await _promoCodeService.GetForBusinessAsync(businessId);
+            var businessDiscount = await _discountService.GetBusinessDiscount(businessId);
 
             return View(new BusinessPromoCodesPageViewModel
             {
                 BusinessId = businessId,
                 StoreName = business.StoreName,
-                PromoCodes = promoCodes
+                PromoCodes = promoCodes,
+                BusinessDiscount = businessDiscount
             });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetBusinessDiscount(Guid businessId, decimal discountPercent, DateTime discountStartDate, DateTime discountEndDate)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var result = await _discountService.SetBusinessDiscount(businessId, discountPercent, discountStartDate, discountEndDate);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "BusinessDiscountSet",
+                    $"Встановлено знижку {discountPercent}% на весь магазин «{business.StoreName}».",
+                    actorUserId: _userManager.GetUserId(User));
+            }
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+
+            return RedirectToAction(nameof(PromoCodes), new { businessId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveBusinessDiscount(Guid businessId)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var result = await _discountService.RemoveBusinessDiscount(businessId);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "BusinessDiscountRemoved",
+                    $"Скасовано знижку на весь магазин «{business.StoreName}».",
+                    actorUserId: _userManager.GetUserId(User));
+            }
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+
+            return RedirectToAction(nameof(PromoCodes), new { businessId });
         }
 
         [HttpPost]

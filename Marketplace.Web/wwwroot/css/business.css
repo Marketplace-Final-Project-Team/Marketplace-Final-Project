@@ -217,6 +217,13 @@
     padding: 0 1.35rem 1.4rem;
 }
 
+.business-discount-status {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    margin-bottom: 0.75rem;
+}
+
 .seller-store__identity-row {
     align-items: flex-end;
     display: flex;

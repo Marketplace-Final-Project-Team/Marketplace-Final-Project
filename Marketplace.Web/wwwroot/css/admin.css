@@ -656,29 +656,6 @@
     width: 4.5rem;
 }
 
-.admin-discount-status {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-    margin-bottom: 0.4rem;
-}
-
-.admin-discount-form {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    min-width: 11rem;
-}
-
-.admin-discount-form__date {
-    background: var(--admin-surface);
-    border: 1px solid var(--admin-line);
-    border-radius: 0.5rem;
-    color: var(--admin-ink);
-    font-size: 0.78rem;
-    padding: 0.3rem 0.45rem;
-}
-
 /* ---------- Limits / config forms ---------- */
 
 .admin-limits-form {
