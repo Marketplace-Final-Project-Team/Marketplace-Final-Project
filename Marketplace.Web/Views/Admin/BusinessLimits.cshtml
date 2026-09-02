@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.BusinessLimitsViewModel
 
 @{
-    ViewData["Title"] = "Ліміти бізнесу — Адмін-панель";
+    ViewData["Title"] = "Ліміти бізнесу - Адмін-панель";
 }
 
 @section Styles {
@@ -17,7 +17,7 @@
                 <div>
                     <div class="admin-kicker">Admin</div>
                     <h1 class="admin-title">Ліміти бізнесу</h1>
-                    <p class="admin-subtitle">Правила, які обмежують продавців на платформі — застосовуються до всіх бізнесів однаково.</p>
+                    <p class="admin-subtitle">Правила, які обмежують продавців на платформі - застосовуються до всіх бізнесів однаково.</p>
                 </div>
             </header>
 
@@ -25,10 +25,14 @@
             {
                 <div class="admin-alert"><span>✓</span><p>@success</p></div>
             }
+            @if (TempData["Error"] is string error)
+            {
+                <div class="admin-alert admin-alert--error"><span>!</span><p>@error</p></div>
+            }
 
             <div class="admin-note">
                 <strong>Значення зберігаються реально</strong>
-                Ліміти зберігаються в таблиці <code>SystemSettings</code>. Поки що вони не застосовуються в <code>DiscountService.SetDiscountAsync</code>, <code>PromoCodeService.CreateAsync</code> і лічильнику товарів у <code>ProductService</code> — застосування вимагатиме правок у цих наявних сервісах.
+                Ліміти зберігаються в таблиці <code>SystemSettings</code> і застосовуються одразу: обмежують знижки на товар і за промокодом, кількість товарів та активних промокодів на бізнес, а також автоматично скасовують прострочені замовлення «Очікує».
             </div>
 
             <div class="admin-panel">
@@ -39,11 +43,11 @@
                     </div>
                     <div class="admin-limits-form__field">
                         <label for="maxDiscount">Макс. знижка на товар, %</label>
-                        <input type="number" id="maxDiscount" name="MaxDiscountPercent" min="1" max="99" value="@Model.MaxDiscountPercent" />
+                        <input type="number" id="maxDiscount" name="MaxDiscountPercent" min="1" max="100" value="@Model.MaxDiscountPercent" />
                     </div>
                     <div class="admin-limits-form__field">
                         <label for="maxPromo">Макс. знижка за промокодом, %</label>
-                        <input type="number" id="maxPromo" name="MaxPromoCodePercent" min="1" max="99" value="@Model.MaxPromoCodePercent" />
+                        <input type="number" id="maxPromo" name="MaxPromoCodePercent" min="1" max="100" value="@Model.MaxPromoCodePercent" />
                     </div>
                     <div class="admin-limits-form__field">
                         <label for="maxActivePromo">Макс. активних промокодів на бізнес</label>
@@ -57,7 +61,7 @@
                     <div class="admin-limits-form__field">
                         <label for="lowStock">Поріг низького залишку, шт.</label>
                         <input type="number" id="lowStock" name="LowStockThreshold" min="0" value="@Model.LowStockThreshold" />
-                        <small>Нижче цього значення продавцю надсилається сповіщення.</small>
+                        <small>Нижче цього значення на сторінці товару з'являється позначка «мало на складі».</small>
                     </div>
 
                     <div class="admin-limits-form__actions">

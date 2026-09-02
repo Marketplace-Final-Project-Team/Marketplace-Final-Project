@@ -1,4 +1,5 @@
 ﻿using Marketplace.BLL.Interfaces;
+using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -9,10 +10,12 @@ namespace Marketplace.Web.Controllers
     public class WishlistCollectionController : Controller
     {
         private readonly IWishlistCollectionService _collectionService;
+        private readonly IWishlistService _wishlistService;
 
-        public WishlistCollectionController(IWishlistCollectionService collectionService)
+        public WishlistCollectionController(IWishlistCollectionService collectionService, IWishlistService wishlistService)
         {
             _collectionService = collectionService;
+            _wishlistService = wishlistService;
         }
 
         private string GetUserId()
@@ -38,7 +41,15 @@ namespace Marketplace.Web.Controllers
             if (collection == null)
                 return NotFound();
 
-            return View(collection);
+            var wishlist = await _wishlistService.GetWishlistAsync(userId);
+            var alreadyInCollection = collection.Items.Select(i => i.ProductId).ToHashSet();
+            var availableToAdd = wishlist.Items.Where(i => !alreadyInCollection.Contains(i.ProductId)).ToList();
+
+            return View(new WishlistCollectionDetailsViewModel
+            {
+                Collection = collection,
+                AvailableToAdd = availableToAdd
+            });
         }
 
         // GET: /WishlistCollection/Create
@@ -90,19 +101,20 @@ namespace Marketplace.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, string name)
         {
+            var userId = GetUserId();
+
             if (string.IsNullOrWhiteSpace(name))
             {
                 TempData["Error"] = "Назва не може бути порожньою.";
-                return View();
+                return RedirectToAction(nameof(Edit), new { id });
             }
 
-            var userId = GetUserId();
             var result = await _collectionService.UpdateCollectionAsync(userId, id, name);
 
             if (!result.Succeeded)
             {
                 TempData["Error"] = result.Message;
-                return View();
+                return RedirectToAction(nameof(Edit), new { id });
             }
 
             TempData["Success"] = "Колекцію оновлено!";
@@ -134,10 +146,6 @@ namespace Marketplace.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddItem(Guid collectionId, Guid productId, string? returnUrl = null)
         {
-            Console.WriteLine($"=== AddToCollectionAsync ===");
-            
-            Console.WriteLine($"collectionId: {collectionId}");
-            Console.WriteLine($"productId: {productId}");
             var userId = GetUserId();
             var result = await _collectionService.AddToCollectionAsync(userId, collectionId, productId);
 

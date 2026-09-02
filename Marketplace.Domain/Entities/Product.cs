@@ -17,9 +17,11 @@ namespace Marketplace.Domain.Entities
         public int Quantity { get; set; }
         public string MainImageUrl { get; set; } = string.Empty;
         public ProductStatus Status { get; set; } = ProductStatus.Pending;
+        public string? ModerationReason { get; set; }
         public ICollection<Discount> Discounts { get; set; } = new List<Discount>();
         public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public bool IsAdultOnly { get; set; }
     }
 }

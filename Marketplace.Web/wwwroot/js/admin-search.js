@@ -43,7 +43,10 @@
             let visibleCount = 0;
 
             state.rows.forEach((row) => {
-                const matchesText = !query || row.textContent.toLowerCase().includes(query);
+                // Rows that hold their label in an <input> (e.g. an inline rename field)
+                // won't show up in textContent, so they set data-search explicitly instead.
+                const searchText = row.dataset.search ?? row.textContent;
+                const matchesText = !query || searchText.toLowerCase().includes(query);
                 const matchesStatus = !status || row.dataset.status === status;
                 const visible = matchesText && matchesStatus;
                 row.hidden = !visible;

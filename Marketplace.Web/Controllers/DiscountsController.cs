@@ -87,10 +87,24 @@ namespace Marketplace.Web.Controllers
             
             var business = await _businessService.GetByIdAsync(businessId);
             if (business == null) return NotFound();
+
             var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.ProductCrud);
             if (!hasAccess) return Forbid();
             var result = await _discountService.SetBusinessDiscount(businessId, discountPercent, discountStartDate, discountEndDate);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "BusinessDiscountSet",
+                    $"Адміністратор встановив знижку {discountPercent}% на весь бізнес «{business.StoreName}».",
+                    actorUserId: CurrentUserId);
+                TempData["Success"] = result.Message;
+            }
+            else
+            {
+                TempData["Error"] = result.Message;
+            }
+
             return RedirectToAction("Index","Business");
+
         }
         
         [HttpPost]
@@ -100,10 +114,24 @@ namespace Marketplace.Web.Controllers
             
             var business = await _businessService.GetByIdAsync(businessId);
             if (business == null) return NotFound();
+
             var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.ProductCrud);
             if (!hasAccess) return Forbid();
             var result = await _discountService.RemoveBusinessDiscount(businessId);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "BusinessDiscountRemoved",
+                    $"Адміністратор скасував знижку на весь бізнес «{business.StoreName}».",
+                    actorUserId: CurrentUserId);
+                TempData["Success"] = result.Message;
+            }
+            else
+            {
+                TempData["Error"] = result.Message;
+            }
+
             return RedirectToAction("Index", "Business");
+
         }
                                                                
         [HttpGet]

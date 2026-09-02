@@ -1,6 +1,7 @@
 using System.Globalization;
 using CloudinaryDotNet;
 using Marketplace.BLL.Common;
+using Marketplace.BLL.Configs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.BLL.Services;
 using Marketplace.DAL.Data;
@@ -10,24 +11,43 @@ using Marketplace.Domain.Entities;
 using Marketplace.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
-using Marketplace.BLL.Configs;
 using Microsoft.EntityFrameworkCore;
+using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(2);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    //if (builder.Environment.IsDevelopment())
-    //{
-    //    options.UseInMemoryDatabase("MarketplaceFrontendDb");
-    //    return;
-    //}
-
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+// Quartz
+builder.Services.AddQuartz(q =>
+{
+    var pendingOrderExpiryJobKey = new JobKey("pending-order-expiry-job", "cleanup");
+    q.AddJob<PendingOrderExpiryJob>(opts => opts.WithIdentity(pendingOrderExpiryJobKey));
+    q.AddTrigger(opts => opts
+        .ForJob(pendingOrderExpiryJobKey)
+        .WithIdentity("pending-order-expiry-trigger", "cleanup")
+        .StartNow()
+        .WithSimpleSchedule(x => x.WithIntervalInHours(1).RepeatForever()));
+});
+
+builder.Services.AddQuartzHostedService(opt =>
+{
+    opt.WaitForJobsToComplete = true;
+});
+
+builder.Services.AddHttpClient();
 builder.Services
     .AddIdentity<User, IdentityRole>(options =>
     {
@@ -51,18 +71,18 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/forbidden";
 });
 
+// Cloudinary
 var cloudinaryAccount = new Account(
     builder.Configuration["Cloudinary:CloudName"] ?? "not-configured",
     builder.Configuration["Cloudinary:ApiKey"] ?? "not-configured",
     builder.Configuration["Cloudinary:ApiSecret"] ?? "not-configured");
-
 builder.Services.AddSingleton(new Cloudinary(cloudinaryAccount));
 
+// Repositories & Services
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
 builder.Services.AddScoped<IBusinessRepository, BusinessRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-
 builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -80,17 +100,13 @@ builder.Services.AddScoped<IWishlistCollectionService, WishlistCollectionService
 builder.Services.AddScoped<IPostSaleService, PostSaleService>();
 builder.Services.AddScoped<IPromoCodeService, PromoCodeService>();
 
-// System settings (admin-editable key/value store) and activity logs — new,
-// additive infrastructure that doesn't touch any existing service's behavior.
 builder.Services.AddMemoryCache();
 builder.Services.AddDataProtection();
 builder.Services.AddScoped<ISystemSettingsService, SystemSettingsService>();
 builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
 builder.Services.AddScoped<IMarketplaceBalanceService, MarketplaceBalanceService>();
 
-
 // LiqPay configuration
-
 builder.Services.Configure<LiqPayOptions>(builder.Configuration.GetSection("LiqPay"));
 builder.Services.AddScoped<IPaymentService, LiqPayPaymentService>();
 
@@ -108,8 +124,6 @@ using (var scope = app.Services.CreateScope())
     await Marketplace.DAL.Seed.DbSeeder.SeedAsync(scope.ServiceProvider);
 }
 
-
-
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -125,6 +139,7 @@ var localizationOptions = new RequestLocalizationOptions
 };
 
 app.UseRequestLocalization(localizationOptions);
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
@@ -132,10 +147,12 @@ if (!app.Environment.IsDevelopment())
 
 app.UseStatusCodePagesWithReExecute("/error/{0}");
 app.UseRouting();
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+app.MapControllers();
 app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}")

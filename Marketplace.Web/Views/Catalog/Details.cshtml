@@ -7,7 +7,7 @@
     var productInitial = string.IsNullOrWhiteSpace(Model.Name) ? "M" : Model.Name[..1].ToUpperInvariant();
     var storeInitial = string.IsNullOrWhiteSpace(Model.StoreName) ? "M" : Model.StoreName[..1].ToUpperInvariant();
     var productCode = Model.Id.ToString()[..8].ToUpperInvariant();
-    var isLowStock = Model.Quantity <= 5;
+    var isLowStock = Model.Quantity <= Model.LowStockThreshold;
     var isNew = Model.CreatedAt >= DateTime.UtcNow.AddDays(-14);
 }
 
@@ -50,7 +50,7 @@
                 }
                 @if (!string.IsNullOrWhiteSpace(mainImage))
                 {
-                    <img src="@mainImage" alt="@Model.Name — основне зображення" data-gallery-main />
+                    <img src="@mainImage" alt="@Model.Name - основне зображення" data-gallery-main />
                 }
                 else
                 {
@@ -75,7 +75,7 @@
                                 class="product-gallery__thumb @(index == 0 ? "is-active" : null)"
                                 data-gallery-thumb
                                 data-image-url="@imageUrl"
-                                data-image-alt="@Model.Name — зображення @(index + 1)"
+                                data-image-alt="@Model.Name - зображення @(index + 1)"
                                 data-image-index="@(index + 1)"
                                 aria-label="Показати зображення @(index + 1)"
                                 aria-pressed="@(index == 0 ? "true" : "false")">
@@ -229,7 +229,7 @@
 
         <div class="product-reviews__summary">
             <div class="product-reviews__score">
-                <strong>@(Model.ReviewCount > 0 ? Model.AverageRating.ToString("0.0") : "—")</strong>
+                <strong>@(Model.ReviewCount > 0 ? Model.AverageRating.ToString("0.0") : "-")</strong>
                 <span>@(Model.ReviewCount > 0 ? $"на основі {Model.ReviewCount} відгуків" : "поки без відгуків")</span>
             </div>
 

@@ -17,15 +17,30 @@ namespace Marketplace.BLL.Services
     {
         private readonly DeliveryApiOptions _options;
         private readonly HttpClient _httpClient;
+        private readonly ISystemSettingsService _settingsService;
 
 
-        public DeliveryProviderService(IOptions<DeliveryApiOptions> options)
+        public DeliveryProviderService(IOptions<DeliveryApiOptions> options, ISystemSettingsService settingsService)
         {
             _options = options.Value;
             _httpClient = new HttpClient();
+            _settingsService = settingsService;
         }
+
+        // The admin Integrations page can override the Nova Poshta key/URL in SystemSettings;
+        // an admin-saved value always wins, falling back to appsettings.json when nothing's
+        // been saved yet (see AdminController.BuildIntegrationsAsync for the same pattern).
+        private async Task<string> GetSettingAsync(string key, string fallback)
+        {
+            var overridden = await _settingsService.GetAsync("NovaPoshta", key);
+            return string.IsNullOrWhiteSpace(overridden) ? fallback : overridden;
+        }
+
         public async Task<IEnumerable<DeliveryCityDto>> ListCitiesAsync(string? search = null, string? limit = null,string? page = null)
         {
+            var apiKey = await GetSettingAsync("NovaPoshtaApiKey", _options.NovaPoshtaApiKey);
+            var baseUrl = await GetSettingAsync("NovaPoshtaBaseUrl", _options.NovaPoshtaBaseUrl);
+
             // 1. Сформуй об'єкт запиту для Нової Пошти
             // 2. Серіалізуй у JSON
             // 3. Відправ POST запит
@@ -34,7 +49,7 @@ namespace Marketplace.BLL.Services
             // 6. Поверни результат
             var request = new
             {
-                apiKey = _options.NovaPoshtaApiKey,
+                apiKey = apiKey,
                 modelName = "Address",
                 calledMethod = "getCities",
                 methodProperties = new
@@ -45,9 +60,9 @@ namespace Marketplace.BLL.Services
                 }
             };
             var json_request = JsonSerializer.Serialize(request);
-            
+
                 var content = new StringContent(json_request, Encoding.UTF8, "application/json");
-                var response = await _httpClient.PostAsync(_options.NovaPoshtaBaseUrl, content);
+                var response = await _httpClient.PostAsync(baseUrl, content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -80,6 +95,9 @@ namespace Marketplace.BLL.Services
 
         public async Task<IEnumerable<DeliveryBranchDto>> ListBranchesAsync(string cityId, string? search = null, string? limit = null, string? typeofwarehouseref = null, string page = null)
         {
+            var apiKey = await GetSettingAsync("NovaPoshtaApiKey", _options.NovaPoshtaApiKey);
+            var baseUrl = await GetSettingAsync("NovaPoshtaBaseUrl", _options.NovaPoshtaBaseUrl);
+
             // 1. Сформуй об'єкт запиту для Нової Пошти
             // 2. Серіалізуй у JSON
             // 3. Відправ POST запит
@@ -88,7 +106,7 @@ namespace Marketplace.BLL.Services
             // 6. Поверни результат
             var request = new
             {
-                apiKey = _options.NovaPoshtaApiKey,
+                apiKey = apiKey,
                 modelName = "Address",
                 calledMethod = "getWarehouses",
                 methodProperties = new
@@ -103,11 +121,9 @@ namespace Marketplace.BLL.Services
                 }
             };
             var json_request = JsonSerializer.Serialize(request);
-            
-            
 
             var content = new StringContent(json_request, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync(_options.NovaPoshtaBaseUrl, content);
+            var response = await _httpClient.PostAsync(baseUrl, content);
 
             if (response.IsSuccessStatusCode)
             {
@@ -140,9 +156,12 @@ namespace Marketplace.BLL.Services
         }
         public async Task<IEnumerable<WarehouseTypeDto>> GetWarehouseTypesAsync()
         {
+            var apiKey = await GetSettingAsync("NovaPoshtaApiKey", _options.NovaPoshtaApiKey);
+            var baseUrl = await GetSettingAsync("NovaPoshtaBaseUrl", _options.NovaPoshtaBaseUrl);
+
             var request = new
             {
-                apiKey = _options.NovaPoshtaApiKey,
+                apiKey = apiKey,
                 modelName = "Address",
                 calledMethod = "getWarehouseTypes",
                 methodProperties = new { }
@@ -150,7 +169,7 @@ namespace Marketplace.BLL.Services
 
             var json_request = JsonSerializer.Serialize(request);
             var content = new StringContent(json_request, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync(_options.NovaPoshtaBaseUrl, content);
+            var response = await _httpClient.PostAsync(baseUrl, content);
 
             if (response.IsSuccessStatusCode)
             {

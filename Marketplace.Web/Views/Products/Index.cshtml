@@ -16,9 +16,9 @@
 <div class="products-page">
     <header class="products-heading">
         <div>
-            <div class="products-eyebrow">Seller workspace</div>
+            <div class="products-eyebrow">Панель продавця</div>
             <h1 class="products-title">Мої товари</h1>
-            <p class="products-subtitle">Тестова панель для керування асортиментом: створення, перегляд, редагування та видалення товарів.</p>
+            <p class="products-subtitle">Керуйте асортиментом: додавайте нові товари, редагуйте наявні та стежте за їхнім статусом.</p>
         </div>
         @if (businessOptions.Any())
         {
@@ -72,7 +72,7 @@
             <h2>Товарів поки немає</h2>
             @if (businessOptions.Any())
             {
-                <p>Створіть перший тестовий товар, щоб перевірити роботу CRUD-операцій.</p>
+                <p>Додайте свій перший товар, щоб він з'явився в каталозі.</p>
                 <a asp-action="Create" class="btn btn-primary">Створити перший товар</a>
             }
             else
@@ -129,7 +129,13 @@
                                 <span class="fw-semibold">@item.Quantity</span>
                                 <span class="text-secondary small">шт.</span>
                             </td>
-                            <td><span class="product-status product-status--@statusClass">@statusLabel</span></td>
+                            <td>
+                                <span class="product-status product-status--@statusClass">@statusLabel</span>
+                                @if (item.Status == "Banned" && !string.IsNullOrWhiteSpace(item.ModerationReason))
+                                {
+                                    <div class="product-moderation-reason">@item.ModerationReason</div>
+                                }
+                            </td>
                             <td>
                                 <div class="product-actions">
                                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Переглянути</a>

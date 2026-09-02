@@ -20,17 +20,20 @@ public class CatalogueController : Controller
     private readonly IReviewService _reviewService;
     private readonly ICategoryService _categoryService;
     private readonly IWishlistService _wishlistService;
+    private readonly ISystemSettingsService _settingsService;
 
     public CatalogueController(
         IProductService productService,
         IReviewService reviewService,
         ICategoryService categoryService,
-        IWishlistService wishlistService)
+        IWishlistService wishlistService,
+        ISystemSettingsService settingsService)
     {
         _productService = productService;
         _reviewService = reviewService;
         _categoryService = categoryService;
         _wishlistService = wishlistService;
+        _settingsService = settingsService;
     }
 
     [HttpGet]
@@ -41,6 +44,8 @@ public class CatalogueController : Controller
         filter.Page = filter.Page < 1 ? 1 : filter.Page;
 
         var categories = await _categoryService.GetAllCategories();
+
+        bool allowAdultContent = Request.Cookies["AdultConfirmed"] == "true";
 
         var result = await _productService.GetCatalogPageAsync(new CatalogFilterDto
         {
@@ -53,7 +58,7 @@ public class CatalogueController : Controller
             Sort = filter.Sort,
             Page = filter.Page,
             PageSize = PageSize
-        });
+        }, allowAdultContent: allowAdultContent);
 
         if (result.TotalPages > 0 && filter.Page > result.TotalPages)
         {
@@ -81,14 +86,25 @@ public class CatalogueController : Controller
     [Route("Details/{id:guid}")]
     public async Task<IActionResult> Details(Guid id)
     {
-        var product = await _productService.GetCatalogProductAsync(id);
+        bool allowAdultContent = Request.Cookies["AdultConfirmed"] == "true";
+
+        var product = await _productService.GetCatalogProductAsync(id, allowAdultContent);
         if (product is null)
         {
+            // Якщо товар 18+, а користувач ще не підтверджував вік
+            var rawProduct = await _productService.GetByIdAsync(id);
+            if (rawProduct != null && rawProduct.IsAdultOnly)
+            {
+                // Перенаправляємо на сторінку підтвердження віку
+                return View("~/Views/Catalog/AgeVerification.cshtml", id);
+            }
+
             return NotFound();
         }
 
         var model = MapProduct(product);
-        var catalog = await _productService.GetCatalogAsync();
+        model.LowStockThreshold = await _settingsService.GetIntAsync("BusinessRules", "LowStockThreshold", 5);
+        var catalog = await _productService.GetCatalogAsync(allowAdultContent: allowAdultContent);
         model.EstimatedDeliveryStart = DateTime.Today.AddDays(2);
         model.EstimatedDeliveryEnd = DateTime.Today.AddDays(4);
         model.RelatedProducts = catalog
@@ -121,6 +137,31 @@ public class CatalogueController : Controller
         RecordRecentlyViewed(id);
 
         return View("~/Views/Catalog/Details.cshtml", model);
+    }
+
+    [HttpPost]
+    [Route("ConfirmAge")]
+    public IActionResult ConfirmAge(Guid? productId, string? returnUrl)
+    {
+        Response.Cookies.Append("AdultConfirmed", "true", new CookieOptions
+        {
+            Expires = DateTimeOffset.UtcNow.AddDays(30),
+            HttpOnly = true,
+            IsEssential = true,
+            SameSite = SameSiteMode.Lax
+        });
+
+        if (productId.HasValue && productId != Guid.Empty)
+        {
+            return RedirectToAction(nameof(Details), new { id = productId.Value });
+        }
+
+        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return Redirect(returnUrl);
+        }
+
+        return RedirectToAction(nameof(Index));
     }
 
     private void RecordRecentlyViewed(Guid productId)
@@ -158,8 +199,15 @@ public class CatalogueController : Controller
             return Json(new SearchSuggestionsResultViewModel());
         }
 
+        bool allowAdultContent = Request.Cookies["AdultConfirmed"] == "true";
+        var suggestions = await _productService.GetSearchSuggestionsAsync(
+            term: term,
+            limit: 5,
+            allowAdultContent: allowAdultContent
+        );
+
         var normalized = term.Trim();
-        var catalog = await _productService.GetCatalogAsync();
+        var catalog = await _productService.GetCatalogAsync(allowAdultContent: allowAdultContent);
 
         var matches = catalog
             .Where(product =>
@@ -174,9 +222,6 @@ public class CatalogueController : Controller
 
         if (matches.Count == 0)
         {
-            // No direct substring match — fall back to typo-tolerant matching against
-            // individual words of each product name, so a misspelled query like
-            // "клавіатрура" still surfaces "Механічна клавіатура KeyPro".
             var threshold = Math.Max(1, normalized.Length / 3);
             var fuzzy = catalog
                 .Select(product => new
@@ -213,7 +258,7 @@ public class CatalogueController : Controller
                 Id = product.Id,
                 Name = product.Name,
                 CategoryName = product.Category?.Name ?? "Без категорії",
-                Price = product.GetActiveDiscount() != null ? product.GetDiscountedPrice() : product.Price,
+                Price = product.GetEffectiveDiscountPercent() > 0 ? product.GetDiscountedPrice() : product.Price,
                 ImageUrl = product.MainImageUrl
             }).ToList()
         });
@@ -246,14 +291,15 @@ public class CatalogueController : Controller
 
     private static CatalogProductViewModel MapProduct(Marketplace.Domain.Entities.Product product, double averageRating = 0, int reviewCount = 0)
     {
-        var activeDiscount = product.GetActiveDiscount();
+        var discountPercent = product.GetEffectiveDiscountPercent();
+        var hasDiscount = discountPercent > 0;
 
         return new CatalogProductViewModel
         {
             Id = product.Id,
             Name = product.Name,
             Description = product.Description,
-            Price = activeDiscount != null ? product.GetDiscountedPrice() : product.Price,
+            Price = hasDiscount ? product.GetDiscountedPrice() : product.Price,
             Quantity = product.Quantity,
             CreatedAt = product.CreatedAt,
             MainImageUrl = product.MainImageUrl,
@@ -264,8 +310,9 @@ public class CatalogueController : Controller
             AdditionalImageUrls = product.Images.Select(image => image.ImageUrl).ToList(),
             AverageRating = averageRating,
             ReviewCount = reviewCount,
-            OriginalPrice = activeDiscount != null ? product.Price : null,
-            DiscountPercent = activeDiscount?.Percent,
+            OriginalPrice = hasDiscount ? product.Price : null,
+            DiscountPercent = hasDiscount ? discountPercent : null,
+            IsAgeRestricted = product.IsAdultOnly
         };
     }
 }

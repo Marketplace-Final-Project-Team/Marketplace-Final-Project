@@ -65,6 +65,15 @@
                             <span asp-validation-for="Quantity" class="text-danger small"></span>
                         </div>
                     </div>
+                    
+                  
+                    <div class="form-check mt-4">
+                        <input asp-for="IsAdultOnly" class="form-check-input" type="checkbox" />
+                        <label asp-for="IsAdultOnly" class="form-check-label">
+                            Товар тільки для дорослих (18+)
+                        </label>
+                        <span asp-validation-for="IsAdultOnly" class="text-danger small d-block mt-1"></span>
+                    </div>
                 </section>
 
                 <section class="product-form-section product-media-section" data-product-uploader>

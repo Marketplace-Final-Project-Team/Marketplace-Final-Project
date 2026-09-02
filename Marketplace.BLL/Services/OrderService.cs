@@ -86,41 +86,25 @@ namespace Marketplace.BLL.Services
                 }
 
                 var business = await _businessRepository.FirstOrDefaultAsync(b => b.Id == cartItem.Product.BusinessId);
-                
-                
 
                 var now = DateTime.UtcNow;
-                Discount? latestDiscount = null;
                 var productDiscount = cartItem.Product.Discounts?
                     .FirstOrDefault(d => d.StartDate <= now && d.EndDate >= now);
 
                 var businessDiscount = business?.Discounts?
                     .FirstOrDefault(d => d.StartDate <= now && d.EndDate >= now);
-                if (productDiscount != null && businessDiscount != null) {
-                    if (productDiscount.CreatedAt > businessDiscount.CreatedAt)
-                    {
-                        latestDiscount = productDiscount;
-                    }
-                }
-                else if (productDiscount != null)
-                {
-                    latestDiscount = productDiscount;
-                }
-                else if (businessDiscount != null)
-                {
-                    latestDiscount = businessDiscount;
-                }
-                
-                var discountPercent = latestDiscount?.Percent ?? 0;
-                
-                // If a promo code applies to this item's business, use whichever discount
-                // is bigger — the product's own sale or the promo — instead of stacking them.
+
+                // A business-wide sale is dominant over the product's own sale — it replaces
+                // it rather than stacking with it. A matching promo code still stacks on top
+                // of whichever one of those applies.
+                var saleDiscountPercent = businessDiscount?.Percent ?? productDiscount?.Percent ?? 0;
                 var promoPercent = promoCode is not null && promoCode.BusinessId == cartItem.Product.BusinessId
                     ? promoCode.Percent
                     : 0;
-                var effectivePercent = discountPercent+promoPercent;
-                if (effectivePercent > 100){
-                  effectivePercent = 100;
+                var effectivePercent = saleDiscountPercent + promoPercent;
+                if (effectivePercent > 100)
+                {
+                    effectivePercent = 100;
                 }
 
                 var unitPrice = effectivePercent > 0
@@ -191,6 +175,18 @@ namespace Marketplace.BLL.Services
             {
                 return new ServiceResult { Succeeded = false, Message = "Замовлення не знайдено." };
             }
+
+            // Commission/balance is credited exactly once, the moment an order first becomes
+            // Confirmed, and reversed exactly once when a credited order is cancelled (see
+            // below). Without restricting which status can follow which, a seller could
+            // toggle Confirmed -> Pending -> Confirmed to re-trigger that credit indefinitely,
+            // or skip Pending -> Shipped/Delivered to dodge it entirely and then have Cancel
+            // claw back money that was never actually paid out.
+            if (status != order.Status && !OrderStatusTransitions.GetAllowedNext(order.Status).Contains(status))
+            {
+                return new ServiceResult { Succeeded = false, Message = $"Неможливо змінити статус замовлення з «{order.Status}» на «{status}»." };
+            }
+
             if (status == OrderStatus.Confirmed && order.Status != OrderStatus.Confirmed) {
                 // Commission is captured per line item at the moment of confirmation (see
                 // OrderItem.CommissionAmount) so a later change to a business's commission

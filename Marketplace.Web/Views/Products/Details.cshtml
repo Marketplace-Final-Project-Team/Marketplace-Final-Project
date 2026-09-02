@@ -29,6 +29,13 @@
         </div>
     </header>
 
+    @if (Model.Status == "Banned" && !string.IsNullOrWhiteSpace(Model.ModerationReason))
+    {
+        <div class="alert alert-danger" role="alert">
+            <strong>Товар заблоковано автоматичною модерацією.</strong> @Model.ModerationReason
+        </div>
+    }
+
     <div class="products-panel product-details-grid">
         <div class="product-detail-media">
             @if (!string.IsNullOrWhiteSpace(Model.MainImageUrl))

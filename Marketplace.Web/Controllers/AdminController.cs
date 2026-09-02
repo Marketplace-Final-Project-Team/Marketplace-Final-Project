@@ -1,11 +1,14 @@
 ﻿using System.Security.Claims;
 using Marketplace.BLL.Interfaces;
+using Marketplace.BLL.Services;
 using Marketplace.Domain.Enums;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Common;
+using Quartz;
+using Quartz.Impl.Matchers;
 
 namespace Marketplace.Web.Controllers
 {
@@ -19,6 +22,8 @@ namespace Marketplace.Web.Controllers
         private readonly IConfiguration _configuration;
         private readonly IMarketplaceBalanceService _marketplaceBalanceService;
         private readonly ICategoryService _categoryService;
+        private readonly ISchedulerFactory _schedulerFactory;
+        private readonly IDiscountService _discountService;
 
         public AdminController(
             IAdminService adminService,
@@ -27,7 +32,9 @@ namespace Marketplace.Web.Controllers
             IProductService productService,
             IConfiguration configuration,
             IMarketplaceBalanceService marketplaceBalanceService,
-            ICategoryService categoryService)
+            ICategoryService categoryService,
+            ISchedulerFactory schedulerFactory,
+            IDiscountService discountService)
         {
             _adminService = adminService;
             _settingsService = settingsService;
@@ -36,6 +43,8 @@ namespace Marketplace.Web.Controllers
             _configuration = configuration;
             _marketplaceBalanceService = marketplaceBalanceService;
             _categoryService = categoryService;
+            _schedulerFactory = schedulerFactory;
+            _discountService = discountService;
         }
 
         private string? CurrentAdminId => User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -101,6 +110,9 @@ namespace Marketplace.Web.Controllers
             {
                 CategoryId = filter.CategoryId,
                 Search = filter.Search,
+                MinPrice = filter.MinPrice,
+                MaxPrice = filter.MaxPrice,
+                InStockOnly = filter.InStockOnly,
                 SortOption = filter.SortOption,
                 Pagination = new PaginationParams
                 {
@@ -145,20 +157,30 @@ namespace Marketplace.Web.Controllers
                 }
             });
 
+            var items = new List<BusinessItemAdminViewModel>();
+            foreach (var b in result.Items)
+            {
+                var discount = await _discountService.GetBusinessDiscount(b.Id);
+                items.Add(new BusinessItemAdminViewModel
+                {
+                    Id = b.Id,
+                    Name = b.Name,
+                    LogoUrl = b.LogoUrl,
+                    Owner = b.Owner,
+                    Status = b.Status,
+                    CommissionPercent = b.CommissionPercent,
+                    HasActiveDiscount = discount.IsActive,
+                    DiscountPercent = discount.DiscountPercent,
+                    DiscountEndDate = discount.EndDate,
+                });
+            }
+
             return View(new AdminBusinessesPageViewModel
             {
                 Filter = filter,
                 Result = new PagedResult<BusinessItemAdminViewModel>
                 {
-                    Items = result.Items.Select(b => new BusinessItemAdminViewModel
-                    {
-                        Id = b.Id,
-                        Name = b.Name,
-                        LogoUrl = b.LogoUrl,
-                        Owner = b.Owner,
-                        Status = b.Status,
-                        CommissionPercent = b.CommissionPercent,
-                    }).ToList(),
+                    Items = items,
                     TotalItems = result.TotalItems,
                     Page = result.Page,
                     TotalPages = result.TotalPages,
@@ -208,11 +230,6 @@ namespace Marketplace.Web.Controllers
             return RedirectToAction("Businesses");
         }
 
-        // Integrations / BusinessLimits are backed by the real SystemSettings
-        // table (see ISystemSettingsService) — saved values persist for real. They just don't
-        // yet drive LiqPay/NovaPoshta/Cloudinary/Email/Discount/PromoCode behaviour, since that
-        // would mean editing the existing services that already implement those integrations.
-
         [HttpGet]
         public async Task<IActionResult> Integrations()
         {
@@ -234,23 +251,57 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Jobs()
+        public async Task<IActionResult> Jobs()
         {
-            return View(BuildJobs());
-        }
+            var scheduler = await _schedulerFactory.GetScheduler();
 
-        [HttpPost]
-        public IActionResult RunJobNow(string jobName)
-        {
-            TempData["Success"] = $"Задачу «{jobName}» запущено (виконання підключить Quartz.NET на бекенді).";
-            return RedirectToAction("Jobs");
-        }
+            var jobKeys = await scheduler.GetJobKeys(GroupMatcher<JobKey>.GroupEquals("moderation"));
+            var scheduledJobs = new List<ScheduledModerationJobViewModel>();
 
-        [HttpPost]
-        public IActionResult ToggleJobPaused(string jobName)
-        {
-            TempData["Success"] = $"Стан задачі «{jobName}» змінено (керування станом підключить Quartz.NET на бекенді).";
-            return RedirectToAction("Jobs");
+            foreach (var jobKey in jobKeys)
+            {
+                if (!Guid.TryParse(jobKey.Name.Replace("moderation-job-", string.Empty), out var productId))
+                {
+                    continue;
+                }
+
+                var product = await _productService.GetByIdAsync(productId);
+                var triggers = await scheduler.GetTriggersOfJob(jobKey);
+                var nextFireTime = triggers
+                    .Select(t => t.GetNextFireTimeUtc())
+                    .Where(t => t.HasValue)
+                    .Select(t => t!.Value.UtcDateTime)
+                    .OrderBy(t => t)
+                    .Cast<DateTime?>()
+                    .FirstOrDefault();
+
+                scheduledJobs.Add(new ScheduledModerationJobViewModel
+                {
+                    ProductId = productId,
+                    ProductName = product?.Name ?? "(товар видалено)",
+                    NextRunAtUtc = nextFireTime
+                });
+            }
+
+            var recentDecisions = (await _activityLog.GetRecentBusinessActionsAsync())
+                .Where(l => l.Action == ProductModerationJob.ActivityLogAction)
+                .Take(30)
+                .Select(l => new BusinessActivityLogItemViewModel
+                {
+                    BusinessName = l.BusinessName,
+                    ActorUserId = l.ActorUserId,
+                    Action = l.Action,
+                    Description = l.Description,
+                    CreatedAt = l.CreatedAt
+                })
+                .ToList();
+
+            return View(new JobsPageViewModel
+            {
+                IsSchedulerRunning = scheduler.IsStarted && !scheduler.InStandbyMode && !scheduler.IsShutdown,
+                ScheduledJobs = scheduledJobs.OrderBy(j => j.NextRunAtUtc).ToList(),
+                RecentDecisions = recentDecisions
+            });
         }
 
         [HttpGet]
@@ -271,6 +322,12 @@ namespace Marketplace.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> BusinessLimits(BusinessLimitsViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Перевірте введені значення - деякі з них поза допустимими межами.";
+                return View(model);
+            }
+
             await _settingsService.SetAsync("BusinessRules", "MaxProductsPerBusiness", model.MaxProductsPerBusiness.ToString(), false, CurrentAdminId);
             await _settingsService.SetAsync("BusinessRules", "MaxDiscountPercent", model.MaxDiscountPercent.ToString(), false, CurrentAdminId);
             await _settingsService.SetAsync("BusinessRules", "MaxPromoCodePercent", model.MaxPromoCodePercent.ToString(), false, CurrentAdminId);
@@ -291,8 +348,6 @@ namespace Marketplace.Web.Controllers
             });
         }
 
-        // Commission is set per business (see Business.CommissionPercent) rather than
-        // globally, so it's edited from the Businesses list instead of this page.
         [HttpPost]
         public async Task<IActionResult> ChangeBusinessCommission(Guid businessId, decimal commissionPercent)
         {
@@ -308,6 +363,59 @@ namespace Marketplace.Web.Controllers
                 TempData["Error"] = result.Message;
             }
             return RedirectToAction("Businesses");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Categories()
+        {
+            var categories = await _categoryService.GetAllCategories();
+            return View(categories);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateCategory(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                TempData["Error"] = "Назва категорії не може бути порожньою.";
+                return RedirectToAction("Categories");
+            }
+
+            var result = await _categoryService.CreateCategory(name.Trim());
+            if (result.Succeeded)
+            {
+                TempData["Success"] = $"Категорію «{name}» створено.";
+            }
+            else
+            {
+                TempData["Error"] = result.Message;
+            }
+
+            return RedirectToAction("Categories");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateCategory(Guid categoryId, string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                TempData["Error"] = "Назва категорії не може бути порожньою.";
+                return RedirectToAction("Categories");
+            }
+
+            var result = await _categoryService.UpdateCategory(name.Trim(), categoryId);
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded ? "Категорію оновлено." : result.Message;
+
+            return RedirectToAction("Categories");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteCategory(Guid categoryId)
+        {
+            var result = await _categoryService.DeleteCategory(categoryId);
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded ? "Категорію видалено." : result.Message;
+
+            return RedirectToAction("Categories");
         }
 
         [HttpGet]
@@ -368,6 +476,11 @@ namespace Marketplace.Web.Controllers
                     ("FromEmail", "From Email", false),
                     ("FromName", "From Name", false),
                 }),
+                ("GoogleAI", "Google AI (Gemini)", "Автоматична модерація товарів (текст і зображення).", "GoogleAI", new[]
+                {
+                    ("ApiKey", "API Key", true),
+                    ("Model", "Model", false),
+                }),
             };
 
             var result = new List<IntegrationSettingViewModel>();
@@ -397,7 +510,7 @@ namespace Marketplace.Web.Controllers
                     Category = def.Category,
                     DisplayName = def.DisplayName,
                     Description = def.Description,
-                    IsConfigured = keys.Any(k => !string.IsNullOrWhiteSpace(k.MaskedValue) && k.MaskedValue != "—"),
+                    IsConfigured = keys.Any(k => !string.IsNullOrWhiteSpace(k.MaskedValue) && k.MaskedValue != "-"),
                     Keys = keys
                 });
             }
@@ -409,7 +522,7 @@ namespace Marketplace.Web.Controllers
         {
             if (string.IsNullOrEmpty(value))
             {
-                return "—";
+                return "-";
             }
 
             if (!isSecret)
@@ -418,38 +531,8 @@ namespace Marketplace.Web.Controllers
             }
 
             return value.Length <= 4
-                ? new string('•', 8)
-                : new string('•', 8) + value[^4..];
-        }
-
-        private static List<AdminJobViewModel> BuildJobs()
-        {
-            var now = DateTime.Now;
-            return new List<AdminJobViewModel>
-            {
-                new()
-                {
-                    Name = "ExpireStalePendingOrdersJob",
-                    DisplayName = "Скасування прострочених замовлень",
-                    Description = "Автоматично скасовує замовлення зі статусом «Очікує підтвердження», якщо з моменту створення минуло більше за ліміт (див. розділ «Ліміти бізнесу»). Повертає товар на склад.",
-                    Schedule = "кожні 15 хв",
-                    IsPaused = false,
-                    NextRunAt = now.AddMinutes(15),
-                    LastRunAt = now.AddMinutes(-5),
-                    LastRunSucceeded = true,
-                },
-                new()
-                {
-                    Name = "LowStockAlertJob",
-                    DisplayName = "Сповіщення про низький залишок",
-                    Description = "Раз на добу перевіряє залишки товарів і надсилає власникам бізнесів лист зі списком товарів, кількість яких нижча за поріг.",
-                    Schedule = "щодня о 08:00",
-                    IsPaused = false,
-                    NextRunAt = now.Date.AddDays(now.Hour >= 8 ? 1 : 0).AddHours(8),
-                    LastRunAt = now.Date.AddHours(8).AddDays(now.Hour >= 8 ? 0 : -1),
-                    LastRunSucceeded = true,
-                },
-            };
+                ? new string('*', 8)
+                : new string('*', 8) + value[^4..];
         }
     }
 }

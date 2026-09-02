@@ -1,20 +1,43 @@
 ﻿using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Marketplace.BLL.Interfaces;
 
 namespace Marketplace.BLL.Services
 {
     public class ImageStorageService: IImageStorageService
     {
-        private readonly Cloudinary _cloudinary;
+        private readonly IConfiguration _configuration;
+        private readonly ISystemSettingsService _settingsService;
 
         private static readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
         private const long MaxFileSizeBytes = 5 * 1024 * 1024;
 
-        public ImageStorageService(Cloudinary cloudinary)
+        public ImageStorageService(IConfiguration configuration, ISystemSettingsService settingsService)
         {
-            _cloudinary = cloudinary;
+            _configuration = configuration;
+            _settingsService = settingsService;
+        }
+
+        // The admin Integrations page can override any of these in SystemSettings; an
+        // admin-saved value always wins, falling back to appsettings.json when nothing's
+        // been saved yet (see AdminController.BuildIntegrationsAsync for the same pattern).
+        // Built per-call rather than cached at startup, since Cloudinary itself is a thin
+        // stateless HTTP wrapper around these credentials.
+        private async Task<Cloudinary> BuildClientAsync()
+        {
+            var cloudName = await GetSettingAsync("CloudName", _configuration["Cloudinary:CloudName"] ?? "not-configured");
+            var apiKey = await GetSettingAsync("ApiKey", _configuration["Cloudinary:ApiKey"] ?? "not-configured");
+            var apiSecret = await GetSettingAsync("ApiSecret", _configuration["Cloudinary:ApiSecret"] ?? "not-configured");
+
+            return new Cloudinary(new Account(cloudName, apiKey, apiSecret));
+        }
+
+        private async Task<string> GetSettingAsync(string key, string fallback)
+        {
+            var overridden = await _settingsService.GetAsync("Cloudinary", key);
+            return string.IsNullOrWhiteSpace(overridden) ? fallback : overridden;
         }
 
         public async Task<string?> UploadImageAsync(IFormFile file)
@@ -25,7 +48,7 @@ namespace Marketplace.BLL.Services
             if (!AllowedExtensions.Contains(extension)) return null;
 
             if (file.Length > MaxFileSizeBytes) return null;
-            
+
             try
             {
                 await using var stream = file.OpenReadStream();
@@ -37,7 +60,8 @@ namespace Marketplace.BLL.Services
                     UniqueFilename = true,
                 };
 
-                var result = await _cloudinary.UploadAsync(uploadParams);
+                var cloudinary = await BuildClientAsync();
+                var result = await cloudinary.UploadAsync(uploadParams);
 
                 if (result.Error != null) return null;
                 return result.SecureUrl.ToString();

@@ -181,6 +181,12 @@ namespace Marketplace.DAL.Data
                 .HasForeignKey(d => d.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Entity<Discount>()
+                .HasOne(d => d.Business)
+                .WithMany(b => b.Discounts)
+                .HasForeignKey(d => d.BusinessId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.Entity<WishlistCollection>()
                 .HasOne(wc => wc.User)
                 .WithMany(u => u.WishlistCollections)

@@ -7,6 +7,7 @@ public class CatalogProductViewModel
     public string Description { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public int Quantity { get; set; }
+    public int LowStockThreshold { get; set; } = 5;
     public DateTime CreatedAt { get; set; }
     public string MainImageUrl { get; set; } = string.Empty;
     public string CategoryName { get; set; } = string.Empty;
@@ -16,6 +17,7 @@ public class CatalogProductViewModel
     public List<string> AdditionalImageUrls { get; set; } = new();
     public DateTime EstimatedDeliveryStart { get; set; }
     public DateTime EstimatedDeliveryEnd { get; set; }
+    public bool IsAgeRestricted { get; set; }
     public List<CatalogRelatedProductViewModel> RelatedProducts { get; set; } = new();
 
     public List<Marketplace.BLL.DTOs.ReviewDto> Reviews { get; set; } = new();

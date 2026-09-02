@@ -38,6 +38,11 @@ namespace Marketplace.Web.Models.Products
         [Required(ErrorMessage = "Оберіть категорію")]
         public Guid CategoryId { get; set; }
 
+        [Display(Name = "Товар тільки для дорослих (18+)")]
+        public bool IsAdultOnly { get; set; }
+
+ 
+
         public IFormFile? MainImage { get; set; }
         public List<IFormFile>? AdditionalImages { get; set; }
         public IEnumerable<SelectListItem> Businesses { get; set; } = new List<SelectListItem>();

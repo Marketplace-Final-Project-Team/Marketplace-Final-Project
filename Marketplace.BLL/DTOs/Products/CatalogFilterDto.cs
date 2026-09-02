@@ -11,5 +11,6 @@ namespace Marketplace.BLL.DTOs.Products
         public CatalogSortOption Sort { get; set; } = CatalogSortOption.Newest;
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 12;
+        public bool AllowAdultContent { get; set; }
     }
 }
