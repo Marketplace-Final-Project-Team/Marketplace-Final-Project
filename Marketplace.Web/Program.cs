@@ -1,4 +1,5 @@
 using System.Globalization;
+using CloudinaryDotNet;
 using Marketplace.BLL.Common;
 using Marketplace.BLL.Interfaces;
 using Marketplace.BLL.Services;
@@ -71,6 +72,13 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/forbidden";
 });
 
+var cloudinaryAccount = new Account(
+    builder.Configuration["Cloudinary:CloudName"] ?? "not-configured",
+    builder.Configuration["Cloudinary:ApiKey"] ?? "not-configured",
+    builder.Configuration["Cloudinary:ApiSecret"] ?? "not-configured");
+
+builder.Services.AddSingleton(new Cloudinary(cloudinaryAccount));
+
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
 builder.Services.AddScoped<IBusinessRepository, BusinessRepository>();
@@ -100,6 +108,8 @@ builder.Services.AddDataProtection();
 builder.Services.AddScoped<ISystemSettingsService, SystemSettingsService>();
 builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
 builder.Services.AddScoped<IMarketplaceBalanceService, MarketplaceBalanceService>();
+
+builder.Services.AddScoped<IContentModerationService, ContentModerationService>();
 
 // LiqPay configuration
 builder.Services.Configure<LiqPayOptions>(builder.Configuration.GetSection("LiqPay"));

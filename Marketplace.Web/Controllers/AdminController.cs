@@ -19,7 +19,6 @@ namespace Marketplace.Web.Controllers
         private readonly ISystemSettingsService _settingsService;
         private readonly IActivityLogService _activityLog;
         private readonly IProductService _productService;
-        private readonly IConfiguration _configuration;
         private readonly IMarketplaceBalanceService _marketplaceBalanceService;
         private readonly ICategoryService _categoryService;
         private readonly ISchedulerFactory _schedulerFactory;
@@ -30,7 +29,6 @@ namespace Marketplace.Web.Controllers
             ISystemSettingsService settingsService,
             IActivityLogService activityLog,
             IProductService productService,
-            IConfiguration configuration,
             IMarketplaceBalanceService marketplaceBalanceService,
             ICategoryService categoryService,
             ISchedulerFactory schedulerFactory,
@@ -40,7 +38,6 @@ namespace Marketplace.Web.Controllers
             _settingsService = settingsService;
             _activityLog = activityLog;
             _productService = productService;
-            _configuration = configuration;
             _marketplaceBalanceService = marketplaceBalanceService;
             _categoryService = categoryService;
             _schedulerFactory = schedulerFactory;
@@ -230,31 +227,10 @@ namespace Marketplace.Web.Controllers
             return RedirectToAction("Businesses");
         }
 
-        // Integrations / BusinessLimits are backed by the real SystemSettings
-        // table (see ISystemSettingsService) — saved values persist for real and drive
-        // live behaviour (LiqPay/NovaPoshta/Cloudinary/Email/GoogleAI integrations,
-        // and the BusinessRules caps enforced in DiscountService/PromoCodeService/
+        // BusinessLimits is backed by the real SystemSettings table (see
+        // ISystemSettingsService) — saved values persist for real and drive live
+        // behaviour (the BusinessRules caps enforced in DiscountService/PromoCodeService/
         // ProductsController plus the PendingOrderExpiryJob and the catalog low-stock badge).
-
-        [HttpGet]
-        public async Task<IActionResult> Integrations()
-        {
-            return View(await BuildIntegrationsAsync());
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> UpdateIntegrationKey(string category, string key, string value, bool isSecret)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                TempData["Error"] = "Введіть значення перед збереженням.";
-                return RedirectToAction("Integrations");
-            }
-
-            await _settingsService.SetAsync(category, key, value, isSecret, CurrentAdminId);
-            TempData["Success"] = $"Ключ «{key}» ({category}) збережено.";
-            return RedirectToAction("Integrations");
-        }
 
         [HttpGet]
         public async Task<IActionResult> Jobs()
@@ -452,95 +428,6 @@ namespace Marketplace.Web.Controllers
                 Description = l.Description,
                 CreatedAt = l.CreatedAt
             }).ToList());
-        }
-
-        private async Task<List<IntegrationSettingViewModel>> BuildIntegrationsAsync()
-        {
-            var definitions = new (string Category, string DisplayName, string Description, string ConfigSection, (string Key, string Label, bool IsSecret)[] Keys)[]
-            {
-                ("LiqPay", "LiqPay", "Приймання онлайн-оплат за замовлення.", "LiqPay", new[]
-                {
-                    ("PublicKey", "Public Key", false),
-                    ("PrivateKey", "Private Key", true),
-                    ("ServerUrl", "Server URL (callback)", false),
-                }),
-                ("NovaPoshta", "Нова пошта", "Пошук міст і відділень для доставки.", "DeliveryApi", new[]
-                {
-                    ("NovaPoshtaApiKey", "API Key", true),
-                    ("NovaPoshtaBaseUrl", "Base URL", false),
-                }),
-                ("Cloudinary", "Cloudinary", "Зберігання зображень товарів і магазинів.", "Cloudinary", new[]
-                {
-                    ("CloudName", "Cloud Name", false),
-                    ("ApiKey", "API Key", true),
-                    ("ApiSecret", "API Secret", true),
-                }),
-                ("Email", "Email (SMTP)", "Підтвердження реєстрації, скидання пароля, сповіщення.", "EmailSettings", new[]
-                {
-                    ("Host", "SMTP Host", false),
-                    ("Port", "Port", false),
-                    ("Username", "Username", false),
-                    ("Password", "Password", true),
-                    ("FromEmail", "From Email", false),
-                    ("FromName", "From Name", false),
-                }),
-                ("GoogleAI", "Google AI (Gemini)", "Автоматична модерація товарів (текст і зображення).", "GoogleAI", new[]
-                {
-                    ("ApiKey", "API Key", true),
-                    ("Model", "Model", false),
-                }),
-            };
-
-            var result = new List<IntegrationSettingViewModel>();
-
-            foreach (var def in definitions)
-            {
-                var saved = await _settingsService.GetByCategoryAsync(def.Category);
-                var keys = new List<IntegrationKeyViewModel>();
-
-                foreach (var (key, label, isSecret) in def.Keys)
-                {
-                    var savedRow = saved.FirstOrDefault(s => s.Key == key);
-                    var value = savedRow?.Value ?? _configuration[$"{def.ConfigSection}:{key}"] ?? string.Empty;
-
-                    keys.Add(new IntegrationKeyViewModel
-                    {
-                        Key = key,
-                        Label = label,
-                        IsSecret = isSecret,
-                        IsOverridden = savedRow is not null,
-                        MaskedValue = Mask(value, isSecret)
-                    });
-                }
-
-                result.Add(new IntegrationSettingViewModel
-                {
-                    Category = def.Category,
-                    DisplayName = def.DisplayName,
-                    Description = def.Description,
-                    IsConfigured = keys.Any(k => !string.IsNullOrWhiteSpace(k.MaskedValue) && k.MaskedValue != "-"),
-                    Keys = keys
-                });
-            }
-
-            return result;
-        }
-
-        private static string Mask(string value, bool isSecret)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return "-";
-            }
-
-            if (!isSecret)
-            {
-                return value;
-            }
-
-            return value.Length <= 4
-                ? new string('*', 8)
-                : new string('*', 8) + value[^4..];
         }
 
     }

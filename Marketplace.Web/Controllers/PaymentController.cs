@@ -1,8 +1,10 @@
-﻿using Marketplace.BLL.DTOs;
+﻿using Marketplace.BLL.Configs;
+using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.BLL.Services;
 using Marketplace.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -14,11 +16,13 @@ namespace Marketplace.Web.Controllers
     public class PaymentController : Controller
     {
         private readonly IPaymentService _paymentService;
+        private readonly IOptions<LiqPayOptions> _options;
         private readonly IOrderService _orderService;
 
-        public PaymentController(IPaymentService paymentService, IOrderService orderService)
+        public PaymentController(IPaymentService paymentService, IOptions<LiqPayOptions> options, IOrderService orderService)
         {
             _paymentService = paymentService;
+            _options = options;
             _orderService = orderService;
         }
 
@@ -48,7 +52,7 @@ namespace Marketplace.Web.Controllers
         {
             
 
-            var privateKey = await _paymentService.GetPrivateKeyAsync();
+            var privateKey = _options.Value.PrivateKey;
             var computedSignature = privateKey + data + privateKey;
             byte[] inputBytes = Encoding.UTF8.GetBytes(computedSignature);
 

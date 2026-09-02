@@ -13,24 +13,13 @@ namespace Marketplace.BLL.Services
     {
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
-        private readonly ISystemSettingsService _settingsService;
         private readonly ILogger<ContentModerationService> _logger;
 
-        public ContentModerationService(IHttpClientFactory httpClientFactory, IConfiguration configuration, ISystemSettingsService settingsService, ILogger<ContentModerationService> logger)
+        public ContentModerationService(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<ContentModerationService> logger)
         {
             _httpClient = httpClientFactory.CreateClient();
             _configuration = configuration;
-            _settingsService = settingsService;
             _logger = logger;
-        }
-
-        // The admin Integrations page can override the Gemini API key/model in SystemSettings;
-        // an admin-saved value always wins, falling back to appsettings.json when nothing's
-        // been saved yet (see AdminController.BuildIntegrationsAsync for the same pattern).
-        private async Task<string> GetSettingAsync(string key, string fallback)
-        {
-            var overridden = await _settingsService.GetAsync("GoogleAI", key);
-            return string.IsNullOrWhiteSpace(overridden) ? fallback : overridden;
         }
 
         private static string GetMimeType(string url)
@@ -49,10 +38,8 @@ namespace Marketplace.BLL.Services
         {
             try
             {
-                var apiKey = await GetSettingAsync("ApiKey", _configuration["GoogleAI:ApiKey"] ?? "");
-                if (string.IsNullOrWhiteSpace(apiKey))
-                    throw new InvalidOperationException("Gemini API key не налаштований");
-                var model = await GetSettingAsync("Model", _configuration["GoogleAI:Model"] ?? "gemini-2.5-flash");
+                var apiKey = _configuration["GoogleAI:ApiKey"] ?? throw new InvalidOperationException("Gemini API key не налаштований");
+                var model = _configuration["GoogleAI:Model"] ?? "gemini-2.5-flash";
 
                 var url = $"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={apiKey}";
                 var response = await _httpClient.PostAsJsonAsync(url, requestBody);
@@ -161,8 +148,8 @@ namespace Marketplace.BLL.Services
 
             var imageUrls = new List<string>();
 
-            if (string.IsNullOrEmpty(business.LogoUrl)) imageUrls.Add(business.LogoUrl);
-            if (string.IsNullOrEmpty(business.BannerUrl)) imageUrls.Add(business.BannerUrl);
+            if (!string.IsNullOrEmpty(business.LogoUrl)) imageUrls.Add(business.LogoUrl);
+            if (!string.IsNullOrEmpty(business.BannerUrl)) imageUrls.Add(business.BannerUrl);
 
             var parts = new List<object>
             {
