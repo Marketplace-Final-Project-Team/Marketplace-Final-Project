@@ -2,6 +2,26 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
+
+  # Prometheus
   - job_name: "prometheus"
     static_configs:
       - targets: ["prometheus:9090"]
+
+  # Grafana
+  - job_name: "grafana"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["grafana:3000"]
+
+  # Web application
+  - job_name: "web"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["web:8080"]
+
+  # Nginx
+  - job_name: "nginx"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["nginx:80"]
