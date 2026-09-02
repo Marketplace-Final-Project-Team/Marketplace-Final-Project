@@ -12,11 +12,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Marketplace.BLL.Configs;
 using Microsoft.EntityFrameworkCore;
-using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddHttpMetrics();
 
 builder.Services.AddControllersWithViews();
 
@@ -125,7 +122,6 @@ if (!app.Environment.IsDevelopment())
 
 app.UseStatusCodePagesWithReExecute("/error/{0}");
 app.UseRouting();
-app.UseHttpMetrics();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -134,6 +130,5 @@ app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-app.MapMetrics();
 
 app.Run();
