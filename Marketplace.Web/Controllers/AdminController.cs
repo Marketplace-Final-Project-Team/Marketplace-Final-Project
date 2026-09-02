@@ -319,6 +319,18 @@ namespace Marketplace.Web.Controllers
             });
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Statistics([FromQuery] AdminStatisticsFilterViewModel filter)
+        {
+            var overview = await _adminService.GetStatisticsAsync(filter.StartDate, filter.EndDate);
+
+            return View(new AdminStatisticsPageViewModel
+            {
+                Filter = filter,
+                Overview = overview
+            });
+        }
+
         // Commission is set per business (see Business.CommissionPercent) rather than
         // globally, so it's edited from the Businesses list instead of this page.
         [HttpPost]

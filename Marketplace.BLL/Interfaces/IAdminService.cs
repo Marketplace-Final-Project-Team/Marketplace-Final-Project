@@ -22,5 +22,7 @@ namespace Marketplace.BLL.Interfaces
         Task<ServiceResult> ChangeBusinessStatus(Guid businessId, BusinessStatus businessStatus);
 
         Task<ServiceResult> ChangeBusinessComission(Guid businessId, decimal commissionPercent);
+
+        Task<AdminStatisticsOverviewDto> GetStatisticsAsync(DateTime? startDate, DateTime? endDate);
     }
 }

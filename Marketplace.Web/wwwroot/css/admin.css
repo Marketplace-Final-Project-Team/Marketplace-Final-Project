@@ -382,6 +382,24 @@
     margin-bottom: 0;
 }
 
+.admin-toolbar__label {
+    color: var(--admin-muted);
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 650;
+    margin-bottom: 0.2rem;
+    text-transform: uppercase;
+}
+
+.admin-toolbar input[type="date"] {
+    background-color: var(--admin-surface);
+    border: 1px solid var(--admin-line);
+    border-radius: 0.6rem;
+    color: var(--admin-ink);
+    font-size: 0.85rem;
+    padding: 0.47rem 0.75rem;
+}
+
 .admin-toolbar select {
     background-color: var(--admin-surface);
     border: 1px solid var(--admin-line);
