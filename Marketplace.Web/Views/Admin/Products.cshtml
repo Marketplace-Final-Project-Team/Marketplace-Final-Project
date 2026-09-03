@@ -49,7 +49,14 @@
                         <circle cx="11" cy="11" r="8" />
                         <path d="m21 21-4.3-4.3" />
                     </svg>
-                    <input type="search" class="form-control admin-search" name="Search" value="@Model.Filter.Search" placeholder="Пошук за назвою..." aria-label="Пошук товарів" />
+                    <input type="search" class="form-control admin-search" name="Search" value="@Model.Filter.Search" placeholder="Пошук за назвою" aria-label="Пошук товарів" />
+                </div>
+                <div class="admin-search-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                    </svg>
+                    <input type="search" class="form-control admin-search" name="SearchBusiness" value="@Model.Filter.SearchBusiness" placeholder="Пошук за магазином" aria-label="Пошук за магазином" />
                 </div>
                 <select class="form-select" name="CategoryId" aria-label="Фільтр за категорією" onchange="this.form.submit()">
                     <option value="">Усі категорії</option>

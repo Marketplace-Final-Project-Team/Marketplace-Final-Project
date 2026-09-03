@@ -7,6 +7,7 @@ namespace Marketplace.BLL.DTOs
     public class ProductAdminQueryDto
     {
         public string? Search { get; set; }
+        public string? SearchBusiness { get; set; }
         public Guid? CategoryId { get; set; }
         public decimal? MinPrice { get; set; }
         public decimal? MaxPrice { get; set; }

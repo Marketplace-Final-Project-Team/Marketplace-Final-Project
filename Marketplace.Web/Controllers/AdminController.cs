@@ -104,6 +104,7 @@ namespace Marketplace.Web.Controllers
             {
                 CategoryId = filter.CategoryId,
                 Search = filter.Search,
+                SearchBusiness = filter.SearchBusiness,
                 MinPrice = filter.MinPrice,
                 MaxPrice = filter.MaxPrice,
                 InStockOnly = filter.InStockOnly,
@@ -170,7 +171,10 @@ namespace Marketplace.Web.Controllers
             var result = await _adminService.GetFilteredBusinessesAsync(new BusinessAdminQueryParams
             {
                 Search = filter.Search,
+                SearchEmail = filter.SearchEmail,
                 Status = filter.Status,
+                MinCommission = filter.MinCommission,
+                MaxCommission = filter.MaxCommission,
                 SortDescending = filter.SortDescending,
                 Pagination = new PaginationParams
                 {

@@ -430,6 +430,10 @@
     color: var(--admin-muted);
 }
 
+.admin-price-range--wide input {
+    width: 8.5rem;
+}
+
 .admin-checkbox-filter {
     align-items: center;
     color: var(--admin-ink);

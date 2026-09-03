@@ -79,6 +79,12 @@ namespace Marketplace.BLL.Services
                 productsQuery = productsQuery.Where(p => p.Name.Contains(normalizedSearch));
             }
 
+            if (!string.IsNullOrEmpty(query.SearchBusiness))
+            {
+                var normalizedBusinessSearch = query.SearchBusiness.Trim();
+                productsQuery = productsQuery.Where(p => p.Business.StoreName.Contains(normalizedBusinessSearch));
+            }
+
             if (query.MinPrice.HasValue)
             {
                 productsQuery = productsQuery.Where(p => p.Price >= query.MinPrice.Value);
@@ -192,6 +198,22 @@ namespace Marketplace.BLL.Services
             {
                 var normalizedSearch = query.Search.Trim();
                 businessesQuery = businessesQuery.Where(b => b.StoreName.Contains(normalizedSearch));
+            }
+
+            if (!string.IsNullOrEmpty(query.SearchEmail))
+            {
+                var normalizedEmail = query.SearchEmail.Trim();
+                businessesQuery = businessesQuery.Where(b => b.Owner.Email!.Contains(normalizedEmail));
+            }
+
+            if (query.MinCommission.HasValue)
+            {
+                businessesQuery = businessesQuery.Where(b => b.CommissionPercent >= query.MinCommission.Value);
+            }
+
+            if (query.MaxCommission.HasValue)
+            {
+                businessesQuery = businessesQuery.Where(b => b.CommissionPercent <= query.MaxCommission.Value);
             }
 
             businessesQuery = query.SortDescending == true ? businessesQuery.OrderByDescending(b => b.CreatedAt) : businessesQuery.OrderBy(b => b.CreatedAt);
