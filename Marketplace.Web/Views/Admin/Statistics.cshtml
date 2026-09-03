@@ -3,6 +3,19 @@
 @{
     ViewData["Title"] = "Статистика - Адмін-панель";
     var overview = Model.Overview;
+
+    var periodJson = System.Text.Json.JsonSerializer.Serialize(overview.ByPeriod.Select(p => new
+    {
+        label = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p.Label),
+        turnover = p.Turnover,
+        orders = p.OrdersCount
+    }));
+
+    var businessesJson = System.Text.Json.JsonSerializer.Serialize(overview.Businesses.Take(10).Select(b => new
+    {
+        name = string.IsNullOrWhiteSpace(b.StoreName) ? "Без назви" : b.StoreName,
+        turnover = b.Turnover
+    }));
 }
 
 @section Styles {
@@ -97,6 +110,35 @@
                 </div>
             </div>
 
+            <div class="admin-two-col">
+                <div class="admin-panel admin-chart-card">
+                    <h2 class="admin-section-heading admin-section-heading--tight">Товарооборот у часі</h2>
+                    @if (overview.ByPeriod.Count == 0)
+                    {
+                        <p class="admin-empty">За обраний період продажів немає.</p>
+                    }
+                    else
+                    {
+                        <div class="admin-chart-card__canvas-wrap">
+                            <canvas id="turnoverChart" data-chart='@Html.Raw(periodJson)'></canvas>
+                        </div>
+                    }
+                </div>
+                <div class="admin-panel admin-chart-card">
+                    <h2 class="admin-section-heading admin-section-heading--tight">Оборот за магазинами</h2>
+                    @if (overview.Businesses.Count == 0)
+                    {
+                        <p class="admin-empty">За обраний період продажів немає.</p>
+                    }
+                    else
+                    {
+                        <div class="admin-chart-card__canvas-wrap">
+                            <canvas id="businessTurnoverChart" data-chart='@Html.Raw(businessesJson)'></canvas>
+                        </div>
+                    }
+                </div>
+            </div>
+
             <h2 class="admin-section-heading">За магазинами</h2>
             @if (overview.Businesses.Count == 0)
             {
@@ -188,3 +230,9 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/lib/chartjs/chart.umd.min.js"></script>
+    <script src="~/js/chart-helpers.js" asp-append-version="true"></script>
+    <script src="~/js/admin-statistics-charts.js" asp-append-version="true"></script>
+}

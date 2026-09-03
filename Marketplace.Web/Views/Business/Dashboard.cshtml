@@ -9,6 +9,28 @@
         revenue = c.Revenue,
         orders = c.OrderCount
     }));
+
+    var productStatusJson = System.Text.Json.JsonSerializer.Serialize(new
+    {
+        active = Model.ActiveProductCount,
+        pending = Model.PendingProductCount,
+        outOfStock = Model.OutOfStockProductCount,
+        lowStock = Model.LowStockProductCount
+    });
+
+    var topProductsJson = System.Text.Json.JsonSerializer.Serialize(Model.TopProducts.Select(p => new
+    {
+        name = p.ProductName,
+        revenue = p.Revenue
+    }));
+
+    var trafficJson = System.Text.Json.JsonSerializer.Serialize(new
+    {
+        views = Model.TotalViews,
+        cartAdds = Model.TotalCartAdds,
+        wishlistAdds = Model.TotalWishlistAdds,
+        orders = Model.PeriodOrders
+    });
 }
 
 @functions {
@@ -78,20 +100,37 @@
         <div class="business-kpi"><span>Товарів усього</span><strong>@Model.TotalProductCount</strong></div>
     </div>
 
-    <section class="business-panel business-chart-card">
-        <h2>Виручка та замовлення за період</h2>
-        <p class="business-panel__lead">@Model.Filter.StartDate?.ToString("dd.MM.yyyy") - @Model.Filter.EndDate?.ToString("dd.MM.yyyy")</p>
-        @if (Model.Chart.Count == 0)
-        {
-            <p class="business-empty">Даних за обраний період немає.</p>
-        }
-        else
-        {
-            <div class="business-chart-card__canvas-wrap">
-                <canvas id="revenueChart" data-chart='@Html.Raw(chartJson)'></canvas>
-            </div>
-        }
-    </section>
+    <div class="business-two-col">
+        <section class="business-panel business-chart-card">
+            <h2>Виручка та замовлення за період</h2>
+            <p class="business-panel__lead">@Model.Filter.StartDate?.ToString("dd.MM.yyyy") - @Model.Filter.EndDate?.ToString("dd.MM.yyyy")</p>
+            @if (Model.Chart.Count == 0)
+            {
+                <p class="business-empty">Даних за обраний період немає.</p>
+            }
+            else
+            {
+                <div class="business-chart-card__canvas-wrap">
+                    <canvas id="revenueChart" data-chart='@Html.Raw(chartJson)'></canvas>
+                </div>
+            }
+        </section>
+
+        <section class="business-panel business-chart-card">
+            <h2>Динаміка середнього чека</h2>
+            <p class="business-panel__lead">Виручка / кількість замовлень по днях.</p>
+            @if (Model.Chart.Count == 0)
+            {
+                <p class="business-empty">Даних за обраний період немає.</p>
+            }
+            else
+            {
+                <div class="business-chart-card__canvas-wrap">
+                    <canvas id="aovChart"></canvas>
+                </div>
+            }
+        </section>
+    </div>
 
     <div class="business-two-col">
         <section class="business-panel">
@@ -103,6 +142,9 @@
             }
             else
             {
+                <div class="business-chart-card__canvas-wrap business-chart-card__canvas-wrap--short">
+                    <canvas id="topProductsChart" data-chart='@Html.Raw(topProductsJson)'></canvas>
+                </div>
                 <div class="table-responsive">
                     <table class="business-table">
                         <thead>
@@ -155,26 +197,35 @@
         </section>
     </div>
 
-    <section class="business-panel">
-        <h2>Трафік і конверсія</h2>
-        <p class="business-panel__lead">Дії покупців з товарами магазину за обраний період.</p>
-        <div class="business-kpis">
-            <div class="business-kpi"><span>Перегляди товарів</span><strong>@Model.TotalViews</strong></div>
-            <div class="business-kpi"><span>Додано в кошик</span><strong>@Model.TotalCartAdds</strong></div>
-            <div class="business-kpi"><span>Додано в побажання</span><strong>@Model.TotalWishlistAdds</strong></div>
-            <div class="business-kpi"><span>Конверсія в замовлення</span><strong>@Model.ConversionRatePercent.ToString("0.0")%</strong></div>
-        </div>
-    </section>
+    <div class="business-two-col">
+        <section class="business-panel">
+            <h2>Трафік і конверсія</h2>
+            <p class="business-panel__lead">Дії покупців з товарами магазину за обраний період.</p>
+            <div class="business-chart-card__canvas-wrap business-chart-card__canvas-wrap--short">
+                <canvas id="trafficChart" data-chart='@Html.Raw(trafficJson)'></canvas>
+            </div>
+            <div class="business-kpis">
+                <div class="business-kpi"><span>Перегляди товарів</span><strong>@Model.TotalViews</strong></div>
+                <div class="business-kpi"><span>Додано в кошик</span><strong>@Model.TotalCartAdds</strong></div>
+                <div class="business-kpi"><span>Додано в побажання</span><strong>@Model.TotalWishlistAdds</strong></div>
+                <div class="business-kpi"><span>Конверсія в замовлення</span><strong>@Model.ConversionRatePercent.ToString("0.0")%</strong></div>
+            </div>
+        </section>
 
-    <section class="business-panel">
-        <h2>Асортимент</h2>
-        <div class="business-kpis">
-            <div class="business-kpi"><span>Активні</span><strong>@Model.ActiveProductCount</strong></div>
-            <div class="business-kpi"><span>На модерації</span><strong>@Model.PendingProductCount</strong></div>
-            <div class="business-kpi @(Model.OutOfStockProductCount > 0 ? "business-kpi--warning" : null)"><span>Немає в наявності</span><strong>@Model.OutOfStockProductCount</strong></div>
-            <div class="business-kpi @(Model.LowStockProductCount > 0 ? "business-kpi--warning" : null)"><span>Мало на складі</span><strong>@Model.LowStockProductCount</strong></div>
-        </div>
-    </section>
+        <section class="business-panel">
+            <h2>Асортимент</h2>
+            <p class="business-panel__lead">Розподіл товарів магазину за станом.</p>
+            <div class="business-chart-card__canvas-wrap business-chart-card__canvas-wrap--short">
+                <canvas id="productStatusChart" data-chart='@Html.Raw(productStatusJson)'></canvas>
+            </div>
+            <div class="business-kpis">
+                <div class="business-kpi"><span>Активні</span><strong>@Model.ActiveProductCount</strong></div>
+                <div class="business-kpi"><span>На модерації</span><strong>@Model.PendingProductCount</strong></div>
+                <div class="business-kpi @(Model.OutOfStockProductCount > 0 ? "business-kpi--warning" : null)"><span>Немає в наявності</span><strong>@Model.OutOfStockProductCount</strong></div>
+                <div class="business-kpi @(Model.LowStockProductCount > 0 ? "business-kpi--warning" : null)"><span>Мало на складі</span><strong>@Model.LowStockProductCount</strong></div>
+            </div>
+        </section>
+    </div>
 
     <section class="business-panel">
         <h2>Останні дії</h2>
@@ -199,5 +250,6 @@
 
 @section Scripts {
     <script src="~/lib/chartjs/chart.umd.min.js"></script>
+    <script src="~/js/chart-helpers.js" asp-append-version="true"></script>
     <script src="~/js/business-dashboard.js" asp-append-version="true"></script>
 }

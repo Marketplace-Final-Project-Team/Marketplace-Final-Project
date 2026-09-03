@@ -1174,6 +1174,11 @@
     position: relative;
 }
 
+.business-chart-card__canvas-wrap--short {
+    height: 12rem;
+    margin-bottom: 1.1rem;
+}
+
 .business-two-col {
     display: grid;
     gap: 1.25rem;

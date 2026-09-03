@@ -491,6 +491,10 @@ namespace Marketplace.Web.Controllers
             var summary = await _orderService.GetBusinessOrderSummary(businessId);
             var orders = await _orderService.GetBusinessOrders(businessId);
 
+            var trendEnd = DateTime.UtcNow.Date;
+            var trendStart = trendEnd.AddDays(-29);
+            var trendResult = await _businessService.GetBusinessStatsByPeriodAsync(businessId, trendStart, trendEnd);
+
             return View(new BusinessFinanceViewModel
             {
                 BusinessId = businessId,
@@ -511,7 +515,13 @@ namespace Marketplace.Web.Controllers
                         ShippingAddress = $"{order.ShippingCity}, {order.ShippingStreet}",
                         ItemsCount = order.ItemsCount,
                         LineTotal = order.LineTotal
-                    }).ToList()
+                    }).ToList(),
+                RevenueTrend = trendResult.Succeeded
+                    ? trendResult.Data.Stats
+                        .OrderBy(s => s.Date)
+                        .Select(s => new BusinessDashboardChartPointViewModel { Date = s.Date, Revenue = s.Revenue, OrderCount = s.OrderCount })
+                        .ToList()
+                    : new List<BusinessDashboardChartPointViewModel>()
             });
         }
 
@@ -535,6 +545,13 @@ namespace Marketplace.Web.Controllers
                 allRatings.AddRange(reviews.Select(r => (double)r.Rating));
             }
 
+            var ratingDistribution = new int[5];
+            foreach (var rating in allRatings)
+            {
+                var bucket = Math.Clamp((int)Math.Round(rating), 1, 5) - 1;
+                ratingDistribution[bucket]++;
+            }
+
             return View(new BusinessPerformanceViewModel
             {
                 BusinessId = businessId,
@@ -544,7 +561,11 @@ namespace Marketplace.Web.Controllers
                 CanceledOrders = distinctOrders.Count(o => o.Status == OrderStatus.Canceled),
                 AverageRating = allRatings.Count == 0 ? 0 : Math.Round(allRatings.Average(), 1),
                 ReviewCount = allRatings.Count,
-                ProductCount = products.Count
+                ProductCount = products.Count,
+                OrdersByStatus = distinctOrders
+                    .GroupBy(o => o.Status)
+                    .ToDictionary(g => g.Key, g => g.Count()),
+                RatingDistribution = ratingDistribution
             });
         }
 

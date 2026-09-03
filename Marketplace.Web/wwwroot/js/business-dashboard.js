@@ -1,70 +1,66 @@
 (() => {
-    const canvas = document.getElementById("revenueChart");
-    if (!canvas || typeof Chart === "undefined") {
+    if (typeof Chart === "undefined" || !window.MpCharts) {
         return;
     }
 
-    let points = [];
-    try {
-        points = JSON.parse(canvas.dataset.chart || "[]");
-    } catch {
-        return;
-    }
+    const revenueCanvas = document.getElementById("revenueChart");
+    if (revenueCanvas) {
+        const points = MpCharts.readData(revenueCanvas) || [];
+        if (points.length > 0) {
+            MpCharts.combo("revenueChart", {
+                labels: points.map((p) => p.date),
+                revenue: points.map((p) => p.revenue),
+                orders: points.map((p) => p.orders)
+            });
 
-    if (points.length === 0) {
-        return;
-    }
-
-    new Chart(canvas, {
-        type: "bar",
-        data: {
-            labels: points.map((p) => p.date),
-            datasets: [
-                {
-                    type: "line",
-                    label: "Виручка, ₴",
-                    data: points.map((p) => p.revenue),
-                    borderColor: "#3157d7",
-                    backgroundColor: "rgba(49, 87, 215, 0.12)",
-                    borderWidth: 2,
-                    tension: 0.3,
-                    yAxisID: "revenue",
-                    pointRadius: 2,
-                    fill: true
-                },
-                {
-                    type: "bar",
-                    label: "Замовлення",
-                    data: points.map((p) => p.orders),
-                    backgroundColor: "rgba(66, 169, 139, 0.55)",
-                    yAxisID: "orders",
-                    borderRadius: 4,
-                    maxBarThickness: 22
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: { mode: "index", intersect: false },
-            scales: {
-                revenue: {
-                    type: "linear",
-                    position: "left",
-                    beginAtZero: true,
-                    ticks: { precision: 0 }
-                },
-                orders: {
-                    type: "linear",
-                    position: "right",
-                    beginAtZero: true,
-                    ticks: { precision: 0 },
-                    grid: { drawOnChartArea: false }
-                }
-            },
-            plugins: {
-                legend: { position: "bottom" }
+            const aovCanvas = document.getElementById("aovChart");
+            if (aovCanvas) {
+                MpCharts.line("aovChart", {
+                    labels: points.map((p) => p.date),
+                    data: points.map((p) => (p.orders > 0 ? Math.round((p.revenue / p.orders) * 100) / 100 : 0)),
+                    label: "Середній чек, ₴",
+                    color: "#8a4fd6"
+                });
             }
         }
-    });
+    }
+
+    const statusCanvas = document.getElementById("productStatusChart");
+    if (statusCanvas) {
+        const d = MpCharts.readData(statusCanvas);
+        if (d) {
+            MpCharts.doughnut("productStatusChart", {
+                labels: ["Активні", "На модерації", "Немає в наявності", "Мало на складі"],
+                data: [d.active, d.pending, d.outOfStock, d.lowStock],
+                colors: ["#22a06b", "#d99a16", "#d92d20", "#f59e0b"]
+            });
+        }
+    }
+
+    const topProductsCanvas = document.getElementById("topProductsChart");
+    if (topProductsCanvas) {
+        const items = MpCharts.readData(topProductsCanvas) || [];
+        if (items.length > 0) {
+            MpCharts.bar("topProductsChart", {
+                labels: items.map((p) => p.name),
+                data: items.map((p) => p.revenue),
+                label: "Виручка, ₴",
+                color: "#3157d7",
+                horizontal: true
+            });
+        }
+    }
+
+    const trafficCanvas = document.getElementById("trafficChart");
+    if (trafficCanvas) {
+        const d = MpCharts.readData(trafficCanvas);
+        if (d) {
+            MpCharts.bar("trafficChart", {
+                labels: ["Перегляди", "У кошик", "У побажання", "Замовлення"],
+                data: [d.views, d.cartAdds, d.wishlistAdds, d.orders],
+                label: "Дії",
+                color: "#42a98b"
+            });
+        }
+    }
 })();
