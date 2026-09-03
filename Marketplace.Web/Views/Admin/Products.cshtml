@@ -102,7 +102,7 @@
 
                                 <tr>
                                     <td>
-                                        <div class="admin-entity-cell">
+                                        <button type="button" class="admin-entity-cell admin-entity-cell--clickable" data-product-open="@product.Id">
                                             @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
                                             {
                                                 <img class="admin-entity-thumb" src="@product.ImageUrl" alt="@product.Name" />
@@ -112,7 +112,7 @@
                                                 <div class="admin-entity-placeholder" aria-hidden="true">@productInitial</div>
                                             }
                                             <span class="admin-entity-name">@product.Name</span>
-                                        </div>
+                                        </button>
                                     </td>
                                     <td class="fw-semibold">@product.Price.ToString("N2") ₴</td>
                                     <td><span class="admin-status admin-status--@statusClass">@StatusLabel(product.Status)</span></td>
@@ -154,3 +154,14 @@
         </div>
     </div>
 </div>
+
+<div class="admin-modal" data-admin-modal hidden>
+    <div class="admin-modal__card admin-modal__card--wide">
+        <button type="button" class="admin-modal__close" aria-label="Закрити" data-admin-modal-close>×</button>
+        <div data-admin-modal-body></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/admin-product-modal.js" asp-append-version="true"></script>
+}

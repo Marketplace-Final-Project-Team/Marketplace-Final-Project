@@ -556,6 +556,28 @@
     min-width: 13rem;
 }
 
+.admin-entity-cell--clickable {
+    background: none;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    text-align: left;
+}
+
+.admin-entity-cell--clickable:hover {
+    background: var(--admin-soft);
+}
+
+.admin-entity-cell--clickable .admin-entity-name {
+    text-decoration: underline;
+    text-decoration-color: transparent;
+}
+
+.admin-entity-cell--clickable:hover .admin-entity-name {
+    text-decoration-color: var(--admin-primary);
+}
+
 .admin-entity-thumb,
 .admin-entity-placeholder {
     align-items: center;
@@ -798,4 +820,119 @@
     .admin-header {
         flex-direction: column;
     }
+}
+
+/* ---------- Generic admin modal ---------- */
+
+.admin-modal {
+    align-items: center;
+    background: rgba(23, 32, 51, 0.45);
+    display: flex;
+    inset: 0;
+    justify-content: center;
+    padding: 1rem;
+    position: fixed;
+    z-index: 1050;
+}
+
+.admin-modal__card {
+    background: var(--admin-surface);
+    border-radius: 1.1rem;
+    max-height: 90vh;
+    max-width: 32rem;
+    overflow-y: auto;
+    padding: 1.75rem;
+    position: relative;
+    width: 100%;
+}
+
+.admin-modal__card--wide {
+    max-width: 46rem;
+}
+
+.admin-modal__close {
+    background: none;
+    border: none;
+    color: var(--admin-muted);
+    font-size: 1.4rem;
+    line-height: 1;
+    position: absolute;
+    right: 0.85rem;
+    top: 0.7rem;
+}
+
+/* ---------- Product details modal content ---------- */
+
+.admin-product-modal__header {
+    align-items: flex-start;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-right: 1.5rem;
+}
+
+.admin-product-modal__header h3 {
+    color: var(--admin-ink);
+    font-size: 1.2rem;
+    font-weight: 750;
+    margin: 0;
+}
+
+.admin-product-modal__gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 1.1rem;
+}
+
+.admin-product-modal__gallery img {
+    border: 1px solid var(--admin-line);
+    border-radius: 0.75rem;
+    height: 7rem;
+    object-fit: cover;
+    width: 7rem;
+}
+
+.admin-product-modal__facts {
+    display: grid;
+    gap: 0.75rem 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    margin: 0 0 1.1rem;
+}
+
+.admin-product-modal__facts dt {
+    color: var(--admin-muted);
+    font-size: 0.72rem;
+    font-weight: 650;
+    text-transform: uppercase;
+}
+
+.admin-product-modal__facts dd {
+    color: var(--admin-ink);
+    font-weight: 650;
+    margin: 0.15rem 0 0;
+}
+
+.admin-product-modal__description h4 {
+    color: var(--admin-ink);
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin: 0 0 0.35rem;
+}
+
+.admin-product-modal__description p {
+    color: var(--admin-muted);
+    font-size: 0.88rem;
+    line-height: 1.55;
+    white-space: pre-line;
+}
+
+.admin-product-modal__actions {
+    border-top: 1px solid var(--admin-line);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.25rem;
+    padding-top: 1.1rem;
 }

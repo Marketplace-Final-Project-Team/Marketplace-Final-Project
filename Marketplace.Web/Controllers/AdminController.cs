@@ -137,6 +137,33 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> ProductDetailsPartial(Guid id)
+        {
+            var product = await _productService.GetByIdAsync(id);
+            if (product is null)
+            {
+                return NotFound();
+            }
+
+            return PartialView("_ProductDetailsModal", new ProductAdminDetailsViewModel
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                Quantity = product.Quantity,
+                MainImageUrl = product.MainImageUrl,
+                AdditionalImageUrls = product.Images.Select(i => i.ImageUrl).ToList(),
+                Status = product.Status,
+                ModerationReason = product.ModerationReason,
+                CategoryName = product.Category?.Name ?? "Без категорії",
+                BusinessId = product.BusinessId,
+                BusinessName = product.Business?.StoreName ?? "Без назви",
+                CreatedAt = product.CreatedAt
+            });
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Businesses([FromQuery] BusinessAdminFilterViewModel filter)
         {
             var result = await _adminService.GetFilteredBusinessesAsync(new BusinessAdminQueryParams
