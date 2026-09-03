@@ -569,15 +569,6 @@
     background: var(--admin-soft);
 }
 
-.admin-entity-cell--clickable .admin-entity-name {
-    text-decoration: underline;
-    text-decoration-color: transparent;
-}
-
-.admin-entity-cell--clickable:hover .admin-entity-name {
-    text-decoration-color: var(--admin-primary);
-}
-
 .admin-entity-thumb,
 .admin-entity-placeholder {
     align-items: center;
@@ -886,12 +877,22 @@
     margin-bottom: 1.1rem;
 }
 
+.admin-product-modal__gallery a {
+    display: block;
+}
+
 .admin-product-modal__gallery img {
     border: 1px solid var(--admin-line);
     border-radius: 0.75rem;
     height: 7rem;
     object-fit: cover;
+    transition: transform 0.15s ease, border-color 0.15s ease;
     width: 7rem;
+}
+
+.admin-product-modal__gallery a:hover img {
+    border-color: var(--admin-primary);
+    transform: scale(1.04);
 }
 
 .admin-product-modal__facts {

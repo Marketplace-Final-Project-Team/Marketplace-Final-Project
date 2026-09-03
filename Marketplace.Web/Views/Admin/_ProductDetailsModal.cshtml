@@ -33,7 +33,9 @@
     <div class="admin-product-modal__gallery">
         @foreach (var url in gallery)
         {
-            <img src="@url" alt="@Model.Name" />
+            <a href="@url" target="_blank" rel="noopener" title="Відкрити зображення на весь розмір">
+                <img src="@url" alt="@Model.Name" />
+            </a>
         }
     </div>
 }
