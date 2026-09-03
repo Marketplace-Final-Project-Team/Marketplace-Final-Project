@@ -20,11 +20,6 @@ namespace Marketplace.BLL.Services
             _settingsService = settingsService;
         }
 
-        // The admin Integrations page can override any of these in SystemSettings; an
-        // admin-saved value always wins, falling back to appsettings.json when nothing's
-        // been saved yet (see AdminController.BuildIntegrationsAsync for the same pattern).
-        // Built per-call rather than cached at startup, since Cloudinary itself is a thin
-        // stateless HTTP wrapper around these credentials.
         private async Task<Cloudinary> BuildClientAsync()
         {
             var cloudName = await GetSettingAsync("CloudName", _configuration["Cloudinary:CloudName"] ?? "not-configured");

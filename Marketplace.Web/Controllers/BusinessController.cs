@@ -227,27 +227,15 @@ namespace Marketplace.Web.Controllers
                 return Forbid();
             }
 
+
             var result = await _postSaleService.ResolveRequestAsync(requestId, businessId, decision, sellerResponse);
             if (result.Succeeded)
             {
                 await _activityLog.LogBusinessActionAsync(businessId, "PostSaleRequestResolved",
                     $"Заявку на повернення вирішено: {decision}.",
                     actorUserId: _userManager.GetUserId(User), relatedEntityId: requestId);
-
-                if (decision == PostSaleRequestStatus.Approved && result.EntityId.HasValue)
-                {
-                    // Approving a return refunds just that one line item — restores its stock,
-                    // gives back the seller's net share, and reverses the marketplace's
-                    // commission at the rate that applied when the order was confirmed. Other
-                    // items in the same (possibly multi-seller) order are untouched.
-                    var refundResult = await _orderService.RefundOrderItemAsync(result.EntityId.Value);
-                    if (!refundResult.Succeeded)
-                    {
-                        TempData["Error"] = $"Заявку підтверджено, але не вдалось повернути кошти: {refundResult.Message}";
-                        return RedirectToAction(nameof(OrderDetails), new { businessId, orderId });
-                    }
-                }
             }
+
             TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded
                 ? "Рішення щодо заявки збережено."
                 : result.Message;
@@ -265,7 +253,7 @@ namespace Marketplace.Web.Controllers
                 return Forbid();
             }
 
-         
+
             var order = await _orderService.GetBusinessOrderDetails(businessId, orderId);
             if (order is null)
             {
@@ -520,7 +508,7 @@ namespace Marketplace.Web.Controllers
                 BusinessId = businessId,
                 StoreName = business.StoreName,
                 Description = business.Description,
-                AdultStatus = (Marketplace.Domain.Enums.AdultContentStatus)business.AdultStatus 
+                AdultStatus = (Marketplace.Domain.Enums.AdultContentStatus)business.AdultStatus
             });
         }
 

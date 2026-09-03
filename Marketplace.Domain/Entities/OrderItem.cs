@@ -11,14 +11,9 @@ namespace Marketplace.Domain.Entities
         public decimal UnitPrice { get; set; }
         public int Quantity { get; set; }
 
-        // Set once, when the order first becomes Confirmed, from the marketplace commission
-        // rate at that moment — kept as a snapshot (not recomputed) so a later change to the
-        // commission rate can't corrupt the reversal if this order is later canceled.
+      
         public decimal CommissionAmount { get; set; }
-
-        // Guards against refunding the same line item twice (e.g. a return approved after
-        // the whole order was separately canceled).
-        public bool IsReturned { get; set; }
+        public bool IsReturned { get; set; } = false;
 
         public Guid OrderId { get; set; }
         public Order Order { get; set; } = null!;

@@ -30,6 +30,7 @@
 
 <div class="shop-page">
     <a asp-action="Index" class="shop-back">← До всіх замовлень</a>
+
     <header class="shop-header">
         <div>
             <div class="shop-kicker">Замовлення #@Model.Id.ToString()[..8].ToUpperInvariant()</div>
@@ -54,6 +55,7 @@
                 <h2 class="mb-0">Склад замовлення</h2>
                 <span class="order-status order-status--@Model.Status.ToString().ToLowerInvariant()">@StatusLabel(Model.Status)</span>
             </div>
+
             <div class="order-lines mt-4">
                 @foreach (var item in Model.Items)
                 {
@@ -72,33 +74,39 @@
                         </div>
                         <div class="order-line__total">@item.LineTotal.ToString("N2") ₴</div>
                     </div>
+
                     @if (Model.Status is Marketplace.Domain.Enums.OrderStatus.Delivered)
                     {
                         @if (item.ReturnRequest is null)
                         {
-                            <button type="button" class="btn btn-sm btn-outline-secondary order-line__return-btn" data-postsale-open="return" data-order-item-id="@item.Id">Оформити повернення</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary order-line__return-btn my-2" data-postsale-open="return" data-order-item-id="@item.Id">Оформити повернення</button>
                         }
                         else
                         {
-                            <div class="postsale-status postsale-status--@item.ReturnRequest.Status.ToString().ToLowerInvariant()">
+                            <div class="postsale-status postsale-status--@item.ReturnRequest.Status.ToString().ToLowerInvariant() my-2 p-3 border rounded">
                                 <strong>@PostSaleStatusLabel(item.ReturnRequest.Status)</strong>
-                                <span>@item.ReturnRequest.SubmittedAtUtc.ToLocalTime().ToString("dd MMMM yyyy, HH:mm") · @item.ReturnRequest.Reason</span>
+                                <div class="text-muted small">@item.ReturnRequest.SubmittedAtUtc.ToLocalTime().ToString("dd MMMM yyyy, HH:mm") · Причина: @item.ReturnRequest.Reason</div>
+
                                 @if (!string.IsNullOrWhiteSpace(item.ReturnRequest.Comment))
                                 {
-                                    <span>«@item.ReturnRequest.Comment»</span>
+                                    <div class="mt-1">«@item.ReturnRequest.Comment»</div>
                                 }
+
                                 @if (item.ReturnRequest.PhotoUrls.Any())
                                 {
-                                    <div class="postsale-photos">
+                                    <div class="postsale-photos mt-2">
                                         @foreach (var url in item.ReturnRequest.PhotoUrls)
                                         {
-                                            <a href="@url" target="_blank" rel="noopener"><img src="@url" alt="Фото до заявки" /></a>
+                                            <a href="@url" target="_blank" rel="noopener" class="me-2">
+                                                <img src="@url" alt="Фото до заявки" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" />
+                                            </a>
                                         }
                                     </div>
                                 }
+
                                 @if (!string.IsNullOrWhiteSpace(item.ReturnRequest.SellerResponse))
                                 {
-                                    <span>Відповідь продавця: @item.ReturnRequest.SellerResponse</span>
+                                    <div class="mt-2 text-primary small"><strong>Відповідь продавця:</strong> @item.ReturnRequest.SellerResponse</div>
                                 }
                             </div>
                         }
@@ -128,7 +136,7 @@
                 </div>
                 <div class="order-info__row">
                     <dt>Разом</dt>
-                    <dd>@Model.TotalAmount.ToString("N2") ₴</dd>
+                    <dd><strong>@Model.TotalAmount.ToString("N2") ₴</strong></dd>
                 </div>
             </dl>
         </aside>
@@ -136,13 +144,13 @@
 
     @if (Model.Status is Marketplace.Domain.Enums.OrderStatus.Delivered)
     {
-        <section class="shop-panel postsale-panel">
+        <section class="shop-panel postsale-panel mt-4">
             <h2>Післяпродажний сервіс та безпека</h2>
-            <div class="postsale-protection">
-                <span class="postsale-protection__icon" aria-hidden="true">🛡</span>
+            <div class="postsale-protection d-flex align-items-start gap-3 mt-3">
+                <span class="postsale-protection__icon fs-3" aria-hidden="true">🛡</span>
                 <div>
                     <strong>Захист покупця</strong>
-                    <span>Кошти продавцю переказуються лише після підтвердження отримання товару. Повернення можливе протягом 14 днів з дати доставки - окремо на кожен товар.</span>
+                    <p class="mb-0 text-muted">Кошти продавцю переказуються лише після підтвердження отримання товару. Повернення можливе протягом 14 днів з дати доставки — окремо на кожен товар.</p>
                 </div>
             </div>
         </section>
@@ -158,8 +166,10 @@
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="orderId" value="@Model.Id" />
                 <input type="hidden" name="orderItemId" data-postsale-item-id-field />
+
                 <h3>Оформлення повернення</h3>
-                <p>Замовлення #@Model.Id.ToString()[..8].ToUpperInvariant()</p>
+                <p class="text-muted small">Замовлення #@Model.Id.ToString()[..8].ToUpperInvariant()</p>
+
                 <label class="form-label mt-2">Причина повернення</label>
                 <select class="form-select" name="reason" required>
                     <option value="">Оберіть причину</option>
@@ -170,12 +180,15 @@
                     <option>Передумав(-ла)</option>
                     <option>Інше</option>
                 </select>
+
                 <label class="form-label mt-3">Опишіть ситуацію</label>
                 <textarea class="form-control" name="comment" rows="3" minlength="10" placeholder="Розкажіть детальніше, що не так із товаром (мінімум 10 символів)..." required></textarea>
+
                 <label class="form-label mt-3">Фото товару</label>
                 <input type="file" class="form-control" name="photos" accept="image/*" multiple required />
-                <div class="form-text">Додайте від 1 до 5 фото - це підтвердження стану товару для продавця.</div>
-                <button type="submit" class="btn btn-primary mt-3 w-100">Надіслати заявку</button>
+                <div class="form-text">Додайте від 1 до 5 фото — це підтвердження стану товару для продавця.</div>
+
+                <button type="submit" class="btn btn-primary mt-4 w-100">Надіслати заявку</button>
             </form>
         </div>
     </div>
