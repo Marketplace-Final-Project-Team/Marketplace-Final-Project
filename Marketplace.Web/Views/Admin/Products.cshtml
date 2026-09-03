@@ -58,6 +58,13 @@
                         <option value="@category.Id" selected="@(Model.Filter.CategoryId == category.Id)">@category.Name</option>
                     }
                 </select>
+                <select class="form-select" name="Status" aria-label="Фільтр за статусом" onchange="this.form.submit()">
+                    <option value="">Усі статуси</option>
+                    @foreach (Marketplace.Domain.Enums.ProductStatus status in Enum.GetValues(typeof(Marketplace.Domain.Enums.ProductStatus)))
+                    {
+                        <option value="@status" selected="@(Model.Filter.Status == status)">@StatusLabel(status)</option>
+                    }
+                </select>
                 <div class="admin-price-range">
                     <input type="number" class="form-control" name="MinPrice" min="0" step="1" placeholder="Ціна від" aria-label="Ціна від" value="@Model.Filter.MinPrice" />
                     <span aria-hidden="true">-</span>

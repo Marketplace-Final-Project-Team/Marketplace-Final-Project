@@ -107,6 +107,7 @@ namespace Marketplace.Web.Controllers
                 MinPrice = filter.MinPrice,
                 MaxPrice = filter.MaxPrice,
                 InStockOnly = filter.InStockOnly,
+                Status = filter.Status,
                 SortOption = filter.SortOption,
                 Pagination = new PaginationParams
                 {

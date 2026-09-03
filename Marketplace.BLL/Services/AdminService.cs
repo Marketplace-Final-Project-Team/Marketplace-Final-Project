@@ -94,6 +94,11 @@ namespace Marketplace.BLL.Services
                 productsQuery = productsQuery.Where(p => p.Quantity > 0);
             }
 
+            if (query.Status.HasValue)
+            {
+                productsQuery = productsQuery.Where(p => p.Status == query.Status.Value);
+            }
+
             switch (query.SortOption)
             {
                 case ProductSortOption.PriceAsc:

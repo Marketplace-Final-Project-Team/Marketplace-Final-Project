@@ -11,6 +11,7 @@ namespace Marketplace.BLL.DTOs
         public decimal? MinPrice { get; set; }
         public decimal? MaxPrice { get; set; }
         public bool? InStockOnly { get; set; }
+        public ProductStatus? Status { get; set; }
         public ProductSortOption SortOption { get; set; } = ProductSortOption.PopularityDesc;
         public PaginationParams Pagination { get; set; } = new PaginationParams();
     }
