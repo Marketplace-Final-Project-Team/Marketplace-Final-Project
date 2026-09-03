@@ -38,6 +38,7 @@ namespace Marketplace.DAL.Data
         public DbSet<UserActionLog> UserActionLogs { get; set; }
         public DbSet<BusinessActionLog> BusinessActionLogs { get; set; }
         public DbSet<MarketplaceBalance> MarketplaceBalances { get; set; }
+        public DbSet<ProductEvent> ProductEvents { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -247,6 +248,15 @@ namespace Marketplace.DAL.Data
 
             // UserActionLog.UserId intentionally has no FK constraint — the trail must
             // survive even if the referenced user is later removed from Identity.
+
+            builder.Entity<ProductEvent>()
+                .HasOne<Product>()
+                .WithMany()
+                .HasForeignKey(pe => pe.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<ProductEvent>()
+                .HasIndex(pe => new { pe.BusinessId, pe.CreatedAt });
 
             builder.Entity<Product>().Navigation(p => p.Category).AutoInclude();
             builder.Entity<Product>().Navigation(p => p.Images).AutoInclude();

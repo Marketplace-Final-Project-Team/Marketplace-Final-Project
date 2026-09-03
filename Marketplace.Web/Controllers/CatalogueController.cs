@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
+using Marketplace.Domain.Enums;
 using Marketplace.Web.Infrastructure;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -21,19 +22,22 @@ public class CatalogueController : Controller
     private readonly ICategoryService _categoryService;
     private readonly IWishlistService _wishlistService;
     private readonly ISystemSettingsService _settingsService;
+    private readonly IProductAnalyticsService _productAnalyticsService;
 
     public CatalogueController(
         IProductService productService,
         IReviewService reviewService,
         ICategoryService categoryService,
         IWishlistService wishlistService,
-        ISystemSettingsService settingsService)
+        ISystemSettingsService settingsService,
+        IProductAnalyticsService productAnalyticsService)
     {
         _productService = productService;
         _reviewService = reviewService;
         _categoryService = categoryService;
         _wishlistService = wishlistService;
         _settingsService = settingsService;
+        _productAnalyticsService = productAnalyticsService;
     }
 
     [HttpGet]
@@ -121,6 +125,8 @@ public class CatalogueController : Controller
             var wishlist = await _wishlistService.GetWishlistAsync(model.CurrentUserId);
             model.IsInWishlist = wishlist.Items.Any(item => item.ProductId == id);
         }
+
+        await _productAnalyticsService.RecordEventAsync(product.Id, product.BusinessId, ProductEventType.View, model.CurrentUserId);
 
         RecordRecentlyViewed(id);
 

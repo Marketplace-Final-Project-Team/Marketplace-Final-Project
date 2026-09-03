@@ -9,6 +9,7 @@
 }
 
 <nav class="business-nav" aria-label="Розділи панелі магазину">
+    <a class="@ActiveClass("Dashboard")" asp-action="Dashboard" asp-route-businessId="@Model">Дашборд</a>
     <a class="@ActiveClass("Orders")" asp-action="Orders" asp-route-businessId="@Model">Замовлення</a>
     <a class="@ActiveClass("Finance")" asp-action="Finance" asp-route-businessId="@Model">Фінанси</a>
     <a class="@ActiveClass("Performance")" asp-action="Performance" asp-route-businessId="@Model">Ефективність</a>

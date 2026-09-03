@@ -100,6 +100,7 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IWishlistCollectionService, WishlistCollectionService>();
 builder.Services.AddScoped<IPostSaleService, PostSaleService>();
 builder.Services.AddScoped<IPromoCodeService, PromoCodeService>();
+builder.Services.AddScoped<IProductAnalyticsService, ProductAnalyticsService>();
 
 // System settings (admin-editable key/value store) and activity logs — new,
 // additive infrastructure that doesn't touch any existing service's behavior.

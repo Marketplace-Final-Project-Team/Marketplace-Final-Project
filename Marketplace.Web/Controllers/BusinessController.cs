@@ -27,6 +27,8 @@ namespace Marketplace.Web.Controllers
         private readonly IEmailSender _emailSender;
         private readonly AppDbContext _context;
         private readonly IActivityLogService _activityLog;
+        private readonly IProductAnalyticsService _productAnalyticsService;
+        private readonly ISystemSettingsService _settingsService;
 
         public BusinessController(
             IBusinessService businessService,
@@ -40,7 +42,9 @@ namespace Marketplace.Web.Controllers
             UserManager<User> userManager,
             IEmailSender emailSender,
             AppDbContext context,
-            IActivityLogService activityLog)
+            IActivityLogService activityLog,
+            IProductAnalyticsService productAnalyticsService,
+            ISystemSettingsService settingsService)
         {
             _businessService = businessService;
             _businessAccessService = businessAccessService;
@@ -54,6 +58,8 @@ namespace Marketplace.Web.Controllers
             _emailSender = emailSender;
             _context = context;
             _activityLog = activityLog;
+            _productAnalyticsService = productAnalyticsService;
+            _settingsService = settingsService;
         }
 
         [HttpGet]
@@ -97,6 +103,124 @@ namespace Marketplace.Web.Controllers
                 Businesses = businessCards,
                 CanCreateBusiness = businesses.All(business => business.OwnerId != userId)
             });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Dashboard(Guid businessId, DateTime? startDate, DateTime? endDate)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var end = (endDate ?? DateTime.UtcNow).Date;
+            var start = (startDate ?? end.AddDays(-29)).Date;
+            var periodLength = (end - start).Days + 1;
+            var previousEnd = start.AddDays(-1);
+            var previousStart = previousEnd.AddDays(-(periodLength - 1));
+
+            var statsResult = await _businessService.GetBusinessStatsByPeriodAsync(businessId, start, end);
+            var previousStatsResult = await _businessService.GetBusinessStatsByPeriodAsync(businessId, previousStart, previousEnd);
+            var productsStatsResult = await _businessService.GetProductsStatsByPeriodAsnyc(businessId, start, end);
+            var customersStatsResult = await _businessService.GetCustomersStatsByPeriodAsync(businessId, start, end);
+            var balance = await _businessService.GetBusinessBalance(businessId);
+            var allTimeSummary = await _orderService.GetBusinessOrderSummary(businessId);
+            var products = await _productService.GetByBusinessAsync(businessId);
+            var lowStockThreshold = await _settingsService.GetIntAsync("BusinessRules", "LowStockThreshold", 5);
+            var traffic = await _productAnalyticsService.GetBusinessTrafficStatsAsync(businessId, start, end);
+            var recentActivity = await _activityLog.GetRecentBusinessActionsAsync(businessId, take: 15);
+
+            var periodRevenue = statsResult.Succeeded ? statsResult.Data.TotalRevenue : 0;
+            var periodOrders = statsResult.Succeeded ? statsResult.Data.Stats.Sum(s => s.OrderCount) : 0;
+            var periodAov = statsResult.Succeeded ? (double)statsResult.Data.AOV : 0;
+
+            var previousRevenue = previousStatsResult.Succeeded ? previousStatsResult.Data.TotalRevenue : 0;
+            var previousOrders = previousStatsResult.Succeeded ? previousStatsResult.Data.Stats.Sum(s => s.OrderCount) : 0;
+            var previousAov = previousStatsResult.Succeeded ? (double)previousStatsResult.Data.AOV : 0;
+
+            static double? PercentDelta(double current, double previous)
+            {
+                if (previous == 0)
+                {
+                    return current == 0 ? 0 : null;
+                }
+
+                return Math.Round((current - previous) * 100d / previous, 1);
+            }
+
+            var viewsByProduct = traffic.ByProduct.ToDictionary(p => p.ProductId, p => p.Views);
+
+            var model = new BusinessDashboardPageViewModel
+            {
+                BusinessId = businessId,
+                StoreName = business.StoreName,
+                Filter = new BusinessDashboardFilterViewModel { BusinessId = businessId, StartDate = start, EndDate = end },
+
+                Chart = statsResult.Succeeded
+                    ? statsResult.Data.Stats
+                        .OrderBy(s => s.Date)
+                        .Select(s => new BusinessDashboardChartPointViewModel { Date = s.Date, Revenue = s.Revenue, OrderCount = s.OrderCount })
+                        .ToList()
+                    : new List<BusinessDashboardChartPointViewModel>(),
+                PeriodRevenue = periodRevenue,
+                PeriodOrders = periodOrders,
+                PeriodAverageOrderValue = periodAov,
+
+                RevenueDeltaPercent = PercentDelta((double)periodRevenue, (double)previousRevenue),
+                OrdersDeltaPercent = PercentDelta(periodOrders, previousOrders),
+                AverageOrderValueDeltaPercent = PercentDelta(periodAov, previousAov),
+
+                Balance = balance,
+                AllTimeRevenue = allTimeSummary.Revenue,
+                AllTimeOrders = allTimeSummary.TotalOrders,
+                AllTimeSoldItems = allTimeSummary.SoldItems,
+                AwaitingOrders = allTimeSummary.AwaitingProcessingOrders,
+
+                TotalProductCount = products.Count,
+                ActiveProductCount = products.Count(p => p.Status == Marketplace.Domain.Enums.ProductStatus.Active),
+                PendingProductCount = products.Count(p => p.Status == Marketplace.Domain.Enums.ProductStatus.Pending),
+                OutOfStockProductCount = products.Count(p => p.Quantity <= 0),
+                LowStockProductCount = products.Count(p => p.Quantity > 0 && p.Quantity <= lowStockThreshold),
+
+                TotalViews = traffic.TotalViews,
+                TotalCartAdds = traffic.TotalCartAdds,
+                TotalWishlistAdds = traffic.TotalWishlistAdds,
+
+                TopProducts = productsStatsResult.Succeeded
+                    ? productsStatsResult.Data.Stats
+                        .OrderByDescending(s => s.Revenue)
+                        .Take(5)
+                        .Select(s => new BusinessDashboardTopProductViewModel
+                        {
+                            ProductId = s.ProductId,
+                            ProductName = s.ProductName,
+                            Revenue = s.Revenue,
+                            UnitsSold = s.TotalSales,
+                            Views = viewsByProduct.TryGetValue(s.ProductId, out var views) ? views : 0
+                        })
+                        .ToList()
+                    : new List<BusinessDashboardTopProductViewModel>(),
+
+                TopCustomers = customersStatsResult.Succeeded
+                    ? customersStatsResult.Data.Stats
+                        .OrderByDescending(s => s.Revenue)
+                        .Take(5)
+                        .Select(s => new BusinessDashboardTopCustomerViewModel
+                        {
+                            UserName = s.UserName,
+                            Revenue = s.Revenue,
+                            PurchaseCount = s.PurchaseCount
+                        })
+                        .ToList()
+                    : new List<BusinessDashboardTopCustomerViewModel>(),
+
+                RecentActivity = recentActivity
+                    .Select(a => new BusinessDashboardActivityItemViewModel { Description = a.Description, CreatedAt = a.CreatedAt })
+                    .ToList()
+            };
+
+            return View(model);
         }
 
         [HttpGet]
