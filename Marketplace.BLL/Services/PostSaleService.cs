@@ -17,15 +17,27 @@ namespace Marketplace.BLL.Services
 
         private readonly AppDbContext _context;
         private readonly IImageStorageService _imageStorageService;
+        private readonly IPaymentService _paymentService;
+        private readonly IMarketplaceBalanceService _marketplaceBalanceService;
+        private readonly IOrderService _orderService;
 
-        public PostSaleService(AppDbContext context, IImageStorageService imageStorageService)
+        public PostSaleService(
+             AppDbContext context,
+             IImageStorageService imageStorageService,
+             IPaymentService paymentService,
+             IMarketplaceBalanceService marketplaceBalanceService,
+             IOrderService orderService)
         {
             _context = context;
             _imageStorageService = imageStorageService;
+            _paymentService = paymentService;
+            _marketplaceBalanceService = marketplaceBalanceService;
+            _orderService = orderService;
         }
 
         public async Task<ServiceResult> CreateRequestAsync(string buyerId, Guid orderItemId, string reason, string comment, List<IFormFile> photos)
         {
+
             var orderItem = await _context.OrderItems
                 .Include(i => i.Order)
                 .FirstOrDefaultAsync(i => i.Id == orderItemId);
@@ -38,6 +50,15 @@ namespace Marketplace.BLL.Services
             if (orderItem.Order.Status != OrderStatus.Delivered)
             {
                 return new ServiceResult { Succeeded = false, Message = "Заявку можна подати лише для доставленого замовлення" };
+            }
+
+            var baseDate = orderItem.Order.UpdatedAt ?? orderItem.Order.CreatedAt;
+            var timePassed = DateTime.UtcNow - baseDate;
+
+
+            if (timePassed.TotalDays > 14)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Термін повернення товару сплив (минуло більше 14 днів з моменту доставки)." };
             }
 
             if (string.IsNullOrWhiteSpace(reason))
@@ -131,34 +152,74 @@ namespace Marketplace.BLL.Services
                 return new ServiceResult { Succeeded = false, Message = "Некоректне рішення" };
             }
 
-            var request = await _context.PostSaleRequests
-                .Include(r => r.OrderItem)
-                    .ThenInclude(oi => oi.Product)
-                .FirstOrDefaultAsync(r => r.Id == requestId);
-
-            if (request is null)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                return new ServiceResult { Succeeded = false, Message = "Заявку не знайдено" };
-            }
+                var request = await _context.PostSaleRequests
+                    .Include(r => r.OrderItem)
+                        .ThenInclude(oi => oi.Product)
+                            .ThenInclude(p => p.Business)
+                    .FirstOrDefaultAsync(r => r.Id == requestId);
 
-            if (request.OrderItem.Product is null || request.OrderItem.Product.BusinessId != businessId)
+                if (request is null)
+                {
+                    return new ServiceResult { Succeeded = false, Message = "Заявку не знайдено" };
+                }
+
+                if (request.OrderItem.Product is null || request.OrderItem.Product.BusinessId != businessId)
+                {
+                    return new ServiceResult { Succeeded = false, Message = "Цей товар не належить вашому магазину" };
+                }
+
+                if (request.Status != PostSaleRequestStatus.Pending)
+                {
+                    return new ServiceResult { Succeeded = false, Message = "Заявку вже розглянуто" };
+                }
+
+                request.SellerResponse = sellerResponse;
+                request.ResolvedAt = DateTime.UtcNow;
+                request.UpdatedAt = DateTime.UtcNow;
+
+                if (decision == PostSaleRequestStatus.Approved)
+                {
+                    decimal totalRefundAmount = request.OrderItem.UnitPrice * request.OrderItem.Quantity;
+                    bool paymentRefunded = await _paymentService.RefundPaymentAsync(request.OrderId.ToString(), totalRefundAmount);
+
+                    if (!paymentRefunded)
+                    {
+                        await transaction.RollbackAsync();
+                        return new ServiceResult { Succeeded = false, Message = "Не вдалося провести повернення коштів через платіжну систему" };
+                    }
+
+
+                    var stockResult = await _orderService.RefundOrderItemAsync(request.OrderItemId);
+                    if (!stockResult.Succeeded)
+                    {
+                        await transaction.RollbackAsync();
+                        return new ServiceResult
+                        {
+                            Succeeded = false,
+                            Message = $"Кошти повернуто через платіжну систему, але виникла помилка синхронізації складу/балансу: {stockResult.Message}"
+                        };
+                    }
+
+                    request.Status = PostSaleRequestStatus.Refunded;
+                }
+                else
+                {
+                    request.Status = decision;
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return new ServiceResult { Succeeded = true, Message = "Рішення збережено та оброблено", EntityId = request.OrderItemId };
+            }
+            catch (Exception)
             {
-                return new ServiceResult { Succeeded = false, Message = "Цей товар не належить вашому магазину" };
+                await transaction.RollbackAsync();
+                throw;
             }
-
-            if (request.Status != PostSaleRequestStatus.Pending)
-            {
-                return new ServiceResult { Succeeded = false, Message = "Заявку вже розглянуто" };
-            }
-
-            request.Status = decision;
-            request.SellerResponse = sellerResponse;
-            request.ResolvedAt = DateTime.UtcNow;
-            request.UpdatedAt = DateTime.UtcNow;
-
-            await _context.SaveChangesAsync();
-
-            return new ServiceResult { Succeeded = true, Message = "Рішення збережено", EntityId = request.OrderItemId };
         }
 
         private static PostSaleRequestDto ToDto(PostSaleRequest r) => new()

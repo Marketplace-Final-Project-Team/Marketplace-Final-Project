@@ -162,7 +162,7 @@ public class ProductsController : Controller
             return View(model);
         }
 
-        // Логування та перенаправлення (оскільки CreateAsync може повертати DTO або сутність, беремо назву з переданого DTO)
+     
         await _activityLog.LogBusinessActionAsync(model.BusinessId, "ProductCreated",
             $"Додано товар «{createdProductDto.Name}».", actorUserId: userId);
 
@@ -352,4 +352,5 @@ public class ProductsController : Controller
             BusinessPermissions.ProductCrud);
         return hasAccess ? (product, null) : (null, Forbid());
     }
+
 }

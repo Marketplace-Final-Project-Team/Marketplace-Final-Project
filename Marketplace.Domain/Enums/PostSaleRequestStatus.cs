@@ -4,6 +4,8 @@ namespace Marketplace.Domain.Enums
     {
         Pending,
         Approved,
-        Rejected
+        Rejected,
+        Refunded
+
     }
 }
