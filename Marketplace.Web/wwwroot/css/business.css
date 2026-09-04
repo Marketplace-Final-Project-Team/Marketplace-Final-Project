@@ -217,6 +217,13 @@
     padding: 0 1.35rem 1.4rem;
 }
 
+.business-discount-status {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    margin-bottom: 0.75rem;
+}
+
 .seller-store__identity-row {
     align-items: flex-end;
     display: flex;
@@ -266,7 +273,7 @@
     font-size: 0.68rem;
     font-weight: 750;
     letter-spacing: 0.06em;
-    margin-bottom: 1.15rem;
+    margin-bottom: 2.6rem;
     text-transform: uppercase;
 }
 
@@ -1125,4 +1132,100 @@
     font-size: 0.7rem;
     font-weight: 700;
     padding: 0.15rem 0.55rem;
+}
+
+/* ---------- Dashboard ---------- */
+
+.business-filter-form {
+    align-items: end;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    margin-bottom: 1.25rem;
+}
+
+.business-filter-form label {
+    color: var(--seller-muted);
+    display: block;
+    font-size: 0.72rem;
+    margin-bottom: 0.25rem;
+}
+
+.business-filter-form input[type="date"] {
+    border: 1px solid var(--seller-line);
+    border-radius: 0.6rem;
+    padding: 0.5rem 0.65rem;
+}
+
+.business-kpi__delta {
+    color: var(--seller-muted);
+    display: block;
+    font-size: 0.72rem;
+    margin-top: 0.3rem;
+}
+
+.business-kpi__delta--up { color: #16794a; }
+.business-kpi__delta--down { color: #b42318; }
+
+.business-kpi--warning strong { color: #b54708; }
+
+.business-chart-card__canvas-wrap {
+    height: 16rem;
+    position: relative;
+}
+
+.business-chart-card__canvas-wrap--short {
+    height: 12rem;
+    margin-bottom: 1.1rem;
+}
+
+.business-two-col {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.business-two-col .business-panel {
+    margin-bottom: 0;
+}
+
+.business-activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.business-activity-list li {
+    border-bottom: 1px solid var(--seller-line);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.85rem;
+    padding-bottom: 0.65rem;
+}
+
+.business-activity-list li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.business-activity-list time {
+    color: var(--seller-muted);
+    flex: 0 0 auto;
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+.business-activity-list span {
+    color: var(--seller-ink);
+    font-size: 0.85rem;
+}
+
+@media (max-width: 767.98px) {
+    .business-filter-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }

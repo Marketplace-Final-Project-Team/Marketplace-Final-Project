@@ -1,19 +1,3 @@
-﻿using Marketplace.DAL.Data;
-using Marketplace.DAL.DTOs;
-using Marketplace.DAL.Interfaces;
-using Marketplace.Domain.Entities;
-using Marketplace.Domain.Enums;
-using Microsoft.EntityFrameworkCore;
-
-namespace Marketplace.DAL.Repositories
-{
-    public class OrderRepository: GenericRepository<Order>, IOrderRepository
-    {
-        public OrderRepository(AppDbContext context): base(context)
-        {
-
-        }
-
         public async Task<List<DailySalesStatsDto>> GetBusinessStatByPeriodAsync(Guid businessId, DateTime startDate, DateTime endDate) 
         {
             var result = await _context.Orders
@@ -108,5 +92,3 @@ namespace Marketplace.DAL.Repositories
 
             return totalCommission;
         }
-    }
-}

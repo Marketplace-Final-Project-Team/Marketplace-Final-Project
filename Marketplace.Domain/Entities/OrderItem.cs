@@ -1,5 +1,4 @@
-﻿using Marketplace.Domain.Common;
-
+using Marketplace.Domain.Common;
 namespace Marketplace.Domain.Entities
 {
     public class OrderItem: BaseEntity
@@ -10,7 +9,7 @@ namespace Marketplace.Domain.Entities
         public decimal UnitPrice { get; set; }
         public int Quantity { get; set; }
         public decimal CommissionAmount { get; set; }
-        public bool IsReturned { get; set; }
+        public bool IsReturned { get; set; } = false;
         public Guid OrderId { get; set; }
         public Order Order { get; set; } = null!;
     }

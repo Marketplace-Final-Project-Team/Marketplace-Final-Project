@@ -15,17 +15,20 @@ namespace Marketplace.BLL.Services
         private readonly ICartItemRepository _cartItemRepository;
         private readonly IGenericRepository<Product> _productRepository;
         private readonly AppDbContext _context;
+        private readonly IProductAnalyticsService _productAnalyticsService;
 
         public CartService(
             IGenericRepository<Cart> cartRepository,
             ICartItemRepository cartItemRepository,
             IGenericRepository<Product> productRepository,
-            AppDbContext context)
+            AppDbContext context,
+            IProductAnalyticsService productAnalyticsService)
         {
             _cartRepository = cartRepository;
             _cartItemRepository = cartItemRepository;
             _productRepository = productRepository;
             _context = context;
+            _productAnalyticsService = productAnalyticsService;
         }
 
         public async Task<List<CartItemDto>> GetCartItems(string userId)
@@ -96,6 +99,8 @@ namespace Marketplace.BLL.Services
 
                 await ChangeQuantity(item, 1);
             }
+
+            await _productAnalyticsService.RecordEventAsync(productId, product.BusinessId, ProductEventType.AddToCart, userId);
 
             return new ServiceResult { Succeeded = true, Message = string.Empty };
         }
