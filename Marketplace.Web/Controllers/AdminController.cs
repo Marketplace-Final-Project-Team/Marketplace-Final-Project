@@ -1,4 +1,4 @@
-﻿ using System.Security.Claims;
+﻿using System.Security.Claims;
 using Marketplace.BLL.Interfaces;
 using Marketplace.BLL.Services;
 using Marketplace.Domain.Enums;
@@ -20,6 +20,7 @@ namespace Marketplace.Web.Controllers
         private readonly ISystemSettingsService _settingsService;
         private readonly IActivityLogService _activityLog;
         private readonly IProductService _productService;
+        private readonly IBusinessService _businessService;
         private readonly IMarketplaceBalanceService _marketplaceBalanceService;
         private readonly ICategoryService _categoryService;
         private readonly ISchedulerFactory _schedulerFactory;
@@ -33,7 +34,8 @@ namespace Marketplace.Web.Controllers
             IMarketplaceBalanceService marketplaceBalanceService,
             ICategoryService categoryService,
             ISchedulerFactory schedulerFactory,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IBusinessService businessService)
         {
             _adminService = adminService;
             _settingsService = settingsService;
@@ -43,6 +45,7 @@ namespace Marketplace.Web.Controllers
             _categoryService = categoryService;
             _schedulerFactory = schedulerFactory;
             _configuration = configuration;
+            _businessService = businessService;
         }
 
         private string? CurrentAdminId => User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -268,12 +271,26 @@ namespace Marketplace.Web.Controllers
 
             foreach (var jobKey in jobKeys)
             {
-                if (!Guid.TryParse(jobKey.Name.Replace("moderation-job-", string.Empty), out var productId))
+                string? entityType = null;
+                Guid entityId;
+
+                if (jobKey.Name.StartsWith("product-moderation-job-") &&
+                    Guid.TryParse(jobKey.Name.Replace("product-moderation-job-", string.Empty), out var productId))
+                {
+                    entityType = "Product";
+                    entityId = productId;
+                }
+                else if (jobKey.Name.StartsWith("business-moderation-job-") &&
+                    Guid.TryParse(jobKey.Name.Replace("business-moderation-job-", string.Empty), out var businessId))
+                {
+                    entityType = "Business";
+                    entityId = businessId;
+                }
+                else
                 {
                     continue;
                 }
 
-                var product = await _productService.GetByIdAsync(productId);
                 var triggers = await scheduler.GetTriggersOfJob(jobKey);
                 var nextFireTime = triggers
                     .Select(t => t.GetNextFireTimeUtc())
@@ -283,10 +300,23 @@ namespace Marketplace.Web.Controllers
                     .Cast<DateTime?>()
                     .FirstOrDefault();
 
+                string name;
+                if (entityType == "Product")
+                {
+                    var product = await _productService.GetByIdAsync(entityId);
+                    name = product?.Name ?? "(товар видалено)";
+                }
+                else
+                {
+                    var business = await _businessService.GetByIdAsync(entityId);
+                    name = business?.StoreName ?? "(бізнес видалено)";
+                }
+
                 scheduledJobs.Add(new ScheduledModerationJobViewModel
                 {
-                    ProductId = productId,
-                    ProductName = product?.Name ?? "(товар видалено)",
+                    EntityType = entityType,
+                    EntityId = entityId,
+                    ProductName = name,
                     NextRunAtUtc = nextFireTime
                 });
             }
@@ -558,7 +588,7 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetTotalCommissionsAsync() 
+        public async Task<IActionResult> GetTotalCommissionsAsync()
         {
             var totalCommission = await _adminService.GetTotalCommissionAsync();
 
@@ -566,11 +596,11 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetCommissionsStatsByPeriodAsync(CommissionStatsQueryViewModel query) 
+        public async Task<IActionResult> GetCommissionsStatsByPeriodAsync(CommissionStatsQueryViewModel query)
         {
             var res = await _adminService.GetCommissionStatsByPeriodAsync(query.StartDate, query.EndDate);
 
-            if(!res.Succeeded) 
+            if (!res.Succeeded)
             {
                 return NotFound();
             }
@@ -581,6 +611,73 @@ namespace Marketplace.Web.Controllers
                 ByBusiness = res.Data!.ByBusiness,
                 TotalCommissionByPeriod = res.Data!.TotalCommissionByPeriod,
             });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PauseScheduler()
+        {
+            var scheduler = await _schedulerFactory.GetScheduler();
+
+            if (scheduler.InStandbyMode)
+            {
+                TempData["Error"] = "Планувальник вже призупинено.";
+                return RedirectToAction("Jobs");
+            }
+
+            await scheduler.Standby();
+
+            await _activityLog.LogUserActionAsync(CurrentAdminId!, "SchedulerPaused",
+                "Планувальник задач модерації призупинено адміністратором.",
+                actorUserId: CurrentAdminId);
+
+            TempData["Success"] = "Планувальник призупинено. Нові задачі не запускатимуться до відновлення.";
+            return RedirectToAction("Jobs");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResumeScheduler()
+        {
+            var scheduler = await _schedulerFactory.GetScheduler();
+
+            if (!scheduler.InStandbyMode)
+            {
+                TempData["Error"] = "Планувальник і так активний.";
+                return RedirectToAction("Jobs");
+            }
+
+            await scheduler.Start();
+
+            await _activityLog.LogUserActionAsync(CurrentAdminId!, "SchedulerResumed",
+                "Планувальник задач модерації відновлено адміністратором.",
+                actorUserId: CurrentAdminId);
+
+            TempData["Success"] = "Планувальник відновлено.";
+            return RedirectToAction("Jobs");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RunModerationJobNow(Guid entityId, string entityType)
+        {
+            var scheduler = await _schedulerFactory.GetScheduler();
+            var jobName = entityType == "Business"
+                ? $"business-moderation-job-{entityId}"
+                : $"product-moderation-job-{entityId}";
+            var jobKey = new JobKey(jobName, "moderation");
+
+            if (!await scheduler.CheckExists(jobKey))
+            {
+                TempData["Error"] = "Задачу не знайдено в черзі — можливо, вона вже виконана.";
+                return RedirectToAction("Jobs");
+            }
+
+            await scheduler.TriggerJob(jobKey);
+
+            await _activityLog.LogUserActionAsync(CurrentAdminId!, "ModerationJobTriggeredManually",
+                $"Модерацію ({entityType}) {entityId} запущено вручну адміністратором.",
+                actorUserId: CurrentAdminId);
+
+            TempData["Success"] = "Задачу запущено негайно.";
+            return RedirectToAction("Jobs");
         }
     }
 }

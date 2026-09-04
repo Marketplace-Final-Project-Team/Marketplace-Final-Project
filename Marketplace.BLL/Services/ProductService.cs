@@ -37,7 +37,7 @@ public class ProductService : IProductService
     {
         var scheduler = await _schedulerFactory.GetScheduler();
 
-        var jobKey = new JobKey($"moderation-job-{productId}", "moderation");
+        var jobKey = new JobKey($"product-moderation-job-{productId}", "moderation");
 
         if (await scheduler.CheckExists(jobKey))
         {
@@ -55,7 +55,7 @@ public class ProductService : IProductService
             .Build();
 
         var trigger = TriggerBuilder.Create()
-            .WithIdentity($"moderation-trigger-{productId}", "moderation")
+            .WithIdentity($"product-moderation-trigger-{productId}", "moderation")
             .StartAt(DateBuilder.FutureDate(5, IntervalUnit.Second))
             .Build();
 
