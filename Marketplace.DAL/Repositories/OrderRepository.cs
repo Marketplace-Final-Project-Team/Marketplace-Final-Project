@@ -1,4 +1,19 @@
-        public async Task<List<DailySalesStatsDto>> GetBusinessStatByPeriodAsync(Guid businessId, DateTime startDate, DateTime endDate) 
+using Marketplace.DAL.Data;
+using Marketplace.DAL.DTOs;
+using Marketplace.DAL.Interfaces;
+using Marketplace.Domain.Entities;
+using Marketplace.Domain.Enums;
+using Marketplace.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
+
+namespace Marketplace.DAL.Repositories
+{
+    public class OrderRepository : GenericRepository<Order>, IOrderRepository
+    {
+
+        public OrderRepository(AppDbContext context) : base(context) { }
+
+        public async Task<List<DailySalesStatsDto>> GetBusinessStatByPeriodAsync(Guid businessId, DateTime startDate, DateTime endDate)
         {
             var result = await _context.Orders
                 .Where(o => o.CreatedAt.Date >= startDate.Date && o.CreatedAt.Date < endDate.AddDays(1).Date && o.Status != OrderStatus.Pending && o.Status != OrderStatus.Canceled)
@@ -15,7 +30,7 @@
             return result;
         }
 
-        public async Task<List<ProductStatsByPeriodDto>> GetProductsStatsByPeriodAsync(Guid businessId, DateTime startDate, DateTime endDate) 
+        public async Task<List<ProductStatsByPeriodDto>> GetProductsStatsByPeriodAsync(Guid businessId, DateTime startDate, DateTime endDate)
         {
             var result = await _context.Orders
                 .Where(o => o.CreatedAt.Date >= startDate.Date && o.CreatedAt.Date < endDate.AddDays(1).Date && o.Status != OrderStatus.Pending && o.Status != OrderStatus.Canceled)
@@ -33,14 +48,15 @@
             return result;
         }
 
-        public async Task<List<CustomerStatsByPeriodDto>> GetCustomersStatsByPeriodAsync(Guid businessId, DateTime startDate, DateTime endDate) 
+        public async Task<List<CustomerStatsByPeriodDto>> GetCustomersStatsByPeriodAsync(Guid businessId, DateTime startDate, DateTime endDate)
         {
             var result = await _context.Orders
                 .Where(o => o.CreatedAt.Date >= startDate.Date && o.CreatedAt.Date < endDate.AddDays(1).Date && o.Status != OrderStatus.Pending && o.Status != OrderStatus.Canceled)
                 .SelectMany(o => o.Items
                 .Where(oi => oi.Product.BusinessId == businessId))
                 .GroupBy(oi => new { oi.Order.UserId, oi.Order.User.UserName })
-                .Select(g => new CustomerStatsByPeriodDto {
+                .Select(g => new CustomerStatsByPeriodDto
+                {
                     UserId = g.Key.UserId,
                     UserName = g.Key.UserName!,
                     Revenue = g.Sum(x => x.Quantity * x.UnitPrice),
@@ -50,7 +66,7 @@
             return result;
         }
 
-        public async Task<List<DailyCommissionStatsDto>> GetCommissionPerDayByPeriodAsync(DateTime startDate, DateTime endDate) 
+        public async Task<List<DailyCommissionStatsDto>> GetCommissionPerDayByPeriodAsync(DateTime startDate, DateTime endDate)
         {
             var result = await _context.Orders
                 .Where(o => o.CreatedAt.Date >= startDate.Date && o.CreatedAt.Date < endDate.AddDays(1).Date && o.Status != OrderStatus.Pending && o.Status != OrderStatus.Canceled)
@@ -83,7 +99,7 @@
             return result;
         }
 
-        public async Task<decimal> GetTotalCommissionAsync() 
+        public async Task<decimal> GetTotalCommissionAsync()
         {
             var totalCommission = await _context.Orders
                 .Where(o => o.Status != OrderStatus.Pending && o.Status != OrderStatus.Canceled)
@@ -92,3 +108,5 @@
 
             return totalCommission;
         }
+    }
+}
