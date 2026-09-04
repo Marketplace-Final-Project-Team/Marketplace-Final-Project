@@ -17,6 +17,7 @@ public class CatalogProductViewModel
     public List<string> AdditionalImageUrls { get; set; } = new();
     public DateTime EstimatedDeliveryStart { get; set; }
     public DateTime EstimatedDeliveryEnd { get; set; }
+    public bool IsAgeRestricted { get; set; }
     public List<CatalogRelatedProductViewModel> RelatedProducts { get; set; } = new();
 
     public List<Marketplace.BLL.DTOs.ReviewDto> Reviews { get; set; } = new();

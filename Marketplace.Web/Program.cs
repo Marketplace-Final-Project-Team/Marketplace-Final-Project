@@ -1,6 +1,7 @@
 using System.Globalization;
 using CloudinaryDotNet;
 using Marketplace.BLL.Common;
+using Marketplace.BLL.Configs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.BLL.Services;
 using Marketplace.DAL.Data;
@@ -10,29 +11,28 @@ using Marketplace.Domain.Entities;
 using Marketplace.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
-using Marketplace.BLL.Configs;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(2);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    //if (builder.Environment.IsDevelopment())
-    //{
-    //    options.UseInMemoryDatabase("MarketplaceFrontendDb");
-    //    return;
-    //}
-
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+// Quartz
 builder.Services.AddQuartz(q =>
 {
-    // Recurring cleanup: cancels orders left Pending too long (see BusinessRules ->
-    // PendingOrderExpiryHours on the admin Business Limits page), restoring their stock.
     var pendingOrderExpiryJobKey = new JobKey("pending-order-expiry-job", "cleanup");
     q.AddJob<PendingOrderExpiryJob>(opts => opts.WithIdentity(pendingOrderExpiryJobKey));
     q.AddTrigger(opts => opts
@@ -48,7 +48,6 @@ builder.Services.AddQuartzHostedService(opt =>
 });
 
 builder.Services.AddHttpClient();
-
 builder.Services
     .AddIdentity<User, IdentityRole>(options =>
     {
@@ -72,6 +71,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/forbidden";
 });
 
+// Cloudinary
 var cloudinaryAccount = new Account(
     builder.Configuration["Cloudinary:CloudName"] ?? "not-configured",
     builder.Configuration["Cloudinary:ApiKey"] ?? "not-configured",
@@ -79,11 +79,11 @@ var cloudinaryAccount = new Account(
 
 builder.Services.AddSingleton(new Cloudinary(cloudinaryAccount));
 
+// Repositories & Services
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
 builder.Services.AddScoped<IBusinessRepository, BusinessRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-
 builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -102,8 +102,6 @@ builder.Services.AddScoped<IPostSaleService, PostSaleService>();
 builder.Services.AddScoped<IPromoCodeService, PromoCodeService>();
 builder.Services.AddScoped<IProductAnalyticsService, ProductAnalyticsService>();
 
-// System settings (admin-editable key/value store) and activity logs — new,
-// additive infrastructure that doesn't touch any existing service's behavior.
 builder.Services.AddMemoryCache();
 builder.Services.AddDataProtection();
 builder.Services.AddScoped<ISystemSettingsService, SystemSettingsService>();
@@ -130,8 +128,6 @@ using (var scope = app.Services.CreateScope())
     await Marketplace.DAL.Seed.DbSeeder.SeedAsync(scope.ServiceProvider);
 }
 
-
-
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -147,6 +143,7 @@ var localizationOptions = new RequestLocalizationOptions
 };
 
 app.UseRequestLocalization(localizationOptions);
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
@@ -154,10 +151,12 @@ if (!app.Environment.IsDevelopment())
 
 app.UseStatusCodePagesWithReExecute("/error/{0}");
 app.UseRouting();
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+app.MapControllers();
 app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}")

@@ -246,8 +246,7 @@ namespace Marketplace.DAL.Data
                 .HasForeignKey(bal => bal.BusinessId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // UserActionLog.UserId intentionally has no FK constraint — the trail must
-            // survive even if the referenced user is later removed from Identity.
+  
 
             builder.Entity<ProductEvent>()
                 .HasOne<Product>()

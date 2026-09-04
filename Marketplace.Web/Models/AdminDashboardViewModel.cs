@@ -9,6 +9,7 @@ namespace Marketplace.Web.Models
         public int BannedProducts { get; set; }
         public int TotalBusinesses { get; set; }
         public int PendingBusinesses { get; set; }
+        public int PendingAdultRequests { get; set; }
         public decimal MarketplaceBalance { get; set; }
     }
 }

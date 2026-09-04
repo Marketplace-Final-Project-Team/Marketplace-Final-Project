@@ -3,7 +3,7 @@ using Marketplace.Domain.Enums;
 
 namespace Marketplace.Domain.Entities
 {
-    public class Business: BaseEntity
+    public class Business : BaseEntity
     {
         public string OwnerId { get; set; } = string.Empty;
         public User Owner { get; set; } = null!;
@@ -14,14 +14,25 @@ namespace Marketplace.Domain.Entities
         public string BannerUrl { get; set; } = string.Empty;
 
         public decimal Balance { get; set; } = 0;
-        public decimal CommissionPercent {  get; set; } = 0;
+        public decimal CommissionPercent {  get; set; } = 20;
 
         public BusinessStatus Status { get; set; } = BusinessStatus.Pending;
+
+        public AdultContentStatus AdultStatus { get; set; } = AdultContentStatus.None;
+        public string? AdultRejectionReason { get; set; }
 
         public ICollection<BusinessMember> Members { get; set; } = new List<BusinessMember>();
         public ICollection<Product> Products { get; set; } = new List<Product>();
         public ICollection<Discount> Discounts { get; set; } = new List<Discount>();
 
 
+    }
+
+    public enum AdultContentStatus
+    {
+        None = 0,       
+        Pending = 1,    
+        Approved = 2,   
+        Rejected = 3    
     }
 }

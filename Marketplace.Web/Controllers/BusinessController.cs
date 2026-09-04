@@ -354,27 +354,15 @@ namespace Marketplace.Web.Controllers
                 return Forbid();
             }
 
+
             var result = await _postSaleService.ResolveRequestAsync(requestId, businessId, decision, sellerResponse);
             if (result.Succeeded)
             {
                 await _activityLog.LogBusinessActionAsync(businessId, "PostSaleRequestResolved",
                     $"Заявку на повернення вирішено: {decision}.",
                     actorUserId: _userManager.GetUserId(User), relatedEntityId: requestId);
-
-                if (decision == PostSaleRequestStatus.Approved && result.EntityId.HasValue)
-                {
-                    // Approving a return refunds just that one line item — restores its stock,
-                    // gives back the seller's net share, and reverses the marketplace's
-                    // commission at the rate that applied when the order was confirmed. Other
-                    // items in the same (possibly multi-seller) order are untouched.
-                    var refundResult = await _orderService.RefundOrderItemAsync(result.EntityId.Value);
-                    if (!refundResult.Succeeded)
-                    {
-                        TempData["Error"] = $"Заявку підтверджено, але не вдалось повернути кошти: {refundResult.Message}";
-                        return RedirectToAction(nameof(OrderDetails), new { businessId, orderId });
-                    }
-                }
             }
+
             TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded
                 ? "Рішення щодо заявки збережено."
                 : result.Message;
@@ -392,9 +380,7 @@ namespace Marketplace.Web.Controllers
                 return Forbid();
             }
 
-            // GetBusinessOrderDetails also acts as the ownership check: it returns null unless
-            // this business actually has a line item in the order, so a seller can't change the
-            // status of an order that has nothing to do with their store.
+
             var order = await _orderService.GetBusinessOrderDetails(businessId, orderId);
             if (order is null)
             {
@@ -715,7 +701,8 @@ namespace Marketplace.Web.Controllers
             {
                 BusinessId = businessId,
                 StoreName = business.StoreName,
-                Description = business.Description
+                Description = business.Description,
+                AdultStatus = (Marketplace.Domain.Enums.AdultContentStatus)business.AdultStatus
             });
         }
 
@@ -875,11 +862,30 @@ namespace Marketplace.Web.Controllers
             return View(pageModel);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RequestAdultStatus(Guid businessId)
+        {
+            var userId = _userManager.GetUserId(User)!;
+            var result = await _businessService.RequestAdultStatusAsync(businessId, userId);
+
+            if (!result.Succeeded)
+            {
+                TempData["Error"] = result.Message;
+            }
+            else
+            {
+                TempData["Success"] = "Заявку на отримання статусу 18+ успішно надіслано адміністратору.";
+            }
+
+            return RedirectToAction("Settings", new { businessId = businessId });
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetBusinessBalance(Guid businessId)
         {
-            var hasAcess = await _businessAccessService.HasAccessAsync(businessId, _userManager.GetUserId(User)!, BusinessMemberRole.Owner);
-            if (!hasAcess)
+            var hasAccess = await _businessAccessService.HasAccessAsync(businessId, _userManager.GetUserId(User)!, BusinessMemberRole.Owner);
+            if (!hasAccess)
             {
                 return Forbid();
             }

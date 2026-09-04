@@ -1,0 +1,20 @@
+@model Guid
+
+<div class="container my-5 text-center" style="max-width: 500px;">
+    <div class="card shadow-sm p-4">
+        <div class="card-body">
+            <h2 class="text-danger mb-3">⚠️ Обмеження 18+</h2>
+            <p class="lead mb-4">
+                Цей товар містить матеріали тільки для дорослих. Для перегляду ви повинні підтвердити, що вам виповнилося 18 років.
+            </p>
+
+            <form asp-action="ConfirmAge" asp-controller="Catalogue" method="post">
+                <input type="hidden" name="productId" value="@Model" />
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-danger btn-lg">Мені є 18 років</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Повернутися до каталогу</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

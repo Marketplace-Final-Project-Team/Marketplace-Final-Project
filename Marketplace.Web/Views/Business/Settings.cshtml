@@ -23,9 +23,17 @@
 
     @if (TempData["Success"] is string success)
     {
-        <div class="seller-alert" role="status">
+        <div class="seller-alert" role="status" style="background-color: #d1e7dd; color: #0f5132; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
             <span aria-hidden="true">✓</span>
-            <p><strong>Успішно</strong>@success</p>
+            <p style="margin: 0;"><strong>Успішно: </strong>@success</p>
+        </div>
+    }
+
+    @if (TempData["Error"] is string error)
+    {
+        <div class="seller-alert" role="status" style="background-color: #f8d7da; color: #842029; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+            <span aria-hidden="true">✕</span>
+            <p style="margin: 0;"><strong>Помилка: </strong>@error</p>
         </div>
     }
 
@@ -52,6 +60,41 @@
                 <button type="submit" class="seller-button seller-button--primary">Зберегти</button>
             </div>
         </form>
+    </section>
+
+    <!-- СЕКЦІЯ: Управління статусом 18+ контенту -->
+    <section class="business-panel">
+        <h2>Статус 18+ контенту</h2>
+        <p class="business-panel__lead">Дозвіл на розміщення товарів із віковими обмеженнями у каталозі.</p>
+
+        <div class="business-settings-form">
+            <div class="mb-3">
+                <p>Поточний статус магазину: <strong>@Model.AdultStatus</strong></p>
+            </div>
+
+          @if (Model.AdultStatus.ToString() == "None" || Model.AdultStatus.ToString() == "Rejected")
+{
+    <form asp-action="RequestAdultStatus" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="businessId" value="@Model.BusinessId" />
+        <button type="submit" class="seller-button seller-button--secondary">
+            Подати заявку на розміщення 18+ контенту
+        </button>
+    </form>
+}
+else if (Model.AdultStatus.ToString() == "Pending")
+{
+    <div class="alert alert-info" role="alert" style="padding: 10px; background-color: #cff4fc; color: #055160; border-radius: 5px;">
+        Ваша заявка на розгляд статусу 18+ наразі опрацьовується адміністратором.
+    </div>
+}
+else if (Model.AdultStatus.ToString() == "Approved")
+{
+    <div class="alert alert-success" role="alert" style="padding: 10px; background-color: #d1e7dd; color: #0f5132; border-radius: 5px;">
+        Магазин успішно верифіковано! Ви можете створювати товари категорії 18+.
+    </div>
+}
+        </div>
     </section>
 
     <section class="business-panel" data-local-settings data-business-id="@Model.BusinessId">

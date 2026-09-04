@@ -6,6 +6,8 @@ namespace Marketplace.Domain.Entities
     {
         public string Name { get; set; } = string.Empty;
 
+        public bool IsAdultOnly { get; set; } = false;
+
         public ICollection<Product> Products { get; set; } = new List<Product>();
     }
 }

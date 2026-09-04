@@ -19,7 +19,7 @@
 
             <form asp-controller="Catalog" asp-action="Index" method="get" class="home-search" role="search" data-search-wrapper>
                 <span aria-hidden="true">⌕</span>
-                <input name="Search" placeholder="Що ви шукаєте?" aria-label="Пошук товарів" data-search-autocomplete autocomplete="off" />
+                <input name="Search" id="homeSearchInput" placeholder="Що ви шукаєте?" aria-label="Пошук товарів" data-search-autocomplete autocomplete="off" />
                 <button type="submit">Знайти</button>
             </form>
 
@@ -44,7 +44,15 @@
             <div class="visual-orbit visual-orbit--one"></div>
             <div class="visual-orbit visual-orbit--two"></div>
 
-            <div class="visual-main-card">
+            <div class="visual-main-card position-relative">
+            
+                @if (topProduct is not null && topProduct.IsAgeRestricted)
+                {
+                    <span class="position-absolute top-0 end-0 bg-danger text-white text-xs fw-bold px-2 py-1 rounded-pill z-1 m-2 shadow">
+                        18+
+                    </span>
+                }
+
                 <div class="visual-main-card__top">
                     <span class="visual-tag">@(topProduct is not null ? "Популярний вибір" : "Каталог")</span>
                     <span class="visual-heart" aria-hidden="true">♡</span>
@@ -73,7 +81,10 @@
                                 <span class="text-muted text-decoration-line-through small ms-1">@topProduct.OriginalPrice.Value.ToString("N0") ₴</span>
                             }
                         </strong>
-                        <a asp-controller="Catalogue" asp-action="Details" asp-route-id="@topProduct.Id">Переглянути товар →</a>
+                        <button type="button" class="btn btn-link p-0 text-start text-decoration-none" 
+                                onclick="checkAgeAndAction('@topProduct.Id', @topProduct.IsAgeRestricted.ToString().ToLower())">
+                            Переглянути товар →
+                        </button>
                     }
                     else
                     {
@@ -153,8 +164,18 @@
                 {
                     var product = Model.FeaturedProducts[index];
                     var colorClass = index % 3 == 0 ? "blue" : index % 3 == 1 ? "violet" : "orange";
-                    <article class="home-product">
-                        <a asp-controller="Catalogue" asp-action="Details" asp-route-id="@product.Id" class="home-product__media home-product__media--@colorClass">
+                    <article class="home-product position-relative">
+                        
+                        <!-- ПЛАШКА 18+ ДЛЯ СПИСКУ -->
+                        @if (product.IsAgeRestricted)
+                        {
+                            <span class="position-absolute top-0 end-0 bg-danger text-white text-xs fw-bold px-2 py-1 rounded-pill z-1 m-2 shadow">
+                                18+
+                            </span>
+                        }
+
+                        <button type="button" class="home-product__media home-product__media--@colorClass border-0 w-100 text-start" 
+                                onclick="checkAgeAndAction('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
                             @if (!string.IsNullOrWhiteSpace(product.MainImageUrl))
                             {
                                 <img src="@product.MainImageUrl" alt="@product.Name" />
@@ -164,10 +185,14 @@
                                 <span>@product.Name[..1].ToUpperInvariant()</span>
                             }
                             <small>@(product.Quantity > 0 ? "В наявності" : "Немає в наявності")</small>
-                        </a>
+                        </button>
+
                         <div class="home-product__body">
                             <div class="home-product__category">@product.CategoryName</div>
-                            <a asp-controller="Catalogue" asp-action="Details" asp-route-id="@product.Id" class="home-product__name">@product.Name</a>
+                            <button type="button" class="home-product__name border-0 bg-transparent p-0 text-start" 
+                                    onclick="checkAgeAndAction('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
+                                @product.Name
+                            </button>
                             @if (product.ReviewCount > 0)
                             {
                                 <div class="home-product__rating">★ @product.AverageRating.ToString("0.0") (@product.ReviewCount)</div>
@@ -269,6 +294,53 @@
     </section>
 </div>
 
+<!-- МОДАЛЬНЕ ВІКНО 18+ -->
+<div id="ageVerificationModal" class="d-none position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-75 z-3 d-flex align-items-center justify-content-center p-3" style="backdrop-filter: blur(4px);">
+    <div class="bg-white rounded-4 shadow-lg p-4 text-center" style="max-width: 400px; width: 100%;">
+        <div class="mx-auto d-flex align-items-center justify-content-center rounded-circle bg-danger bg-opacity-10 text-danger fs-3 fw-bold mb-3" style="width: 64px; height: 64px;">
+            18+
+        </div>
+        <h3 class="fs-4 fw-bold text-dark mb-2">Підтвердження віку</h3>
+        <p class="text-secondary small mb-4">
+            Цей контент містить товари для повнолітніх. Вам вже виповнилося 18 років?
+        </p>
+        <div class="d-flex gap-2 justify-content-center">
+            <button onclick="confirmAge(false)" class="btn btn-light w-100 fw-medium">Ні, мені менше 18</button>
+            <button onclick="confirmAge(true)" class="btn btn-danger w-100 fw-medium">Так, мені є 18</button>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script src="~/js/search-autocomplete.js" asp-append-version="true"></script>
+    <script>
+        let pendingTargetUrl = null;
+        const modal = document.getElementById('ageVerificationModal');
+
+        function checkAgeAndAction(entityId, isRestricted) {
+            const isAdultConfirmed = localStorage.getItem('age_verified') === 'true';
+
+            if (isRestricted && !isAdultConfirmed) {
+                pendingTargetUrl = `/Catalogue/Details/${entityId}`;
+                modal.classList.remove('d-none');
+            } else {
+                window.location.href = `/Catalogue/Details/${entityId}`;
+            }
+        }
+
+        function confirmAge(isAdult) {
+            if (isAdult) {
+                localStorage.setItem('age_verified', 'true');
+                modal.classList.add('d-none');
+                
+                if (pendingTargetUrl) {
+                    window.location.href = pendingTargetUrl;
+                }
+            } else {
+                alert("Доступ обмежено для осіб молодше 18 років.");
+                modal.classList.add('d-none');
+            }
+        }
+    </script>
+    
 }

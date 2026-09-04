@@ -52,5 +52,7 @@ namespace Marketplace.Web.Models.Businesses
 
         [StringLength(1000)]
         public string Description { get; set; } = string.Empty;
+
+        public AdultContentStatus AdultStatus { get; set; }
     }
 }

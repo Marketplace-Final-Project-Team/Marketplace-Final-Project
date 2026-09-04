@@ -239,7 +239,7 @@ namespace Marketplace.BLL.Services
             return new ServiceResult { Succeeded = true, Message = "Запит відхилено" };
         }
 
-        //Статистика
+
         public async Task<DataResult<BusinessStatsByPeriodDto>> GetBusinessStatsByPeriodAsync(Guid businessId, DateTime? startDate, DateTime? endDate)
         {
             var validationResult = await ValidateStatsRequestAsync(businessId, startDate, endDate);
@@ -290,13 +290,13 @@ namespace Marketplace.BLL.Services
 
             var (actualStartDate, actualEndDate) = validationResult.Data;
             var stats = await _orderRepository.GetProductsStatsByPeriodAsync(businessId, actualStartDate, actualEndDate);
-            stats = sortDescending ? stats.OrderByDescending(s => s.Revenue).ToList(): stats.OrderBy(s => s.Revenue).ToList();
+            stats = sortDescending ? stats.OrderByDescending(s => s.Revenue).ToList() : stats.OrderBy(s => s.Revenue).ToList();
 
             return new DataResult<ProductsStatsByPeriodDto>
             {
                 Message = string.Empty,
                 Succeeded = true,
-                Data = new  ProductsStatsByPeriodDto
+                Data = new ProductsStatsByPeriodDto
                 {
                     StartDate = actualStartDate,
                     EndDate = actualEndDate,
@@ -336,8 +336,27 @@ namespace Marketplace.BLL.Services
             };
         }
 
-        public async Task<decimal> GetBusinessBalance(Guid businessid) {
-            
+        public async Task<ServiceResult> RequestAdultStatusAsync(Guid businessId, string userId)
+        {
+            var business = await _businessRepo.GetByIdAsync(businessId);
+            if (business == null)
+                return new ServiceResult { Succeeded = false, Message = "Магазин не знайдено" };
+
+            var isOwner = business.OwnerId == userId;
+            if (!isOwner)
+                return new ServiceResult { Succeeded = false, Message = "Немає прав для здійснення цієї операції" };
+
+            business.AdultStatus = Marketplace.Domain.Entities.AdultContentStatus.Pending;
+            business.AdultRejectionReason = null;
+
+            _businessRepo.Update(business);
+            await _context.SaveChangesAsync();
+            return new ServiceResult { Succeeded = true, Message = string.Empty };
+        }
+
+        public async Task<decimal> GetBusinessBalance(Guid businessid)
+        {
+
             var business = await _businessRepo.GetByIdAsync(businessid);
             if (business == null)
             {
@@ -345,6 +364,7 @@ namespace Marketplace.BLL.Services
             }
             return business.Balance;
         }
+
         public async Task<Business> GetByIdAsync(Guid id)
         {
             var business = await _businessRepo.GetByIdAsync(id);

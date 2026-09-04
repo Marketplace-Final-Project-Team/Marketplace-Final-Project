@@ -4,6 +4,7 @@
 @{
     ViewData["Title"] = "Каталог товарів";
     var filter = Model.Filter;
+    bool isAdultConfirmed = Context.Request.Cookies["AdultConfirmed"] == "true";
 }
 
 @functions {
@@ -117,13 +118,28 @@
             </div>
         </div>
 
-        <div class="catalog-filters__actions">
-            @if (filter.HasActiveFilters)
-            {
-                <a asp-action="Index" class="btn btn-outline-secondary">Скинути фільтри</a>
-                <button type="button" class="btn btn-outline-primary" data-save-search>☆ Зберегти пошук</button>
-            }
-            <button type="submit" class="btn btn-primary">Застосувати</button>
+        <div class="catalog-filters__actions d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+            <div>
+                @if (!isAdultConfirmed)
+                {
+                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="showAgeModal(null)">
+                        🔞 Увімкнути контент 18+
+                    </button>
+                }
+                else
+                {
+                    <span class="badge bg-danger p-2">🔞 Контент 18+ увімкнено</span>
+                }
+            </div>
+
+            <div class="d-flex gap-2 flex-wrap">
+                @if (filter.HasActiveFilters)
+                {
+                    <a asp-action="Index" class="btn btn-outline-secondary">Скинути фільтри</a>
+                    <button type="button" class="btn btn-outline-primary" data-save-search>☆ Зберегти пошук</button>
+                }
+                <button type="submit" class="btn btn-primary">Застосувати</button>
+            </div>
         </div>
     </form>
 
@@ -151,9 +167,20 @@
         <div class="catalog-grid">
             @foreach (var product in Model.Products)
             {
-                <article class="catalog-card" data-product-id="@product.Id">
+                <article class="catalog-card position-relative" data-product-id="@product.Id">
                     <span class="catalog-card__new-badge" data-new-badge hidden>Нове</span>
-                    <a asp-action="Details" asp-route-id="@product.Id" class="catalog-card__media" aria-label="Переглянути @product.Name">
+
+                    @if (product.IsAgeRestricted)
+                    {
+                        <span class="position-absolute top-0 end-0 bg-danger text-white text-xs fw-bold px-2 py-1 rounded-pill z-1 m-2 shadow">
+                            18+
+                        </span>
+                    }
+
+                    <button type="button" 
+                            class="catalog-card__media border-0 p-0 text-start bg-transparent w-100 position-relative" 
+                            aria-label="Переглянути @product.Name"
+                            onclick="checkAgeAndNavigate('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
                         @if (!string.IsNullOrWhiteSpace(product.MainImageUrl))
                         {
                             <img src="@product.MainImageUrl" alt="@product.Name" />
@@ -162,7 +189,8 @@
                         {
                             <span aria-hidden="true">@product.Name[..1].ToUpperInvariant()</span>
                         }
-                    </a>
+                    </button>
+
                     <div class="catalog-card__body">
                         <div class="catalog-card__category">@product.CategoryName</div>
                         @if (product.ReviewCount > 0)
@@ -177,7 +205,13 @@
                         {
                             <div class="catalog-card__rating" data-empty>Ще немає відгуків</div>
                         }
-                        <a asp-action="Details" asp-route-id="@product.Id" class="catalog-card__title">@product.Name</a>
+                        
+                        <button type="button" 
+                                class="catalog-card__title border-0 p-0 text-start bg-transparent text-primary fw-semibold w-100" 
+                                onclick="checkAgeAndNavigate('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
+                            @product.Name
+                        </button>
+
                         <p class="catalog-card__description">@product.Description</p>
                         <div class="catalog-card__footer">
                             <div class="shop-price-container d-flex align-items-center gap-2">
@@ -264,7 +298,55 @@
     }
 </div>
 
+<!-- МОДАЛЬНЕ ВІКНО 18+ З ФОРМОЮ POST ДЛЯ COOKIE -->
+<div id="ageVerificationModal" class="d-none position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-75 d-flex align-items-center justify-content-center p-3" style="backdrop-filter: blur(4px); z-index: 9999;">
+    <div class="bg-white rounded-4 shadow-lg p-4 text-center" style="max-width: 400px; width: 100%;">
+        <div class="mx-auto d-flex align-items-center justify-content-center rounded-circle bg-danger bg-opacity-10 text-danger fs-3 fw-bold mb-3" style="width: 64px; height: 64px;">
+            18+
+        </div>
+        <h3 class="fs-4 fw-bold text-dark mb-2">Підтвердження віку</h3>
+        <p class="text-secondary small mb-4">
+            Цей товар має вікове обмеження. Вам вже виповнилося 18 років?
+        </p>
+        <div class="d-flex gap-2 justify-content-center">
+            <button type="button" onclick="closeAgeModal()" class="btn btn-light w-100 fw-medium">Ні, мені менше 18</button>
+            
+            <form asp-action="ConfirmAge" asp-controller="Catalogue" method="post" class="w-100">
+                <input type="hidden" id="modalProductId" name="productId" value="" />
+                <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                <button type="submit" class="btn btn-danger w-100 fw-medium">Так, мені є 18</button>
+            </form>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script src="~/js/search-autocomplete.js" asp-append-version="true"></script>
     <script src="~/js/saved-searches.js" asp-append-version="true"></script>
+    <script>
+        const isAdultConfirmedServer = @(isAdultConfirmed.ToString().ToLower());
+        const ageModal = document.getElementById('ageVerificationModal');
+        const modalProductIdInput = document.getElementById('modalProductId');
+
+        function checkAgeAndNavigate(productId, isRestricted) {
+            if (isRestricted && !isAdultConfirmedServer) {
+                showAgeModal(productId);
+            } else {
+                window.location.href = `/Catalogue/Details/${productId}`;
+            }
+        }
+
+        function showAgeModal(productId) {
+            if (productId) {
+                modalProductIdInput.value = productId;
+            } else {
+                modalProductIdInput.value = '';
+            }
+            ageModal.classList.remove('d-none');
+        }
+
+        function closeAgeModal() {
+            ageModal.classList.add('d-none');
+        }
+    </script>
 }
