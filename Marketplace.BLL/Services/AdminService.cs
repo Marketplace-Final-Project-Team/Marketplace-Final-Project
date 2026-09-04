@@ -18,17 +18,20 @@ namespace Marketplace.BLL.Services
         private readonly IGenericRepository<Product> _productRepo;
         private readonly UserManager<User> _userManager;
         private readonly IBusinessRepository _businessRepo;
+        private readonly IOrderRepository _orderRepository;
         private readonly AppDbContext _context;
 
         public AdminService(
             IGenericRepository<Product> productRepo,
             UserManager<User> userManager,
             IBusinessRepository businessRepo,
+            IOrderRepository orderRepository,
             AppDbContext context)
         {
             _productRepo = productRepo;
             _userManager = userManager;
             _businessRepo = businessRepo;
+            _orderRepository = orderRepository;
             _context = context;
         }
 
@@ -85,7 +88,7 @@ namespace Marketplace.BLL.Services
             if (query.Search != null)
             {
                 var normalizedSearch = query.Search.Trim();
-                productsQuery = productsQuery.Where(p => p.Name.Contains(normalizedSearch));
+                productsQuery = productsQuery.Where(p => p.Name.Contains(normalizedSearch) || p.Business.StoreName.Contains(normalizedSearch));
             }
 
             if (!string.IsNullOrEmpty(query.SearchBusiness))
@@ -145,7 +148,8 @@ namespace Marketplace.BLL.Services
                 Name = p.Name,
                 ImageUrl = p.MainImageUrl,
                 Price = p.Price,
-                Status = p.Status
+                Status = p.Status,
+                Business = p.Business.StoreName
             }).ToListAsync();
 
             return new PagedResult<ProductAdminDto>
@@ -206,7 +210,7 @@ namespace Marketplace.BLL.Services
             if (!string.IsNullOrEmpty(query.Search))
             {
                 var normalizedSearch = query.Search.Trim();
-                businessesQuery = businessesQuery.Where(b => b.StoreName.Contains(normalizedSearch));
+                businessesQuery = businessesQuery.Where(b => b.StoreName.Contains(normalizedSearch) || b.Owner.Email!.Contains(normalizedSearch));
             }
 
             if (!string.IsNullOrEmpty(query.SearchEmail))
@@ -225,7 +229,21 @@ namespace Marketplace.BLL.Services
                 businessesQuery = businessesQuery.Where(b => b.CommissionPercent <= query.MaxCommission.Value);
             }
 
-            businessesQuery = query.SortDescending == true ? businessesQuery.OrderByDescending(b => b.CreatedAt) : businessesQuery.OrderBy(b => b.CreatedAt);
+            switch (query.SortOption)
+            {
+                case BusinessSortOption.CreatedAtAsc:
+                    businessesQuery = businessesQuery.OrderBy(b => b.CreatedAt);
+                    break;
+                case BusinessSortOption.CreatedAtDesc:
+                    businessesQuery = businessesQuery.OrderByDescending(b => b.CreatedAt);
+                    break;
+                case BusinessSortOption.CommissionAsc:
+                    businessesQuery = businessesQuery.OrderBy(b => b.CommissionPercent);
+                    break;
+                case BusinessSortOption.CommissionDesc:
+                    businessesQuery = businessesQuery.OrderByDescending(b => b.CommissionPercent);
+                    break;
+            }
 
             var page = Math.Max(1, query.Pagination.Page);
             var totalCount = await businessesQuery.CountAsync();
@@ -381,6 +399,54 @@ namespace Marketplace.BLL.Services
             };
         }
 
+        public async Task<DataResult<AdminCommissionStatsDto>> GetCommissionStatsByPeriodAsync(DateTime? startDate, DateTime? endDate)
+        {
+            var today = DateTime.UtcNow.Date;
+
+            var actualEndDate = endDate ?? today;
+            if (endDate.HasValue && actualEndDate.Date > DateTime.UtcNow.Date)
+            {
+                return new DataResult<AdminCommissionStatsDto>
+                {
+                    Message = "Кінцева дата знаходиться у майбутньому",
+                    Succeeded = false
+                };
+            }
+
+            var actualStartDate = startDate ?? today.AddDays(-7);
+            if (startDate.HasValue && actualStartDate > actualEndDate)
+            {
+                return new DataResult<AdminCommissionStatsDto>
+                {
+                    Message = "Початкова дата більша за кінцеву",
+                    Succeeded = false
+                };
+            }
+
+            var daily = await _orderRepository.GetCommissionPerDayByPeriodAsync(actualStartDate, actualEndDate);
+            var totalCommissionByPeriod = daily.Sum(d => d.TotalCommission);
+            var byBusiness = await _orderRepository.GetCommissionForBusinessByPeriodAsync(actualStartDate, actualEndDate);
+
+            return new DataResult<AdminCommissionStatsDto>
+            {
+                Message = string.Empty,
+                Succeeded = true,
+                Data = new AdminCommissionStatsDto
+                {
+                    Daily = daily,
+                    ByBusiness = byBusiness,
+                    TotalCommissionByPeriod = totalCommissionByPeriod
+                }
+            };
+        }
+
+        public async Task<decimal> GetTotalCommissionAsync()
+        {
+            var totalCommission = await _orderRepository.GetTotalCommissionAsync();
+
+            return totalCommission;
+        }
+
         // "Sale" here means the order actually reached Confirmed - that's the only point
         // OrderService.ChangeOrderStatus captures OrderItem.CommissionAmount and credits the
         // balances, so it's the only status range where turnover/revenue numbers here will
@@ -456,8 +522,6 @@ namespace Marketplace.BLL.Services
             .OrderByDescending(b => b.MarketplaceRevenue)
             .ToList();
 
-            // No explicit range (all-time) or a wide range groups by month so the table
-            // doesn't turn into hundreds of daily rows; anything a month or narrower groups by day.
             var groupByMonth = !startDate.HasValue || !endDate.HasValue
                 || (endDate.Value - startDate.Value).TotalDays > 31;
 
