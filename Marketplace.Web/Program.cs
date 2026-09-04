@@ -76,6 +76,7 @@ var cloudinaryAccount = new Account(
     builder.Configuration["Cloudinary:CloudName"] ?? "not-configured",
     builder.Configuration["Cloudinary:ApiKey"] ?? "not-configured",
     builder.Configuration["Cloudinary:ApiSecret"] ?? "not-configured");
+
 builder.Services.AddSingleton(new Cloudinary(cloudinaryAccount));
 
 // Repositories & Services
@@ -99,12 +100,15 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IWishlistCollectionService, WishlistCollectionService>();
 builder.Services.AddScoped<IPostSaleService, PostSaleService>();
 builder.Services.AddScoped<IPromoCodeService, PromoCodeService>();
+builder.Services.AddScoped<IProductAnalyticsService, ProductAnalyticsService>();
 
 builder.Services.AddMemoryCache();
 builder.Services.AddDataProtection();
 builder.Services.AddScoped<ISystemSettingsService, SystemSettingsService>();
 builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
 builder.Services.AddScoped<IMarketplaceBalanceService, MarketplaceBalanceService>();
+
+builder.Services.AddScoped<IContentModerationService, ContentModerationService>();
 
 // LiqPay configuration
 builder.Services.Configure<LiqPayOptions>(builder.Configuration.GetSection("LiqPay"));

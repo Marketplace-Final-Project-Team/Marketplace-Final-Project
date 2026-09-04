@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.Businesses.BusinessPromoCodesPageViewModel
 
 @{
-    ViewData["Title"] = $"Промокоди - {Model.StoreName}";
+    ViewData["Title"] = $"Знижки та промокоди - {Model.StoreName}";
 }
 
 @section Styles {
@@ -14,8 +14,8 @@
     <header class="seller-orders-header">
         <div>
             <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Панель продавця</div>
-            <h1>Промокоди - @Model.StoreName</h1>
-            <p>Створюйте промокоди зі знижкою - покупці зможуть застосувати їх при оформленні замовлення.</p>
+            <h1>Знижки та промокоди - @Model.StoreName</h1>
+            <p>Керуйте знижкою на весь магазин і промокодами, які покупці застосовують при оформленні замовлення.</p>
         </div>
     </header>
 
@@ -29,6 +29,48 @@
     {
         <div class="seller-state-note seller-state-note--rejected"><span class="seller-state-note__icon">!</span><p>@error</p></div>
     }
+
+    <section class="business-panel">
+        <h2>Знижка на весь магазин</h2>
+        <p class="business-panel__lead">Діє одразу на всі товари магазину замість їхніх власних знижок, поки не мине термін дії.</p>
+
+        @if (Model.BusinessDiscount?.IsActive == true)
+        {
+            <div class="business-discount-status">
+                <span class="seller-status seller-status--active"><span></span> Діє знижка −@Model.BusinessDiscount.DiscountPercent.ToString("0.##")%</span>
+                <span class="business-panel__lead">до @Model.BusinessDiscount.EndDate?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+            </div>
+            <form asp-action="RemoveBusinessDiscount" method="post" onsubmit="return confirm('Скасувати знижку на весь магазин?');">
+                <input type="hidden" name="businessId" value="@Model.BusinessId" />
+                <button type="submit" class="seller-button seller-button--secondary">Скасувати знижку</button>
+            </form>
+        }
+        else
+        {
+            <form asp-action="SetBusinessDiscount" method="post" class="business-settings-form">
+                <input type="hidden" name="businessId" value="@Model.BusinessId" />
+
+                <div>
+                    <label for="discountPercent">Знижка, %</label>
+                    <input type="number" id="discountPercent" name="discountPercent" min="1" max="100" required />
+                </div>
+
+                <div>
+                    <label for="discountStartDate">Діє з</label>
+                    <input type="datetime-local" id="discountStartDate" name="discountStartDate" required value="@DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm")" />
+                </div>
+
+                <div>
+                    <label for="discountEndDate">Діє до</label>
+                    <input type="datetime-local" id="discountEndDate" name="discountEndDate" required value="@DateTime.UtcNow.AddDays(3).ToString("yyyy-MM-ddTHH:mm")" />
+                </div>
+
+                <div>
+                    <button type="submit" class="seller-button seller-button--primary">Встановити знижку</button>
+                </div>
+            </form>
+        }
+    </section>
 
     <section class="business-panel">
         <h2>Новий промокод</h2>

@@ -22,10 +22,13 @@ namespace Marketplace.Web.Controllers
         private readonly IReviewService _reviewService;
         private readonly IPostSaleService _postSaleService;
         private readonly IPromoCodeService _promoCodeService;
+        private readonly IDiscountService _discountService;
         private readonly UserManager<User> _userManager;
         private readonly IEmailSender _emailSender;
         private readonly AppDbContext _context;
         private readonly IActivityLogService _activityLog;
+        private readonly IProductAnalyticsService _productAnalyticsService;
+        private readonly ISystemSettingsService _settingsService;
 
         public BusinessController(
             IBusinessService businessService,
@@ -35,10 +38,13 @@ namespace Marketplace.Web.Controllers
             IReviewService reviewService,
             IPostSaleService postSaleService,
             IPromoCodeService promoCodeService,
+            IDiscountService discountService,
             UserManager<User> userManager,
             IEmailSender emailSender,
             AppDbContext context,
-            IActivityLogService activityLog)
+            IActivityLogService activityLog,
+            IProductAnalyticsService productAnalyticsService,
+            ISystemSettingsService settingsService)
         {
             _businessService = businessService;
             _businessAccessService = businessAccessService;
@@ -47,10 +53,13 @@ namespace Marketplace.Web.Controllers
             _reviewService = reviewService;
             _postSaleService = postSaleService;
             _promoCodeService = promoCodeService;
+            _discountService = discountService;
             _userManager = userManager;
             _emailSender = emailSender;
             _context = context;
             _activityLog = activityLog;
+            _productAnalyticsService = productAnalyticsService;
+            _settingsService = settingsService;
         }
 
         [HttpGet]
@@ -94,6 +103,124 @@ namespace Marketplace.Web.Controllers
                 Businesses = businessCards,
                 CanCreateBusiness = businesses.All(business => business.OwnerId != userId)
             });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Dashboard(Guid businessId, DateTime? startDate, DateTime? endDate)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var end = (endDate ?? DateTime.UtcNow).Date;
+            var start = (startDate ?? end.AddDays(-29)).Date;
+            var periodLength = (end - start).Days + 1;
+            var previousEnd = start.AddDays(-1);
+            var previousStart = previousEnd.AddDays(-(periodLength - 1));
+
+            var statsResult = await _businessService.GetBusinessStatsByPeriodAsync(businessId, start, end);
+            var previousStatsResult = await _businessService.GetBusinessStatsByPeriodAsync(businessId, previousStart, previousEnd);
+            var productsStatsResult = await _businessService.GetProductsStatsByPeriodAsnyc(businessId, start, end);
+            var customersStatsResult = await _businessService.GetCustomersStatsByPeriodAsync(businessId, start, end);
+            var balance = await _businessService.GetBusinessBalance(businessId);
+            var allTimeSummary = await _orderService.GetBusinessOrderSummary(businessId);
+            var products = await _productService.GetByBusinessAsync(businessId);
+            var lowStockThreshold = await _settingsService.GetIntAsync("BusinessRules", "LowStockThreshold", 5);
+            var traffic = await _productAnalyticsService.GetBusinessTrafficStatsAsync(businessId, start, end);
+            var recentActivity = await _activityLog.GetRecentBusinessActionsAsync(businessId, take: 15);
+
+            var periodRevenue = statsResult.Succeeded ? statsResult.Data.TotalRevenue : 0;
+            var periodOrders = statsResult.Succeeded ? statsResult.Data.Stats.Sum(s => s.OrderCount) : 0;
+            var periodAov = statsResult.Succeeded ? (double)statsResult.Data.AOV : 0;
+
+            var previousRevenue = previousStatsResult.Succeeded ? previousStatsResult.Data.TotalRevenue : 0;
+            var previousOrders = previousStatsResult.Succeeded ? previousStatsResult.Data.Stats.Sum(s => s.OrderCount) : 0;
+            var previousAov = previousStatsResult.Succeeded ? (double)previousStatsResult.Data.AOV : 0;
+
+            static double? PercentDelta(double current, double previous)
+            {
+                if (previous == 0)
+                {
+                    return current == 0 ? 0 : null;
+                }
+
+                return Math.Round((current - previous) * 100d / previous, 1);
+            }
+
+            var viewsByProduct = traffic.ByProduct.ToDictionary(p => p.ProductId, p => p.Views);
+
+            var model = new BusinessDashboardPageViewModel
+            {
+                BusinessId = businessId,
+                StoreName = business.StoreName,
+                Filter = new BusinessDashboardFilterViewModel { BusinessId = businessId, StartDate = start, EndDate = end },
+
+                Chart = statsResult.Succeeded
+                    ? statsResult.Data.Stats
+                        .OrderBy(s => s.Date)
+                        .Select(s => new BusinessDashboardChartPointViewModel { Date = s.Date, Revenue = s.Revenue, OrderCount = s.OrderCount })
+                        .ToList()
+                    : new List<BusinessDashboardChartPointViewModel>(),
+                PeriodRevenue = periodRevenue,
+                PeriodOrders = periodOrders,
+                PeriodAverageOrderValue = periodAov,
+
+                RevenueDeltaPercent = PercentDelta((double)periodRevenue, (double)previousRevenue),
+                OrdersDeltaPercent = PercentDelta(periodOrders, previousOrders),
+                AverageOrderValueDeltaPercent = PercentDelta(periodAov, previousAov),
+
+                Balance = balance,
+                AllTimeRevenue = allTimeSummary.Revenue,
+                AllTimeOrders = allTimeSummary.TotalOrders,
+                AllTimeSoldItems = allTimeSummary.SoldItems,
+                AwaitingOrders = allTimeSummary.AwaitingProcessingOrders,
+
+                TotalProductCount = products.Count,
+                ActiveProductCount = products.Count(p => p.Status == Marketplace.Domain.Enums.ProductStatus.Active),
+                PendingProductCount = products.Count(p => p.Status == Marketplace.Domain.Enums.ProductStatus.Pending),
+                OutOfStockProductCount = products.Count(p => p.Quantity <= 0),
+                LowStockProductCount = products.Count(p => p.Quantity > 0 && p.Quantity <= lowStockThreshold),
+
+                TotalViews = traffic.TotalViews,
+                TotalCartAdds = traffic.TotalCartAdds,
+                TotalWishlistAdds = traffic.TotalWishlistAdds,
+
+                TopProducts = productsStatsResult.Succeeded
+                    ? productsStatsResult.Data.Stats
+                        .OrderByDescending(s => s.Revenue)
+                        .Take(5)
+                        .Select(s => new BusinessDashboardTopProductViewModel
+                        {
+                            ProductId = s.ProductId,
+                            ProductName = s.ProductName,
+                            Revenue = s.Revenue,
+                            UnitsSold = s.TotalSales,
+                            Views = viewsByProduct.TryGetValue(s.ProductId, out var views) ? views : 0
+                        })
+                        .ToList()
+                    : new List<BusinessDashboardTopProductViewModel>(),
+
+                TopCustomers = customersStatsResult.Succeeded
+                    ? customersStatsResult.Data.Stats
+                        .OrderByDescending(s => s.Revenue)
+                        .Take(5)
+                        .Select(s => new BusinessDashboardTopCustomerViewModel
+                        {
+                            UserName = s.UserName,
+                            Revenue = s.Revenue,
+                            PurchaseCount = s.PurchaseCount
+                        })
+                        .ToList()
+                    : new List<BusinessDashboardTopCustomerViewModel>(),
+
+                RecentActivity = recentActivity
+                    .Select(a => new BusinessDashboardActivityItemViewModel { Description = a.Description, CreatedAt = a.CreatedAt })
+                    .ToList()
+            };
+
+            return View(model);
         }
 
         [HttpGet]
@@ -350,6 +477,10 @@ namespace Marketplace.Web.Controllers
             var summary = await _orderService.GetBusinessOrderSummary(businessId);
             var orders = await _orderService.GetBusinessOrders(businessId);
 
+            var trendEnd = DateTime.UtcNow.Date;
+            var trendStart = trendEnd.AddDays(-29);
+            var trendResult = await _businessService.GetBusinessStatsByPeriodAsync(businessId, trendStart, trendEnd);
+
             return View(new BusinessFinanceViewModel
             {
                 BusinessId = businessId,
@@ -370,7 +501,13 @@ namespace Marketplace.Web.Controllers
                         ShippingAddress = $"{order.ShippingCity}, {order.ShippingStreet}",
                         ItemsCount = order.ItemsCount,
                         LineTotal = order.LineTotal
-                    }).ToList()
+                    }).ToList(),
+                RevenueTrend = trendResult.Succeeded
+                    ? trendResult.Data.Stats
+                        .OrderBy(s => s.Date)
+                        .Select(s => new BusinessDashboardChartPointViewModel { Date = s.Date, Revenue = s.Revenue, OrderCount = s.OrderCount })
+                        .ToList()
+                    : new List<BusinessDashboardChartPointViewModel>()
             });
         }
 
@@ -394,6 +531,13 @@ namespace Marketplace.Web.Controllers
                 allRatings.AddRange(reviews.Select(r => (double)r.Rating));
             }
 
+            var ratingDistribution = new int[5];
+            foreach (var rating in allRatings)
+            {
+                var bucket = Math.Clamp((int)Math.Round(rating), 1, 5) - 1;
+                ratingDistribution[bucket]++;
+            }
+
             return View(new BusinessPerformanceViewModel
             {
                 BusinessId = businessId,
@@ -403,7 +547,11 @@ namespace Marketplace.Web.Controllers
                 CanceledOrders = distinctOrders.Count(o => o.Status == OrderStatus.Canceled),
                 AverageRating = allRatings.Count == 0 ? 0 : Math.Round(allRatings.Average(), 1),
                 ReviewCount = allRatings.Count,
-                ProductCount = products.Count
+                ProductCount = products.Count,
+                OrdersByStatus = distinctOrders
+                    .GroupBy(o => o.Status)
+                    .ToDictionary(g => g.Key, g => g.Count()),
+                RatingDistribution = ratingDistribution
             });
         }
 
@@ -417,13 +565,59 @@ namespace Marketplace.Web.Controllers
             }
 
             var promoCodes = await _promoCodeService.GetForBusinessAsync(businessId);
+            var businessDiscount = await _discountService.GetBusinessDiscount(businessId);
 
             return View(new BusinessPromoCodesPageViewModel
             {
                 BusinessId = businessId,
                 StoreName = business.StoreName,
-                PromoCodes = promoCodes
+                PromoCodes = promoCodes,
+                BusinessDiscount = businessDiscount
             });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetBusinessDiscount(Guid businessId, decimal discountPercent, DateTime discountStartDate, DateTime discountEndDate)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var result = await _discountService.SetBusinessDiscount(businessId, discountPercent, discountStartDate, discountEndDate);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "BusinessDiscountSet",
+                    $"Встановлено знижку {discountPercent}% на весь магазин «{business.StoreName}».",
+                    actorUserId: _userManager.GetUserId(User));
+            }
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+
+            return RedirectToAction(nameof(PromoCodes), new { businessId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveBusinessDiscount(Guid businessId)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var result = await _discountService.RemoveBusinessDiscount(businessId);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "BusinessDiscountRemoved",
+                    $"Скасовано знижку на весь магазин «{business.StoreName}».",
+                    actorUserId: _userManager.GetUserId(User));
+            }
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+
+            return RedirectToAction(nameof(PromoCodes), new { businessId });
         }
 
         [HttpPost]
