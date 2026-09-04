@@ -534,5 +534,63 @@ namespace Marketplace.Web.Controllers
                 ? new string('*', 8)
                 : new string('*', 8) + value[^4..];
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> BusinessDetails(Guid id)
+        {
+            var details = await _adminService.GetBusinessDetailsAsync(id);
+            if (details == null)
+            {
+                return NotFound();
+            }
+
+            var discount = await _discountService.GetBusinessDiscount(id);
+
+            var model = new AdminBusinessDetailsViewModel
+            {
+                Id = details.Id,
+                StoreName = details.StoreName,
+                Description = details.Description,
+                LogoUrl = details.LogoUrl,
+                BannerUrl = details.BannerUrl,
+                Status = details.Status,
+                CommissionPercent = details.CommissionPercent,
+                CreatedAt = details.CreatedAt,
+                AdultStatus = details.AdultStatus,
+                AdultRejectionReason = details.AdultRejectionReason,
+                OwnerId = details.OwnerId,
+                OwnerEmail = details.OwnerEmail,
+                TotalProductCount = details.TotalProductCount,
+                ActiveProductCount = details.ActiveProductCount,
+                PendingProductCount = details.PendingProductCount,
+                BannedProductCount = details.BannedProductCount,
+                HasActiveDiscount = discount.IsActive,
+                DiscountPercent = discount.DiscountPercent,
+                DiscountEndDate = discount.EndDate
+            };
+
+            return View(model);
+        }
+
+        // БОНУС — ці два методи вже існували в IAdminService, але ніде не викликалися з контролера.
+        // Логічне місце для них — саме сторінка деталей одного бізнесу.
+        [HttpPost]
+        public async Task<IActionResult> ApproveAdultStatus(Guid businessId)
+        {
+            var result = await _adminService.ApproveAdultStatusAsync(businessId);
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            return RedirectToAction("BusinessDetails", new { id = businessId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RejectAdultStatus(Guid businessId, string reason)
+        {
+            var result = await _adminService.RejectAdultStatusAsync(businessId, reason);
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            return RedirectToAction("BusinessDetails", new { id = businessId });
+        }
+
+
     }
 }

@@ -17,7 +17,8 @@ public class BusinessDashboardItemViewModel
     public string LogoUrl { get; init; } = string.Empty;
     public string BannerUrl { get; init; } = string.Empty;
     public BusinessStatus Status { get; init; }
-    public bool IsOwner { get; init; }
+    public bool IsOwner { get; set; }
+    public Marketplace.Domain.Enums.BusinessMemberRole CurrentUserRole { get; set; }
     public int ProductCount { get; init; }
     public int ActiveProductCount { get; init; }
     public int PendingProductCount { get; init; }

@@ -32,7 +32,7 @@ namespace Marketplace.BLL.Services
                 }
             }
 
-            var memberships = await _memberRepository.FindAsync(m => m.UserId == userId);
+            var memberships = await _memberRepository.FindAsync(m => m.UserId == userId && m.IsAccepted);
 
             if (allowedRoles.Length > 0)
                 memberships = memberships.Where(m => allowedRoles.Contains(m.Role)).ToList();
@@ -62,12 +62,28 @@ namespace Marketplace.BLL.Services
                 }
             }
 
-            var memberships = await _memberRepository.FindAsync(m => m.BusinessId == businessId && m.UserId == userId);
+            var memberships = await _memberRepository.FindAsync(
+                m => m.BusinessId == businessId && m.UserId == userId && m.IsAccepted);
 
             if (allowedRoles.Length == 0)
                 return memberships.Any();
 
             return memberships.Any(m => allowedRoles.Contains(m.Role));
+        }
+
+        public async Task<BusinessMemberRole?> GetUserRoleAsync(Guid businessId, string userId)
+        {
+            var isOwner = await _businessRepository.ExistsAsync(
+                b => b.Id == businessId && b.OwnerId == userId);
+            if (isOwner)
+            {
+                return BusinessMemberRole.Owner;
+            }
+
+            var membership = await _memberRepository.FirstOrDefaultAsync(
+                m => m.BusinessId == businessId && m.UserId == userId && m.IsAccepted);
+
+            return membership?.Role;
         }
     }
 }

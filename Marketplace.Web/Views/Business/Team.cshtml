@@ -1,7 +1,15 @@
 @model Marketplace.Web.Models.Businesses.BusinessTeamViewModel
+@using System.Security.Claims
+@using Marketplace.BLL.Interfaces
+@using Marketplace.Web.Models.Businesses
+@inject IBusinessAccessService BusinessAccessService
 
 @{
     ViewData["Title"] = $"Команда - {Model.StoreName}";
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var currentRole = !string.IsNullOrEmpty(userId)
+        ? await BusinessAccessService.GetUserRoleAsync(Model.BusinessId, userId)
+        : null;
 }
 
 @functions {
@@ -24,7 +32,7 @@
 
     <header class="seller-orders-header">
         <div>
-            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Панель продавця</div>
+            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> @BusinessRoleContext.PanelLabel(currentRole)</div>
             <h1>Команда - @Model.StoreName</h1>
             <p>Хто має доступ до керування цим магазином.</p>
         </div>

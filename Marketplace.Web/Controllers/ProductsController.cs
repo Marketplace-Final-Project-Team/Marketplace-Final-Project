@@ -63,16 +63,23 @@ public class ProductsController : Controller
         }).ToList();
         ViewBag.SelectedBusinessId = selectedBusinessId;
 
-        return View(products.Select(p => new ProductListItemViewModel
+        return View(products.Select(p =>
         {
-            Id = p.Id,
-            Name = p.Name,
-            Price = p.Price,
-            Quantity = p.Quantity,
-            MainImageUrl = p.MainImageUrl,
-            Status = p.Status.ToString(),
-            CategoryName = p.Category?.Name ?? string.Empty,
-            ModerationReason = p.ModerationReason
+            var activeDiscount = p.GetActiveProductDiscount();
+
+            return new ProductListItemViewModel
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,
+                Quantity = p.Quantity,
+                MainImageUrl = p.MainImageUrl,
+                Status = p.Status.ToString(),
+                CategoryName = p.Category?.Name ?? string.Empty,
+                ModerationReason = p.ModerationReason,
+                HasDiscount = activeDiscount != null,
+                DiscountPercent = activeDiscount != null ? (int)activeDiscount.Percent : 0
+            };
         }).ToList());
     }
 
@@ -162,7 +169,6 @@ public class ProductsController : Controller
             return View(model);
         }
 
-        // Логування та перенаправлення (оскільки CreateAsync може повертати DTO або сутність, беремо назву з переданого DTO)
         await _activityLog.LogBusinessActionAsync(model.BusinessId, "ProductCreated",
             $"Додано товар «{createdProductDto.Name}».", actorUserId: userId);
 

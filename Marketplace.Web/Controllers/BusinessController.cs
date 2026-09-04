@@ -1,4 +1,5 @@
-﻿using Marketplace.BLL.DTOs;
+﻿using Marketplace.BLL.Common;
+using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
 using Marketplace.Domain.Entities;
@@ -69,6 +70,10 @@ namespace Marketplace.Web.Controllers
             {
                 var products = await _productService.GetByBusinessAsync(business.Id);
                 var orderSummary = await _orderService.GetBusinessOrderSummary(business.Id);
+
+                var currentRole = await _businessAccessService.GetUserRoleAsync(business.Id, userId)
+                    ?? Marketplace.Domain.Enums.BusinessMemberRole.Owner; // fallback не повинен спрацювати, бо бізнес вже пройшов GetAccessibleBusinessesAsync
+
                 businessCards.Add(new BusinessDashboardItemViewModel
                 {
                     Id = business.Id,
@@ -78,6 +83,7 @@ namespace Marketplace.Web.Controllers
                     BannerUrl = business.BannerUrl,
                     Status = business.Status,
                     IsOwner = business.OwnerId == userId,
+                    CurrentUserRole = currentRole,   // <-- НОВЕ ПОЛЕ
                     ProductCount = products.Count,
                     ActiveProductCount = products.Count(product => product.Status == Marketplace.Domain.Enums.ProductStatus.Active),
                     PendingProductCount = products.Count(product => product.Status == Marketplace.Domain.Enums.ProductStatus.Pending),
@@ -265,7 +271,7 @@ namespace Marketplace.Web.Controllers
                 return Forbid();
             }
 
-         
+
             var order = await _orderService.GetBusinessOrderDetails(businessId, orderId);
             if (order is null)
             {
@@ -506,10 +512,11 @@ namespace Marketplace.Web.Controllers
             return View(new BusinessIntegrationsViewModel { BusinessId = businessId, StoreName = business.StoreName });
         }
 
+        // === ЗМІНЕНО: тільки Owner може переглядати/редагувати налаштування магазину ===
         [HttpGet]
         public async Task<IActionResult> Settings(Guid businessId)
         {
-            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.ManageSettings);
             if (business is null)
             {
                 return Forbid();
@@ -520,7 +527,7 @@ namespace Marketplace.Web.Controllers
                 BusinessId = businessId,
                 StoreName = business.StoreName,
                 Description = business.Description,
-                AdultStatus = (Marketplace.Domain.Enums.AdultContentStatus)business.AdultStatus 
+                AdultStatus = (Marketplace.Domain.Enums.AdultContentStatus)business.AdultStatus
             });
         }
 
@@ -528,7 +535,7 @@ namespace Marketplace.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Settings(BusinessSettingsViewModel model)
         {
-            var business = await GetAccessibleBusinessOrNullAsync(model.BusinessId);
+            var business = await GetAccessibleBusinessOrNullAsync(model.BusinessId, BusinessPermissions.ManageSettings);
             if (business is null)
             {
                 return Forbid();
@@ -560,6 +567,19 @@ namespace Marketplace.Web.Controllers
             return businesses.FirstOrDefault(b => b.Id == businessId);
         }
 
+        // === НОВИЙ: перегрузка з перевіркою конкретних ролей ===
+        private async Task<Business?> GetAccessibleBusinessOrNullAsync(Guid businessId, params BusinessMemberRole[] allowedRoles)
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return null;
+            }
+
+            var businesses = await _businessAccessService.GetAccessibleBusinessesAsync(userId, allowedRoles);
+            return businesses.FirstOrDefault(b => b.Id == businessId);
+        }
+
         [HttpGet("business/{businessId}/add-member")]
         public IActionResult AddMember(Guid businessId)
         {
@@ -568,9 +588,17 @@ namespace Marketplace.Web.Controllers
             return View(model);
         }
 
+        // === ЗМІНЕНО: додано перевірку — запрошувати нових учасників може тільки Owner ===
         [HttpPost("business/{businessId}/add-member")]
         public async Task<IActionResult> AddMember(BusinessMemberCreateViewModel model)
         {
+            var userId = _userManager.GetUserId(User)!;
+            var canManage = await _businessAccessService.HasAccessAsync(model.BusinessId, userId, BusinessMemberRole.Owner);
+            if (!canManage)
+            {
+                return Forbid();
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(model);

@@ -353,5 +353,40 @@ namespace Marketplace.BLL.Services
                 Message = "Комісія успішно змінена",
             };
         }
+
+
+        public async Task<BusinessAdminDetailsDto?> GetBusinessDetailsAsync(Guid businessId)
+        {
+            var business = await _context.Businesses
+                .Include(b => b.Owner)
+                .FirstOrDefaultAsync(b => b.Id == businessId);
+
+            if (business == null)
+            {
+                return null;
+            }
+
+            var products = await _productRepo.FindAsync(p => p.BusinessId == businessId);
+
+            return new BusinessAdminDetailsDto
+            {
+                Id = business.Id,
+                StoreName = business.StoreName,
+                Description = business.Description,
+                LogoUrl = business.LogoUrl,
+                BannerUrl = business.BannerUrl,
+                Status = business.Status,
+                CommissionPercent = business.CommissionPercent,
+                CreatedAt = business.CreatedAt,
+                AdultStatus = business.AdultStatus,
+                AdultRejectionReason = business.AdultRejectionReason,
+                OwnerId = business.OwnerId,
+                OwnerEmail = business.Owner.Email!,
+                TotalProductCount = products.Count,
+                ActiveProductCount = products.Count(p => p.Status == ProductStatus.Active),
+                PendingProductCount = products.Count(p => p.Status == ProductStatus.Pending),
+                BannedProductCount = products.Count(p => p.Status == ProductStatus.Banned)
+            };
+        }
     }
 }

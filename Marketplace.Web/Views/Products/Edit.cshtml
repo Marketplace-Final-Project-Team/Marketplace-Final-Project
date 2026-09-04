@@ -28,110 +28,69 @@
     }
 
     <div class="product-form-shell">
-        <form asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data" class="products-panel">
+        <form asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data" class="products-panel w-100">
             <input type="hidden" asp-for="Id" />
             <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
             <section class="product-form-section">
                 <h2>Основна інформація</h2>
-                    <div class="mb-3">
-                        <label asp-for="Name" class="form-label">Назва товару</label>
-                        <input asp-for="Name" class="form-control" autofocus />
-                        <span asp-validation-for="Name" class="text-danger small"></span>
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label">Назва товару</label>
+                    <input asp-for="Name" class="form-control" autofocus />
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+                <div>
+                    <label asp-for="Description" class="form-label">Опис</label>
+                    <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+            </section>
+
+            <section class="product-form-section">
+                <h2>Продаж і класифікація</h2>
+                <div class="product-field-grid">
+                    <div>
+                        <label asp-for="CategoryId" class="form-label">Категорія</label>
+                        <select asp-for="CategoryId" asp-items="Model.Categories" class="form-select"></select>
+                        <span asp-validation-for="CategoryId" class="text-danger small"></span>
                     </div>
                     <div>
-                        <label asp-for="Description" class="form-label">Опис</label>
-                        <textarea asp-for="Description" class="form-control" rows="5"></textarea>
-                        <span asp-validation-for="Description" class="text-danger small"></span>
-                    </div>
-                </section>
-
-                <section class="product-form-section">
-                    <h2>Продаж і класифікація</h2>
-                    <div class="product-field-grid">
-                        <div>
-                            <label asp-for="CategoryId" class="form-label">Категорія</label>
-                            <select asp-for="CategoryId" asp-items="Model.Categories" class="form-select"></select>
-                            <span asp-validation-for="CategoryId" class="text-danger small"></span>
-                        </div>
-                        <div>
-                            <label asp-for="Price" class="form-label">Ціна, ₴</label>
-                            <input asp-for="Price" class="form-control" inputmode="decimal" />
-                            <span asp-validation-for="Price" class="text-danger small"></span>
-                        </div>
-                        <div>
-                            <label asp-for="Quantity" class="form-label">Кількість, шт.</label>
-                            <input asp-for="Quantity" class="form-control" inputmode="numeric" />
-                            <span asp-validation-for="Quantity" class="text-danger small"></span>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="product-form-section">
-                    <h2>Зображення</h2>
-                    @if (!string.IsNullOrWhiteSpace(Model.ExistingMainImageUrl))
-                    {
-                        <div class="mb-3">
-                            <div class="form-label">Поточне головне фото</div>
-                            <img src="@Model.ExistingMainImageUrl" class="product-current-image" alt="@Model.Name" />
-                        </div>
-                    }
-                    <div class="mb-3">
-                        <label asp-for="MainImage" class="form-label">Замінити головне фото</label>
-                        <input asp-for="MainImage" type="file" class="form-control" accept="image/*" />
+                        <label asp-for="Price" class="form-label">Ціна, ₴</label>
+                        <input asp-for="Price" class="form-control" inputmode="decimal" />
+                        <span asp-validation-for="Price" class="text-danger small"></span>
                     </div>
                     <div>
-                        <label asp-for="AdditionalImages" class="form-label">Додати ще фото</label>
-                        <input asp-for="AdditionalImages" type="file" class="form-control" accept="image/*" multiple />
+                        <label asp-for="Quantity" class="form-label">Кількість, шт.</label>
+                        <input asp-for="Quantity" class="form-control" inputmode="numeric" />
+                        <span asp-validation-for="Quantity" class="text-danger small"></span>
                     </div>
-                </section>
+                </div>
+            </section>
+
+            <section class="product-form-section">
+                <h2>Зображення</h2>
+                @if (!string.IsNullOrWhiteSpace(Model.ExistingMainImageUrl))
+                {
+                    <div class="mb-3">
+                        <div class="form-label">Поточне головне фото</div>
+                        <img src="@Model.ExistingMainImageUrl" class="product-current-image" alt="@Model.Name" />
+                    </div>
+                }
+                <div class="mb-3">
+                    <label asp-for="MainImage" class="form-label">Замінити головне фото</label>
+                    <input asp-for="MainImage" type="file" class="form-control" accept="image/*" />
+                </div>
+                <div>
+                    <label asp-for="AdditionalImages" class="form-label">Додати ще фото</label>
+                    <input asp-for="AdditionalImages" type="file" class="form-control" accept="image/*" multiple />
+                </div>
+            </section>
 
             <div class="product-form-actions">
                 <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Скасувати</a>
                 <button type="submit" class="btn btn-primary">Зберегти зміни</button>
             </div>
         </form>
-
-        <aside>
-            <div class="product-note">
-                <strong>Зверніть увагу</strong>
-                Будь-яке редагування повертає товар у статус «На модерації».
-            </div>
-
-            @{
-                var activeDiscount = ViewBag.ActiveDiscount as Marketplace.Domain.Entities.Discount;
-            }
-            <div class="product-discount-card">
-                <h2>Знижка</h2>
-                @if (activeDiscount is not null)
-                {
-                    <div class="product-discount-card__active">
-                        <strong>Діє знижка −@activeDiscount.Percent%</strong>
-                        <span>До @activeDiscount.EndDate.ToLocalTime().ToString("dd MMMM yyyy, HH:mm")</span>
-                        <span>Ціна зі знижкою: @Math.Round(Model.Price * (100 - activeDiscount.Percent) / 100m, 2).ToString("N2") ₴</span>
-                    </div>
-                    <form asp-controller="Discounts" asp-action="Remove" method="post" class="product-discount-card__remove">
-                        <input type="hidden" name="productId" value="@Model.Id" />
-                        <button type="submit" class="btn btn-outline-secondary btn-sm w-100">Скасувати знижку</button>
-                    </form>
-                }
-                else
-                {
-                    <p class="text-muted small">Знижка зараз не активна.</p>
-                }
-
-                <form asp-controller="Discounts" asp-action="Set" method="post" class="product-discount-card__form">
-                    <input type="hidden" name="productId" value="@Model.Id" />
-                    <label class="form-label">Відсоток знижки</label>
-                    <input type="number" name="percent" min="1" max="99" step="1" class="form-control" required value="@(activeDiscount?.Percent ?? 10)" />
-                    <label class="form-label mt-2">Початок</label>
-                    <input type="datetime-local" name="startDate" class="form-control" required value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
-                    <label class="form-label mt-2">Закінчення</label>
-                    <input type="datetime-local" name="endDate" class="form-control" required value="@DateTime.Now.AddDays(7).ToString("yyyy-MM-ddTHH:mm")" />
-                    <button type="submit" class="btn btn-primary btn-sm mt-3 w-100">@(activeDiscount is not null ? "Оновити знижку" : "Встановити знижку")</button>
-                </form>
-            </div>
-        </aside>
     </div>
 </div>
 

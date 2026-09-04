@@ -12,7 +12,6 @@
 @section Styles {
     <link rel="stylesheet" href="~/css/products.css" asp-append-version="true" />
 }
-
 <div class="products-page">
     <header class="products-heading">
         <div>
@@ -124,7 +123,39 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="fw-semibold">@item.Price.ToString("N2") ₴</td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    @if (item.DiscountPercent > 0)
+                                    {
+                                        var discountedPrice = item.Price * (1 - (item.DiscountPercent / 100m));
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="fw-semibold text-danger">@discountedPrice.ToString("N2") ₴</span>
+                                            <span class="text-muted text-decoration-line-through small">@item.Price.ToString("N2") ₴</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="fw-semibold">@item.Price.ToString("N2") ₴</span>
+                                    }
+
+                                    @if (item.DiscountPercent > 0)
+                                    {
+                                        <div class="d-flex align-items-center gap-1 mt-1">
+                                            <span class="badge bg-warning text-dark small">
+                                                -@item.DiscountPercent%
+                                            </span>
+
+                                            <!-- Кнопка-хрестик для швидкого видалення знижки -->
+                                            <form asp-controller="Discounts" asp-action="Remove" method="post" class="d-inline m-0 p-0" title="Видалити знижку">
+                                                <input type="hidden" name="productId" value="@item.Id" />
+                                                <button type="submit" class="btn btn-link btn-sm text-danger p-0 text-decoration-none fw-bold" style="font-size: 14px; line-height: 1;">
+                                                    &times;
+                                                </button>
+                                            </form>
+                                        </div>
+                                    }
+                                </div>
+                            </td>
                             <td>
                                 <span class="fw-semibold">@item.Quantity</span>
                                 <span class="text-secondary small">шт.</span>
@@ -137,9 +168,19 @@
                                 }
                             </td>
                             <td>
-                                <div class="product-actions">
+                                <div class="product-actions justify-content-end align-items-center gap-2">
                                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Переглянути</a>
                                     <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Редагувати</a>
+
+                                    <!-- Кнопка, що відкриває модальне вікно знижки -->
+                                    <button type="button" class="btn btn-sm btn-outline-warning text-dark"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#discountModal"
+                                            data-product-id="@item.Id"
+                                            title="Встановити знижку">
+                                        Знижка
+                                    </button>
+
                                     <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Видалити</a>
                                 </div>
                             </td>
@@ -150,3 +191,55 @@
         </div>
     }
 </div>
+
+<!-- Модальне вікно для налаштування знижки -->
+<div class="modal fade" id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-controller="Discounts" asp-action="Set" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="discountModalLabel">Керування знижкою</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрити"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="modalProductId" name="productId" />
+
+                    <div class="mb-3">
+                        <label for="modalPercent" class="form-label">Відсоток знижки (%)</label>
+                        <input type="number" id="modalPercent" name="percent" min="1" max="99" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="modalStartDate" class="form-label">Дата початку</label>
+                        <input type="date" id="modalStartDate" name="startDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="modalEndDate" class="form-label">Дата закінчення</label>
+                        <input type="date" id="modalEndDate" name="endDate" class="form-control" value="@DateTime.Today.AddDays(7).ToString("yyyy-MM-dd")" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
+                    <button type="submit" class="btn btn-primary">Зберегти знижку</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const discountModal = document.getElementById('discountModal');
+        if (discountModal) {
+            discountModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const productId = button.getAttribute('data-product-id');
+                const inputProductId = discountModal.querySelector('#modalProductId');
+                if (inputProductId) {
+                    inputProductId.value = productId;
+                }
+            });
+        }
+    </script>
+}

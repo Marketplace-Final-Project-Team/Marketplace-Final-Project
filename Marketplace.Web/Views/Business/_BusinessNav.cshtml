@@ -1,4 +1,8 @@
 @model Guid
+@using System.Security.Claims
+@using Marketplace.BLL.Interfaces
+@using Marketplace.Domain.Enums
+@inject IBusinessAccessService BusinessAccessService
 
 @{
     var current = ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty;
@@ -6,6 +10,12 @@
     string ActiveClass(string action) => string.Equals(current, action, StringComparison.OrdinalIgnoreCase)
         ? "is-active"
         : string.Empty;
+
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var currentRole = !string.IsNullOrEmpty(userId)
+        ? await BusinessAccessService.GetUserRoleAsync(Model, userId)
+        : null;
+    var canManageSettings = currentRole == BusinessMemberRole.Owner;
 }
 
 <nav class="business-nav" aria-label="Розділи панелі магазину">
@@ -16,5 +26,8 @@
     <a class="@ActiveClass("PromoCodes")" asp-action="PromoCodes" asp-route-businessId="@Model">Промокоди</a>
     <a class="@ActiveClass("Integrations")" asp-action="Integrations" asp-route-businessId="@Model">Додатки</a>
     <a class="@ActiveClass("Team")" asp-action="Team" asp-route-businessId="@Model">Команда</a>
-    <a class="@ActiveClass("Settings")" asp-action="Settings" asp-route-businessId="@Model">Налаштування</a>
+    @if (canManageSettings)
+    {
+        <a class="@ActiveClass("Settings")" asp-action="Settings" asp-route-businessId="@Model">Налаштування</a>
+    }
 </nav>

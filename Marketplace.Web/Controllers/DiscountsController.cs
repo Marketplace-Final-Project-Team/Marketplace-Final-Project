@@ -57,7 +57,7 @@ namespace Marketplace.Web.Controllers
                 TempData["Error"] = ex.Message;
             }
 
-            return RedirectToAction("Edit", "Products", new { id = productId });
+            return RedirectToAction("Index", "Products");
         }
 
         // POST: /Discounts/Remove
@@ -77,19 +77,19 @@ namespace Marketplace.Web.Controllers
                 actorUserId: CurrentUserId, relatedEntityId: productId);
             TempData["Success"] = "Знижку скасовано.";
 
-            return RedirectToAction("Edit", "Products", new { id = productId });
+            return RedirectToAction("Index", "Products");
         }
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetBusinessDiscount(Guid businessId, decimal discountPercent, DateTime discountStartDate, DateTime discountEndDate)
         {
-            
             var business = await _businessService.GetByIdAsync(businessId);
             if (business == null) return NotFound();
 
             var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.ProductCrud);
             if (!hasAccess) return Forbid();
+
             var result = await _discountService.SetBusinessDiscount(businessId, discountPercent, discountStartDate, discountEndDate);
             if (result.Succeeded)
             {
@@ -103,20 +103,19 @@ namespace Marketplace.Web.Controllers
                 TempData["Error"] = result.Message;
             }
 
-            return RedirectToAction("Index","Business");
-
+            return RedirectToAction("Index", "Business");
         }
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveBusinessDiscount(Guid businessId)
         {
-            
             var business = await _businessService.GetByIdAsync(businessId);
             if (business == null) return NotFound();
 
             var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.ProductCrud);
             if (!hasAccess) return Forbid();
+
             var result = await _discountService.RemoveBusinessDiscount(businessId);
             if (result.Succeeded)
             {
@@ -131,17 +130,17 @@ namespace Marketplace.Web.Controllers
             }
 
             return RedirectToAction("Index", "Business");
-
         }
-                                                               
+
         [HttpGet]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> GetBusinessDiscount(Guid businessId)
         {
             var business = await _businessService.GetByIdAsync(businessId);
             if (business == null) return NotFound();
+
             var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.Statistics);
             if (!hasAccess) return Forbid();
+
             var discount = await _discountService.GetBusinessDiscount(businessId);
             return Json(discount);
         }

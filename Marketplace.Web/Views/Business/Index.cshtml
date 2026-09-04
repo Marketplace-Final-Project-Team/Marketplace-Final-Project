@@ -1,18 +1,38 @@
 @model Marketplace.Web.Models.Businesses.BusinessDashboardViewModel
 
 @{
-    ViewData["Title"] = "Панель продавця";
+    var ownerAccess = Model.Businesses.Any(b => b.CurrentUserRole == Marketplace.Domain.Enums.BusinessMemberRole.Owner);
+    var adminAccess = Model.Businesses.Any(b => b.CurrentUserRole == Marketplace.Domain.Enums.BusinessMemberRole.Admin);
+    var productManagerAccess = Model.Businesses.Any(b => b.CurrentUserRole == Marketplace.Domain.Enums.BusinessMemberRole.ProductManager);
+    var analystAccess = Model.Businesses.Any(b => b.CurrentUserRole == Marketplace.Domain.Enums.BusinessMemberRole.BusinessAnalyst);
+
+    var pageTitle = ownerAccess ? "Панель продавця"
+        : adminAccess ? "Панель адміністратора"
+        : productManagerAccess ? "Панель менеджера товарів"
+        : analystAccess ? "Панель аналітика"
+        : "Панель продавця";
+
+    ViewData["Title"] = pageTitle;
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/css/business.css" asp-append-version="true" />
+    <style>
+        .seller-store__role--staff {
+            background: #e6f4ff;
+            color: #0958d9;
+            padding: 2px 10px;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+    </style>
 }
 
 <div class="seller-dashboard">
     <header class="seller-dashboard__heading">
         <div>
-            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Панель продавця</div>
-            <h1>Панель продавця</h1>
+            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> @pageTitle</div>
+            <h1>@pageTitle</h1>
             <p>Контролюйте асортимент, замовлення та стан магазину в одному робочому просторі.</p>
         </div>
         @if (Model.CanCreateBusiness)
@@ -104,7 +124,20 @@
                                     <span class="seller-store__logo seller-store__logo--fallback" aria-hidden="true">@storeInitial</span>
                                 }
                                 <div>
-                                    <span class="seller-store__role">@(business.IsOwner ? "Ваш магазин" : "Командний доступ")</span>
+                                    @{
+                                        var roleLabel = business.CurrentUserRole switch
+                                        {
+                                            Marketplace.Domain.Enums.BusinessMemberRole.Owner => "Ваш магазин",
+                                            Marketplace.Domain.Enums.BusinessMemberRole.Admin => "Адміністратор магазину",
+                                            Marketplace.Domain.Enums.BusinessMemberRole.ProductManager => "Менеджер товарів",
+                                            Marketplace.Domain.Enums.BusinessMemberRole.BusinessAnalyst => "Бізнес-аналітик",
+                                            _ => "Командний доступ"
+                                        };
+                                        var roleClass = business.CurrentUserRole == Marketplace.Domain.Enums.BusinessMemberRole.Owner
+                                            ? "seller-store__role"
+                                            : "seller-store__role seller-store__role--staff";
+                                    }
+                                    <span class="@roleClass">@roleLabel</span>
                                     <h2>@business.StoreName</h2>
                                     <p>@business.Description</p>
                                 </div>
@@ -219,9 +252,12 @@
                                     <a asp-action="Team" asp-route-businessId="@business.Id">
                                         <span aria-hidden="true">☺</span><div><strong>Команда</strong><small>Учасники та доступи</small></div><b aria-hidden="true">→</b>
                                     </a>
-                                    <a asp-action="Settings" asp-route-businessId="@business.Id">
-                                        <span aria-hidden="true">⚙</span><div><strong>Налаштування</strong><small>Дані компанії та платежі</small></div><b aria-hidden="true">→</b>
-                                    </a>
+                                    @if (business.CurrentUserRole == Marketplace.Domain.Enums.BusinessMemberRole.Owner)
+                                    {
+                                        <a asp-action="Settings" asp-route-businessId="@business.Id">
+                                            <span aria-hidden="true">⚙</span><div><strong>Налаштування</strong><small>Дані компанії та платежі</small></div><b aria-hidden="true">→</b>
+                                        </a>
+                                    }
                                     <a asp-controller="Catalog" asp-action="Index">
                                         <span aria-hidden="true">◎</span><div><strong>Вітрина</strong><small>Переглянути каталог покупця</small></div><b aria-hidden="true">→</b>
                                     </a>
