@@ -35,15 +35,37 @@ namespace Marketplace.BLL.Services
 
             return cartItems.Select(ci =>
             {
-                var activeDiscount = ci.Product.Discounts?
-                    .FirstOrDefault(d => d.StartDate <= now && d.EndDate >= now);
+                var productDiscount = ci.Product.Discounts?
+                .FirstOrDefault(d => d.StartDate <= now && d.EndDate >= now && d.DiscountType == DiscountType.Product);
 
-                decimal finalPrice = ci.Product.Price;
 
-                if (activeDiscount != null)
+                var businessDiscount = ci.Product.Business?.Discounts?
+                    .FirstOrDefault(d => d.BusinessId == ci.Product.BusinessId && d.DiscountType == DiscountType.Business && d.StartDate <= now && d.EndDate >= now);
+
+
+                var categoryDiscount = ci.Product.Category?.Discounts?
+                    .FirstOrDefault(d => d.BusinessId == ci.Product.BusinessId && d.CategoryId == ci.Product.CategoryId && d.DiscountType == DiscountType.Category && d.StartDate <= now && d.EndDate >= now);
+
+
+                decimal discountPercent = 0;
+
+                if (productDiscount != null)
                 {
-                    finalPrice = ci.Product.Price - (ci.Product.Price * activeDiscount.Percent / 100m);
+                    discountPercent = productDiscount.Percent;
                 }
+                else if (categoryDiscount != null)
+                {
+                    discountPercent = categoryDiscount.Percent;
+
+                }
+                else if (businessDiscount != null)
+                {
+                    discountPercent = businessDiscount.Percent;
+                }
+
+                decimal finalPrice = discountPercent > 0
+                    ? ci.Product.Price * (1 - discountPercent / 100m)
+                    : ci.Product.Price;
 
                 return new CartItemDto
                 {

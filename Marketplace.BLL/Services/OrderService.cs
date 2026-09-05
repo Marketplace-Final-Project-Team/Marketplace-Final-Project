@@ -86,18 +86,36 @@ namespace Marketplace.BLL.Services
                 }
 
                 var business = await _businessRepository.FirstOrDefaultAsync(b => b.Id == cartItem.Product.BusinessId);
-
+                var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == cartItem.Product.CategoryId);
                 var now = DateTime.UtcNow;
                 var productDiscount = cartItem.Product.Discounts?
-                    .FirstOrDefault(d => d.StartDate <= now && d.EndDate >= now);
+                    .FirstOrDefault(d => d.ProductId == cartItem.Product.Id && d.DiscountType == DiscountType.Product && d.StartDate <= now && d.EndDate >= now);
 
                 var businessDiscount = business?.Discounts?
-                    .FirstOrDefault(d => d.StartDate <= now && d.EndDate >= now);
+                    .FirstOrDefault(d =>  d.BusinessId == cartItem.Product.BusinessId && d.DiscountType == DiscountType.Business && d.StartDate <= now && d.EndDate >= now);
+
+                var categoryDiscount = category?.Discounts?
+                    .FirstOrDefault(d => d.DiscountType == DiscountType.Category && d.StartDate <= now && d.BusinessId == cartItem.Product.BusinessId && d.CategoryId == cartItem.Product.CategoryId && d.EndDate >= now);
 
                 // A business-wide sale is dominant over the product's own sale — it replaces
                 // it rather than stacking with it. A matching promo code still stacks on top
                 // of whichever one of those applies.
-                var saleDiscountPercent = businessDiscount?.Percent ?? productDiscount?.Percent ?? 0;
+                decimal? bestDiscount = 0;
+                if (productDiscount != null)
+                {
+                    bestDiscount = productDiscount.Percent;
+                }else if (categoryDiscount != null)
+                {
+                    bestDiscount = categoryDiscount.Percent;
+
+                } else if (businessDiscount != null)
+                {
+                    bestDiscount = businessDiscount.Percent;
+                }
+
+
+
+                var saleDiscountPercent = bestDiscount ?? 0;
                 var promoPercent = promoCode is not null && promoCode.BusinessId == cartItem.Product.BusinessId
                     ? promoCode.Percent
                     : 0;

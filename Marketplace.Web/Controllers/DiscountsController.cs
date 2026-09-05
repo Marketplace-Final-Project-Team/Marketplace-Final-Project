@@ -17,18 +17,21 @@ namespace Marketplace.Web.Controllers
         private readonly IBusinessService _businessService;
         private readonly IActivityLogService _activityLog;
 
+        private readonly ICategoryService _categoryService;
+
         public DiscountsController(
             IDiscountService discountService,
             IProductService productService,
             IBusinessAccessService businessAccessService,
             IBusinessService businessService,
-            IActivityLogService activityLog)
+            IActivityLogService activityLog,ICategoryService categoryService)
         {
             _discountService = discountService;
             _productService = productService;
             _businessAccessService = businessAccessService;
             _businessService = businessService;
             _activityLog = activityLog;
+            _categoryService = categoryService;
         }
 
         private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
@@ -143,6 +146,76 @@ namespace Marketplace.Web.Controllers
             var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.Statistics);
             if (!hasAccess) return Forbid();
             var discount = await _discountService.GetBusinessDiscount(businessId);
+            return Json(discount);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetCategoryDiscount(Guid categoryId, Guid businessId, decimal discountPercent, DateTime discountStartDate, DateTime discountEndDate)
+        {
+            Console.WriteLine($"CategoryId: {categoryId}");
+            
+            var category = await _categoryService.GetByIdAsync(categoryId);
+            Console.WriteLine($"CategoryId: {categoryId}");
+            Console.WriteLine($"Category: {category?.Id} - {category?.Name}");
+            if (category == null) return NotFound();
+
+            var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.ProductCrud);
+            if (!hasAccess) return Forbid();
+            var result = await _discountService.SetCategoryDiscount(categoryId, businessId, discountPercent, discountStartDate, discountEndDate);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "CategoryDiscountSet",
+                    $"Адміністратор встановив знижку {discountPercent}% на категорію «{category.Name}».",
+                    actorUserId: CurrentUserId);
+                TempData["Success"] = result.Message;
+            }
+            else
+            {
+                TempData["Error"] = result.Message;
+            }
+
+            return RedirectToAction("Index", "Business");
+
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveCategoryDiscount(Guid categoryId, Guid businessId)
+        {
+
+            var category = await _categoryService.GetByIdAsync(categoryId);
+            if (category == null) return NotFound();
+
+            var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.ProductCrud);
+            if (!hasAccess) return Forbid();
+            var result = await _discountService.RemoveCategoryDiscount(categoryId, businessId);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "CategoryDiscountRemoved",
+                    $"Адміністратор скасував знижку на категорію «{category.Name}».",
+                    actorUserId: CurrentUserId);
+                TempData["Success"] = result.Message;
+            }
+            else
+            {
+                TempData["Error"] = result.Message;
+            }
+
+            return RedirectToAction("Index", "Business");
+
+        }
+
+        [HttpGet]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GetCategoryDiscount(Guid categoryId, Guid businessId)
+        {
+            var category = await _categoryService.GetByIdAsync(categoryId);
+            if (category == null) return NotFound();
+            var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.Statistics);
+            if (!hasAccess) return Forbid();
+            var discount = await _discountService.GetCategoryDiscount(categoryId, businessId);
             return Json(discount);
         }
     }
