@@ -377,16 +377,14 @@
 }
 
 /* Google Translate injects an automatic top banner as an iframe appended
-   directly to <body> (its class name is internal/obfuscated and changes across
-   Google's releases, so it can't be targeted by class) plus a `top` offset on
-   <body> itself to make room for it; both are neutralized here so the header
-   doesn't visibly jump when a translation is active. The widget's own language
-   dropdown lives inside #google_translate_element, not as a body child, so this
-   doesn't affect it. */
-body > iframe.skiptranslate {
-    display: none !important;
-}
-
+   directly to <body>, alongside a `top` offset on <body> itself to make room
+   for it. The offset is neutralized so the header doesn't visibly jump when a
+   translation is active. The banner iframe itself is intentionally NOT hidden
+   here anymore: Google renders more than one `iframe.skiptranslate` as a body
+   child, and the SIMPLE widget's own language-picker popup is one of them -
+   blanket-hiding by that class also hid the popup, breaking language
+   selection entirely. Trade-off accepted: the banner briefly shows while a
+   translation is active, same as on most other sites using this widget. */
 body {
     top: 0 !important;
 }
