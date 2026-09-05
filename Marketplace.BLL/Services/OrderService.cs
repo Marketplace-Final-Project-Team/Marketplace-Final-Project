@@ -24,10 +24,19 @@ namespace Marketplace.BLL.Services
         private readonly IPromoCodeService _promoCodeService;
         private readonly IMarketplaceBalanceService _marketplaceBalanceService;
         public readonly IOptions<LiqPayOptions> _options;
-
         public readonly IGenericRepository<Business> _businessRepository;
 
-        public OrderService(IGenericRepository<Order> orerRepository, ICartItemRepository cartItemRepository, IGenericRepository<Address> addressRepository, IGenericRepository<Product> productRepository, AppDbContext context, IPaymentService paymentService, IPromoCodeService promoCodeService, IMarketplaceBalanceService marketplaceBalanceService, IOptions<LiqPayOptions> options,IGenericRepository<Business> businessRepository)
+        public OrderService(
+            IGenericRepository<Order> orerRepository,
+            ICartItemRepository cartItemRepository,
+            IGenericRepository<Address> addressRepository,
+            IGenericRepository<Product> productRepository,
+            AppDbContext context,
+            IPaymentService paymentService,
+            IPromoCodeService promoCodeService,
+            IMarketplaceBalanceService marketplaceBalanceService,
+            IOptions<LiqPayOptions> options,
+            IGenericRepository<Business> businessRepository)
         {
             _orerRepository = orerRepository;
             _cartItemRepository = cartItemRepository;
@@ -43,287 +52,282 @@ namespace Marketplace.BLL.Services
 
         public async Task<OrderResultDto> CreateOrder(string userId, OrderCreateDto dto)
         {
-            var cartItems = await _cartItemRepository.GetCartItemsByUserIdAsync(userId);
-            
-            if (cartItems == null || !cartItems.Any())
+     
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                return new OrderResultDto { Succeeded = false, Message = "Кошик пустий." };
-            }
-            
-            
+                var cartItems = await _cartItemRepository.GetCartItemsByUserIdAsync(userId);
 
-            var address = await _addressRepository.FirstOrDefaultAsync(a => a.Id == dto.AddressId && a.UserId == userId);
-
-            if (address == null)
-            {
-                return new OrderResultDto { Succeeded = false, Message = "Адреса не знайдена." };
-            }
-
-            var orderItems = new List<OrderItem>();
-
-            // A promo code belongs to one business — it only discounts that business's
-            // line items in the (possibly multi-seller) cart, never the whole order.
-            var promoCode = !string.IsNullOrWhiteSpace(dto.PromoCode)
-                ? await _promoCodeService.FindActiveAsync(dto.PromoCode)
-                : null;
-
-            foreach (var cartItem in cartItems)
-            {
-                
-                if (cartItem.Product.Status != ProductStatus.Active)
+                if (cartItems == null || !cartItems.Any())
                 {
-                    return new OrderResultDto
+                    return new OrderResultDto { Succeeded = false, Message = "Кошик пустий." };
+                }
+
+                var address = await _addressRepository.FirstOrDefaultAsync(a => a.Id == dto.AddressId && a.UserId == userId);
+                if (address == null)
+                {
+                    return new OrderResultDto { Succeeded = false, Message = "Адреса не знайдена." };
+                }
+
+                var orderItems = new List<OrderItem>();
+                var promoCode = !string.IsNullOrWhiteSpace(dto.PromoCode)
+                    ? await _promoCodeService.FindActiveAsync(dto.PromoCode)
+                    : null;
+
+                foreach (var cartItem in cartItems)
+                {
+                    if (cartItem.Product.Status != ProductStatus.Active)
                     {
-                        Succeeded = false,
-                        Message = $"Товар «{cartItem.Product.Name}» більше недоступний."
+                        return new OrderResultDto
+                        {
+                            Succeeded = false,
+                            Message = $"Товар «{cartItem.Product.Name}» більше недоступний."
+                        };
+                    }
+
+                    if (cartItem.Product.Quantity < cartItem.Quantity)
+                    {
+                        return new OrderResultDto { Succeeded = false, Message = $"Недостатньо товару «{cartItem.Product.Name}» на складі." };
+                    }
+
+                    var business = await _businessRepository.FirstOrDefaultAsync(b => b.Id == cartItem.Product.BusinessId);
+
+                    var now = DateTime.UtcNow;
+                    var productDiscount = cartItem.Product.Discounts?
+                        .FirstOrDefault(d => d.StartDate <= now && d.EndDate >= now);
+
+                    var businessDiscount = business?.Discounts?
+                        .FirstOrDefault(d => d.StartDate <= now && d.EndDate >= now);
+
+                    var saleDiscountPercent = businessDiscount?.Percent ?? productDiscount?.Percent ?? 0;
+                    var promoPercent = promoCode is not null && promoCode.BusinessId == cartItem.Product.BusinessId
+                        ? promoCode.Percent
+                        : 0;
+
+                    var effectivePercent = Math.Min(saleDiscountPercent + promoPercent, 100);
+
+             
+                    var unitPrice = effectivePercent > 0
+                        ? Math.Round(cartItem.Product.Price * (1m - effectivePercent / 100m), 2, MidpointRounding.AwayFromZero)
+                        : Math.Round(cartItem.Product.Price, 2, MidpointRounding.AwayFromZero);
+
+                    var orderItem = new OrderItem
+                    {
+                        ProductId = cartItem.ProductId,
+                        ProductName = cartItem.Product.Name,
+                        UnitPrice = unitPrice,
+                        Quantity = cartItem.Quantity,
+                        IsReturned = false
                     };
+
+                    cartItem.Product.Quantity -= cartItem.Quantity;
+                    _productRepository.Update(cartItem.Product);
+
+                    orderItems.Add(orderItem);
                 }
 
-                if (cartItem.Product.Quantity < cartItem.Quantity)
+                var totalAmount = orderItems.Sum(oi => Math.Round(oi.UnitPrice * oi.Quantity, 2, MidpointRounding.AwayFromZero));
 
+                var order = new Order
                 {
-                    return new OrderResultDto { Succeeded = false, Message = "Недостатньо товару на складі." };
-                }
-
-                var business = await _businessRepository.FirstOrDefaultAsync(b => b.Id == cartItem.Product.BusinessId);
-
-                var now = DateTime.UtcNow;
-                var productDiscount = cartItem.Product.Discounts?
-                    .FirstOrDefault(d => d.StartDate <= now && d.EndDate >= now);
-
-                var businessDiscount = business?.Discounts?
-                    .FirstOrDefault(d => d.StartDate <= now && d.EndDate >= now);
-
-                // A business-wide sale is dominant over the product's own sale — it replaces
-                // it rather than stacking with it. A matching promo code still stacks on top
-                // of whichever one of those applies.
-                var saleDiscountPercent = businessDiscount?.Percent ?? productDiscount?.Percent ?? 0;
-                var promoPercent = promoCode is not null && promoCode.BusinessId == cartItem.Product.BusinessId
-                    ? promoCode.Percent
-                    : 0;
-                var effectivePercent = saleDiscountPercent + promoPercent;
-                if (effectivePercent > 100)
-                {
-                    effectivePercent = 100;
-                }
-
-                var unitPrice = effectivePercent > 0
-                    ? cartItem.Product.Price * (1 - effectivePercent / 100m)
-                    : cartItem.Product.Price;
-
-                var orderItem = new OrderItem
-                {
-                    ProductId = cartItem.ProductId,
-                    ProductName = cartItem.Product.Name,
-                    UnitPrice = unitPrice,
-                    Quantity = cartItem.Quantity
+                    UserId = userId,
+                    Items = orderItems,
+                    TotalAmount = totalAmount,
+                    CreatedAt = DateTime.UtcNow,
+                    ShippingCountry = address.Country,
+                    ShippingCity = address.City,
+                    ShippingStreet = address.Street,
+                    Status = OrderStatus.Pending
                 };
 
-                cartItem.Product.Quantity -= cartItem.Quantity;
-                _productRepository.Update(cartItem.Product);
+                await _orerRepository.AddAsync(order);
+                _cartItemRepository.RemoveRange(cartItems);
 
-                orderItems.Add(orderItem);
+                await _context.SaveChangesAsync();
+
+ 
+                var paymentData = await _paymentService.CreatePaymentAsync(
+                    orderId: order.Id.ToString(),
+                    amount: order.TotalAmount,
+                    description: $"Оплата замовлення #{order.Id}",
+                    successUrl: dto.SuccessUrl,
+                    cancelUrl: dto.CancelUrl
+                );
+
+                await transaction.CommitAsync();
+
+                return new OrderResultDto
+                {
+                    Succeeded = true,
+                    Message = string.Empty,
+                    OrderId = order.Id.ToString(),
+                    PaymentData = paymentData
+                };
             }
-
-            var order = new Order
+            catch (Exception)
             {
-                UserId = userId,
-                Items = orderItems,
-                TotalAmount = orderItems.Sum(oi => oi.UnitPrice * oi.Quantity),
-                CreatedAt = DateTime.UtcNow,
-                ShippingCountry = address.Country,
-                ShippingCity = address.City,
-                ShippingStreet = address.Street,
-                Status = OrderStatus.Pending
-            };
-
-            await _orerRepository.AddAsync(order);
-            _cartItemRepository.RemoveRange(cartItems);
-
-            await _context.SaveChangesAsync();
-
-            var paymentData = await _paymentService.CreatePaymentAsync(
-            orderId: order.Id.ToString(),
-            amount: order.TotalAmount,
-            description: $"Оплата замовлення #{order.Id}",
-            successUrl: dto.SuccessUrl,
-            cancelUrl: dto.CancelUrl
-
-            );
-
-            return new OrderResultDto
-            {
-                Succeeded = true,
-                Message = string.Empty,
-                OrderId = order.Id.ToString(),
-                PaymentData = paymentData
-            };
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
-
 
         public async Task<ServiceResult> ChangeOrderStatus(Guid orderId, OrderStatus status)
         {
-            var order = await _context.Orders
-                .Include(o => o.Items)
-                .ThenInclude(i => i.Product)
-                .ThenInclude(p => p.Business)
-                .FirstOrDefaultAsync(o => o.Id == orderId);
-
-
-
-            if (order == null)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                return new ServiceResult { Succeeded = false, Message = "Замовлення не знайдено." };
-            }
+                var order = await _context.Orders
+                    .Include(o => o.Items)
+                        .ThenInclude(i => i.Product)
+                            .ThenInclude(p => p.Business)
+                    .FirstOrDefaultAsync(o => o.Id == orderId);
 
-            // Commission/balance is credited exactly once, the moment an order first becomes
-            // Confirmed, and reversed exactly once when a credited order is cancelled (see
-            // below). Without restricting which status can follow which, a seller could
-            // toggle Confirmed -> Pending -> Confirmed to re-trigger that credit indefinitely,
-            // or skip Pending -> Shipped/Delivered to dodge it entirely and then have Cancel
-            // claw back money that was never actually paid out.
-            if (status != order.Status && !OrderStatusTransitions.GetAllowedNext(order.Status).Contains(status))
-            {
-                return new ServiceResult { Succeeded = false, Message = $"Неможливо змінити статус замовлення з «{order.Status}» на «{status}»." };
-            }
-
-            if (status == OrderStatus.Confirmed && order.Status != OrderStatus.Confirmed) {
-                // Commission is captured per line item at the moment of confirmation (see
-                // OrderItem.CommissionAmount) so a later change to a business's commission
-                // rate can never retroactively change what a past order already settled.
-                var marketplaceBalance = await _marketplaceBalanceService.GetOrCreateTrackedAsync();
-
-                foreach (var item in order.Items) {
-                    if (item.Product.Business != null)
-                    {
-                        var business = item.Product.Business;
-                        if (business == null)
-                        {
-                            return new ServiceResult { Succeeded = false, Message = "Бізнес не знайдено." };
-                        }
-                        var amount = item.UnitPrice * item.Quantity;
-                        var commission = Math.Round(amount * business.CommissionPercent / 100m, 2);
-                        var netAmount = amount - commission;
-
-                        item.CommissionAmount = commission;
-                        business.Balance += netAmount;
-                        marketplaceBalance.Balance += commission;
-                    }
-                }
-            }
-
-            // Stock was decremented when the order was created (see CreateOrder) — cancelling
-            // must give it back, or the item stays under-counted in inventory forever.
-            if (status == OrderStatus.Canceled && order.Status != OrderStatus.Canceled)
-            {
-                foreach (var item in order.Items)
+                if (order == null)
                 {
-                    if (item.Product != null)
-                    {
-                        item.Product.Quantity += item.Quantity;
-                    }
+                    return new ServiceResult { Succeeded = false, Message = "Замовлення не знайдено." };
                 }
 
-                // Balance is credited exactly once, the moment an order first becomes Confirmed
-                // (see above). If the order already passed through that state — Confirmed,
-                // Shipped, or Delivered — cancelling it now must reverse that credit, the same
-                // way a refund claws back a seller's earnings on a real marketplace.
-                if (order.Status is OrderStatus.Confirmed or OrderStatus.Shipped or OrderStatus.Delivered)
+                if (status != order.Status && !OrderStatusTransitions.GetAllowedNext(order.Status).Contains(status))
+                {
+                    return new ServiceResult { Succeeded = false, Message = $"Неможливо змінити статус замовлення з «{order.Status}» на «{status}»." };
+                }
+
+            
+                if (status == OrderStatus.Confirmed && order.Status == OrderStatus.Pending)
                 {
                     var marketplaceBalance = await _marketplaceBalanceService.GetOrCreateTrackedAsync();
 
                     foreach (var item in order.Items)
                     {
-                        if (item.Product?.Business != null)
+                        var business = item.Product?.Business;
+                        if (business != null)
                         {
-                            var amount = item.UnitPrice * item.Quantity;
-                            var netAmount = amount - item.CommissionAmount;
+                            var amount = Math.Round(item.UnitPrice * item.Quantity, 2, MidpointRounding.AwayFromZero);
+                            var commission = Math.Round(amount * business.CommissionPercent / 100m, 2, MidpointRounding.AwayFromZero);
+                            var netAmount = amount - commission;
 
-                            item.Product.Business.Balance -= netAmount;
-                            marketplaceBalance.Balance -= item.CommissionAmount;
+                            item.CommissionAmount = commission;
+                            business.Balance += netAmount;
+                            marketplaceBalance.Balance += commission;
                         }
                     }
                 }
+
+
+                if (status == OrderStatus.Canceled && order.Status != OrderStatus.Canceled)
+                {
+                    foreach (var item in order.Items)
+                    {
+                        if (item.Product != null)
+                        {
+                            item.Product.Quantity += item.Quantity;
+                        }
+                    }
+
+                
+                    if (order.Status is OrderStatus.Confirmed or OrderStatus.Shipped or OrderStatus.Delivered)
+                    {
+                        var marketplaceBalance = await _marketplaceBalanceService.GetOrCreateTrackedAsync();
+
+                        foreach (var item in order.Items)
+                        {
+                            if (item.Product?.Business != null)
+                            {
+                                var amount = Math.Round(item.UnitPrice * item.Quantity, 2, MidpointRounding.AwayFromZero);
+                                var netAmount = amount - item.CommissionAmount;
+
+                                item.Product.Business.Balance -= netAmount;
+                                marketplaceBalance.Balance -= item.CommissionAmount;
+                            }
+                        }
+                    }
+                }
+
+                order.Status = status;
+                _orerRepository.Update(order);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return new ServiceResult { Succeeded = true, Message = string.Empty };
             }
-
-            order.Status = status;
-            _orerRepository.Update(order);
-            await _context.SaveChangesAsync();
-
-            return new ServiceResult { Succeeded = true, Message = string.Empty };
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
-        // Refunds a single line item — used when a seller approves a return for one product
-        // in an order that may contain items from other sellers too. Mirrors the reversal
-        // math in ChangeOrderStatus's Canceled branch, but scoped to one OrderItem instead of
-        // the whole order, so the other sellers' balances/stock are never touched.
         public async Task<ServiceResult> RefundOrderItemAsync(Guid orderItemId)
         {
-            var item = await _context.OrderItems
-                .Include(i => i.Order)
-                .Include(i => i.Product)
-                    .ThenInclude(p => p.Business)
-                .FirstOrDefaultAsync(i => i.Id == orderItemId);
-
-            if (item is null)
+ 
+            try
             {
-                return new ServiceResult { Succeeded = false, Message = "Позицію замовлення не знайдено." };
-            }
+                var item = await _context.OrderItems
+                    .Include(i => i.Order)
+                    .Include(i => i.Product)
+                        .ThenInclude(p => p.Business)
+                    .FirstOrDefaultAsync(i => i.Id == orderItemId);
 
-            if (item.IsReturned)
-            {
-                return new ServiceResult { Succeeded = false, Message = "За цей товар уже оформлено повернення." };
-            }
-
-            if (item.Order.Status is not (OrderStatus.Confirmed or OrderStatus.Shipped or OrderStatus.Delivered))
-            {
-                return new ServiceResult { Succeeded = false, Message = "Повернення можливе лише для підтвердженого або доставленого замовлення." };
-            }
-
-            if (item.Product != null)
-            {
-                item.Product.Quantity += item.Quantity;
-
-                if (item.Product.Business != null)
+                if (item is null)
                 {
-                    var amount = item.UnitPrice * item.Quantity;
-                    var netAmount = amount - item.CommissionAmount;
-                    var marketplaceBalance = await _marketplaceBalanceService.GetOrCreateTrackedAsync();
-
-                    item.Product.Business.Balance -= netAmount;
-                    marketplaceBalance.Balance -= item.CommissionAmount;
+                    return new ServiceResult { Succeeded = false, Message = "Позицію замовлення не знайдено." };
                 }
+
+                if (item.IsReturned)
+                {
+                    return new ServiceResult { Succeeded = false, Message = "За цей товар уже оформлено повернення." };
+                }
+
+                if (item.Order.Status is not (OrderStatus.Confirmed or OrderStatus.Shipped or OrderStatus.Delivered))
+                {
+                    return new ServiceResult { Succeeded = false, Message = "Повернення можливе лише для підтвердженого або доставленого замовлення." };
+                }
+
+                if (item.Product != null)
+                {
+                    item.Product.Quantity += item.Quantity;
+
+                    if (item.Product.Business != null)
+                    {
+                        var amount = Math.Round(item.UnitPrice * item.Quantity, 2, MidpointRounding.AwayFromZero);
+                        var netAmount = amount - item.CommissionAmount;
+                        var marketplaceBalance = await _marketplaceBalanceService.GetOrCreateTrackedAsync();
+
+                        item.Product.Business.Balance -= netAmount;
+                        marketplaceBalance.Balance -= item.CommissionAmount;
+                    }
+                }
+
+                item.IsReturned = true;
+                await _context.SaveChangesAsync();
+        
+                return new ServiceResult { Succeeded = true, Message = string.Empty };
             }
-
-            item.IsReturned = true;
-            await _context.SaveChangesAsync();
-
-            return new ServiceResult { Succeeded = true, Message = string.Empty };
+            catch (Exception)
+            {
+               
+                throw;
+            }
         }
 
-        public async Task<Order?> GetOrderByIdAsync(Guid orderId)
-        {
-            return await _orerRepository.FirstOrDefaultAsync(o => o.Id == orderId);
-        }
-        public async Task<IReadOnlyList<Order>> GetUserOrders(string userId)
-        {
-            return await _context.Orders
+        public async Task<Order?> GetOrderByIdAsync(Guid orderId) =>
+            await _orerRepository.FirstOrDefaultAsync(o => o.Id == orderId);
+
+        public async Task<IReadOnlyList<Order>> GetUserOrders(string userId) =>
+            await _context.Orders
                 .AsNoTracking()
                 .Where(order => order.UserId == userId)
                 .Include(order => order.Items)
                 .OrderByDescending(order => order.CreatedAt)
                 .ToListAsync();
-        }
 
-        public async Task<Order?> GetUserOrder(string userId, Guid orderId)
-        {
-            return await _context.Orders
+        public async Task<Order?> GetUserOrder(string userId, Guid orderId) =>
+            await _context.Orders
                 .AsNoTracking()
                 .Where(order => order.UserId == userId && order.Id == orderId)
                 .Include(order => order.Items)
                 .ThenInclude(item => item.Product)
                 .FirstOrDefaultAsync();
-        }
 
         public async Task<BusinessOrderSummaryDto> GetBusinessOrderSummary(Guid businessId)
         {
@@ -413,7 +417,6 @@ namespace Marketplace.BLL.Services
                 .ThenInclude(item => item.Product)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
 
-  
             if (order == null || !order.Items.Any(item => item.Product != null && item.Product.BusinessId == businessId))
             {
                 return null;

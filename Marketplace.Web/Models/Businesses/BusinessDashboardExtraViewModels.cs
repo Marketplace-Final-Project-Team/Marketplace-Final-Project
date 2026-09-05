@@ -12,6 +12,7 @@ namespace Marketplace.Web.Models.Businesses
         public int TotalOrders { get; set; }
         public decimal AverageOrderValue => TotalOrders == 0 ? 0 : Revenue / TotalOrders;
         public List<BusinessOrderListItemViewModel> RecentSales { get; set; } = new();
+        public List<BusinessDashboardChartPointViewModel> RevenueTrend { get; set; } = new();
     }
 
     public class BusinessPerformanceViewModel
@@ -25,6 +26,8 @@ namespace Marketplace.Web.Models.Businesses
         public double AverageRating { get; set; }
         public int ReviewCount { get; set; }
         public int ProductCount { get; set; }
+        public Dictionary<OrderStatus, int> OrdersByStatus { get; set; } = new();
+        public int[] RatingDistribution { get; set; } = new int[5];
     }
 
     public class BusinessGrowthViewModel

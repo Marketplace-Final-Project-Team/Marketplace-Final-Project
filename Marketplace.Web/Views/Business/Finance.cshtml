@@ -11,6 +11,13 @@
     var currentRole = !string.IsNullOrEmpty(userId)
         ? await BusinessAccessService.GetUserRoleAsync(Model.BusinessId, userId)
         : null;
+
+    var trendJson = System.Text.Json.JsonSerializer.Serialize(Model.RevenueTrend.Select(c => new
+    {
+        date = c.Date.ToString("dd.MM"),
+        revenue = c.Revenue,
+        orders = c.OrderCount
+    }));
 }
 
 @functions {
@@ -49,6 +56,21 @@
         <div class="business-kpi"><span>Замовлень</span><strong>@Model.TotalOrders</strong></div>
         <div class="business-kpi"><span>Середній чек</span><strong>@Model.AverageOrderValue.ToString("N0") ₴</strong></div>
     </div>
+
+    <section class="business-panel business-chart-card">
+        <h2>Динаміка обороту</h2>
+        <p class="business-panel__lead">Виручка та замовлення за останні 30 днів.</p>
+        @if (Model.RevenueTrend.Count == 0)
+        {
+            <p class="business-empty">Даних за останні 30 днів немає.</p>
+        }
+        else
+        {
+            <div class="business-chart-card__canvas-wrap">
+                <canvas id="financeTrendChart" data-chart='@Html.Raw(trendJson)'></canvas>
+            </div>
+        }
+    </section>
 
     <section class="business-panel">
         <h2>Історія продажів</h2>
@@ -126,5 +148,8 @@
 </div>
 
 @section Scripts {
+    <script src="~/lib/chartjs/chart.umd.min.js"></script>
+    <script src="~/js/chart-helpers.js" asp-append-version="true"></script>
+    <script src="~/js/business-finance-chart.js" asp-append-version="true"></script>
     <script src="~/js/business-finance.js" asp-append-version="true"></script>
 }

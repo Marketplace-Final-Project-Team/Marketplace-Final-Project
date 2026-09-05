@@ -358,4 +358,5 @@ public class ProductsController : Controller
             BusinessPermissions.ProductCrud);
         return hasAccess ? (product, null) : (null, Forbid());
     }
+
 }

@@ -14,10 +14,32 @@
         Marketplace.Domain.Enums.BusinessStatus.Rejected => "Відхилений",
         _ => Model.Status.ToString()
     };
+
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
     var currentRole = !string.IsNullOrEmpty(userId)
         ? await BusinessAccessService.GetUserRoleAsync(Model.BusinessId, userId)
         : null;
+
+    string OrderStatusLabel(Marketplace.Domain.Enums.OrderStatus status) => status switch
+    {
+        Marketplace.Domain.Enums.OrderStatus.Pending => "Очікує підтвердження",
+        Marketplace.Domain.Enums.OrderStatus.Confirmed => "Підтверджено",
+        Marketplace.Domain.Enums.OrderStatus.Shipped => "Відправлено",
+        Marketplace.Domain.Enums.OrderStatus.Delivered => "Доставлено",
+        Marketplace.Domain.Enums.OrderStatus.Canceled => "Скасовано",
+        _ => status.ToString()
+    };
+
+    var orderStatusJson = System.Text.Json.JsonSerializer.Serialize(
+        Enum.GetValues(typeof(Marketplace.Domain.Enums.OrderStatus))
+            .Cast<Marketplace.Domain.Enums.OrderStatus>()
+            .Select(status => new
+            {
+                label = OrderStatusLabel(status),
+                count = Model.OrdersByStatus.TryGetValue(status, out var count) ? count : 0
+            }));
+
+    var ratingJson = System.Text.Json.JsonSerializer.Serialize(Model.RatingDistribution);
 }
 
 @section Styles {
@@ -49,6 +71,38 @@
         <div class="business-kpi"><span>Відгуків усього</span><strong>@Model.ReviewCount</strong></div>
     </div>
 
+    <div class="business-two-col">
+        <section class="business-panel">
+            <h2>Замовлення за статусами</h2>
+            <p class="business-panel__lead">Розподіл усіх замовлень магазину.</p>
+            @if (Model.TotalOrders == 0)
+            {
+                <p class="business-empty">Замовлень поки немає.</p>
+            }
+            else
+            {
+                <div class="business-chart-card__canvas-wrap">
+                    <canvas id="orderStatusChart" data-chart='@Html.Raw(orderStatusJson)'></canvas>
+                </div>
+            }
+        </section>
+
+        <section class="business-panel">
+            <h2>Розподіл рейтингів</h2>
+            <p class="business-panel__lead">Кількість відгуків за оцінкою (1-5).</p>
+            @if (Model.ReviewCount == 0)
+            {
+                <p class="business-empty">Відгуків поки немає.</p>
+            }
+            else
+            {
+                <div class="business-chart-card__canvas-wrap">
+                    <canvas id="ratingChart" data-chart='@Html.Raw(ratingJson)'></canvas>
+                </div>
+            }
+        </section>
+    </div>
+
     <section class="business-panel">
         <h2>Претензії та повернення</h2>
         <div class="business-note">
@@ -57,3 +111,9 @@
         </div>
     </section>
 </div>
+
+@section Scripts {
+    <script src="~/lib/chartjs/chart.umd.min.js"></script>
+    <script src="~/js/chart-helpers.js" asp-append-version="true"></script>
+    <script src="~/js/business-performance-charts.js" asp-append-version="true"></script>
+}

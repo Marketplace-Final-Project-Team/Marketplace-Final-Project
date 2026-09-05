@@ -3,6 +3,7 @@ using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
 using Marketplace.Domain.Entities;
+using Marketplace.Domain.Enums;
 using Marketplace.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -17,17 +18,20 @@ namespace Marketplace.BLL.Services
         private readonly IGenericRepository<WishlistItem> _wishlistItemRepository;
         private readonly IGenericRepository<Product> _productRepository;
         private readonly AppDbContext _context;
+        private readonly IProductAnalyticsService _productAnalyticsService;
 
         public WishlistService(
             IGenericRepository<Wishlist> wishlistRepository,
             IGenericRepository<WishlistItem> wishlistItemRepository,
             IGenericRepository<Product> productRepository,
-            AppDbContext context)
+            AppDbContext context,
+            IProductAnalyticsService productAnalyticsService)
         {
             _wishlistRepository = wishlistRepository;
             _wishlistItemRepository = wishlistItemRepository;
             _productRepository = productRepository;
             _context = context;
+            _productAnalyticsService = productAnalyticsService;
         }
 
         public async Task<WishlistDto> GetWishlistAsync(string userId)
@@ -109,6 +113,8 @@ namespace Marketplace.BLL.Services
 
             await _wishlistItemRepository.AddAsync(wishlistItem);
             await _context.SaveChangesAsync();
+
+            await _productAnalyticsService.RecordEventAsync(productId, product.BusinessId, ProductEventType.AddToWishlist, userId);
 
             return new ServiceResult { Succeeded = true, Message = "Товар додано до списку бажаного." };
 

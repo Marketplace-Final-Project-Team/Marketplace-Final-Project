@@ -19,11 +19,12 @@
 }
 
 <nav class="business-nav" aria-label="Розділи панелі магазину">
+    <a class="@ActiveClass("Dashboard")" asp-action="Dashboard" asp-route-businessId="@Model">Дашборд</a>
     <a class="@ActiveClass("Orders")" asp-action="Orders" asp-route-businessId="@Model">Замовлення</a>
     <a class="@ActiveClass("Finance")" asp-action="Finance" asp-route-businessId="@Model">Фінанси</a>
     <a class="@ActiveClass("Performance")" asp-action="Performance" asp-route-businessId="@Model">Ефективність</a>
     <a class="@ActiveClass("Growth")" asp-action="Growth" asp-route-businessId="@Model">Розвиток</a>
-    <a class="@ActiveClass("PromoCodes")" asp-action="PromoCodes" asp-route-businessId="@Model">Промокоди</a>
+    <a class="@ActiveClass("PromoCodes")" asp-action="PromoCodes" asp-route-businessId="@Model">Знижки</a>
     <a class="@ActiveClass("Integrations")" asp-action="Integrations" asp-route-businessId="@Model">Додатки</a>
     <a class="@ActiveClass("Team")" asp-action="Team" asp-route-businessId="@Model">Команда</a>
     @if (canManageSettings)
