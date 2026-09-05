@@ -75,7 +75,7 @@ namespace Marketplace.BLL.Services
             foreach (var d in activeDiscounts)
             {
                 d.EndDate = DateTime.UtcNow.AddSeconds(-1);
-                d.IsDeleted = true;
+                
             }
             
 
@@ -178,7 +178,7 @@ namespace Marketplace.BLL.Services
 
             }
             active_discount.EndDate = DateTime.UtcNow.AddSeconds(-1);
-            active_discount.IsDeleted = true;
+            
             await _context.SaveChangesAsync();
             return new ServiceResult
             {
@@ -322,7 +322,7 @@ namespace Marketplace.BLL.Services
 
             }
             active_discount.EndDate = DateTime.UtcNow.AddSeconds(-1);
-            active_discount.IsDeleted = true;
+            
             await _context.SaveChangesAsync();
             return new ServiceResult
             {

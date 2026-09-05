@@ -15,6 +15,7 @@ namespace Marketplace.Web.Controllers
         private readonly IProductService _productService;
         private readonly IBusinessAccessService _businessAccessService;
         private readonly IActivityLogService _activityLog;
+        private readonly IBusinessService _businessService;
 
         private readonly ICategoryService _categoryService;
 
@@ -30,6 +31,7 @@ namespace Marketplace.Web.Controllers
             _businessAccessService = businessAccessService;
             _activityLog = activityLog;
             _categoryService = categoryService;
+            _businessService = businessService;
         }
 
         private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
