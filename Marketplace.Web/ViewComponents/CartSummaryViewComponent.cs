@@ -18,7 +18,7 @@ public class CartSummaryViewComponent : ViewComponent
         var userId = UserClaimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrWhiteSpace(userId))
         {
-            return Content(string.Empty);
+            return View(0);
         }
 
         var items = await _cartService.GetCartItems(userId);
