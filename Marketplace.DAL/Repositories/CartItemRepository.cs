@@ -15,6 +15,13 @@ namespace Marketplace.DAL.Repositories
                 .Where(ci => ci.Cart.UserId == userId)
                 .Include(ci => ci.Product)
                     .ThenInclude(p => p.Discounts)
+                .Include(ci => ci.Product)
+                    .ThenInclude(p => p.Business)
+                        .ThenInclude(b => b.Discounts)
+                .Include(ci => ci.Product)
+                    .ThenInclude(p => p.Category)
+                        .ThenInclude(c => c.Discounts)
+
                 .ToListAsync();
         }
     }
