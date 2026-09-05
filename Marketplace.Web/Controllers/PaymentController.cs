@@ -15,11 +15,16 @@ namespace Marketplace.Web.Controllers
     {
         private readonly IPaymentService _paymentService;
         private readonly IOrderService _orderService;
+        private readonly ILogger<PaymentController> _logger;
 
-        public PaymentController(IPaymentService paymentService, IOrderService orderService)
+        public PaymentController(
+            IPaymentService paymentService,
+            IOrderService orderService,
+            ILogger<PaymentController> logger)
         {
             _paymentService = paymentService;
             _orderService = orderService;
+            _logger = logger;
         }
 
         [HttpPost("create")]
@@ -27,7 +32,8 @@ namespace Marketplace.Web.Controllers
         {
             var order = await _orderService.GetOrderByIdAsync(Guid.Parse(request.OrderId));
 
-            if (order == null) {
+            if (order == null)
+            {
                 return NotFound("Order not found");
             }
 
@@ -46,13 +52,11 @@ namespace Marketplace.Web.Controllers
         [HttpPost("callback")]
         public async Task<IActionResult> Callback([FromForm] string data, [FromForm] string signature)
         {
-            
-
             var privateKey = await _paymentService.GetPrivateKeyAsync();
             var computedSignature = privateKey + data + privateKey;
             byte[] inputBytes = Encoding.UTF8.GetBytes(computedSignature);
 
-            
+
             byte[] hashBytes = SHA1.HashData(inputBytes);
             string base64signature = Convert.ToBase64String(hashBytes);
 
@@ -71,21 +75,15 @@ namespace Marketplace.Web.Controllers
                 var orderId = Guid.Parse(callbackData.order_id);
                 await _orderService.ChangeOrderStatus(orderId, OrderStatus.Confirmed);
             }
-            
-            
+            else if (callbackData?.status is "failure" or "error")
+            {
+                _logger.LogWarning(
+                    "LiqPay payment failed for order {OrderId}: status={Status}",
+                    callbackData.order_id, callbackData.status);
+            }
+
+
             return Ok();
-
-
-
-
-
-
-
-
         }
     }
-
-
-    
-
 }

@@ -71,5 +71,15 @@ namespace Marketplace.BLL.Services
                 .Take(take)
                 .ToListAsync();
         }
+
+        public async Task<List<BusinessActionLog>> GetRecentBusinessActionsAsync(Guid businessId, int take = 15)
+        {
+            return await _context.BusinessActionLogs
+                .AsNoTracking()
+                .Where(log => log.BusinessId == businessId)
+                .OrderByDescending(log => log.CreatedAt)
+                .Take(take)
+                .ToListAsync();
+        }
     }
 }

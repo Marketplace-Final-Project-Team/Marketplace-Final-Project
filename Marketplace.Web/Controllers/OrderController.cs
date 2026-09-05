@@ -108,27 +108,19 @@ public class OrderController : Controller
         }
 
         var userId = GetUserId();
-        Address address;
-        var isNewAddress = !model.IsUsingSavedAddress;
+        Guid addressId;
 
-        if (isNewAddress)
+        if (model.IsUsingSavedAddress)
         {
-            address = new Address
+            if (!model.SelectedAddressId.HasValue)
             {
-                UserId = userId,
-                Country = model.Country!.Trim(),
-                City = model.City!.Trim(),
-                Street = model.Street!.Trim(),
-                IsDefault = false
-            };
+                ModelState.AddModelError(string.Empty, "Будь ласка, оберіть збережену адресу.");
+                await PopulateSavedAddresses(model);
+                return View(model);
+            }
 
-            await _addressRepository.AddAsync(address);
-            await _context.SaveChangesAsync();
-        }
-        else
-        {
             var savedAddress = await _addressRepository.FirstOrDefaultAsync(
-                a => a.Id == model.SelectedAddressId!.Value && a.UserId == userId);
+                a => a.Id == model.SelectedAddressId.Value && a.UserId == userId);
 
             if (savedAddress is null)
             {
@@ -137,29 +129,41 @@ public class OrderController : Controller
                 return View(model);
             }
 
-            address = savedAddress;
+            addressId = savedAddress.Id;
         }
+        else
+        {
+            var newAddress = new Address
+            {
+                UserId = userId,
+                Country = model.Country!.Trim(),
+                City = model.City!.Trim(),
+                Street = model.Street!.Trim(),
+                IsDefault = false
+            };
 
+            await _addressRepository.AddAsync(newAddress);
+            await _context.SaveChangesAsync();
+            addressId = newAddress.Id;
+        }
+        var scheme = Request.Scheme; 
+        var host = Request.Host;
+        
         var result = await _orderService.CreateOrder(userId!, new OrderCreateDto
         {
-            AddressId = address.Id,
-            SuccessUrl = model.SuccessUrl,
-            CancelUrl = model.CancelUrl,
-            PromoCode = model.PromoCode
+            AddressId = addressId,
+            PromoCode = model.PromoCode,
+            SuccessUrl = $"{scheme}://{host}/Order/MyOrders", 
+            CancelUrl = $"{scheme}://{host}/Order/MyOrders"
         });
 
         if (!result.Succeeded)
         {
-            if (isNewAddress)
-            {
-                _addressRepository.Remove(address);
-                await _context.SaveChangesAsync();
-            }
-
             ModelState.AddModelError(string.Empty, result.Message);
             await PopulateSavedAddresses(model);
             return View(model);
         }
+
         if (Guid.TryParse(result.OrderId, out var createdOrderId))
         {
             RecordDeliveryChoice(createdOrderId, model);
@@ -167,12 +171,9 @@ public class OrderController : Controller
             await _activityLog.LogUserActionAsync(userId!, "OrderCreated", $"Створено замовлення на суму {model.Total:N2} ₴.", relatedEntityId: createdOrderId);
         }
 
-        // CreateOrder always opens a LiqPay session under the hood, but a buyer who chose
-        // "pay on delivery" should never be pushed through it — the order already exists
-        // (Status = Pending), so we just skip straight to its details page.
         if (result.PaymentData != null && model.PaymentMethod != PaymentMethods.CashOnDelivery)
         {
-          return View("Payment", result.PaymentData);
+            return View("Payment", result.PaymentData);
         }
 
         TempData["Success"] = model.PaymentMethod == PaymentMethods.CashOnDelivery
@@ -180,7 +181,6 @@ public class OrderController : Controller
             : "Замовлення успішно оформлено.";
         return RedirectToAction(nameof(Details), new { id = result.OrderId });
     }
-
     [HttpGet]
     public async Task<IActionResult> ValidatePromoCode(string code)
     {

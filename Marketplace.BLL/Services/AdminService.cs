@@ -18,17 +18,20 @@ namespace Marketplace.BLL.Services
         private readonly IGenericRepository<Product> _productRepo;
         private readonly UserManager<User> _userManager;
         private readonly IBusinessRepository _businessRepo;
+        private readonly IOrderRepository _orderRepository;
         private readonly AppDbContext _context;
 
         public AdminService(
             IGenericRepository<Product> productRepo,
             UserManager<User> userManager,
             IBusinessRepository businessRepo,
+            IOrderRepository orderRepository,
             AppDbContext context)
         {
             _productRepo = productRepo;
             _userManager = userManager;
             _businessRepo = businessRepo;
+            _orderRepository = orderRepository;
             _context = context;
         }
 
@@ -85,7 +88,13 @@ namespace Marketplace.BLL.Services
             if (query.Search != null)
             {
                 var normalizedSearch = query.Search.Trim();
-                productsQuery = productsQuery.Where(p => p.Name.Contains(normalizedSearch));
+                productsQuery = productsQuery.Where(p => p.Name.Contains(normalizedSearch) || p.Business.StoreName.Contains(normalizedSearch));
+            }
+
+            if (!string.IsNullOrEmpty(query.SearchBusiness))
+            {
+                var normalizedBusinessSearch = query.SearchBusiness.Trim();
+                productsQuery = productsQuery.Where(p => p.Business.StoreName.Contains(normalizedBusinessSearch));
             }
 
             if (query.MinPrice.HasValue)
@@ -101,6 +110,11 @@ namespace Marketplace.BLL.Services
             if (query.InStockOnly == true)
             {
                 productsQuery = productsQuery.Where(p => p.Quantity > 0);
+            }
+
+            if (query.Status.HasValue)
+            {
+                productsQuery = productsQuery.Where(p => p.Status == query.Status.Value);
             }
 
             switch (query.SortOption)
@@ -134,7 +148,8 @@ namespace Marketplace.BLL.Services
                 Name = p.Name,
                 ImageUrl = p.MainImageUrl,
                 Price = p.Price,
-                Status = p.Status
+                Status = p.Status,
+                Business = p.Business.StoreName
             }).ToListAsync();
 
             return new PagedResult<ProductAdminDto>
@@ -195,10 +210,40 @@ namespace Marketplace.BLL.Services
             if (!string.IsNullOrEmpty(query.Search))
             {
                 var normalizedSearch = query.Search.Trim();
-                businessesQuery = businessesQuery.Where(b => b.StoreName.Contains(normalizedSearch));
+                businessesQuery = businessesQuery.Where(b => b.StoreName.Contains(normalizedSearch) || b.Owner.Email!.Contains(normalizedSearch));
             }
 
-            businessesQuery = query.SortDescending == true ? businessesQuery.OrderByDescending(b => b.CreatedAt) : businessesQuery.OrderBy(b => b.CreatedAt);
+            if (!string.IsNullOrEmpty(query.SearchEmail))
+            {
+                var normalizedEmail = query.SearchEmail.Trim();
+                businessesQuery = businessesQuery.Where(b => b.Owner.Email!.Contains(normalizedEmail));
+            }
+
+            if (query.MinCommission.HasValue)
+            {
+                businessesQuery = businessesQuery.Where(b => b.CommissionPercent >= query.MinCommission.Value);
+            }
+
+            if (query.MaxCommission.HasValue)
+            {
+                businessesQuery = businessesQuery.Where(b => b.CommissionPercent <= query.MaxCommission.Value);
+            }
+
+            switch (query.SortOption)
+            {
+                case BusinessSortOption.CreatedAtAsc:
+                    businessesQuery = businessesQuery.OrderBy(b => b.CreatedAt);
+                    break;
+                case BusinessSortOption.CreatedAtDesc:
+                    businessesQuery = businessesQuery.OrderByDescending(b => b.CreatedAt);
+                    break;
+                case BusinessSortOption.CommissionAsc:
+                    businessesQuery = businessesQuery.OrderBy(b => b.CommissionPercent);
+                    break;
+                case BusinessSortOption.CommissionDesc:
+                    businessesQuery = businessesQuery.OrderByDescending(b => b.CommissionPercent);
+                    break;
+            }
 
             var page = Math.Max(1, query.Pagination.Page);
             var totalCount = await businessesQuery.CountAsync();
@@ -351,6 +396,163 @@ namespace Marketplace.BLL.Services
             {
                 Succeeded = true,
                 Message = "Комісія успішно змінена",
+            };
+        }
+
+        public async Task<DataResult<AdminCommissionStatsDto>> GetCommissionStatsByPeriodAsync(DateTime? startDate, DateTime? endDate)
+        {
+            var today = DateTime.UtcNow.Date;
+
+            var actualEndDate = endDate ?? today;
+            if (endDate.HasValue && actualEndDate.Date > DateTime.UtcNow.Date)
+            {
+                return new DataResult<AdminCommissionStatsDto>
+                {
+                    Message = "Кінцева дата знаходиться у майбутньому",
+                    Succeeded = false
+                };
+            }
+
+            var actualStartDate = startDate ?? today.AddDays(-7);
+            if (startDate.HasValue && actualStartDate > actualEndDate)
+            {
+                return new DataResult<AdminCommissionStatsDto>
+                {
+                    Message = "Початкова дата більша за кінцеву",
+                    Succeeded = false
+                };
+            }
+
+            var daily = await _orderRepository.GetCommissionPerDayByPeriodAsync(actualStartDate, actualEndDate);
+            var totalCommissionByPeriod = daily.Sum(d => d.TotalCommission);
+            var byBusiness = await _orderRepository.GetCommissionForBusinessByPeriodAsync(actualStartDate, actualEndDate);
+
+            return new DataResult<AdminCommissionStatsDto>
+            {
+                Message = string.Empty,
+                Succeeded = true,
+                Data = new AdminCommissionStatsDto
+                {
+                    Daily = daily,
+                    ByBusiness = byBusiness,
+                    TotalCommissionByPeriod = totalCommissionByPeriod
+                }
+            };
+        }
+
+        public async Task<decimal> GetTotalCommissionAsync()
+        {
+            var totalCommission = await _orderRepository.GetTotalCommissionAsync();
+
+            return totalCommission;
+        }
+
+        // "Sale" here means the order actually reached Confirmed - that's the only point
+        // OrderService.ChangeOrderStatus captures OrderItem.CommissionAmount and credits the
+        // balances, so it's the only status range where turnover/revenue numbers here will
+        // ever match what Admin/MarketplaceBalance and the seller's own Business/Finance show.
+        // Pending orders are excluded even though they're real carts, because no money has
+        // actually changed hands yet.
+        public async Task<AdminStatisticsOverviewDto> GetStatisticsAsync(DateTime? startDate, DateTime? endDate)
+        {
+            if (startDate.HasValue && endDate.HasValue && startDate > endDate)
+            {
+                (startDate, endDate) = (endDate, startDate);
+            }
+
+            var itemsQuery = _context.OrderItems
+                .Where(oi => oi.Order.Status == OrderStatus.Confirmed
+                    || oi.Order.Status == OrderStatus.Shipped
+                    || oi.Order.Status == OrderStatus.Delivered);
+
+            if (startDate.HasValue)
+            {
+                itemsQuery = itemsQuery.Where(oi => oi.Order.CreatedAt >= startDate.Value.Date);
+            }
+            if (endDate.HasValue)
+            {
+                var endExclusive = endDate.Value.Date.AddDays(1);
+                itemsQuery = itemsQuery.Where(oi => oi.Order.CreatedAt < endExclusive);
+            }
+
+            var rows = await itemsQuery
+                .Select(oi => new
+                {
+                    oi.OrderId,
+                    BusinessId = oi.Product.BusinessId,
+                    oi.Order.CreatedAt,
+                    LineTotal = oi.UnitPrice * oi.Quantity,
+                    oi.Quantity,
+                    oi.CommissionAmount
+                })
+                .ToListAsync();
+
+            var businesses = await _context.Businesses.AsNoTracking()
+                .Select(b => new { b.Id, b.StoreName, b.LogoUrl, b.Status })
+                .ToListAsync();
+
+            var productCounts = await _context.Products.AsNoTracking()
+                .GroupBy(p => p.BusinessId)
+                .Select(g => new
+                {
+                    BusinessId = g.Key,
+                    Total = g.Count(),
+                    Active = g.Count(p => p.Status == ProductStatus.Active)
+                })
+                .ToListAsync();
+
+            var businessStats = businesses.Select(b =>
+            {
+                var rowsForBusiness = rows.Where(r => r.BusinessId == b.Id).ToList();
+                var productCount = productCounts.FirstOrDefault(p => p.BusinessId == b.Id);
+
+                return new BusinessStatisticsDto
+                {
+                    BusinessId = b.Id,
+                    StoreName = b.StoreName,
+                    LogoUrl = b.LogoUrl,
+                    ProductCount = productCount?.Total ?? 0,
+                    ActiveProductCount = productCount?.Active ?? 0,
+                    OrdersCount = rowsForBusiness.Select(r => r.OrderId).Distinct().Count(),
+                    UnitsSold = rowsForBusiness.Sum(r => r.Quantity),
+                    Turnover = rowsForBusiness.Sum(r => r.LineTotal),
+                    MarketplaceRevenue = rowsForBusiness.Sum(r => r.CommissionAmount)
+                };
+            })
+            .OrderByDescending(b => b.MarketplaceRevenue)
+            .ToList();
+
+            var groupByMonth = !startDate.HasValue || !endDate.HasValue
+                || (endDate.Value - startDate.Value).TotalDays > 31;
+
+            var byPeriod = rows
+                .GroupBy(r => groupByMonth
+                    ? new DateTime(r.CreatedAt.Year, r.CreatedAt.Month, 1)
+                    : r.CreatedAt.Date)
+                .OrderBy(g => g.Key)
+                .Select(g => new PeriodStatisticsDto
+                {
+                    PeriodStart = g.Key,
+                    Label = groupByMonth ? g.Key.ToString("MMMM yyyy") : g.Key.ToString("dd.MM.yyyy"),
+                    OrdersCount = g.Select(r => r.OrderId).Distinct().Count(),
+                    Turnover = g.Sum(r => r.LineTotal),
+                    MarketplaceRevenue = g.Sum(r => r.CommissionAmount)
+                })
+                .ToList();
+
+            return new AdminStatisticsOverviewDto
+            {
+                StartDate = startDate,
+                EndDate = endDate,
+                TotalTurnover = rows.Sum(r => r.LineTotal),
+                TotalMarketplaceRevenue = rows.Sum(r => r.CommissionAmount),
+                TotalOrders = rows.Select(r => r.OrderId).Distinct().Count(),
+                TotalUnitsSold = rows.Sum(r => r.Quantity),
+                ActiveBusinessCount = businesses.Count(b => b.Status == BusinessStatus.Active),
+                TotalBusinessCount = businesses.Count,
+                TotalProductCount = productCounts.Sum(p => p.Total),
+                Businesses = businessStats,
+                ByPeriod = byPeriod
             };
         }
     }

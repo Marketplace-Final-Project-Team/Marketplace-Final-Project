@@ -7,5 +7,6 @@ namespace Marketplace.Web.Models.Businesses
         public Guid BusinessId { get; set; }
         public string StoreName { get; set; } = string.Empty;
         public List<PromoCodeDto> PromoCodes { get; set; } = new();
+        public BusinessDiscountDto? BusinessDiscount { get; set; }
     }
 }

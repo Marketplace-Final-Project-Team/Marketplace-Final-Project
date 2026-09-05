@@ -49,13 +49,27 @@
                         <circle cx="11" cy="11" r="8" />
                         <path d="m21 21-4.3-4.3" />
                     </svg>
-                    <input type="search" class="form-control admin-search" name="Search" value="@Model.Filter.Search" placeholder="Пошук за назвою..." aria-label="Пошук товарів" />
+                    <input type="search" class="form-control admin-search" name="Search" value="@Model.Filter.Search" placeholder="Пошук за назвою" aria-label="Пошук товарів" />
+                </div>
+                <div class="admin-search-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                    </svg>
+                    <input type="search" class="form-control admin-search" name="SearchBusiness" value="@Model.Filter.SearchBusiness" placeholder="Пошук за магазином" aria-label="Пошук за магазином" />
                 </div>
                 <select class="form-select" name="CategoryId" aria-label="Фільтр за категорією" onchange="this.form.submit()">
                     <option value="">Усі категорії</option>
                     @foreach (var category in Model.Categories)
                     {
                         <option value="@category.Id" selected="@(Model.Filter.CategoryId == category.Id)">@category.Name</option>
+                    }
+                </select>
+                <select class="form-select" name="Status" aria-label="Фільтр за статусом" onchange="this.form.submit()">
+                    <option value="">Усі статуси</option>
+                    @foreach (Marketplace.Domain.Enums.ProductStatus status in Enum.GetValues(typeof(Marketplace.Domain.Enums.ProductStatus)))
+                    {
+                        <option value="@status" selected="@(Model.Filter.Status == status)">@StatusLabel(status)</option>
                     }
                 </select>
                 <div class="admin-price-range">
@@ -84,73 +98,177 @@
             }
             else
             {
-                <div class="admin-panel table-responsive">
-                    <table class="table admin-table" id="products-table">
-                        <thead>
-                            <tr>
-                                <th>Товар</th>
-                                <th>Ціна</th>
-                                <th>Статус</th>
-                                <th class="text-end">Дії</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                <div class="admin-view-toggle" role="group" aria-label="Режим перегляду товарів">
+                    <button type="button" class="admin-view-toggle__btn" data-view-toggle="list" aria-label="Список">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="17" height="17">
+                            <path d="M8 6h13" />
+                            <path d="M8 12h13" />
+                            <path d="M8 18h13" />
+                            <path d="M3 6h.01" />
+                            <path d="M3 12h.01" />
+                            <path d="M3 18h.01" />
+                        </svg>
+                        <span>Список</span>
+                    </button>
+                    <button type="button" class="admin-view-toggle__btn" data-view-toggle="grid" aria-label="Плитка">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="17" height="17">
+                            <rect x="3" y="3" width="7" height="7" rx="1.2" />
+                            <rect x="14" y="3" width="7" height="7" rx="1.2" />
+                            <rect x="14" y="14" width="7" height="7" rx="1.2" />
+                            <rect x="3" y="14" width="7" height="7" rx="1.2" />
+                        </svg>
+                        <span>Плитка</span>
+                    </button>
+                    <button type="button" class="admin-view-toggle__btn" data-view-toggle="carousel" aria-label="Карусель">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="17" height="17">
+                            <rect x="7" y="4" width="10" height="16" rx="1.5" />
+                            <path d="M2 8v8" />
+                            <path d="M22 8v8" />
+                        </svg>
+                        <span>Карусель</span>
+                    </button>
+                </div>
+
+                <div data-products-view="list">
+                    <div class="admin-panel table-responsive">
+                        <table class="table admin-table" id="products-table">
+                            <thead>
+                                <tr>
+                                    <th>Товар</th>
+                                    <th>Ціна</th>
+                                    <th>Статус</th>
+                                    <th class="text-end">Дії</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var product in products)
+                                {
+                                    var statusClass = product.Status.ToString().ToLowerInvariant();
+                                    var productInitial = string.IsNullOrWhiteSpace(product.Name) ? "?" : product.Name[..1].ToUpperInvariant();
+
+                                    <tr>
+                                        <td>
+                                            <button type="button" class="admin-entity-cell admin-entity-cell--clickable" data-product-open="@product.Id">
+                                                @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
+                                                {
+                                                    <img class="admin-entity-thumb" src="@product.ImageUrl" alt="@product.Name" />
+                                                }
+                                                else
+                                                {
+                                                    <div class="admin-entity-placeholder" aria-hidden="true">@productInitial</div>
+                                                }
+                                                <span class="admin-entity-name">@product.Name</span>
+                                            </button>
+                                        </td>
+                                        <td class="fw-semibold">@product.Price.ToString("N2") ₴</td>
+                                        <td><span class="admin-status admin-status--@statusClass">@StatusLabel(product.Status)</span></td>
+                                        <td>
+                                            <div class="admin-row-actions">
+                                                <partial name="_ProductActionButtons" model="product" />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <partial name="_AdminPagination" model="new Marketplace.Web.Models.AdminPaginationViewModel { Page = Model.Result.Page, TotalPages = Model.Result.TotalPages }" />
+                    </div>
+                </div>
+
+                <div data-products-view="grid" hidden>
+                    <div class="admin-product-grid">
+                        @foreach (var product in products)
+                        {
+                            var statusClass = product.Status.ToString().ToLowerInvariant();
+                            var productInitial = string.IsNullOrWhiteSpace(product.Name) ? "?" : product.Name[..1].ToUpperInvariant();
+
+                            <div class="admin-product-card">
+                                <button type="button" class="admin-product-card__image" data-product-open="@product.Id" aria-label="@product.Name">
+                                    @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
+                                    {
+                                        <img src="@product.ImageUrl" alt="@product.Name" />
+                                    }
+                                    else
+                                    {
+                                        <span class="admin-product-card__placeholder" aria-hidden="true">@productInitial</span>
+                                    }
+                                    <span class="admin-status admin-status--@statusClass admin-product-card__status">@StatusLabel(product.Status)</span>
+                                </button>
+                                <div class="admin-product-card__body">
+                                    <button type="button" class="admin-product-card__name" data-product-open="@product.Id">@product.Name</button>
+                                    <span class="admin-product-card__price">@product.Price.ToString("N2") ₴</span>
+                                </div>
+                                <div class="admin-product-card__actions">
+                                    <partial name="_ProductActionButtons" model="product" />
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="admin-panel">
+                        <partial name="_AdminPagination" model="new Marketplace.Web.Models.AdminPaginationViewModel { Page = Model.Result.Page, TotalPages = Model.Result.TotalPages }" />
+                    </div>
+                </div>
+
+                <div data-products-view="carousel" hidden>
+                    <div id="productsCarousel" class="carousel slide admin-product-carousel" data-bs-ride="false" data-bs-interval="false">
+                        <div class="carousel-inner">
+                            @{ var isFirstSlide = true; }
                             @foreach (var product in products)
                             {
                                 var statusClass = product.Status.ToString().ToLowerInvariant();
                                 var productInitial = string.IsNullOrWhiteSpace(product.Name) ? "?" : product.Name[..1].ToUpperInvariant();
 
-                                <tr>
-                                    <td>
-                                        <div class="admin-entity-cell">
+                                <div class="carousel-item @(isFirstSlide ? "active" : "")">
+                                    <div class="admin-carousel-slide">
+                                        <button type="button" class="admin-carousel-slide__image" data-product-open="@product.Id" aria-label="@product.Name">
                                             @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
                                             {
-                                                <img class="admin-entity-thumb" src="@product.ImageUrl" alt="@product.Name" />
+                                                <img src="@product.ImageUrl" alt="@product.Name" />
                                             }
                                             else
                                             {
-                                                <div class="admin-entity-placeholder" aria-hidden="true">@productInitial</div>
+                                                <span class="admin-product-card__placeholder" aria-hidden="true">@productInitial</span>
                                             }
-                                            <span class="admin-entity-name">@product.Name</span>
+                                        </button>
+                                        <div class="admin-carousel-slide__body">
+                                            <span class="admin-status admin-status--@statusClass">@StatusLabel(product.Status)</span>
+                                            <button type="button" class="admin-carousel-slide__name" data-product-open="@product.Id">@product.Name</button>
+                                            <span class="admin-carousel-slide__price">@product.Price.ToString("N2") ₴</span>
+                                            <div class="admin-carousel-slide__actions">
+                                                <partial name="_ProductActionButtons" model="product" />
+                                            </div>
                                         </div>
-                                    </td>
-                                    <td class="fw-semibold">@product.Price.ToString("N2") ₴</td>
-                                    <td><span class="admin-status admin-status--@statusClass">@StatusLabel(product.Status)</span></td>
-                                    <td>
-                                        <div class="admin-row-actions">
-                                            @if (product.Status != Marketplace.Domain.Enums.ProductStatus.Active)
-                                            {
-                                                <form asp-action="ChangeProductStatus" method="post">
-                                                    <input type="hidden" name="productId" value="@product.Id" />
-                                                    <input type="hidden" name="status" value="Active" />
-                                                    <button type="submit" class="btn btn-sm btn-outline-success">Активувати</button>
-                                                </form>
-                                            }
-                                            @if (product.Status != Marketplace.Domain.Enums.ProductStatus.Pending)
-                                            {
-                                                <form asp-action="ChangeProductStatus" method="post">
-                                                    <input type="hidden" name="productId" value="@product.Id" />
-                                                    <input type="hidden" name="status" value="Pending" />
-                                                    <button type="submit" class="btn btn-sm btn-outline-secondary">На модерацію</button>
-                                                </form>
-                                            }
-                                            @if (product.Status != Marketplace.Domain.Enums.ProductStatus.Banned)
-                                            {
-                                                <form asp-action="ChangeProductStatus" method="post">
-                                                    <input type="hidden" name="productId" value="@product.Id" />
-                                                    <input type="hidden" name="status" value="Banned" />
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Заблокувати</button>
-                                                </form>
-                                            }
-                                        </div>
-                                    </td>
-                                </tr>
+                                    </div>
+                                </div>
+                                isFirstSlide = false;
                             }
-                        </tbody>
-                    </table>
-                    <partial name="_AdminPagination" model="new Marketplace.Web.Models.AdminPaginationViewModel { Page = Model.Result.Page, TotalPages = Model.Result.TotalPages }" />
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#productsCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Попередній</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#productsCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Наступний</span>
+                        </button>
+                    </div>
+                    <div class="admin-panel">
+                        <partial name="_AdminPagination" model="new Marketplace.Web.Models.AdminPaginationViewModel { Page = Model.Result.Page, TotalPages = Model.Result.TotalPages }" />
+                    </div>
                 </div>
             }
         </div>
     </div>
+
+    <div class="admin-modal" data-admin-modal hidden>
+        <div class="admin-modal__card admin-modal__card--wide">
+            <button type="button" class="admin-modal__close" aria-label="Закрити" data-admin-modal-close>×</button>
+            <div data-admin-modal-body></div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/admin-product-modal.js" asp-append-version="true"></script>
+    <script src="~/js/admin-products-view.js" asp-append-version="true"></script>
+}

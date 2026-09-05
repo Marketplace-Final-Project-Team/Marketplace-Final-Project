@@ -1,0 +1,238 @@
+@model Marketplace.Web.Models.AdminStatisticsPageViewModel
+
+@{
+    ViewData["Title"] = "Статистика - Адмін-панель";
+    var overview = Model.Overview;
+
+    var periodJson = System.Text.Json.JsonSerializer.Serialize(overview.ByPeriod.Select(p => new
+    {
+        label = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p.Label),
+        turnover = p.Turnover,
+        orders = p.OrdersCount
+    }));
+
+    var businessesJson = System.Text.Json.JsonSerializer.Serialize(overview.Businesses.Take(10).Select(b => new
+    {
+        name = string.IsNullOrWhiteSpace(b.StoreName) ? "Без назви" : b.StoreName,
+        turnover = b.Turnover
+    }));
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+}
+
+<div class="admin-page admin-page--wide">
+    <div class="admin-shell">
+        <partial name="_AdminNav" />
+
+        <div class="admin-content">
+            <header class="admin-header">
+                <div>
+                    <div class="admin-kicker">Admin</div>
+                    <h1 class="admin-title">Статистика</h1>
+                    <p class="admin-subtitle">Товарооборот і дохід маркетплейсу за період - по магазинах і в часі. Враховує лише замовлення, що дійшли принаймні до статусу «Підтверджено».</p>
+                </div>
+            </header>
+
+            <form method="get" asp-action="Statistics" class="admin-toolbar">
+                <div>
+                    <label for="startDate" class="admin-toolbar__label">З дати</label>
+                    <input type="date" id="startDate" class="form-control" name="StartDate" value="@Model.Filter.StartDate?.ToString("yyyy-MM-dd")" />
+                </div>
+                <div>
+                    <label for="endDate" class="admin-toolbar__label">По дату</label>
+                    <input type="date" id="endDate" class="form-control" name="EndDate" value="@Model.Filter.EndDate?.ToString("yyyy-MM-dd")" />
+                </div>
+                <button type="submit" class="btn btn-outline-secondary">Застосувати</button>
+                @if (Model.Filter.StartDate.HasValue || Model.Filter.EndDate.HasValue)
+                {
+                    <a asp-action="Statistics" class="btn btn-outline-secondary">Весь час</a>
+                }
+            </form>
+
+            <div class="admin-stats" aria-label="Загальна статистика">
+                <div class="admin-stat-card">
+                    <span class="admin-stat-card__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                            <path d="M3 3v18h18" />
+                            <path d="M7 16v-4" />
+                            <path d="M12 16V8" />
+                            <path d="M17 16v-7" />
+                        </svg>
+                    </span>
+                    <div class="admin-stat-card__body">
+                        <span class="admin-stat-card__label">Товарооборот</span>
+                        <strong class="admin-stat-card__value">@overview.TotalTurnover.ToString("N2") ₴</strong>
+                        <span class="admin-stat-card__hint">Сума всіх позицій продажів</span>
+                    </div>
+                </div>
+                <div class="admin-stat-card">
+                    <span class="admin-stat-card__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                            <path d="M12 1v22" />
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                        </svg>
+                    </span>
+                    <div class="admin-stat-card__body">
+                        <span class="admin-stat-card__label">Дохід маркетплейсу</span>
+                        <strong class="admin-stat-card__value">@overview.TotalMarketplaceRevenue.ToString("N2") ₴</strong>
+                        <span class="admin-stat-card__hint">Комісія з продажів за період</span>
+                    </div>
+                </div>
+                <div class="admin-stat-card">
+                    <span class="admin-stat-card__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+                            <path d="M3 6h18" />
+                            <path d="M16 10a4 4 0 0 1-8 0" />
+                        </svg>
+                    </span>
+                    <div class="admin-stat-card__body">
+                        <span class="admin-stat-card__label">Продажів</span>
+                        <strong class="admin-stat-card__value">@overview.TotalOrders</strong>
+                        <span class="admin-stat-card__hint">@overview.TotalUnitsSold шт. товарів</span>
+                    </div>
+                </div>
+                <div class="admin-stat-card">
+                    <span class="admin-stat-card__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                            <path d="M3 9 4 4h16l1 5" />
+                            <path d="M3 9a2 2 0 0 0 4 0 2 2 0 0 0 4 0 2 2 0 0 0 4 0 2 2 0 0 0 4 0" />
+                            <path d="M4 9v10h16V9" />
+                        </svg>
+                    </span>
+                    <div class="admin-stat-card__body">
+                        <span class="admin-stat-card__label">Магазинів</span>
+                        <strong class="admin-stat-card__value">@overview.ActiveBusinessCount / @overview.TotalBusinessCount</strong>
+                        <span class="admin-stat-card__hint">Активних із загальної кількості - @overview.TotalProductCount товарів</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-two-col">
+                <div class="admin-panel admin-chart-card">
+                    <h2 class="admin-section-heading admin-section-heading--tight">Товарооборот у часі</h2>
+                    @if (overview.ByPeriod.Count == 0)
+                    {
+                        <p class="admin-empty">За обраний період продажів немає.</p>
+                    }
+                    else
+                    {
+                        <div class="admin-chart-card__canvas-wrap">
+                            <canvas id="turnoverChart" data-chart='@Html.Raw(periodJson)'></canvas>
+                        </div>
+                    }
+                </div>
+                <div class="admin-panel admin-chart-card">
+                    <h2 class="admin-section-heading admin-section-heading--tight">Оборот за магазинами</h2>
+                    @if (overview.Businesses.Count == 0)
+                    {
+                        <p class="admin-empty">За обраний період продажів немає.</p>
+                    }
+                    else
+                    {
+                        <div class="admin-chart-card__canvas-wrap">
+                            <canvas id="businessTurnoverChart" data-chart='@Html.Raw(businessesJson)'></canvas>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <h2 class="admin-section-heading">За магазинами</h2>
+            @if (overview.Businesses.Count == 0)
+            {
+                <div class="admin-panel">
+                    <p class="admin-empty">За обраний період продажів немає.</p>
+                </div>
+            }
+            else
+            {
+                <div class="admin-panel table-responsive">
+                    <table class="table admin-table">
+                        <thead>
+                            <tr>
+                                <th>Магазин</th>
+                                <th>Товарів</th>
+                                <th>Продажів</th>
+                                <th>Одиниць</th>
+                                <th>Оборот</th>
+                                <th>Дохід маркетплейсу</th>
+                                <th>Середній чек</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var b in overview.Businesses)
+                            {
+                                var name = string.IsNullOrWhiteSpace(b.StoreName) ? "Без назви" : b.StoreName;
+                                var initial = name[..1].ToUpperInvariant();
+
+                                <tr>
+                                    <td>
+                                        <div class="admin-entity-cell">
+                                            @if (!string.IsNullOrWhiteSpace(b.LogoUrl))
+                                            {
+                                                <img class="admin-entity-thumb" src="@b.LogoUrl" alt="@name" />
+                                            }
+                                            else
+                                            {
+                                                <div class="admin-entity-placeholder" aria-hidden="true">@initial</div>
+                                            }
+                                            <span class="admin-entity-name">@name</span>
+                                        </div>
+                                    </td>
+                                    <td class="admin-entity-meta">@b.ActiveProductCount / @b.ProductCount</td>
+                                    <td>@b.OrdersCount</td>
+                                    <td>@b.UnitsSold</td>
+                                    <td>@b.Turnover.ToString("N2") ₴</td>
+                                    <td>@b.MarketplaceRevenue.ToString("N2") ₴</td>
+                                    <td class="admin-entity-meta">@b.AverageOrderValue.ToString("N2") ₴</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            <h2 class="admin-section-heading">У часі</h2>
+            @if (overview.ByPeriod.Count == 0)
+            {
+                <div class="admin-panel">
+                    <p class="admin-empty">За обраний період продажів немає.</p>
+                </div>
+            }
+            else
+            {
+                <div class="admin-panel table-responsive">
+                    <table class="table admin-table">
+                        <thead>
+                            <tr>
+                                <th>Період</th>
+                                <th>Продажів</th>
+                                <th>Оборот</th>
+                                <th>Дохід маркетплейсу</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var p in overview.ByPeriod)
+                            {
+                                <tr>
+                                    <td class="admin-entity-name">@System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(p.Label)</td>
+                                    <td>@p.OrdersCount</td>
+                                    <td>@p.Turnover.ToString("N2") ₴</td>
+                                    <td>@p.MarketplaceRevenue.ToString("N2") ₴</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/chartjs/chart.umd.min.js"></script>
+    <script src="~/js/chart-helpers.js" asp-append-version="true"></script>
+    <script src="~/js/admin-statistics-charts.js" asp-append-version="true"></script>
+}

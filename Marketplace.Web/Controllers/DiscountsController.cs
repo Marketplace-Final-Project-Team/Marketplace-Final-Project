@@ -14,7 +14,6 @@ namespace Marketplace.Web.Controllers
         private readonly IDiscountService _discountService;
         private readonly IProductService _productService;
         private readonly IBusinessAccessService _businessAccessService;
-        private readonly IBusinessService _businessService;
         private readonly IActivityLogService _activityLog;
 
         private readonly ICategoryService _categoryService;
@@ -29,7 +28,6 @@ namespace Marketplace.Web.Controllers
             _discountService = discountService;
             _productService = productService;
             _businessAccessService = businessAccessService;
-            _businessService = businessService;
             _activityLog = activityLog;
             _categoryService = categoryService;
         }
