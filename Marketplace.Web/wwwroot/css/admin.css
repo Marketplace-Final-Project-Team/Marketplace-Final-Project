@@ -564,9 +564,11 @@
     background: none;
     border: none;
     border-radius: 0.5rem;
+    color: inherit;
     cursor: pointer;
     padding: 0.25rem;
     text-align: left;
+    text-decoration: none;
 }
 
 .admin-entity-cell--clickable:hover {

@@ -102,7 +102,7 @@
 
                                 <tr>
                                     <td>
-                                        <div class="admin-entity-cell">
+                                        <a asp-action="BusinessDetails" asp-route-businessId="@business.Id" class="admin-entity-cell admin-entity-cell--clickable">
                                             @if (!string.IsNullOrWhiteSpace(business.LogoUrl))
                                             {
                                                 <img class="admin-entity-thumb" src="@business.LogoUrl" alt="@name" />
@@ -112,7 +112,7 @@
                                                 <div class="admin-entity-placeholder" aria-hidden="true">@businessInitial</div>
                                             }
                                             <span class="admin-entity-name">@name</span>
-                                        </div>
+                                        </a>
                                     </td>
                                     <td class="admin-entity-meta">@business.Owner</td>
                                     <td><span class="admin-status admin-status--@statusClass">@StatusLabel(business.Status)</span></td>
