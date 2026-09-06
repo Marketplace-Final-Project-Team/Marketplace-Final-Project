@@ -29,6 +29,7 @@ namespace Marketplace.Web.Controllers
         private readonly IActivityLogService _activityLog;
         private readonly IProductAnalyticsService _productAnalyticsService;
         private readonly ISystemSettingsService _settingsService;
+        private readonly ICategoryService _categoryService;
 
         public BusinessController(
             IBusinessService businessService,
@@ -44,7 +45,8 @@ namespace Marketplace.Web.Controllers
             AppDbContext context,
             IActivityLogService activityLog,
             IProductAnalyticsService productAnalyticsService,
-            ISystemSettingsService settingsService)
+            ISystemSettingsService settingsService,
+            ICategoryService categoryService)
         {
             _businessService = businessService;
             _businessAccessService = businessAccessService;
@@ -60,6 +62,7 @@ namespace Marketplace.Web.Controllers
             _activityLog = activityLog;
             _productAnalyticsService = productAnalyticsService;
             _settingsService = settingsService;
+            _categoryService = categoryService;
         }
 
         [HttpGet]
@@ -566,13 +569,17 @@ namespace Marketplace.Web.Controllers
 
             var promoCodes = await _promoCodeService.GetForBusinessAsync(businessId);
             var businessDiscount = await _discountService.GetBusinessDiscount(businessId);
+            var categoryDiscounts = await _discountService.GetActiveCategoryDiscountsForBusiness(businessId);
+            var categories = await _categoryService.GetAllCategories();
 
             return View(new BusinessPromoCodesPageViewModel
             {
                 BusinessId = businessId,
                 StoreName = business.StoreName,
                 PromoCodes = promoCodes,
-                BusinessDiscount = businessDiscount
+                BusinessDiscount = businessDiscount,
+                CategoryDiscounts = categoryDiscounts,
+                Categories = categories.ToList()
             });
         }
 

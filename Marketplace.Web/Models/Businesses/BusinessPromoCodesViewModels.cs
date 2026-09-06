@@ -8,5 +8,7 @@ namespace Marketplace.Web.Models.Businesses
         public string StoreName { get; set; } = string.Empty;
         public List<PromoCodeDto> PromoCodes { get; set; } = new();
         public BusinessDiscountDto? BusinessDiscount { get; set; }
+        public List<CategoryDiscountDto> CategoryDiscounts { get; set; } = new();
+        public List<CategoryDto> Categories { get; set; } = new();
     }
 }

@@ -21,6 +21,15 @@
                 </div>
             </header>
 
+            @if (TempData["Success"] is string success)
+            {
+                <div class="admin-alert"><span>✓</span><p>@success</p></div>
+            }
+            @if (TempData["Error"] is string error)
+            {
+                <div class="admin-alert admin-alert--error"><span>!</span><p>@error</p></div>
+            }
+
             <div class="admin-stats" aria-label="Стан планувальника">
                 <div class="admin-stat-card">
                     <span class="admin-stat-card__icon" aria-hidden="true">
@@ -33,6 +42,18 @@
                         <span class="admin-stat-card__label">Планувальник Quartz</span>
                         <strong class="admin-stat-card__value">@(Model.IsSchedulerRunning ? "Працює" : "Зупинено")</strong>
                         <span class="admin-stat-card__hint">ProductModerationJob - модерація товарів через Gemini</span>
+                        @if (Model.IsSchedulerRunning)
+                        {
+                            <form asp-action="PauseScheduler" method="post" class="mt-2">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">Призупинити планувальник</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="ResumeScheduler" method="post" class="mt-2">
+                                <button type="submit" class="btn btn-sm btn-outline-success">Відновити планувальник</button>
+                            </form>
+                        }
                     </div>
                 </div>
                 <div class="admin-stat-card">
@@ -70,16 +91,26 @@
                     <table class="table admin-table">
                         <thead>
                             <tr>
-                                <th>Товар</th>
+                                <th>Тип</th>
+                                <th>Назва</th>
                                 <th>Запуск перевірки</th>
+                                <th class="text-end">Дії</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var job in Model.ScheduledJobs)
                             {
                                 <tr>
+                                    <td>@(job.EntityType == "Business" ? "Бізнес" : "Товар")</td>
                                     <td class="admin-entity-name">@job.ProductName</td>
                                     <td>@(job.NextRunAtUtc?.ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss") ?? "-")</td>
+                                    <td class="text-end">
+                                        <form asp-action="RunModerationJobNow" method="post" class="d-inline">
+                                            <input type="hidden" name="entityId" value="@job.EntityId" />
+                                            <input type="hidden" name="entityType" value="@job.EntityType" />
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">Запустити зараз</button>
+                                        </form>
+                                    </td>
                                 </tr>
                             }
                         </tbody>
