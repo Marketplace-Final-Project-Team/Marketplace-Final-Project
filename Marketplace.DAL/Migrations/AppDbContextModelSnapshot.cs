@@ -60,7 +60,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Addresses");
+                    b.ToTable("Addresses", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Business", b =>
@@ -117,7 +117,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Businesses");
+                    b.ToTable("Businesses", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.BusinessActionLog", b =>
@@ -154,7 +154,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("BusinessId");
 
-                    b.ToTable("BusinessActionLogs");
+                    b.ToTable("BusinessActionLogs", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.BusinessMember", b =>
@@ -191,7 +191,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("BusinessMembers");
+                    b.ToTable("BusinessMembers", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Cart", b =>
@@ -217,7 +217,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Carts");
+                    b.ToTable("Carts", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.CartItem", b =>
@@ -250,7 +250,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CartItems");
+                    b.ToTable("CartItems", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Category", b =>
@@ -277,7 +277,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Discount", b =>
@@ -289,8 +289,14 @@ namespace Marketplace.DAL.Migrations
                     b.Property<Guid?>("BusinessId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("CategoryId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("DiscountType")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
@@ -314,9 +320,11 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("BusinessId");
 
+                    b.HasIndex("CategoryId");
+
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Discounts");
+                    b.ToTable("Discounts", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.MarketplaceBalance", b =>
@@ -339,7 +347,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MarketplaceBalances");
+                    b.ToTable("MarketplaceBalances", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Order", b =>
@@ -383,7 +391,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.OrderItem", b =>
@@ -429,7 +437,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderItems");
+                    b.ToTable("OrderItems", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.PostSaleRequest", b =>
@@ -481,7 +489,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("OrderItemId");
 
-                    b.ToTable("PostSaleRequests");
+                    b.ToTable("PostSaleRequests", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.PostSaleRequestImage", b =>
@@ -510,7 +518,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("PostSaleRequestId");
 
-                    b.ToTable("PostSaleRequestImages");
+                    b.ToTable("PostSaleRequestImages", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Product", b =>
@@ -567,7 +575,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.ProductEvent", b =>
@@ -597,7 +605,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("BusinessId", "CreatedAt");
 
-                    b.ToTable("ProductEvents");
+                    b.ToTable("ProductEvents", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.ProductImage", b =>
@@ -626,7 +634,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductImages");
+                    b.ToTable("ProductImages", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.PromoCode", b =>
@@ -667,7 +675,7 @@ namespace Marketplace.DAL.Migrations
                     b.HasIndex("Code")
                         .IsUnique();
 
-                    b.ToTable("PromoCodes");
+                    b.ToTable("PromoCodes", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Review", b =>
@@ -705,7 +713,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reviews");
+                    b.ToTable("Reviews", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.SystemSetting", b =>
@@ -743,7 +751,7 @@ namespace Marketplace.DAL.Migrations
                     b.HasIndex("Category", "Key")
                         .IsUnique();
 
-                    b.ToTable("SystemSettings");
+                    b.ToTable("SystemSettings", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.User", b =>
@@ -860,7 +868,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserActionLogs");
+                    b.ToTable("UserActionLogs", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Wishlist", b =>
@@ -883,7 +891,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Wishlists");
+                    b.ToTable("Wishlists", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.WishlistCollection", b =>
@@ -910,7 +918,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("WishlistCollections");
+                    b.ToTable("WishlistCollections", (string)null);
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.WishlistItem", b =>
@@ -942,7 +950,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("WishlistId");
 
-                    b.ToTable("WishlistItems");
+                    b.ToTable("WishlistItems", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -1165,12 +1173,18 @@ namespace Marketplace.DAL.Migrations
                         .HasForeignKey("BusinessId")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.HasOne("Marketplace.Domain.Entities.Category", "Category")
+                        .WithMany("Discounts")
+                        .HasForeignKey("CategoryId");
+
                     b.HasOne("Marketplace.Domain.Entities.Product", "Product")
                         .WithMany("Discounts")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Business");
+
+                    b.Navigation("Category");
 
                     b.Navigation("Product");
                 });
@@ -1426,6 +1440,8 @@ namespace Marketplace.DAL.Migrations
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Category", b =>
                 {
+                    b.Navigation("Discounts");
+
                     b.Navigation("Products");
                 });
 

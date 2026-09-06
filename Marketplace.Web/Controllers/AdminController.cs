@@ -9,7 +9,6 @@ using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Common;
 using Quartz;
 using Quartz.Impl.Matchers;
-using Microsoft.Extensions.Configuration;
 
 namespace Marketplace.Web.Controllers
 {
@@ -24,7 +23,8 @@ namespace Marketplace.Web.Controllers
         private readonly IMarketplaceBalanceService _marketplaceBalanceService;
         private readonly ICategoryService _categoryService;
         private readonly ISchedulerFactory _schedulerFactory;
-        private readonly IConfiguration _configuration;
+        private readonly IDiscountService _discountService;
+        private readonly IOrderService _orderService;
 
         public AdminController(
             IAdminService adminService,
@@ -34,8 +34,9 @@ namespace Marketplace.Web.Controllers
             IMarketplaceBalanceService marketplaceBalanceService,
             ICategoryService categoryService,
             ISchedulerFactory schedulerFactory,
-            IConfiguration configuration,
-            IBusinessService businessService)
+            IBusinessService businessService,
+            IDiscountService discountService,
+            IOrderService orderService)
         {
             _adminService = adminService;
             _settingsService = settingsService;
@@ -44,8 +45,9 @@ namespace Marketplace.Web.Controllers
             _marketplaceBalanceService = marketplaceBalanceService;
             _categoryService = categoryService;
             _schedulerFactory = schedulerFactory;
-            _configuration = configuration;
             _businessService = businessService;
+            _discountService = discountService;
+            _orderService = orderService;
         }
 
         private string? CurrentAdminId => User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -244,7 +246,7 @@ namespace Marketplace.Web.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> ChangeBusinessStatus(Guid businessId, BusinessStatus status)
+        public async Task<IActionResult> ChangeBusinessStatus(Guid businessId, BusinessStatus status, string? returnUrl = null)
         {
             var result = await _adminService.ChangeBusinessStatus(businessId, status);
             if (result.Succeeded)
@@ -253,7 +255,83 @@ namespace Marketplace.Web.Controllers
                     $"Статус бізнесу змінено адміністратором на «{status}».",
                     actorUserId: CurrentAdminId);
             }
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
             return RedirectToAction("Businesses");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ApproveAdultStatus(Guid businessId, string? returnUrl = null)
+        {
+            var result = await _adminService.ApproveAdultStatusAsync(businessId);
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "AdultStatusApproved",
+                    "Статус 18+ підтверджено адміністратором.", actorUserId: CurrentAdminId);
+            }
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            return RedirectToAction("BusinessDetails", new { businessId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RejectAdultStatus(Guid businessId, string reason, string? returnUrl = null)
+        {
+            var result = await _adminService.RejectAdultStatusAsync(businessId, reason);
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "AdultStatusRejected",
+                    $"Заявку на статус 18+ відхилено адміністратором: {reason}", actorUserId: CurrentAdminId);
+            }
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            return RedirectToAction("BusinessDetails", new { businessId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> BusinessDetails(Guid businessId)
+        {
+            var details = await _adminService.GetBusinessDetailsAsync(businessId);
+            if (details is null)
+            {
+                return NotFound();
+            }
+
+            var orderSummary = await _orderService.GetBusinessOrderSummary(businessId);
+            var businessDiscount = await _discountService.GetBusinessDiscount(businessId);
+            var categoryDiscounts = await _discountService.GetActiveCategoryDiscountsForBusiness(businessId);
+
+            return View(new AdminBusinessDetailsViewModel
+            {
+                Id = details.Id,
+                StoreName = details.StoreName,
+                Description = details.Description,
+                LogoUrl = details.LogoUrl,
+                BannerUrl = details.BannerUrl,
+                Status = details.Status,
+                CommissionPercent = details.CommissionPercent,
+                CreatedAt = details.CreatedAt,
+                OwnerEmail = details.OwnerEmail,
+                AdultStatus = details.AdultStatus,
+                AdultRejectionReason = details.AdultRejectionReason,
+                TotalProductCount = details.TotalProductCount,
+                ActiveProductCount = details.ActiveProductCount,
+                PendingProductCount = details.PendingProductCount,
+                BannedProductCount = details.BannedProductCount,
+                TotalOrders = orderSummary.TotalOrders,
+                SoldItems = orderSummary.SoldItems,
+                Revenue = orderSummary.Revenue,
+                BusinessDiscount = businessDiscount,
+                CategoryDiscounts = categoryDiscounts
+            });
         }
 
         // BusinessLimits is backed by the real SystemSettings table (see
@@ -401,7 +479,7 @@ namespace Marketplace.Web.Controllers
         // Commission is set per business (see Business.CommissionPercent) rather than
         // globally, so it's edited from the Businesses list instead of this page.
         [HttpPost]
-        public async Task<IActionResult> ChangeBusinessCommission(Guid businessId, decimal commissionPercent)
+        public async Task<IActionResult> ChangeBusinessCommission(Guid businessId, decimal commissionPercent, string? returnUrl = null)
         {
             var result = await _adminService.ChangeBusinessComission(businessId, commissionPercent);
             if (result.Succeeded)
@@ -413,6 +491,10 @@ namespace Marketplace.Web.Controllers
             else
             {
                 TempData["Error"] = result.Message;
+            }
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
             }
             return RedirectToAction("Businesses");
         }
@@ -496,95 +578,6 @@ namespace Marketplace.Web.Controllers
                 Description = l.Description,
                 CreatedAt = l.CreatedAt
             }).ToList());
-        }
-
-        private async Task<List<IntegrationSettingViewModel>> BuildIntegrationsAsync()
-        {
-            var definitions = new (string Category, string DisplayName, string Description, string ConfigSection, (string Key, string Label, bool IsSecret)[] Keys)[]
-            {
-                ("LiqPay", "LiqPay", "Приймання онлайн-оплат за замовлення.", "LiqPay", new[]
-                {
-                    ("PublicKey", "Public Key", false),
-                    ("PrivateKey", "Private Key", true),
-                    ("ServerUrl", "Server URL (callback)", false),
-                }),
-                ("NovaPoshta", "Нова пошта", "Пошук міст і відділень для доставки.", "DeliveryApi", new[]
-                {
-                    ("NovaPoshtaApiKey", "API Key", true),
-                    ("NovaPoshtaBaseUrl", "Base URL", false),
-                }),
-                ("Cloudinary", "Cloudinary", "Зберігання зображень товарів і магазинів.", "Cloudinary", new[]
-                {
-                    ("CloudName", "Cloud Name", false),
-                    ("ApiKey", "API Key", true),
-                    ("ApiSecret", "API Secret", true),
-                }),
-                ("Email", "Email (SMTP)", "Підтвердження реєстрації, скидання пароля, сповіщення.", "EmailSettings", new[]
-                {
-                    ("Host", "SMTP Host", false),
-                    ("Port", "Port", false),
-                    ("Username", "Username", false),
-                    ("Password", "Password", true),
-                    ("FromEmail", "From Email", false),
-                    ("FromName", "From Name", false),
-                }),
-                ("GoogleAI", "Google AI (Gemini)", "Автоматична модерація товарів (текст і зображення).", "GoogleAI", new[]
-                {
-                    ("ApiKey", "API Key", true),
-                    ("Model", "Model", false),
-                }),
-            };
-
-            var result = new List<IntegrationSettingViewModel>();
-
-            foreach (var def in definitions)
-            {
-                var saved = await _settingsService.GetByCategoryAsync(def.Category);
-                var keys = new List<IntegrationKeyViewModel>();
-
-                foreach (var (key, label, isSecret) in def.Keys)
-                {
-                    var savedRow = saved.FirstOrDefault(s => s.Key == key);
-                    var value = savedRow?.Value ?? _configuration[$"{def.ConfigSection}:{key}"] ?? string.Empty;
-
-                    keys.Add(new IntegrationKeyViewModel
-                    {
-                        Key = key,
-                        Label = label,
-                        IsSecret = isSecret,
-                        IsOverridden = savedRow is not null,
-                        MaskedValue = Mask(value, isSecret)
-                    });
-                }
-
-                result.Add(new IntegrationSettingViewModel
-                {
-                    Category = def.Category,
-                    DisplayName = def.DisplayName,
-                    Description = def.Description,
-                    IsConfigured = keys.Any(k => !string.IsNullOrWhiteSpace(k.MaskedValue) && k.MaskedValue != "-"),
-                    Keys = keys
-                });
-            }
-
-            return result;
-        }
-
-        private static string Mask(string value, bool isSecret)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return "-";
-            }
-
-            if (!isSecret)
-            {
-                return value;
-            }
-
-            return value.Length <= 4
-                ? new string('*', 8)
-                : new string('*', 8) + value[^4..];
         }
 
         [HttpGet]

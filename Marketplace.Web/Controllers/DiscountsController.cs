@@ -176,7 +176,7 @@ namespace Marketplace.Web.Controllers
                 TempData["Error"] = result.Message;
             }
 
-            return RedirectToAction("Index", "Business");
+            return RedirectToAction("PromoCodes", "Business", new { businessId });
 
         }
 
@@ -203,7 +203,7 @@ namespace Marketplace.Web.Controllers
                 TempData["Error"] = result.Message;
             }
 
-            return RedirectToAction("Index", "Business");
+            return RedirectToAction("PromoCodes", "Business", new { businessId });
 
         }
 

@@ -73,6 +73,85 @@
     </section>
 
     <section class="business-panel">
+        <h2>Знижки на категорії</h2>
+        <p class="business-panel__lead">Діє на товари вибраної категорії у вашому магазині. Пріоритет знижок: власна знижка товару → знижка категорії → знижка на весь магазин.</p>
+
+        @if (Model.CategoryDiscounts.Any())
+        {
+            <table class="business-table">
+                <thead>
+                    <tr>
+                        <th>Категорія</th>
+                        <th>Знижка</th>
+                        <th>Діє до</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var cd in Model.CategoryDiscounts)
+                    {
+                        <tr>
+                            <td><strong>@cd.CategoryName</strong></td>
+                            <td>−@cd.DiscountPercent.ToString("0.##")%</td>
+                            <td>@cd.EndDate?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>
+                                <form asp-controller="Discounts" asp-action="RemoveCategoryDiscount" method="post" onsubmit="return confirm('Скасувати знижку на цю категорію?');">
+                                    <input type="hidden" name="categoryId" value="@cd.CategoryId" />
+                                    <input type="hidden" name="businessId" value="@Model.BusinessId" />
+                                    <button type="submit" class="seller-button seller-button--secondary">Скасувати</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="business-empty">Наразі немає активних знижок на категорії.</p>
+        }
+
+        @{
+            var categoriesWithoutDiscount = Model.Categories.Where(c => Model.CategoryDiscounts.All(cd => cd.CategoryId != c.Id)).ToList();
+        }
+        @if (categoriesWithoutDiscount.Any())
+        {
+            <form asp-controller="Discounts" asp-action="SetCategoryDiscount" method="post" class="business-settings-form">
+                <input type="hidden" name="businessId" value="@Model.BusinessId" />
+
+                <div>
+                    <label for="categoryId">Категорія</label>
+                    <select id="categoryId" name="categoryId" required>
+                        @foreach (var category in categoriesWithoutDiscount)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div>
+                    <label for="categoryDiscountPercent">Знижка, %</label>
+                    <input type="number" id="categoryDiscountPercent" name="discountPercent" min="1" max="100" required />
+                </div>
+
+                <div>
+                    <label for="categoryDiscountStartDate">Діє з</label>
+                    <input type="datetime-local" id="categoryDiscountStartDate" name="discountStartDate" required value="@DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm")" />
+                </div>
+
+                <div>
+                    <label for="categoryDiscountEndDate">Діє до</label>
+                    <input type="datetime-local" id="categoryDiscountEndDate" name="discountEndDate" required value="@DateTime.UtcNow.AddDays(3).ToString("yyyy-MM-ddTHH:mm")" />
+                </div>
+
+                <div>
+                    <button type="submit" class="seller-button seller-button--primary">Встановити знижку</button>
+                </div>
+            </form>
+        }
+    </section>
+
+    <section class="business-panel">
         <h2>Новий промокод</h2>
         <p class="business-panel__lead">Код буде приведено до верхнього регістру. Покупець отримає знижку лише на товари вашого магазину в замовленні.</p>
 

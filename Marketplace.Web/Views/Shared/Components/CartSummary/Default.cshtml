@@ -1,9 +1,16 @@
 @model int
 
-<a class="nav-link text-dark nav-cart-link"
+<a class="site-header__cart"
    asp-controller="Cart"
    asp-action="Index"
    aria-label="Кошик, товарів: @Model">
-    <span>Кошик</span>
-    <span class="nav-cart-count @(Model == 0 ? "is-empty" : null)">@Model</span>
+    <span class="site-header__cart-icon-wrap">
+        <svg class="site-header__cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="26" height="26" aria-hidden="true">
+            <circle cx="9" cy="21" r="1" />
+            <circle cx="19" cy="21" r="1" />
+            <path d="M2 2h2l2.6 12.6a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L21 6H6" />
+        </svg>
+        <span class="site-header__cart-count">@Model</span>
+    </span>
+    <span class="site-header__cart-label">Кошик</span>
 </a>

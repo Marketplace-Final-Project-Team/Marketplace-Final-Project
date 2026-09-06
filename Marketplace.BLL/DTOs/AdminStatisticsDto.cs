@@ -15,6 +15,16 @@ namespace Marketplace.BLL.DTOs
 
         public List<BusinessStatisticsDto> Businesses { get; set; } = new();
         public List<PeriodStatisticsDto> ByPeriod { get; set; } = new();
+        public List<CategoryStatisticsDto> Categories { get; set; } = new();
+    }
+
+    public class CategoryStatisticsDto
+    {
+        public Guid CategoryId { get; set; }
+        public string CategoryName { get; set; } = string.Empty;
+        public int OrdersCount { get; set; }
+        public int UnitsSold { get; set; }
+        public decimal Turnover { get; set; }
     }
 
     public class BusinessStatisticsDto

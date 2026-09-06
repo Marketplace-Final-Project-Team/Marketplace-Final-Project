@@ -16,6 +16,14 @@
         name = string.IsNullOrWhiteSpace(b.StoreName) ? "Без назви" : b.StoreName,
         turnover = b.Turnover
     }));
+
+    var categoryColors = new[] { "#3157d7", "#42a98b", "#e8a33d", "#c65f9e", "#5b8def", "#8a5b00", "#b42318", "#7a89bb" };
+    var categoriesJson = System.Text.Json.JsonSerializer.Serialize(overview.Categories.Select((c, i) => new
+    {
+        name = c.CategoryName,
+        turnover = c.Turnover,
+        color = categoryColors[i % categoryColors.Length]
+    }));
 }
 
 @section Styles {
@@ -137,6 +145,19 @@
                         </div>
                     }
                 </div>
+                <div class="admin-panel admin-chart-card">
+                    <h2 class="admin-section-heading admin-section-heading--tight">Продажі за категоріями</h2>
+                    @if (overview.Categories.Count == 0)
+                    {
+                        <p class="admin-empty">За обраний період продажів немає.</p>
+                    }
+                    else
+                    {
+                        <div class="admin-chart-card__canvas-wrap">
+                            <canvas id="categoryTurnoverChart" data-chart='@Html.Raw(categoriesJson)'></canvas>
+                        </div>
+                    }
+                </div>
             </div>
 
             <h2 class="admin-section-heading">За магазинами</h2>
@@ -187,6 +208,40 @@
                                     <td>@b.Turnover.ToString("N2") ₴</td>
                                     <td>@b.MarketplaceRevenue.ToString("N2") ₴</td>
                                     <td class="admin-entity-meta">@b.AverageOrderValue.ToString("N2") ₴</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            <h2 class="admin-section-heading">За категоріями</h2>
+            @if (overview.Categories.Count == 0)
+            {
+                <div class="admin-panel">
+                    <p class="admin-empty">За обраний період продажів немає.</p>
+                </div>
+            }
+            else
+            {
+                <div class="admin-panel table-responsive">
+                    <table class="table admin-table">
+                        <thead>
+                            <tr>
+                                <th>Категорія</th>
+                                <th>Продажів</th>
+                                <th>Одиниць</th>
+                                <th>Оборот</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var c in overview.Categories)
+                            {
+                                <tr>
+                                    <td class="admin-entity-name">@c.CategoryName</td>
+                                    <td>@c.OrdersCount</td>
+                                    <td>@c.UnitsSold</td>
+                                    <td>@c.Turnover.ToString("N2") ₴</td>
                                 </tr>
                             }
                         </tbody>
