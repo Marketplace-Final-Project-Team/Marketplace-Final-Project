@@ -92,6 +92,8 @@ namespace Marketplace.BLL.Services
                     }
                     var business = await _businessRepository.FirstOrDefaultAsync(b => b.Id == cartItem.Product.BusinessId);
                     var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == cartItem.Product.CategoryId);
+                    
+
                     var now = DateTime.UtcNow;
                     var productDiscount = cartItem.Product.Discounts?
                         .FirstOrDefault(d => d.ProductId == cartItem.Product.Id && d.DiscountType == DiscountType.Product && d.StartDate <= now && d.EndDate >= now);
@@ -102,22 +104,49 @@ namespace Marketplace.BLL.Services
                     var categoryDiscount = category?.Discounts?
                         .FirstOrDefault(d => d.DiscountType == DiscountType.Category && d.StartDate <= now && d.BusinessId == cartItem.Product.BusinessId && d.CategoryId == cartItem.Product.CategoryId && d.EndDate >= now);
 
+                    var userdiscount = await _context.UserDiscounts
+                        .FirstOrDefaultAsync(ud => ud.UserId == userId && ud.BusinessId == cartItem.Product.BusinessId && ud.StartDate <= DateTime.UtcNow && ud.EndDate >= DateTime.UtcNow);
+
                     // A business-wide sale is dominant over the product's own sale — it replaces
                     // it rather than stacking with it. A matching promo code still stacks on top
                     // of whichever one of those applies.
                     decimal? bestDiscount = 0;
-                    if (productDiscount != null)
+                    if (userdiscount != null)
                     {
-                        bestDiscount = productDiscount.Percent;
+                        var alldiscounts = new List<decimal>();
+                        if (productDiscount != null)
+                        {
+                            alldiscounts.Add(productDiscount.Percent);
+                        }
+                        if (categoryDiscount != null) { 
+                            alldiscounts.Add(categoryDiscount.Percent);
+                        }
+                        if (userdiscount != null)
+                        {
+                            alldiscounts.Add(userdiscount.Percent);
+                        }
+                        if (businessDiscount != null)
+                        {
+                            alldiscounts.Add(businessDiscount.Percent);
+                        }
+                        bestDiscount = alldiscounts.Any() ? alldiscounts.Max() : 0;
                     }
-                    else if (categoryDiscount != null)
+                    else
                     {
-                        bestDiscount = categoryDiscount.Percent;
+                        if (productDiscount != null)
+                        {
+                            bestDiscount = productDiscount.Percent;
+                        }
+                        else if (categoryDiscount != null)
+                        {
+                            bestDiscount = categoryDiscount.Percent;
 
-                    }
-                    else if (businessDiscount != null)
-                    {
-                        bestDiscount = businessDiscount.Percent;
+                        }
+
+                        else if (businessDiscount != null)
+                        {
+                            bestDiscount = businessDiscount.Percent;
+                        }
                     }
 
 

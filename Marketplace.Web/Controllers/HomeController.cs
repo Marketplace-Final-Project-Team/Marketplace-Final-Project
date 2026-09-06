@@ -18,7 +18,7 @@ namespace Marketplace.Web.Controllers
             _categoryService = categoryService;
         }
 
-        public async Task<IActionResult> Index([FromQuery] CatalogFilterViewModel filter)
+        public async Task<IActionResult> Index([FromQuery] CatalogFilterViewModel filter, string? userId)
         {
             const int pageSize = 6;
             filter.Page = filter.Page <= 0 ? 1 : filter.Page;
@@ -45,7 +45,7 @@ namespace Marketplace.Web.Controllers
             var featuredProducts = catalogPage.Items
                 .Select(item =>
                 {
-                    var discountPercent = item.Product.GetEffectiveDiscountPercent();
+                    var discountPercent = item.Product.GetEffectiveDiscountPercent(userId);
                     var hasDiscount = discountPercent > 0;
 
                     return new CatalogProductViewModel
@@ -53,7 +53,7 @@ namespace Marketplace.Web.Controllers
                         Id = item.Product.Id,
                         Name = item.Product.Name,
                         Description = item.Product.Description,
-                        Price = hasDiscount ? item.Product.GetDiscountedPrice() : item.Product.Price,
+                        Price = hasDiscount ? item.Product.GetDiscountedPrice(userId) : item.Product.Price,
                         Quantity = item.Product.Quantity,
                         MainImageUrl = item.Product.MainImageUrl,
                         CategoryName = item.Product.Category?.Name ?? "Без категорії",
