@@ -9,7 +9,6 @@ using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Common;
 using Quartz;
 using Quartz.Impl.Matchers;
-using Microsoft.Extensions.Configuration;
 
 namespace Marketplace.Web.Controllers
 {
@@ -24,7 +23,6 @@ namespace Marketplace.Web.Controllers
         private readonly IMarketplaceBalanceService _marketplaceBalanceService;
         private readonly ICategoryService _categoryService;
         private readonly ISchedulerFactory _schedulerFactory;
-        private readonly IConfiguration _configuration;
 
         public AdminController(
             IAdminService adminService,
@@ -34,7 +32,6 @@ namespace Marketplace.Web.Controllers
             IMarketplaceBalanceService marketplaceBalanceService,
             ICategoryService categoryService,
             ISchedulerFactory schedulerFactory,
-            IConfiguration configuration,
             IBusinessService businessService)
         {
             _adminService = adminService;
@@ -44,7 +41,6 @@ namespace Marketplace.Web.Controllers
             _marketplaceBalanceService = marketplaceBalanceService;
             _categoryService = categoryService;
             _schedulerFactory = schedulerFactory;
-            _configuration = configuration;
             _businessService = businessService;
         }
 
@@ -496,95 +492,6 @@ namespace Marketplace.Web.Controllers
                 Description = l.Description,
                 CreatedAt = l.CreatedAt
             }).ToList());
-        }
-
-        private async Task<List<IntegrationSettingViewModel>> BuildIntegrationsAsync()
-        {
-            var definitions = new (string Category, string DisplayName, string Description, string ConfigSection, (string Key, string Label, bool IsSecret)[] Keys)[]
-            {
-                ("LiqPay", "LiqPay", "Приймання онлайн-оплат за замовлення.", "LiqPay", new[]
-                {
-                    ("PublicKey", "Public Key", false),
-                    ("PrivateKey", "Private Key", true),
-                    ("ServerUrl", "Server URL (callback)", false),
-                }),
-                ("NovaPoshta", "Нова пошта", "Пошук міст і відділень для доставки.", "DeliveryApi", new[]
-                {
-                    ("NovaPoshtaApiKey", "API Key", true),
-                    ("NovaPoshtaBaseUrl", "Base URL", false),
-                }),
-                ("Cloudinary", "Cloudinary", "Зберігання зображень товарів і магазинів.", "Cloudinary", new[]
-                {
-                    ("CloudName", "Cloud Name", false),
-                    ("ApiKey", "API Key", true),
-                    ("ApiSecret", "API Secret", true),
-                }),
-                ("Email", "Email (SMTP)", "Підтвердження реєстрації, скидання пароля, сповіщення.", "EmailSettings", new[]
-                {
-                    ("Host", "SMTP Host", false),
-                    ("Port", "Port", false),
-                    ("Username", "Username", false),
-                    ("Password", "Password", true),
-                    ("FromEmail", "From Email", false),
-                    ("FromName", "From Name", false),
-                }),
-                ("GoogleAI", "Google AI (Gemini)", "Автоматична модерація товарів (текст і зображення).", "GoogleAI", new[]
-                {
-                    ("ApiKey", "API Key", true),
-                    ("Model", "Model", false),
-                }),
-            };
-
-            var result = new List<IntegrationSettingViewModel>();
-
-            foreach (var def in definitions)
-            {
-                var saved = await _settingsService.GetByCategoryAsync(def.Category);
-                var keys = new List<IntegrationKeyViewModel>();
-
-                foreach (var (key, label, isSecret) in def.Keys)
-                {
-                    var savedRow = saved.FirstOrDefault(s => s.Key == key);
-                    var value = savedRow?.Value ?? _configuration[$"{def.ConfigSection}:{key}"] ?? string.Empty;
-
-                    keys.Add(new IntegrationKeyViewModel
-                    {
-                        Key = key,
-                        Label = label,
-                        IsSecret = isSecret,
-                        IsOverridden = savedRow is not null,
-                        MaskedValue = Mask(value, isSecret)
-                    });
-                }
-
-                result.Add(new IntegrationSettingViewModel
-                {
-                    Category = def.Category,
-                    DisplayName = def.DisplayName,
-                    Description = def.Description,
-                    IsConfigured = keys.Any(k => !string.IsNullOrWhiteSpace(k.MaskedValue) && k.MaskedValue != "-"),
-                    Keys = keys
-                });
-            }
-
-            return result;
-        }
-
-        private static string Mask(string value, bool isSecret)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return "-";
-            }
-
-            if (!isSecret)
-            {
-                return value;
-            }
-
-            return value.Length <= 4
-                ? new string('*', 8)
-                : new string('*', 8) + value[^4..];
         }
 
         [HttpGet]
