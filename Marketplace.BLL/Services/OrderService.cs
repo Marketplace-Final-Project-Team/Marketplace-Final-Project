@@ -1,4 +1,4 @@
-﻿using Marketplace.BLL.Common;
+using Marketplace.BLL.Common;
 using Marketplace.BLL.Configs;
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.DTOs.Businesses;
@@ -52,7 +52,7 @@ namespace Marketplace.BLL.Services
 
         public async Task<OrderResultDto> CreateOrder(string userId, OrderCreateDto dto)
         {
-     
+
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
@@ -69,6 +69,7 @@ namespace Marketplace.BLL.Services
                     return new OrderResultDto { Succeeded = false, Message = "Адреса не знайдена." };
                 }
 
+                
                 var orderItems = new List<OrderItem>();
                 var promoCode = !string.IsNullOrWhiteSpace(dto.PromoCode)
                     ? await _promoCodeService.FindActiveAsync(dto.PromoCode)
@@ -89,24 +90,51 @@ namespace Marketplace.BLL.Services
                     {
                         return new OrderResultDto { Succeeded = false, Message = $"Недостатньо товару «{cartItem.Product.Name}» на складі." };
                     }
-
                     var business = await _businessRepository.FirstOrDefaultAsync(b => b.Id == cartItem.Product.BusinessId);
-
+                    var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == cartItem.Product.CategoryId);
                     var now = DateTime.UtcNow;
                     var productDiscount = cartItem.Product.Discounts?
-                        .FirstOrDefault(d => d.StartDate <= now && d.EndDate >= now);
+                        .FirstOrDefault(d => d.ProductId == cartItem.Product.Id && d.DiscountType == DiscountType.Product && d.StartDate <= now && d.EndDate >= now);
 
                     var businessDiscount = business?.Discounts?
-                        .FirstOrDefault(d => d.StartDate <= now && d.EndDate >= now);
+                        .FirstOrDefault(d => d.BusinessId == cartItem.Product.BusinessId && d.DiscountType == DiscountType.Business && d.StartDate <= now && d.EndDate >= now);
 
-                    var saleDiscountPercent = businessDiscount?.Percent ?? productDiscount?.Percent ?? 0;
+                    var categoryDiscount = category?.Discounts?
+                        .FirstOrDefault(d => d.DiscountType == DiscountType.Category && d.StartDate <= now && d.BusinessId == cartItem.Product.BusinessId && d.CategoryId == cartItem.Product.CategoryId && d.EndDate >= now);
+
+                    // A business-wide sale is dominant over the product's own sale — it replaces
+                    // it rather than stacking with it. A matching promo code still stacks on top
+                    // of whichever one of those applies.
+                    decimal? bestDiscount = 0;
+                    if (productDiscount != null)
+                    {
+                        bestDiscount = productDiscount.Percent;
+                    }
+                    else if (categoryDiscount != null)
+                    {
+                        bestDiscount = categoryDiscount.Percent;
+
+                    }
+                    else if (businessDiscount != null)
+                    {
+                        bestDiscount = businessDiscount.Percent;
+                    }
+
+
+
+                    var saleDiscountPercent = bestDiscount ?? 0;
                     var promoPercent = promoCode is not null && promoCode.BusinessId == cartItem.Product.BusinessId
                         ? promoCode.Percent
                         : 0;
+                    var effectivePercent = saleDiscountPercent + promoPercent;
+                    if (effectivePercent > 100)
+                    {
+                        effectivePercent = 100;
+                    }
 
-                    var effectivePercent = Math.Min(saleDiscountPercent + promoPercent, 100);
+                    
 
-             
+
                     var unitPrice = effectivePercent > 0
                         ? Math.Round(cartItem.Product.Price * (1m - effectivePercent / 100m), 2, MidpointRounding.AwayFromZero)
                         : Math.Round(cartItem.Product.Price, 2, MidpointRounding.AwayFromZero);
@@ -145,7 +173,7 @@ namespace Marketplace.BLL.Services
 
                 await _context.SaveChangesAsync();
 
- 
+
                 var paymentData = await _paymentService.CreatePaymentAsync(
                     orderId: order.Id.ToString(),
                     amount: order.TotalAmount,
@@ -192,7 +220,7 @@ namespace Marketplace.BLL.Services
                     return new ServiceResult { Succeeded = false, Message = $"Неможливо змінити статус замовлення з «{order.Status}» на «{status}»." };
                 }
 
-            
+
                 if (status == OrderStatus.Confirmed && order.Status == OrderStatus.Pending)
                 {
                     var marketplaceBalance = await _marketplaceBalanceService.GetOrCreateTrackedAsync();
@@ -224,7 +252,7 @@ namespace Marketplace.BLL.Services
                         }
                     }
 
-                
+
                     if (order.Status is OrderStatus.Confirmed or OrderStatus.Shipped or OrderStatus.Delivered)
                     {
                         var marketplaceBalance = await _marketplaceBalanceService.GetOrCreateTrackedAsync();
@@ -259,7 +287,7 @@ namespace Marketplace.BLL.Services
 
         public async Task<ServiceResult> RefundOrderItemAsync(Guid orderItemId)
         {
- 
+
             try
             {
                 var item = await _context.OrderItems
@@ -300,12 +328,12 @@ namespace Marketplace.BLL.Services
 
                 item.IsReturned = true;
                 await _context.SaveChangesAsync();
-        
+
                 return new ServiceResult { Succeeded = true, Message = string.Empty };
             }
             catch (Exception)
             {
-               
+
                 throw;
             }
         }

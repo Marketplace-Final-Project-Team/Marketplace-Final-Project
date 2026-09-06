@@ -37,7 +37,7 @@ public class ProductService : IProductService
     {
         var scheduler = await _schedulerFactory.GetScheduler();
 
-        var jobKey = new JobKey($"moderation-job-{productId}", "moderation");
+        var jobKey = new JobKey($"product-moderation-job-{productId}", "moderation");
 
         if (await scheduler.CheckExists(jobKey))
         {
@@ -55,7 +55,7 @@ public class ProductService : IProductService
             .Build();
 
         var trigger = TriggerBuilder.Create()
-            .WithIdentity($"moderation-trigger-{productId}", "moderation")
+            .WithIdentity($"product-moderation-trigger-{productId}", "moderation")
             .StartAt(DateBuilder.FutureDate(5, IntervalUnit.Second))
             .Build();
 
@@ -67,6 +67,11 @@ public class ProductService : IProductService
         var query = _context.Products
             .AsNoTracking()
             .Include(p => p.Category)
+            .Include(p => p.Business)
+                .ThenInclude(b => b.Discounts)  
+            .Include(p => p.Category)
+                .ThenInclude(c => c.Discounts)
+
             .Include(p => p.Images)
             .Where(p => p.Status == ProductStatus.Active);
 
@@ -94,6 +99,10 @@ public class ProductService : IProductService
         var query = _context.Products
             .AsNoTracking()
             .Include(p => p.Category)
+            .Include(p => p.Business)
+                .ThenInclude(b => b.Discounts)   
+            .Include(p => p.Category)
+                .ThenInclude(c => c.Discounts)
             .Include(p => p.Images)
             .Where(p => p.Status == ProductStatus.Active);
 
@@ -163,6 +172,9 @@ public class ProductService : IProductService
             .AsNoTracking()
             .Include(p => p.Category)
             .Include(p => p.Business)
+                .ThenInclude(b => b.Discounts)   
+            .Include(p => p.Category)
+                .ThenInclude(c => c.Discounts)
             .Include(p => p.Images)
             .FirstOrDefaultAsync(p => p.Id == id && p.Status == ProductStatus.Active);
 
@@ -184,8 +196,12 @@ public class ProductService : IProductService
 
         var productsQuery = _context.Products
             .AsNoTracking()
-            .Include(p => p.Category)
+            
             .Include(p => p.Images)
+            .Include(p => p.Business)
+                .ThenInclude(b => b.Discounts)   
+            .Include(p => p.Category)
+                .ThenInclude(c => c.Discounts)
             .Where(p => p.Status == ProductStatus.Active);
 
         if (!allowAdultContent)
@@ -213,8 +229,12 @@ public class ProductService : IProductService
     public async Task<IReadOnlyList<Product>> GetByBusinessAsync(Guid businessId)
     {
         return await _context.Products
-            .Include(p => p.Category)
+            
             .Include(p => p.Images)
+            .Include(p => p.Business)
+                .ThenInclude(b => b.Discounts)   
+            .Include(p => p.Category)
+                .ThenInclude(c => c.Discounts)
             .Where(p => p.BusinessId == businessId)
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
@@ -224,6 +244,10 @@ public class ProductService : IProductService
     {
         return await _context.Products
             .Include(p => p.Category)
+            .Include(p => p.Business)
+                .ThenInclude(b => b.Discounts)   
+            .Include(p => p.Category)
+                .ThenInclude(c => c.Discounts)
             .Include(p => p.Images)
             .FirstOrDefaultAsync(p => p.Id == id);
     }

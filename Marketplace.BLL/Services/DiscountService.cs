@@ -4,7 +4,9 @@ using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
 using Marketplace.DAL.Interfaces;
 using Marketplace.Domain.Entities;
+using Marketplace.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Marketplace.Domain.Enums;
 
 namespace Marketplace.BLL.Services
 {
@@ -12,13 +14,16 @@ namespace Marketplace.BLL.Services
     {
         private readonly AppDbContext _context;
         private readonly IBusinessRepository _businessRepo;
+        private readonly IGenericRepository<Category> _categoryRepo;
         private readonly ISystemSettingsService _settingsService;
 
-        public DiscountService(AppDbContext context, IBusinessRepository businessRepo, ISystemSettingsService settingsService)
+        public DiscountService(AppDbContext context, IBusinessRepository businessRepo, IGenericRepository<Category> categoryRepo, ISystemSettingsService settingsService)
         {
             _context = context;
             _businessRepo = businessRepo;
+            _categoryRepo = categoryRepo;
             _settingsService = settingsService;
+            
         }
 
         public async Task SetDiscountAsync(Guid productId, decimal percent, DateTime startDate, DateTime endDate)
@@ -35,21 +40,26 @@ namespace Marketplace.BLL.Services
                 throw new ArgumentException("Продукт не знайдено");
             }
 
-            var existingDiscounts = await _context.Discounts
-                .Where(d => d.ProductId == productId)
+            var productDiscounts = await _context.Discounts
+                .Where(d => d.ProductId == productId && d.DiscountType == DiscountType.Product && d.EndDate > DateTime.UtcNow)
                 .ToListAsync();
 
-            foreach (var old in existingDiscounts)
+            foreach (var old in productDiscounts)
             {
                 old.EndDate = DateTime.UtcNow.AddSeconds(-1);
             }
+            
+            
+
+
 
             var discount = new Discount
             {
                 ProductId = productId,
                 Percent = percent,
                 StartDate = startDate,
-                EndDate = endDate
+                EndDate = endDate,
+                DiscountType = DiscountType.Product,
             };
 
             _context.Discounts.Add(discount);
@@ -59,13 +69,15 @@ namespace Marketplace.BLL.Services
         public async Task RemoveDiscountAsync(Guid productId)
         {
             var activeDiscounts = await _context.Discounts
-                .Where(d => d.ProductId == productId && d.EndDate > DateTime.UtcNow)
+                .Where(d => d.ProductId == productId && d.DiscountType == DiscountType.Product && d.EndDate > DateTime.UtcNow)
                 .ToListAsync();
 
             foreach (var d in activeDiscounts)
             {
                 d.EndDate = DateTime.UtcNow.AddSeconds(-1);
+                
             }
+            
 
             await _context.SaveChangesAsync();
         }
@@ -75,7 +87,7 @@ namespace Marketplace.BLL.Services
             
 
             var business = await _businessRepo.GetByIdAsync(businessId);
-            var active_discount = await _context.Discounts.FirstOrDefaultAsync(d => d.BusinessId == businessId && d.EndDate > DateTime.UtcNow);
+            var active_discount = await _context.Discounts.FirstOrDefaultAsync(d => d.BusinessId == businessId && d.DiscountType == DiscountType.Business && d.EndDate > DateTime.UtcNow);
             
             if (business == null)
             {
@@ -87,10 +99,148 @@ namespace Marketplace.BLL.Services
             }
             if (active_discount != null)
             {
+                active_discount.EndDate = DateTime.UtcNow.AddSeconds(-1);
+            }
+            var maxDiscountPercent = await _settingsService.GetIntAsync("BusinessRules", "MaxDiscountPercent", 90);
+            if (percent < 0 || percent > maxDiscountPercent)
+            {
                 return new ServiceResult
                 {
                     Succeeded = false,
-                    Message = "Неможливо встановити знижку для бізнесу, поки існує активна знижка для цього бізнесу"
+                    Message = $"Знижка повинна бути в межах від 0 до {maxDiscountPercent}"
+                };
+            }
+            if (startDate >= endDate)
+            {
+                return new ServiceResult
+                {
+                    Succeeded = false,
+                    Message = "Дата початку знижки повинна бути менше дати закінчення"
+                };
+            }
+            if (startDate < DateTime.UtcNow.Date)
+            {
+                return new ServiceResult
+                {
+                    Succeeded = false,
+                    Message = "Дата початку знижки не може бути в минулому"
+                };
+            }
+            if (endDate < DateTime.UtcNow)
+            {
+                return new ServiceResult
+                {
+                    Succeeded = false,
+                    Message = "Дата закінчення знижки не може бути в минулому"
+                };
+            }
+            
+
+            var discount = new Discount
+            {
+                BusinessId = businessId,
+                Percent = percent,
+                StartDate = startDate,
+                EndDate = endDate,
+                DiscountType = DiscountType.Business
+            };
+            
+            
+            await _context.Discounts.AddAsync(discount);
+            await _context.SaveChangesAsync();
+            return new ServiceResult
+            {
+                Succeeded = true,
+                Message = "Знижка успішно встановлена"
+
+            };
+        }
+        public async Task<ServiceResult> RemoveBusinessDiscount(Guid businessId)
+        {
+            var business = await _businessRepo.GetByIdAsync(businessId);
+            var active_discount = await _context.Discounts.FirstOrDefaultAsync(d => d.BusinessId == businessId && d.DiscountType == DiscountType.Business && d.EndDate >= DateTime.UtcNow);
+            if (business == null)
+            {
+                return new ServiceResult
+                {
+                    Succeeded = false,
+                    Message = "Бізнес не знайдено"
+                };
+
+            }
+            if (active_discount == null)
+            {
+                return new ServiceResult
+                {
+                    Succeeded = false,
+                    Message = "Немає активної знижки для видалення"
+                };
+
+            }
+            active_discount.EndDate = DateTime.UtcNow.AddSeconds(-1);
+            
+            await _context.SaveChangesAsync();
+            return new ServiceResult
+            {
+                Succeeded = true,
+                Message = "Знижка успішно видалена"
+            };
+
+        }
+        public async Task<BusinessDiscountDto> GetBusinessDiscount(Guid businessId)
+        {
+            var business = await _businessRepo.GetByIdAsync(businessId);
+            var active_discount = await _context.Discounts.FirstOrDefaultAsync(d => d.BusinessId == businessId && d.DiscountType == DiscountType.Business && d.EndDate >= DateTime.UtcNow);
+            if (business == null)
+            {
+                return null;
+            }
+            
+            if (active_discount != null && active_discount.IsActive)
+            {
+                return new BusinessDiscountDto
+                {
+                    BusinessId = business.Id,
+                    DiscountPercent = active_discount.Percent,
+                    StartDate = active_discount.StartDate,
+                    EndDate = active_discount.EndDate,
+                    IsActive = true
+                };
+
+            }
+
+
+            return new BusinessDiscountDto
+            {
+                BusinessId = businessId,
+                DiscountPercent = 0,
+                IsActive = false
+            };
+
+
+        }
+        public async Task<ServiceResult> SetCategoryDiscount(Guid categoryId, Guid businessId, decimal percent, DateTime startDate, DateTime endDate)
+        {
+
+            
+            var category = await _categoryRepo.GetByIdAsync(categoryId);
+            
+
+            if (category == null)
+            {
+                return new ServiceResult
+                {
+                    Succeeded = false,
+                    Message = "Категорія не знайдена"
+                };
+            }
+            var active_discount = await _context.Discounts.FirstOrDefaultAsync(d => d.CategoryId == categoryId && d.BusinessId == businessId && d.DiscountType == DiscountType.Category && d.EndDate > DateTime.UtcNow);
+            if (active_discount != null)
+            {
+                return new ServiceResult
+                {
+                    Succeeded = false,
+                    Message = "Неможливо встановити знижку для категорії, поки існує активна знижка для цієї категорії"
                 };
             }
             var maxDiscountPercent = await _settingsService.GetIntAsync("BusinessRules", "MaxDiscountPercent", 90);
@@ -126,23 +276,20 @@ namespace Marketplace.BLL.Services
                     Message = "Дата закінчення знижки не може бути в минулому"
                 };
             }
-            var productDiscounts = await _context.Discounts
-                .Where(d => d.Product.BusinessId == businessId && d.EndDate > DateTime.UtcNow)
-                .ToListAsync();
-            foreach( var pd in productDiscounts)
-            {
-                 pd.EndDate = DateTime.UtcNow.AddSeconds(-1);
-            }
+            
 
-            var discount = new Discount
+
+                var discount = new Discount
             {
+                CategoryId = categoryId,
                 BusinessId = businessId,
                 Percent = percent,
                 StartDate = startDate,
-                EndDate = endDate
-            };
-            
-            
+                EndDate = endDate,
+                DiscountType = DiscountType.Category
+                };
+
+
             await _context.Discounts.AddAsync(discount);
             await _context.SaveChangesAsync();
             return new ServiceResult
@@ -152,16 +299,16 @@ namespace Marketplace.BLL.Services
 
             };
         }
-        public async Task<ServiceResult> RemoveBusinessDiscount(Guid businessId)
+        public async Task<ServiceResult> RemoveCategoryDiscount(Guid categoryId, Guid businessId)
         {
-            var business = await _businessRepo.GetByIdAsync(businessId);
-            var active_discount = await _context.Discounts.FirstOrDefaultAsync(d => d.BusinessId == businessId && d.EndDate >= DateTime.UtcNow);
-            if (business == null)
+            var category = await _categoryRepo.GetByIdAsync(categoryId);
+            var active_discount = await _context.Discounts.FirstOrDefaultAsync(d => d.CategoryId == categoryId && d.BusinessId == businessId && d.DiscountType == DiscountType.Category && d.EndDate >= DateTime.UtcNow);
+            if (category == null)
             {
                 return new ServiceResult
                 {
                     Succeeded = false,
-                    Message = "Бізнес не знайдено"
+                    Message = "Категорія не знайдена"
                 };
 
             }
@@ -175,6 +322,7 @@ namespace Marketplace.BLL.Services
 
             }
             active_discount.EndDate = DateTime.UtcNow.AddSeconds(-1);
+            
             await _context.SaveChangesAsync();
             return new ServiceResult
             {
@@ -183,20 +331,23 @@ namespace Marketplace.BLL.Services
             };
 
         }
-        public async Task<BusinessDiscountDto> GetBusinessDiscount(Guid businessId)
+        public async Task<CategoryDiscountDto> GetCategoryDiscount(Guid categoryId, Guid businessId)
         {
-            var business = await _businessRepo.GetByIdAsync(businessId);
-            var active_discount = await _context.Discounts.FirstOrDefaultAsync(d => d.BusinessId == businessId && d.EndDate >= DateTime.UtcNow);
-            if (business == null)
+            var category = await _categoryRepo.GetByIdAsync(categoryId);
+            if (category == null)
             {
                 return null;
             }
+            var active_discount = await _context.Discounts.FirstOrDefaultAsync(d => d.CategoryId == categoryId && d.BusinessId == businessId && d.DiscountType == DiscountType.Category && d.EndDate >= DateTime.UtcNow);
             
+
             if (active_discount != null && active_discount.IsActive)
             {
-                return new BusinessDiscountDto
+                return new CategoryDiscountDto
                 {
-                    BusinessId = business.Id,
+                    CategoryId = category.Id,
+                    CategoryName = category.Name,
+                    BusinessId = businessId,
                     DiscountPercent = active_discount.Percent,
                     StartDate = active_discount.StartDate,
                     EndDate = active_discount.EndDate,
@@ -206,8 +357,10 @@ namespace Marketplace.BLL.Services
             }
 
 
-            return new BusinessDiscountDto
+            return new CategoryDiscountDto
             {
+                CategoryId = category.Id,
+                CategoryName = category.Name,
                 BusinessId = businessId,
                 DiscountPercent = 0,
                 IsActive = false

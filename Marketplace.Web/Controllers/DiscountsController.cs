@@ -15,17 +15,23 @@ namespace Marketplace.Web.Controllers
         private readonly IProductService _productService;
         private readonly IBusinessAccessService _businessAccessService;
         private readonly IActivityLogService _activityLog;
+        private readonly IBusinessService _businessService;
+
+        private readonly ICategoryService _categoryService;
 
         public DiscountsController(
             IDiscountService discountService,
             IProductService productService,
             IBusinessAccessService businessAccessService,
-            IActivityLogService activityLog)
+            IBusinessService businessService,
+            IActivityLogService activityLog,ICategoryService categoryService)
         {
             _discountService = discountService;
             _productService = productService;
             _businessAccessService = businessAccessService;
             _activityLog = activityLog;
+            _categoryService = categoryService;
+            _businessService = businessService;
         }
 
         private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
@@ -75,6 +81,142 @@ namespace Marketplace.Web.Controllers
             TempData["Success"] = "Знижку скасовано.";
 
             return RedirectToAction("Edit", "Products", new { id = productId });
+        }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetBusinessDiscount(Guid businessId, decimal discountPercent, DateTime discountStartDate, DateTime discountEndDate)
+        {
+            
+            var business = await _businessService.GetByIdAsync(businessId);
+            if (business == null) return NotFound();
+
+            var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.ProductCrud);
+            if (!hasAccess) return Forbid();
+            var result = await _discountService.SetBusinessDiscount(businessId, discountPercent, discountStartDate, discountEndDate);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "BusinessDiscountSet",
+                    $"Адміністратор встановив знижку {discountPercent}% на весь бізнес «{business.StoreName}».",
+                    actorUserId: CurrentUserId);
+                TempData["Success"] = result.Message;
+            }
+            else
+            {
+                TempData["Error"] = result.Message;
+            }
+
+            return RedirectToAction("Index","Business");
+
+        }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveBusinessDiscount(Guid businessId)
+        {
+            
+            var business = await _businessService.GetByIdAsync(businessId);
+            if (business == null) return NotFound();
+
+            var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.ProductCrud);
+            if (!hasAccess) return Forbid();
+            var result = await _discountService.RemoveBusinessDiscount(businessId);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "BusinessDiscountRemoved",
+                    $"Адміністратор скасував знижку на весь бізнес «{business.StoreName}».",
+                    actorUserId: CurrentUserId);
+                TempData["Success"] = result.Message;
+            }
+            else
+            {
+                TempData["Error"] = result.Message;
+            }
+
+            return RedirectToAction("Index", "Business");
+
+        }
+                                                               
+        [HttpGet]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GetBusinessDiscount(Guid businessId)
+        {
+            var business = await _businessService.GetByIdAsync(businessId);
+            if (business == null) return NotFound();
+            var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.Statistics);
+            if (!hasAccess) return Forbid();
+            var discount = await _discountService.GetBusinessDiscount(businessId);
+            return Json(discount);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetCategoryDiscount(Guid categoryId, Guid businessId, decimal discountPercent, DateTime discountStartDate, DateTime discountEndDate)
+        {
+            Console.WriteLine($"CategoryId: {categoryId}");
+            
+            var category = await _categoryService.GetByIdAsync(categoryId);
+            Console.WriteLine($"CategoryId: {categoryId}");
+            Console.WriteLine($"Category: {category?.Id} - {category?.Name}");
+            if (category == null) return NotFound();
+
+            var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.ProductCrud);
+            if (!hasAccess) return Forbid();
+            var result = await _discountService.SetCategoryDiscount(categoryId, businessId, discountPercent, discountStartDate, discountEndDate);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "CategoryDiscountSet",
+                    $"Адміністратор встановив знижку {discountPercent}% на категорію «{category.Name}».",
+                    actorUserId: CurrentUserId);
+                TempData["Success"] = result.Message;
+            }
+            else
+            {
+                TempData["Error"] = result.Message;
+            }
+
+            return RedirectToAction("Index", "Business");
+
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveCategoryDiscount(Guid categoryId, Guid businessId)
+        {
+
+            var category = await _categoryService.GetByIdAsync(categoryId);
+            if (category == null) return NotFound();
+
+            var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.ProductCrud);
+            if (!hasAccess) return Forbid();
+            var result = await _discountService.RemoveCategoryDiscount(categoryId, businessId);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "CategoryDiscountRemoved",
+                    $"Адміністратор скасував знижку на категорію «{category.Name}».",
+                    actorUserId: CurrentUserId);
+                TempData["Success"] = result.Message;
+            }
+            else
+            {
+                TempData["Error"] = result.Message;
+            }
+
+            return RedirectToAction("Index", "Business");
+
+        }
+
+        [HttpGet]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GetCategoryDiscount(Guid categoryId, Guid businessId)
+        {
+            var category = await _categoryService.GetByIdAsync(categoryId);
+            if (category == null) return NotFound();
+            var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.Statistics);
+            if (!hasAccess) return Forbid();
+            var discount = await _discountService.GetCategoryDiscount(categoryId, businessId);
+            return Json(discount);
         }
     }
 }

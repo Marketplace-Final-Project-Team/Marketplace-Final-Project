@@ -9,5 +9,7 @@ namespace Marketplace.Domain.Entities
         public bool IsAdultOnly { get; set; } = false;
 
         public ICollection<Product> Products { get; set; } = new List<Product>();
+
+        public ICollection<Discount> Discounts { get; set; } = new List<Discount>();
     }
 }

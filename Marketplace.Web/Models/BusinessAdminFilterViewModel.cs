@@ -1,5 +1,4 @@
-﻿using Marketplace.Domain.Enums;
-
+using Marketplace.Domain.Enums;
 namespace Marketplace.Web.Models
 {
     public class BusinessAdminFilterViewModel
@@ -9,7 +8,7 @@ namespace Marketplace.Web.Models
         public BusinessStatus? Status { get; set; }
         public decimal? MinCommission { get; set; }
         public decimal? MaxCommission { get; set; }
-        public bool? SortDescending { get; set; }
+        public BusinessSortOption SortOption { get; set; } = BusinessSortOption.CreatedAtDesc;
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 20;
     }
