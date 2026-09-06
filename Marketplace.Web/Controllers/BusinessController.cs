@@ -677,18 +677,6 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Integrations(Guid businessId)
-        {
-            var business = await GetAccessibleBusinessOrNullAsync(businessId);
-            if (business is null)
-            {
-                return Forbid();
-            }
-
-            return View(new BusinessIntegrationsViewModel { BusinessId = businessId, StoreName = business.StoreName });
-        }
-
-        [HttpGet]
         public async Task<IActionResult> Settings(Guid businessId)
         {
             var business = await GetAccessibleBusinessOrNullAsync(businessId);

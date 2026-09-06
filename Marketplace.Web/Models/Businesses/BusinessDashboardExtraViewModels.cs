@@ -36,12 +36,6 @@ namespace Marketplace.Web.Models.Businesses
         public string StoreName { get; set; } = string.Empty;
     }
 
-    public class BusinessIntegrationsViewModel
-    {
-        public Guid BusinessId { get; set; }
-        public string StoreName { get; set; } = string.Empty;
-    }
-
     public class BusinessSettingsViewModel
     {
         public Guid BusinessId { get; set; }
