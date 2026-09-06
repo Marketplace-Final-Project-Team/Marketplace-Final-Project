@@ -34,6 +34,14 @@ namespace Marketplace.Web.Models
                 .OrderByDescending(d => d.CreatedAt)
                 .FirstOrDefault();
         }
+        public static UserDiscount? GetActiveUserDiscount(this Product product, string userId)
+        {
+            var now = DateTime.UtcNow;
+            return product.Business?.UserDiscounts?
+                .Where(d => d.UserId == userId && d.BusinessId == product.BusinessId && d.StartDate <= now && d.EndDate >= now)
+                .OrderByDescending(d => d.CreatedAt)
+                .FirstOrDefault();
+        }
 
 
 
@@ -42,31 +50,56 @@ namespace Marketplace.Web.Models
         // A business-wide sale is dominant over a product's own sale rather than stacking
         // with it — setting one is meant to replace the other (same rule as
         // OrderService.CreateOrder), capped at 100% so a price can never go to zero or below.
-        public static decimal GetEffectiveDiscountPercent(this Product product)
+        public static decimal GetEffectiveDiscountPercent(this Product product,string userId)
         {
             decimal? discount = 0;
-            var productobj = product.GetActiveProductDiscount()?.Percent;
-            var categoryobj = product.GetActiveCategoryDiscount()?.Percent;
-            var businessobj = product.GetActiveBusinessDiscount()?.Percent;
-            if (productobj != null)
+            var productobj = product.GetActiveProductDiscount();
+            var categoryobj = product.GetActiveCategoryDiscount();
+            var businessobj = product.GetActiveBusinessDiscount();
+            var userobj = product.GetActiveUserDiscount(userId);
+            if (userobj != null)
             {
-                discount = productobj;
+                var alldiscounts = new List<decimal>();
+                if (productobj != null)
+                {
+                    alldiscounts.Add(productobj.Percent);
+                }
+                if (categoryobj != null)
+                {
+                    alldiscounts.Add(categoryobj.Percent);
+                }
+                if (userobj != null)
+                {
+                    alldiscounts.Add(userobj.Percent);
+                }
+                if (businessobj != null)
+                {
+                    alldiscounts.Add(businessobj.Percent);
+                }
+                discount = alldiscounts.Any() ? alldiscounts.Max() : 0;
             }
-            else if ( categoryobj != null)
+            else
             {
-                discount = categoryobj;
-            }
-            else if (businessobj != null)
-            {
-                discount = businessobj;
+                if (productobj != null)
+                {
+                    discount = productobj.Percent;
+                }
+                else if (categoryobj != null)
+                {
+                    discount = categoryobj.Percent;
+                }
+                else if (businessobj != null)
+                {
+                    discount = businessobj.Percent;
+                }
             }
             var percent = discount ?? 0;
             return percent > 90 ? 90 : percent;
         }
 
-        public static decimal GetDiscountedPrice(this Product product)
+        public static decimal GetDiscountedPrice(this Product product, string userId)
         {
-            var percent = product.GetEffectiveDiscountPercent();
+            var percent = product.GetEffectiveDiscountPercent(userId);
             if (percent <= 0) return product.Price;
 
             return Math.Round(product.Price * (100 - percent) / 100m, 2);

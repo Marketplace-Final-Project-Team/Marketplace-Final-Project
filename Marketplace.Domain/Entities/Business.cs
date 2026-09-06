@@ -24,6 +24,7 @@ namespace Marketplace.Domain.Entities
         public ICollection<BusinessMember> Members { get; set; } = new List<BusinessMember>();
         public ICollection<Product> Products { get; set; } = new List<Product>();
         public ICollection<Discount> Discounts { get; set; } = new List<Discount>();
+        public ICollection<UserDiscount> UserDiscounts { get; set; } = new List<UserDiscount>();
 
 
     }
