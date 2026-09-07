@@ -5,14 +5,14 @@ using Marketplace.BLL.Interfaces;
 
 namespace Marketplace.BLL.Services
 {
-    public class ImageStorageService: IImageStorageService
+    public class CloudinaryImageStorageService: IImageStorageService
     {
         private readonly Cloudinary _cloudinary;
 
         private static readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
         private const long MaxFileSizeBytes = 5 * 1024 * 1024;
 
-        public ImageStorageService(Cloudinary cloudinary)
+        public CloudinaryImageStorageService(Cloudinary cloudinary)
         {
             _cloudinary = cloudinary;
         }
