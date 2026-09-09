@@ -727,6 +727,220 @@
     width: 2.3rem;
 }
 
+/* ---------- View toggle (Плитка / Список / Слайдер) ---------- */
+
+.home-view-toggle {
+    background: #f3f5f9;
+    border: 1px solid #e5e8ef;
+    border-radius: 0.75rem;
+    display: inline-flex;
+    gap: 0.25rem;
+    margin-bottom: 1.25rem;
+    padding: 0.25rem;
+}
+
+.home-view-toggle__btn {
+    align-items: center;
+    background: none;
+    border: none;
+    border-radius: 0.55rem;
+    color: var(--home-muted);
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 0.82rem;
+    font-weight: 650;
+    gap: 0.4rem;
+    padding: 0.45rem 0.85rem;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.home-view-toggle__btn:hover {
+    color: var(--home-ink);
+}
+
+.home-view-toggle__btn.is-active {
+    background: #fff;
+    box-shadow: 0 0.2rem 0.6rem rgba(23, 32, 51, 0.1);
+    color: var(--home-primary);
+}
+
+/* ---------- List view ---------- */
+
+.home-product-list {
+    background: #fff;
+    border: 1px solid #e5e8ef;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.home-product-list__row {
+    align-items: center;
+    border-bottom: 1px solid #eef0f5;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 3.75rem 1fr auto auto;
+    padding: 0.75rem 1rem;
+}
+
+.home-product-list__row:last-child {
+    border-bottom: none;
+}
+
+.home-product-list__media {
+    align-items: center;
+    background: #f3f5f9;
+    border-radius: 0.6rem;
+    color: #526589;
+    display: flex;
+    font-weight: 800;
+    height: 3.75rem;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    width: 3.75rem;
+}
+
+.home-product-list__media img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.home-product-list__age-badge {
+    background: #dc3545;
+    border-radius: 999px;
+    color: #fff;
+    font-size: 0.58rem;
+    font-weight: 800;
+    padding: 0.1rem 0.4rem;
+    position: absolute;
+    right: 0.2rem;
+    top: 0.2rem;
+}
+
+.home-product-list__info {
+    min-width: 0;
+}
+
+.home-product-list__name {
+    color: var(--home-ink);
+    display: block;
+    font-size: 0.92rem;
+    font-weight: 720;
+    text-decoration: none;
+}
+
+.home-product-list__name:hover {
+    color: var(--home-primary);
+}
+
+.home-product-list__price {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.home-product-list__price strong {
+    font-size: 1rem;
+}
+
+.home-product-list__add {
+    align-items: center;
+    background: var(--home-primary);
+    border: 0;
+    border-radius: 0.6rem;
+    color: #fff;
+    display: flex;
+    font-size: 1.1rem;
+    height: 2.15rem;
+    justify-content: center;
+    width: 2.15rem;
+}
+
+@media (max-width: 575.98px) {
+    .home-product-list__row {
+        grid-template-columns: 3rem 1fr auto;
+    }
+
+    .home-product-list__price {
+        display: none;
+    }
+}
+
+/* ---------- Slider view ---------- */
+
+.home-product-carousel .carousel-item {
+    padding: 0 3rem;
+}
+
+.home-product-slide {
+    background: #fff;
+    border: 1px solid #e5e8ef;
+    border-radius: 1rem;
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    overflow: hidden;
+}
+
+.home-product-slide__media {
+    align-items: center;
+    background: #f3f5f9;
+    border: none;
+    color: #526589;
+    display: flex;
+    font-size: 3rem;
+    font-weight: 850;
+    justify-content: center;
+    min-height: 16rem;
+    overflow: hidden;
+    position: relative;
+}
+
+.home-product-slide__media img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.home-product-slide__body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 1.5rem 1.5rem 1.5rem 0;
+}
+
+.home-product-slide__name {
+    color: var(--home-ink);
+    display: block;
+    font-size: 1.3rem;
+    font-weight: 750;
+    margin: 0.4rem 0;
+    text-decoration: none;
+}
+
+.home-product-slide__name:hover {
+    color: var(--home-primary);
+}
+
+.home-product-carousel .carousel-control-prev,
+.home-product-carousel .carousel-control-next {
+    color: var(--home-ink);
+    filter: invert(1) grayscale(1);
+    width: 3rem;
+}
+
+@media (max-width: 767.98px) {
+    .home-product-slide {
+        grid-template-columns: 1fr;
+    }
+
+    .home-product-carousel .carousel-item {
+        padding: 0 2.25rem;
+    }
+}
+
 .home-promo {
     align-items: center;
     background: linear-gradient(125deg, #203986, #4266dc);
