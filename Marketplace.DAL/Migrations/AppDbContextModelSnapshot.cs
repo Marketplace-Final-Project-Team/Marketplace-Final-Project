@@ -289,8 +289,14 @@ namespace Marketplace.DAL.Migrations
                     b.Property<Guid?>("BusinessId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("CategoryId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("DiscountType")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
@@ -313,6 +319,8 @@ namespace Marketplace.DAL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BusinessId");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("ProductId");
 
@@ -1165,12 +1173,18 @@ namespace Marketplace.DAL.Migrations
                         .HasForeignKey("BusinessId")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.HasOne("Marketplace.Domain.Entities.Category", "Category")
+                        .WithMany("Discounts")
+                        .HasForeignKey("CategoryId");
+
                     b.HasOne("Marketplace.Domain.Entities.Product", "Product")
                         .WithMany("Discounts")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Business");
+
+                    b.Navigation("Category");
 
                     b.Navigation("Product");
                 });
@@ -1426,6 +1440,8 @@ namespace Marketplace.DAL.Migrations
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Category", b =>
                 {
+                    b.Navigation("Discounts");
+
                     b.Navigation("Products");
                 });
 
