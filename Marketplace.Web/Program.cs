@@ -110,6 +110,8 @@ builder.Services.AddScoped<IMarketplaceBalanceService, MarketplaceBalanceService
 
 builder.Services.AddScoped<IContentModerationService, ContentModerationService>();
 
+builder.Services.AddScoped<IUserDiscountService, UserDiscountService>();
+
 // LiqPay configuration
 builder.Services.Configure<LiqPayOptions>(builder.Configuration.GetSection("LiqPay"));
 builder.Services.AddScoped<IPaymentService, LiqPayPaymentService>();

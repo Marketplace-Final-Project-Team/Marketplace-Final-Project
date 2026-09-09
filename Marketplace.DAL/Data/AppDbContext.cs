@@ -40,6 +40,8 @@ namespace Marketplace.DAL.Data
         public DbSet<MarketplaceBalance> MarketplaceBalances { get; set; }
         public DbSet<ProductEvent> ProductEvents { get; set; }
 
+        public DbSet<UserDiscount> UserDiscounts { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -256,6 +258,17 @@ namespace Marketplace.DAL.Data
 
             builder.Entity<ProductEvent>()
                 .HasIndex(pe => new { pe.BusinessId, pe.CreatedAt });
+
+            builder.Entity<UserDiscount>()
+                .HasOne(ud => ud.User)
+                .WithMany(ud => ud.UserDiscounts)
+                .HasForeignKey(ud => ud.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<UserDiscount>()
+                .HasOne(ud => ud.Business)
+                .WithMany(b => b.UserDiscounts)
+                .HasForeignKey(ud => ud.BusinessId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Product>().Navigation(p => p.Category).AutoInclude();
             builder.Entity<Product>().Navigation(p => p.Images).AutoInclude();
