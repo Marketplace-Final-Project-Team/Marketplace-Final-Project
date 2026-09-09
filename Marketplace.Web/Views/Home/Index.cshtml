@@ -279,15 +279,57 @@
                 <a asp-controller="Auth" asp-action="SignUp" class="home-button home-button--light">Почати продавати →</a>
             }
         </div>
-        <div class="home-promo__dashboard" aria-hidden="true">
-            <div class="dashboard-top"><span></span><span></span><span></span></div>
-            <div class="dashboard-body">
-                <div class="dashboard-sidebar"></div>
-                <div class="dashboard-content">
-                    <span></span>
-                    <div class="dashboard-bars"><i></i><i></i><i></i><i></i><i></i></div>
-                    <div class="dashboard-lines"><i></i><i></i><i></i></div>
+        <div class="home-promo__visual" aria-hidden="true">
+            <div class="home-promo__glow"></div>
+            <div class="home-promo__badge home-promo__badge--growth">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="m17 7-9.5 9.5L3 12" /><path d="m22 7-9.5 9.5" /></svg>
+                +24% цього тижня
+            </div>
+            <div class="home-promo__badge home-promo__badge--order">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" /></svg>
+                Нове замовлення
+            </div>
+            <div class="home-promo__dashboard">
+                <div class="dashboard-top"><span></span><span></span><span></span></div>
+                <div class="dashboard-body">
+                    <div class="dashboard-sidebar"></div>
+                    <div class="dashboard-content">
+                        <span></span>
+                        <div class="dashboard-bars">
+                            <i style="--bar-h: 40%"></i>
+                            <i style="--bar-h: 72%"></i>
+                            <i style="--bar-h: 55%"></i>
+                            <i style="--bar-h: 88%"></i>
+                            <i style="--bar-h: 68%"></i>
+                            <i style="--bar-h: 95%"></i>
+                        </div>
+                        <svg class="dashboard-trend" viewBox="0 0 220 46" preserveAspectRatio="none">
+                            <polyline points="0,34 30,26 60,30 90,16 120,20 150,8 180,14 220,2" />
+                        </svg>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="home-steps" aria-label="Як почати продавати">
+        <span class="home-section__kicker">Три кроки</span>
+        <h2>Від ідеї до першого продажу</h2>
+        <div class="home-steps__grid">
+            <div class="home-step">
+                <span class="home-step__number">1</span>
+                <h3>Створіть магазин</h3>
+                <p>Назва, опис і логотип - займає кілька хвилин.</p>
+            </div>
+            <div class="home-step">
+                <span class="home-step__number">2</span>
+                <h3>Додайте товари</h3>
+                <p>Фото, ціна, категорія - і товар вже в каталозі.</p>
+            </div>
+            <div class="home-step">
+                <span class="home-step__number">3</span>
+                <h3>Отримуйте замовлення</h3>
+                <p>Керуйте продажами й доставкою з панелі продавця.</p>
             </div>
         </div>
     </section>
@@ -338,6 +380,22 @@
                 alert("Доступ обмежено для осіб молодше 18 років.");
                 modal.classList.add('d-none');
             }
+        }
+
+        const homeSteps = document.querySelectorAll('.home-step');
+        if (homeSteps.length && 'IntersectionObserver' in window) {
+            const stepsObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        stepsObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.2 });
+
+            homeSteps.forEach((step) => stepsObserver.observe(step));
+        } else {
+            homeSteps.forEach((step) => step.classList.add('is-visible'));
         }
     </script>
     
