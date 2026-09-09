@@ -65,12 +65,14 @@
                     <span aria-hidden="true">-</span>
                     <input type="number" class="form-control" name="MaxCommission" min="0" max="100" step="0.1" placeholder="Комісія до" aria-label="Комісія до" value="@Model.Filter.MaxCommission" />
                 </div>
-                <select class="form-select" name="SortDescending" aria-label="Сортування" onchange="this.form.submit()">
-                    <option value="true" selected="@(Model.Filter.SortDescending != false)">Спочатку нові</option>
-                    <option value="false" selected="@(Model.Filter.SortDescending == false)">Спочатку старі</option>
+                <select class="form-select" name="SortOption" aria-label="Сортування" onchange="this.form.submit()">
+                    <option value="CreatedAtDesc" selected="@(Model.Filter.SortOption == Marketplace.Domain.Enums.BusinessSortOption.CreatedAtDesc)">Спочатку нові</option>
+                    <option value="CreatedAtAsc" selected="@(Model.Filter.SortOption == Marketplace.Domain.Enums.BusinessSortOption.CreatedAtAsc)">Спочатку старі</option>
+                    <option value="CommissionAsc" selected="@(Model.Filter.SortOption == Marketplace.Domain.Enums.BusinessSortOption.CommissionAsc)">Спочатку низька комісія</option>
+                    <option value="CommissionDesc" selected="@(Model.Filter.SortOption == Marketplace.Domain.Enums.BusinessSortOption.CommissionDesc)">Спочатку висока комісія</option>
                 </select>
                 <button type="submit" class="btn btn-outline-secondary">Застосувати</button>
-            </form>
+          </form>
 
             @if (businesses.Count == 0)
             {

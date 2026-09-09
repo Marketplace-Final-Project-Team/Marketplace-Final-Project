@@ -1,5 +1,5 @@
 using Marketplace.Domain.Entities;
-
+using Marketplace.Domain.Enums;
 namespace Marketplace.Web.Models
 {
     public static class DiscountExtensions
@@ -11,7 +11,7 @@ namespace Marketplace.Web.Models
         {
             var now = DateTime.UtcNow;
             return product.Discounts?
-                .Where(d => d.StartDate <= now && d.EndDate >= now)
+                .Where(d => d.ProductId == product.Id && d.DiscountType == DiscountType.Product && d.StartDate <= now && d.EndDate >= now)
                 .OrderByDescending(d => d.CreatedAt)
                 .FirstOrDefault();
         }
@@ -21,21 +21,47 @@ namespace Marketplace.Web.Models
         {
             var now = DateTime.UtcNow;
             return product.Business?.Discounts?
-                .Where(d => d.StartDate <= now && d.EndDate >= now)
+                .Where(d => d.DiscountType == DiscountType.Business && d.BusinessId == product.BusinessId && d.StartDate <= now && d.EndDate >= now)
                 .OrderByDescending(d => d.CreatedAt)
                 .FirstOrDefault();
         }
+
+        public static Discount? GetActiveCategoryDiscount(this Product product)
+        {
+            var now = DateTime.UtcNow;
+            return product.Category?.Discounts?
+                .Where(d => d.DiscountType == DiscountType.Category && d.BusinessId == product.BusinessId && d.CategoryId == product.CategoryId && d.StartDate <= now && d.EndDate >= now)
+                .OrderByDescending(d => d.CreatedAt)
+                .FirstOrDefault();
+        }
+
+
+
+
 
         // A business-wide sale is dominant over a product's own sale rather than stacking
         // with it — setting one is meant to replace the other (same rule as
         // OrderService.CreateOrder), capped at 100% so a price can never go to zero or below.
         public static decimal GetEffectiveDiscountPercent(this Product product)
         {
-            var percent = product.GetActiveBusinessDiscount()?.Percent
-                ?? product.GetActiveProductDiscount()?.Percent
-                ?? 0;
-
-            return percent > 100 ? 100 : percent;
+            decimal? discount = 0;
+            var productobj = product.GetActiveProductDiscount()?.Percent;
+            var categoryobj = product.GetActiveCategoryDiscount()?.Percent;
+            var businessobj = product.GetActiveBusinessDiscount()?.Percent;
+            if (productobj != null)
+            {
+                discount = productobj;
+            }
+            else if ( categoryobj != null)
+            {
+                discount = categoryobj;
+            }
+            else if (businessobj != null)
+            {
+                discount = businessobj;
+            }
+            var percent = discount ?? 0;
+            return percent > 90 ? 90 : percent;
         }
 
         public static decimal GetDiscountedPrice(this Product product)

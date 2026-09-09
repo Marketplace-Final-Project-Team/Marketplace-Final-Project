@@ -48,7 +48,7 @@ namespace Marketplace.BLL.Services
         {
             var scheduler = await _schedulerFactory.GetScheduler();
 
-            var jobKey = new JobKey($"moderation-job-{businessId}", "moderation");
+            var jobKey = new JobKey($"business-moderation-job-{businessId}", "moderation");
 
             if (await scheduler.CheckExists(jobKey))
             {
@@ -66,7 +66,7 @@ namespace Marketplace.BLL.Services
                 .Build();
 
             var trigger = TriggerBuilder.Create()
-                .WithIdentity($"moderation-trigger-{businessId}", "moderation")
+                .WithIdentity($"business-moderation-trigger-{businessId}", "moderation")
                 .StartAt(DateBuilder.FutureDate(5, IntervalUnit.Second))
                 .Build();
 

@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Marketplace.BLL.Services
 {
-    public class CategoryService: ICategoryService
+    public class CategoryService : ICategoryService
     {
         private readonly IGenericRepository<Category> _categoryRepository;
         private readonly AppDbContext _context;
@@ -80,6 +80,16 @@ namespace Marketplace.BLL.Services
             await _context.SaveChangesAsync();
 
             return new ServiceResult { Succeeded = true, Message = string.Empty };
+        }
+
+        public async Task<Category> GetByIdAsync(Guid categoryId)
+        {
+            var category = await _categoryRepository.GetByIdAsync(categoryId);
+            if (category == null)
+            {
+                return null;
+            }
+            return category;
         }
     }
 }

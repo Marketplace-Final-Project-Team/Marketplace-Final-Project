@@ -20,10 +20,6 @@ namespace Marketplace.BLL.Services
             return balance?.Balance ?? 0m;
         }
 
-        // Returns the tracked singleton row so a caller already inside a unit of work (e.g.
-        // OrderService.ChangeOrderStatus) can mutate .Balance directly and have it persist
-        // together with the rest of that method's SaveChangesAsync — same pattern as
-        // Business.Balance elsewhere in this codebase.
         public async Task<MarketplaceBalance> GetOrCreateTrackedAsync()
         {
             var balance = await _context.MarketplaceBalances.FirstOrDefaultAsync();

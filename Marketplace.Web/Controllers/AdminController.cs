@@ -9,6 +9,7 @@ using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Common;
 using Quartz;
 using Quartz.Impl.Matchers;
+using Microsoft.Extensions.Configuration;
 
 namespace Marketplace.Web.Controllers
 {
@@ -19,10 +20,12 @@ namespace Marketplace.Web.Controllers
         private readonly ISystemSettingsService _settingsService;
         private readonly IActivityLogService _activityLog;
         private readonly IProductService _productService;
+        private readonly IBusinessService _businessService;
         private readonly IMarketplaceBalanceService _marketplaceBalanceService;
         private readonly ICategoryService _categoryService;
         private readonly ISchedulerFactory _schedulerFactory;
         private readonly IDiscountService _discountService;
+        private readonly IConfiguration _configuration;
 
         public AdminController(
             IAdminService adminService,
@@ -32,7 +35,9 @@ namespace Marketplace.Web.Controllers
             IMarketplaceBalanceService marketplaceBalanceService,
             ICategoryService categoryService,
             ISchedulerFactory schedulerFactory,
-            IDiscountService discountService)
+            IDiscountService discountService,
+            IConfiguration configuration,
+            IBusinessService businessService)
         {
             _adminService = adminService;
             _settingsService = settingsService;
@@ -42,6 +47,8 @@ namespace Marketplace.Web.Controllers
             _categoryService = categoryService;
             _schedulerFactory = schedulerFactory;
             _discountService = discountService;
+            _configuration = configuration;
+            _businessService = businessService;
         }
 
         private string? CurrentAdminId => User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -132,6 +139,7 @@ namespace Marketplace.Web.Controllers
                         Name = p.Name,
                         ImageUrl = p.ImageUrl,
                         Price = p.Price,
+                        Business = p.Business,
                         Status = p.Status,
                     }).ToList(),
                     TotalItems = result.TotalItems,
@@ -178,7 +186,7 @@ namespace Marketplace.Web.Controllers
                 Status = filter.Status,
                 MinCommission = filter.MinCommission,
                 MaxCommission = filter.MaxCommission,
-                SortDescending = filter.SortDescending,
+                SortOption = filter.SortOption,
                 Pagination = new PaginationParams
                 {
                     Page = filter.Page,
@@ -266,12 +274,26 @@ namespace Marketplace.Web.Controllers
 
             foreach (var jobKey in jobKeys)
             {
-                if (!Guid.TryParse(jobKey.Name.Replace("moderation-job-", string.Empty), out var productId))
+                string? entityType = null;
+                Guid entityId;
+
+                if (jobKey.Name.StartsWith("product-moderation-job-") &&
+                    Guid.TryParse(jobKey.Name.Replace("product-moderation-job-", string.Empty), out var productId))
+                {
+                    entityType = "Product";
+                    entityId = productId;
+                }
+                else if (jobKey.Name.StartsWith("business-moderation-job-") &&
+                    Guid.TryParse(jobKey.Name.Replace("business-moderation-job-", string.Empty), out var businessId))
+                {
+                    entityType = "Business";
+                    entityId = businessId;
+                }
+                else
                 {
                     continue;
                 }
 
-                var product = await _productService.GetByIdAsync(productId);
                 var triggers = await scheduler.GetTriggersOfJob(jobKey);
                 var nextFireTime = triggers
                     .Select(t => t.GetNextFireTimeUtc())
@@ -281,10 +303,23 @@ namespace Marketplace.Web.Controllers
                     .Cast<DateTime?>()
                     .FirstOrDefault();
 
+                string name;
+                if (entityType == "Product")
+                {
+                    var product = await _productService.GetByIdAsync(entityId);
+                    name = product?.Name ?? "(товар видалено)";
+                }
+                else
+                {
+                    var business = await _businessService.GetByIdAsync(entityId);
+                    name = business?.StoreName ?? "(бізнес видалено)";
+                }
+
                 scheduledJobs.Add(new ScheduledModerationJobViewModel
                 {
-                    ProductId = productId,
-                    ProductName = product?.Name ?? "(товар видалено)",
+                    EntityType = entityType,
+                    EntityId = entityId,
+                    ProductName = name,
                     NextRunAtUtc = nextFireTime
                 });
             }
@@ -464,6 +499,188 @@ namespace Marketplace.Web.Controllers
             }).ToList());
         }
 
+        private async Task<List<IntegrationSettingViewModel>> BuildIntegrationsAsync()
+        {
+            var definitions = new (string Category, string DisplayName, string Description, string ConfigSection, (string Key, string Label, bool IsSecret)[] Keys)[]
+            {
+                ("LiqPay", "LiqPay", "Приймання онлайн-оплат за замовлення.", "LiqPay", new[]
+                {
+                    ("PublicKey", "Public Key", false),
+                    ("PrivateKey", "Private Key", true),
+                    ("ServerUrl", "Server URL (callback)", false),
+                }),
+                ("NovaPoshta", "Нова пошта", "Пошук міст і відділень для доставки.", "DeliveryApi", new[]
+                {
+                    ("NovaPoshtaApiKey", "API Key", true),
+                    ("NovaPoshtaBaseUrl", "Base URL", false),
+                }),
+                ("Cloudinary", "Cloudinary", "Зберігання зображень товарів і магазинів.", "Cloudinary", new[]
+                {
+                    ("CloudName", "Cloud Name", false),
+                    ("ApiKey", "API Key", true),
+                    ("ApiSecret", "API Secret", true),
+                }),
+                ("Email", "Email (SMTP)", "Підтвердження реєстрації, скидання пароля, сповіщення.", "EmailSettings", new[]
+                {
+                    ("Host", "SMTP Host", false),
+                    ("Port", "Port", false),
+                    ("Username", "Username", false),
+                    ("Password", "Password", true),
+                    ("FromEmail", "From Email", false),
+                    ("FromName", "From Name", false),
+                }),
+                ("GoogleAI", "Google AI (Gemini)", "Автоматична модерація товарів (текст і зображення).", "GoogleAI", new[]
+                {
+                    ("ApiKey", "API Key", true),
+                    ("Model", "Model", false),
+                }),
+            };
+
+            var result = new List<IntegrationSettingViewModel>();
+
+            foreach (var def in definitions)
+            {
+                var saved = await _settingsService.GetByCategoryAsync(def.Category);
+                var keys = new List<IntegrationKeyViewModel>();
+
+                foreach (var (key, label, isSecret) in def.Keys)
+                {
+                    var savedRow = saved.FirstOrDefault(s => s.Key == key);
+                    var value = savedRow?.Value ?? _configuration[$"{def.ConfigSection}:{key}"] ?? string.Empty;
+
+                    keys.Add(new IntegrationKeyViewModel
+                    {
+                        Key = key,
+                        Label = label,
+                        IsSecret = isSecret,
+                        IsOverridden = savedRow is not null,
+                        MaskedValue = Mask(value, isSecret)
+                    });
+                }
+
+                result.Add(new IntegrationSettingViewModel
+                {
+                    Category = def.Category,
+                    DisplayName = def.DisplayName,
+                    Description = def.Description,
+                    IsConfigured = keys.Any(k => !string.IsNullOrWhiteSpace(k.MaskedValue) && k.MaskedValue != "-"),
+                    Keys = keys
+                });
+            }
+
+            return result;
+        }
+
+        private static string Mask(string value, bool isSecret)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return "-";
+            }
+
+            if (!isSecret)
+            {
+                return value;
+            }
+
+            return value.Length <= 4
+                ? new string('*', 8)
+                : new string('*', 8) + value[^4..];
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTotalCommissionsAsync()
+        {
+            var totalCommission = await _adminService.GetTotalCommissionAsync();
+
+            return View(totalCommission);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetCommissionsStatsByPeriodAsync(CommissionStatsQueryViewModel query)
+        {
+            var res = await _adminService.GetCommissionStatsByPeriodAsync(query.StartDate, query.EndDate);
+
+            if (!res.Succeeded)
+            {
+                return NotFound();
+            }
+
+            return View(new CommissionStatsAdminViewModel
+            {
+                Daily = res.Data!.Daily,
+                ByBusiness = res.Data!.ByBusiness,
+                TotalCommissionByPeriod = res.Data!.TotalCommissionByPeriod,
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PauseScheduler()
+        {
+            var scheduler = await _schedulerFactory.GetScheduler();
+
+            if (scheduler.InStandbyMode)
+            {
+                TempData["Error"] = "Планувальник вже призупинено.";
+                return RedirectToAction("Jobs");
+            }
+
+            await scheduler.Standby();
+
+            await _activityLog.LogUserActionAsync(CurrentAdminId!, "SchedulerPaused",
+                "Планувальник задач модерації призупинено адміністратором.",
+                actorUserId: CurrentAdminId);
+
+            TempData["Success"] = "Планувальник призупинено. Нові задачі не запускатимуться до відновлення.";
+            return RedirectToAction("Jobs");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResumeScheduler()
+        {
+            var scheduler = await _schedulerFactory.GetScheduler();
+
+            if (!scheduler.InStandbyMode)
+            {
+                TempData["Error"] = "Планувальник і так активний.";
+                return RedirectToAction("Jobs");
+            }
+
+            await scheduler.Start();
+
+            await _activityLog.LogUserActionAsync(CurrentAdminId!, "SchedulerResumed",
+                "Планувальник задач модерації відновлено адміністратором.",
+                actorUserId: CurrentAdminId);
+
+            TempData["Success"] = "Планувальник відновлено.";
+            return RedirectToAction("Jobs");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RunModerationJobNow(Guid entityId, string entityType)
+        {
+            var scheduler = await _schedulerFactory.GetScheduler();
+            var jobName = entityType == "Business"
+                ? $"business-moderation-job-{entityId}"
+                : $"product-moderation-job-{entityId}";
+            var jobKey = new JobKey(jobName, "moderation");
+
+            if (!await scheduler.CheckExists(jobKey))
+            {
+                TempData["Error"] = "Задачу не знайдено в черзі — можливо, вона вже виконана.";
+                return RedirectToAction("Jobs");
+            }
+
+            await scheduler.TriggerJob(jobKey);
+
+            await _activityLog.LogUserActionAsync(CurrentAdminId!, "ModerationJobTriggeredManually",
+                $"Модерацію ({entityType}) {entityId} запущено вручну адміністратором.",
+                actorUserId: CurrentAdminId);
+
+            TempData["Success"] = "Задачу запущено негайно.";
+            return RedirectToAction("Jobs");
+        }
+
         [HttpGet]
         public async Task<IActionResult> BusinessDetails(Guid id)
         {
@@ -500,7 +717,6 @@ namespace Marketplace.Web.Controllers
 
             return View(model);
         }
-
 
         [HttpPost]
         public async Task<IActionResult> ApproveAdultStatus(Guid businessId)
