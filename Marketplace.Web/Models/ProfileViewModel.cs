@@ -9,5 +9,6 @@
         public int OrdersCount { get; set; }
         public int AddressesCount { get; set; }
         public int WishlistCount { get; set; }
+        public int DiscountsCount { get; set; }
     }
 }

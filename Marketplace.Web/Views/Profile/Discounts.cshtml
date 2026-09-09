@@ -1,0 +1,45 @@
+@model List<Marketplace.BLL.DTOs.UserDiscountGetDto>
+
+@{
+    ViewData["Title"] = "Мої знижки";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+}
+
+<div class="profile-page">
+    <a asp-action="Index" class="profile-back">← До кабінету</a>
+
+    <div class="profile-summary">
+        <div>
+            <h1>Мої знижки</h1>
+            <p>Персональні знижки, які магазини надали саме вам - діють на всі товари магазину, поки не мине термін.</p>
+        </div>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="profile-empty">
+            <div class="profile-empty__icon" aria-hidden="true">%</div>
+            <h2>Персональних знижок поки немає</h2>
+            <p>Коли продавець надасть вам персональну знижку, вона з'явиться тут.</p>
+            <a asp-controller="Catalog" asp-action="Index" class="btn btn-primary">До каталогу</a>
+        </div>
+    }
+    else
+    {
+        <div class="address-list">
+            @foreach (var discount in Model)
+            {
+                <div class="address-card">
+                    <div class="address-card__lines">
+                        <span class="address-card__badge">−@discount.Percent.ToString("0.##")%</span>
+                        <strong>@discount.StoreName</strong>
+                        <p>Діє до @discount.EndDate?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
