@@ -31,6 +31,14 @@
         wishlistAdds = Model.TotalWishlistAdds,
         orders = Model.PeriodOrders
     });
+
+    var categoryColors = new[] { "#3157d7", "#42a98b", "#e8a33d", "#c65f9e", "#5b8def", "#8a5b00", "#b42318", "#7a89bb" };
+    var categoryJson = System.Text.Json.JsonSerializer.Serialize(Model.CategoryStats.Select((c, i) => new
+    {
+        name = c.CategoryName,
+        revenue = c.Revenue,
+        color = categoryColors[i % categoryColors.Length]
+    }));
 }
 
 @functions {
@@ -224,6 +232,59 @@
                 <div class="business-kpi @(Model.OutOfStockProductCount > 0 ? "business-kpi--warning" : null)"><span>Немає в наявності</span><strong>@Model.OutOfStockProductCount</strong></div>
                 <div class="business-kpi @(Model.LowStockProductCount > 0 ? "business-kpi--warning" : null)"><span>Мало на складі</span><strong>@Model.LowStockProductCount</strong></div>
             </div>
+        </section>
+    </div>
+
+    <div class="business-two-col">
+        <section class="business-panel">
+            <h2>Продажі за категоріями</h2>
+            <p class="business-panel__lead">За виручкою в обраному періоді.</p>
+            @if (Model.CategoryStats.Count == 0)
+            {
+                <p class="business-empty">Продажів за цей період немає.</p>
+            }
+            else
+            {
+                <div class="business-chart-card__canvas-wrap business-chart-card__canvas-wrap--short">
+                    <canvas id="categoryChart" data-chart='@Html.Raw(categoryJson)'></canvas>
+                </div>
+            }
+        </section>
+
+        <section class="business-panel">
+            <h2>Категорії за виручкою</h2>
+            <p class="business-panel__lead">Розподіл продажів між категоріями товарів.</p>
+            @if (Model.CategoryStats.Count == 0)
+            {
+                <p class="business-empty">Продажів за цей період немає.</p>
+            }
+            else
+            {
+                var categoryTotalRevenue = Model.CategoryStats.Sum(c => c.Revenue);
+                <div class="table-responsive">
+                    <table class="business-table">
+                        <thead>
+                            <tr><th>Категорія</th><th>Виручка</th><th>Одиниць</th><th>Частка</th></tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.CategoryStats.Count; i++)
+                            {
+                                var category = Model.CategoryStats[i];
+                                var share = categoryTotalRevenue == 0 ? 0 : Math.Round(category.Revenue * 100 / categoryTotalRevenue, 1);
+                                <tr>
+                                    <td>
+                                        <span class="business-category-dot" style="background: @categoryColors[i % categoryColors.Length]"></span>
+                                        @category.CategoryName
+                                    </td>
+                                    <td>@category.Revenue.ToString("N0") ₴</td>
+                                    <td>@category.UnitsSold</td>
+                                    <td>@share%</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
         </section>
     </div>
 

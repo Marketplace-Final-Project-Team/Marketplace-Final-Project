@@ -63,4 +63,16 @@
             });
         }
     }
+
+    const categoryCanvas = document.getElementById("categoryChart");
+    if (categoryCanvas) {
+        const items = MpCharts.readData(categoryCanvas) || [];
+        if (items.length > 0) {
+            MpCharts.doughnut("categoryChart", {
+                labels: items.map((c) => c.name),
+                data: items.map((c) => c.revenue),
+                colors: items.map((c) => c.color)
+            });
+        }
+    }
 })();

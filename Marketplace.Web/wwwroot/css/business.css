@@ -1029,6 +1029,14 @@
     font-weight: 650;
 }
 
+.business-category-dot {
+    border-radius: 50%;
+    display: inline-block;
+    height: 0.6rem;
+    margin-right: 0.4rem;
+    width: 0.6rem;
+}
+
 .business-empty {
     color: var(--seller-muted);
     font-size: 0.88rem;
@@ -1117,12 +1125,23 @@
     font-weight: 650;
 }
 
-.business-settings-form input,
+.business-settings-form input:not([type="checkbox"]),
 .business-settings-form textarea {
     border: 1px solid var(--seller-line);
     border-radius: 0.6rem;
     padding: 0.55rem 0.75rem;
     width: 100%;
+}
+
+.business-settings-form input[type="checkbox"] {
+    flex: 0 0 auto;
+    height: 1.05rem;
+    margin: 0;
+    width: 1.05rem;
+}
+
+.business-settings-form label.d-flex {
+    font-weight: 500;
 }
 
 .business-local-badge {
