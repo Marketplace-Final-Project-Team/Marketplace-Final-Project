@@ -218,6 +218,19 @@ namespace Marketplace.Web.Controllers
                         .ToList()
                     : new List<BusinessDashboardTopCustomerViewModel>(),
 
+                CategoryStats = productsStatsResult.Succeeded
+                    ? productsStatsResult.Data.Stats
+                        .GroupBy(s => products.FirstOrDefault(p => p.Id == s.ProductId)?.Category?.Name ?? "Без категорії")
+                        .Select(g => new BusinessDashboardCategoryStatViewModel
+                        {
+                            CategoryName = g.Key,
+                            Revenue = g.Sum(s => s.Revenue),
+                            UnitsSold = g.Sum(s => s.TotalSales)
+                        })
+                        .OrderByDescending(c => c.Revenue)
+                        .ToList()
+                    : new List<BusinessDashboardCategoryStatViewModel>(),
+
                 RecentActivity = recentActivity
                     .Select(a => new BusinessDashboardActivityItemViewModel { Description = a.Description, CreatedAt = a.CreatedAt })
                     .ToList()
@@ -263,7 +276,7 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Orders(Guid businessId, OrderStatus? status)
+        public async Task<IActionResult> Orders(Guid businessId, OrderStatus? status, string? search, string? searchEmail)
         {
             var business = await GetAccessibleBusinessOrNullAsync(businessId);
             if (business is null)
@@ -271,13 +284,15 @@ namespace Marketplace.Web.Controllers
                 return Forbid();
             }
 
-            var orders = await _orderService.GetBusinessOrders(businessId, status);
+            var orders = await _orderService.GetBusinessOrders(businessId, status, search, searchEmail);
 
             return View(new BusinessOrdersPageViewModel
             {
                 BusinessId = businessId,
                 StoreName = business.StoreName,
                 StatusFilter = status,
+                Search = search,
+                SearchEmail = searchEmail,
                 Orders = orders.Select(order => new BusinessOrderListItemViewModel
                 {
                     OrderId = order.OrderId,

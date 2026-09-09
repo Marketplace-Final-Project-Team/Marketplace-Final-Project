@@ -49,6 +49,14 @@
     <form asp-action="Orders" method="get" class="seller-orders-filter">
         <input type="hidden" name="businessId" value="@Model.BusinessId" />
         <div>
+            <label for="search-filter">Покупець</label>
+            <input type="search" id="search-filter" name="search" class="form-control" placeholder="Ім'я покупця" value="@Model.Search" />
+        </div>
+        <div>
+            <label for="search-email-filter">Email</label>
+            <input type="search" id="search-email-filter" name="searchEmail" class="form-control" placeholder="Email покупця" value="@Model.SearchEmail" />
+        </div>
+        <div>
             <label for="status-filter">Статус</label>
             <select id="status-filter" name="status" class="form-select">
                 <option value="">Усі статуси</option>
@@ -59,7 +67,7 @@
             </select>
         </div>
         <button type="submit" class="seller-button seller-button--secondary">Показати</button>
-        @if (Model.StatusFilter.HasValue)
+        @if (Model.StatusFilter.HasValue || !string.IsNullOrWhiteSpace(Model.Search) || !string.IsNullOrWhiteSpace(Model.SearchEmail))
         {
             <a asp-action="Orders" asp-route-businessId="@Model.BusinessId" class="seller-button seller-button--secondary">Скинути</a>
         }

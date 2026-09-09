@@ -390,7 +390,7 @@ namespace Marketplace.BLL.Services
             };
         }
 
-        public async Task<IReadOnlyList<BusinessOrderListItemDto>> GetBusinessOrders(Guid businessId, OrderStatus? statusFilter = null)
+        public async Task<IReadOnlyList<BusinessOrderListItemDto>> GetBusinessOrders(Guid businessId, OrderStatus? statusFilter = null, string? search = null, string? searchEmail = null)
         {
             var query = _context.OrderItems
                 .AsNoTracking()
@@ -399,6 +399,16 @@ namespace Marketplace.BLL.Services
             if (statusFilter.HasValue)
             {
                 query = query.Where(item => item.Order.Status == statusFilter.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(item => item.Order.User.UserName != null && item.Order.User.UserName.Contains(search));
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchEmail))
+            {
+                query = query.Where(item => item.Order.User.Email != null && item.Order.User.Email.Contains(searchEmail));
             }
 
             var lines = await query
