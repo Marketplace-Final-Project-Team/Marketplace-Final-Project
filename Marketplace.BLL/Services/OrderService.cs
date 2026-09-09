@@ -74,6 +74,7 @@ namespace Marketplace.BLL.Services
                 var promoCode = !string.IsNullOrWhiteSpace(dto.PromoCode)
                     ? await _promoCodeService.FindActiveAsync(dto.PromoCode)
                     : null;
+                var promoCodeApplied = false;
 
                 foreach (var cartItem in cartItems)
                 {
@@ -152,9 +153,12 @@ namespace Marketplace.BLL.Services
 
 
                     var saleDiscountPercent = bestDiscount ?? 0;
-                    var promoPercent = promoCode is not null && promoCode.BusinessId == cartItem.Product.BusinessId
-                        ? promoCode.Percent
-                        : 0;
+                    var promoApplies = promoCode is not null && promoCode.BusinessId == cartItem.Product.BusinessId;
+                    var promoPercent = promoApplies ? promoCode!.Percent : 0;
+                    if (promoApplies)
+                    {
+                        promoCodeApplied = true;
+                    }
                     var effectivePercent = saleDiscountPercent + promoPercent;
                     if (effectivePercent > 100)
                     {
@@ -199,6 +203,11 @@ namespace Marketplace.BLL.Services
 
                 await _orerRepository.AddAsync(order);
                 _cartItemRepository.RemoveRange(cartItems);
+
+                if (promoCodeApplied && promoCode!.IsSingleUse)
+                {
+                    promoCode.IsUsed = true;
+                }
 
                 await _context.SaveChangesAsync();
 

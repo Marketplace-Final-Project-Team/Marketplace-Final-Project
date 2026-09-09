@@ -7,7 +7,7 @@ namespace Marketplace.BLL.Interfaces
     public interface IPromoCodeService
     {
         // Створити новий промокод для магазину.
-        Task<ServiceResult> CreateAsync(Guid businessId, string code, int percent, DateTime startDate, DateTime endDate);
+        Task<ServiceResult> CreateAsync(Guid businessId, string code, int percent, DateTime startDate, DateTime endDate, bool isSingleUse = false);
 
         // Достроково завершити дію промокоду (не видаляє, щоб зберегти історію застосувань).
         Task<ServiceResult> DeactivateAsync(Guid businessId, Guid promoCodeId);

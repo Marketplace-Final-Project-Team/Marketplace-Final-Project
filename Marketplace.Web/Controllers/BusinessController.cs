@@ -657,7 +657,7 @@ namespace Marketplace.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreatePromoCode(Guid businessId, string code, int percent, DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> CreatePromoCode(Guid businessId, string code, int percent, DateTime startDate, DateTime endDate, bool isSingleUse = false)
         {
             var business = await GetAccessibleBusinessOrNullAsync(businessId);
             if (business is null)
@@ -665,11 +665,12 @@ namespace Marketplace.Web.Controllers
                 return Forbid();
             }
 
-            var result = await _promoCodeService.CreateAsync(businessId, code, percent, startDate, endDate);
+            var result = await _promoCodeService.CreateAsync(businessId, code, percent, startDate, endDate, isSingleUse);
             if (result.Succeeded)
             {
+                var usageNote = isSingleUse ? "одноразовий" : "багаторазовий";
                 await _activityLog.LogBusinessActionAsync(businessId, "PromoCodeCreated",
-                    $"Створено промокод «{code}» (знижка {percent}%).",
+                    $"Створено промокод «{code}» (знижка {percent}%, {usageNote}).",
                     actorUserId: _userManager.GetUserId(User), relatedEntityId: result.EntityId);
             }
             TempData[result.Succeeded ? "Success" : "Error"] = result.Message;

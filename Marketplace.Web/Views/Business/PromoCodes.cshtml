@@ -261,6 +261,14 @@
             </div>
 
             <div>
+                <label for="isSingleUse">Тип використання</label>
+                <select id="isSingleUse" name="isSingleUse">
+                    <option value="false">Багаторазовий</option>
+                    <option value="true">Одноразовий</option>
+                </select>
+            </div>
+
+            <div>
                 <button type="submit" class="seller-button seller-button--primary">Створити промокод</button>
             </div>
         </form>
@@ -280,6 +288,7 @@
                     <tr>
                         <th>Код</th>
                         <th>Знижка</th>
+                        <th>Тип</th>
                         <th>Діє з</th>
                         <th>Діє до</th>
                         <th>Статус</th>
@@ -292,12 +301,17 @@
                         <tr>
                             <td><strong>@promo.Code</strong></td>
                             <td>@promo.Percent%</td>
+                            <td>@(promo.IsSingleUse ? "Одноразовий" : "Багаторазовий")</td>
                             <td>@promo.StartDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
                             <td>@promo.EndDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
                             <td>
                                 @if (promo.IsActive)
                                 {
                                     <span class="seller-status seller-status--active"><span></span> Активний</span>
+                                }
+                                else if (promo.IsSingleUse && promo.IsUsed)
+                                {
+                                    <span class="seller-status seller-status--suspended"><span></span> Використано</span>
                                 }
                                 else
                                 {
