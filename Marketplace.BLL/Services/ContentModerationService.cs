@@ -13,12 +13,14 @@ namespace Marketplace.BLL.Services
     {
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
+        private readonly ISystemSettingsService _settingsService;
         private readonly ILogger<ContentModerationService> _logger;
 
-        public ContentModerationService(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<ContentModerationService> logger)
+        public ContentModerationService(IHttpClientFactory httpClientFactory, IConfiguration configuration, ISystemSettingsService settingsService, ILogger<ContentModerationService> logger)
         {
             _httpClient = httpClientFactory.CreateClient();
             _configuration = configuration;
+            _settingsService = settingsService;
             _logger = logger;
         }
 
@@ -38,8 +40,12 @@ namespace Marketplace.BLL.Services
         {
             try
             {
-                var apiKey = _configuration["GoogleAI:ApiKey"] ?? throw new InvalidOperationException("Gemini API key не налаштований");
-                var model = _configuration["GoogleAI:Model"] ?? "gemini-2.5-flash";
+                var apiKey = await _settingsService.GetAsync("GoogleAI", "ApiKey")
+                    ?? _configuration["GoogleAI:ApiKey"]
+                    ?? throw new InvalidOperationException("Gemini API key не налаштований");
+                var model = await _settingsService.GetAsync("GoogleAI", "Model")
+                    ?? _configuration["GoogleAI:Model"]
+                    ?? "gemini-2.5-flash";
 
                 var url = $"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={apiKey}";
                 var response = await _httpClient.PostAsJsonAsync(url, requestBody);

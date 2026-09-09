@@ -416,8 +416,26 @@ namespace Marketplace.Web.Controllers
             {
                 IsSchedulerRunning = scheduler.IsStarted && !scheduler.InStandbyMode && !scheduler.IsShutdown,
                 ScheduledJobs = scheduledJobs.OrderBy(j => j.NextRunAtUtc).ToList(),
-                RecentDecisions = recentDecisions
+                RecentDecisions = recentDecisions,
+                HasCustomApiKey = !string.IsNullOrEmpty(await _settingsService.GetAsync("GoogleAI", "ApiKey")),
+                ModerationModel = await _settingsService.GetAsync("GoogleAI", "Model")
             });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateModerationApiKey(string? apiKey, string? model)
+        {
+            if (!string.IsNullOrWhiteSpace(apiKey))
+            {
+                await _settingsService.SetAsync("GoogleAI", "ApiKey", apiKey, isSecret: true, actorUserId: CurrentAdminId);
+            }
+            if (!string.IsNullOrWhiteSpace(model))
+            {
+                await _settingsService.SetAsync("GoogleAI", "Model", model, isSecret: false, actorUserId: CurrentAdminId);
+            }
+
+            TempData["Success"] = "Налаштування Gemini API оновлено.";
+            return RedirectToAction("Jobs");
         }
 
         [HttpGet]

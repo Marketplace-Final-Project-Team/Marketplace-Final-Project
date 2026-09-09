@@ -118,6 +118,20 @@
                 }
             </section>
 
+            <section class="admin-panel" style="padding: 1.25rem 1.5rem;">
+                <h2 class="admin-title" style="font-size: 1.1rem;">Налаштування Gemini API</h2>
+                <p class="admin-subtitle">Ключ і модель, які використовує автоматична модерація товарів. @(Model.HasCustomApiKey ? "Зараз використовується ключ, збережений тут." : "Зараз використовується ключ із конфігурації сервера.")</p>
+                <form asp-action="UpdateModerationApiKey" method="post" class="admin-toolbar">
+                    <div class="admin-search-wrap">
+                        <input type="password" class="form-control" name="apiKey" placeholder="@(Model.HasCustomApiKey ? "Введіть, щоб замінити збережений ключ" : "Gemini API key")" autocomplete="off" />
+                    </div>
+                    <div class="admin-search-wrap">
+                        <input type="text" class="form-control" name="model" placeholder="gemini-2.5-flash" value="@Model.ModerationModel" />
+                    </div>
+                    <button type="submit" class="btn btn-outline-secondary">Зберегти</button>
+                </form>
+            </section>
+
             <section class="admin-panel table-responsive mt-3">
                 <div class="admin-header" style="padding: 1rem 1.25rem 0;">
                     <h2 class="admin-title" style="font-size: 1.1rem;">Останні рішення модерації</h2>
