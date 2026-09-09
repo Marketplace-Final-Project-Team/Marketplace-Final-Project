@@ -75,6 +75,7 @@
                                 <li><a class="dropdown-item" asp-controller="Order" asp-action="Index">Мої замовлення</a></li>
                                 <li><a class="dropdown-item" asp-controller="Profile" asp-action="Wishlist">Список бажань</a></li>
                                 <li><a class="dropdown-item" asp-controller="Profile" asp-action="Addresses">Адреси доставки</a></li>
+                                <li><a class="dropdown-item" asp-controller="Business" asp-action="Index">Панель продавця</a></li>
                                 <li><a class="dropdown-item" asp-controller="Products" asp-action="Index">Мої товари</a></li>
                                 @if (User.IsInRole("Admin"))
                                 {
@@ -257,7 +258,7 @@
 
         <div class="site-footer__bottom">
             <div class="site-footer__inner">
-                <span class="site-footer__copyright">&copy; 2026 MarketPlace - навчальний маркетплейс</span>
+                <span class="site-footer__copyright">&copy; 2026 MarketPlace</span>
                 <div class="site-footer__payments">
                     <span>Оплата карткою через LiqPay:</span>
                     <span class="site-footer__payment-badge">VISA</span>

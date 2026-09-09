@@ -201,6 +201,9 @@
                                 <span class="seller-panel__label">Швидкі дії</span>
                                 <h3>Продовжити роботу</h3>
                                 <nav aria-label="Швидкі дії магазину @business.StoreName">
+                                    <a asp-action="Dashboard" asp-route-businessId="@business.Id">
+                                        <span aria-hidden="true">◫</span><div><strong>Дашборд</strong><small>Продажі, товари, трафік у графіках</small></div><b aria-hidden="true">→</b>
+                                    </a>
                                     <a asp-controller="Products" asp-action="Create" asp-route-businessId="@business.Id">
                                         <span aria-hidden="true">＋</span><div><strong>Новий товар</strong><small>Створити картку товару</small></div><b aria-hidden="true">→</b>
                                     </a>
