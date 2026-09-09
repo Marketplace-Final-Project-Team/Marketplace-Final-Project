@@ -152,6 +152,88 @@
     </section>
 
     <section class="business-panel">
+        <h2>Персональні знижки клієнтам</h2>
+        <p class="business-panel__lead">Знижка діє тільки для одного покупця на всі товари вашого магазину. Пріоритет знижок: власна знижка товару → знижка категорії → персональна знижка клієнта → знижка на весь магазин.</p>
+
+        @if (Model.PersonalDiscounts.Any())
+        {
+            <table class="business-table">
+                <thead>
+                    <tr>
+                        <th>Покупець</th>
+                        <th>Знижка</th>
+                        <th>Діє до</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pd in Model.PersonalDiscounts)
+                    {
+                        <tr>
+                            <td><strong>@pd.UserName</strong></td>
+                            <td>−@pd.Percent.ToString("0.##")%</td>
+                            <td>@pd.EndDate?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>
+                                <form asp-controller="UserDiscount" asp-action="RemoveUserDiscount" method="post" onsubmit="return confirm('Скасувати персональну знижку цього покупця?');">
+                                    <input type="hidden" name="userId" value="@pd.UserId" />
+                                    <input type="hidden" name="businessId" value="@Model.BusinessId" />
+                                    <input type="hidden" name="returnUrl" value="@Url.Action("PromoCodes", "Business", new { businessId = Model.BusinessId })" />
+                                    <button type="submit" class="seller-button seller-button--secondary">Скасувати</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="business-empty">Наразі немає активних персональних знижок.</p>
+        }
+
+        @if (Model.Customers.Any())
+        {
+            <form asp-controller="UserDiscount" asp-action="SetUserDiscount" method="post" class="business-settings-form">
+                <input type="hidden" name="businessId" value="@Model.BusinessId" />
+                <input type="hidden" name="returnUrl" value="@Url.Action("PromoCodes", "Business", new { businessId = Model.BusinessId })" />
+
+                <div>
+                    <label for="userId">Покупець</label>
+                    <select id="userId" name="userId" required>
+                        @foreach (var customer in Model.Customers)
+                        {
+                            <option value="@customer.UserId">@customer.UserName</option>
+                        }
+                    </select>
+                </div>
+
+                <div>
+                    <label for="personalDiscountPercent">Знижка, %</label>
+                    <input type="number" id="personalDiscountPercent" name="percent" min="1" max="100" required />
+                </div>
+
+                <div>
+                    <label for="personalDiscountStartDate">Діє з</label>
+                    <input type="datetime-local" id="personalDiscountStartDate" name="startDate" required value="@DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm")" />
+                </div>
+
+                <div>
+                    <label for="personalDiscountEndDate">Діє до</label>
+                    <input type="datetime-local" id="personalDiscountEndDate" name="endDate" required value="@DateTime.UtcNow.AddDays(3).ToString("yyyy-MM-ddTHH:mm")" />
+                </div>
+
+                <div>
+                    <button type="submit" class="seller-button seller-button--primary">Встановити знижку</button>
+                </div>
+            </form>
+        }
+        else
+        {
+            <p class="business-empty">Усі ваші покупці вже мають активну персональну знижку, або у вас ще не було покупців.</p>
+        }
+    </section>
+
+    <section class="business-panel">
         <h2>Новий промокод</h2>
         <p class="business-panel__lead">Код буде приведено до верхнього регістру. Покупець отримає знижку лише на товари вашого магазину в замовленні.</p>
 

@@ -30,6 +30,7 @@ namespace Marketplace.Web.Controllers
         private readonly IProductAnalyticsService _productAnalyticsService;
         private readonly ISystemSettingsService _settingsService;
         private readonly ICategoryService _categoryService;
+        private readonly IUserDiscountService _userDiscountService;
 
         public BusinessController(
             IBusinessService businessService,
@@ -46,7 +47,8 @@ namespace Marketplace.Web.Controllers
             IActivityLogService activityLog,
             IProductAnalyticsService productAnalyticsService,
             ISystemSettingsService settingsService,
-            ICategoryService categoryService)
+            ICategoryService categoryService,
+            IUserDiscountService userDiscountService)
         {
             _businessService = businessService;
             _businessAccessService = businessAccessService;
@@ -63,6 +65,7 @@ namespace Marketplace.Web.Controllers
             _productAnalyticsService = productAnalyticsService;
             _settingsService = settingsService;
             _categoryService = categoryService;
+            _userDiscountService = userDiscountService;
         }
 
         [HttpGet]
@@ -586,6 +589,14 @@ namespace Marketplace.Web.Controllers
             var businessDiscount = await _discountService.GetBusinessDiscount(businessId);
             var categoryDiscounts = await _discountService.GetActiveCategoryDiscountsForBusiness(businessId);
             var categories = await _categoryService.GetAllCategories();
+            var personalDiscounts = await _userDiscountService.GetActiveDiscountsForBusinessAsync(businessId);
+            var customersResult = await _businessService.GetCustomersStatsByPeriodAsync(businessId, business.CreatedAt, DateTime.UtcNow);
+            var customers = customersResult.Succeeded
+                ? customersResult.Data.Stats
+                    .Where(c => personalDiscounts.All(d => d.UserId != c.UserId))
+                    .OrderBy(c => c.UserName)
+                    .ToList()
+                : new List<Marketplace.DAL.DTOs.CustomerStatsByPeriodDto>();
 
             return View(new BusinessPromoCodesPageViewModel
             {
@@ -594,7 +605,9 @@ namespace Marketplace.Web.Controllers
                 PromoCodes = promoCodes,
                 BusinessDiscount = businessDiscount,
                 CategoryDiscounts = categoryDiscounts,
-                Categories = categories.ToList()
+                Categories = categories.ToList(),
+                PersonalDiscounts = personalDiscounts,
+                Customers = customers
             });
         }
 

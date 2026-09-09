@@ -11,5 +11,7 @@ namespace Marketplace.BLL.Interfaces
         Task<ServiceResult> SetUserDiscount(string userId, Guid businessId, decimal percent, DateTime startDate, DateTime endDate);
         Task<ServiceResult> RemoveUserDiscount(string userId, Guid businessId);
         Task<UserDiscountGetDto> GetUserDiscountAsync(string userId, Guid businessId);
+        Task<List<UserDiscountGetDto>> GetActiveDiscountsForBusinessAsync(Guid businessId);
+        Task<List<UserDiscountGetDto>> GetActiveDiscountsForUserAsync(string userId);
     }
 }
