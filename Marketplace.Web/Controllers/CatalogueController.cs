@@ -39,6 +39,9 @@ public class CatalogueController : Controller
         _settingsService = settingsService;
         _productAnalyticsService = productAnalyticsService;
     }
+    private string? GetCurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
+    
+
 
     [HttpGet]
     [Route("")]
@@ -46,6 +49,7 @@ public class CatalogueController : Controller
     public async Task<IActionResult> Index(CatalogFilterViewModel filter)
     {
         filter.Page = filter.Page < 1 ? 1 : filter.Page;
+        var userId = GetCurrentUserId();
 
         var categories = await _categoryService.GetAllCategories();
 
@@ -76,7 +80,7 @@ public class CatalogueController : Controller
             Categories = categories
                 .Select(category => new SelectListItem(category.Name, category.Id.ToString()))
                 .ToList(),
-            Products = result.Items.Select(item => MapProduct(item.Product, item.AverageRating, item.ReviewCount)).ToList(),
+            Products = result.Items.Select(item => MapProduct(item.Product, item.AverageRating, item.ReviewCount, userId)).ToList(),
             TotalCount = result.TotalCount,
             Page = result.Page,
             PageSize = result.PageSize,
@@ -91,6 +95,7 @@ public class CatalogueController : Controller
     public async Task<IActionResult> Details(Guid id)
     {
         bool allowAdultContent = Request.Cookies["AdultConfirmed"] == "true";
+        var userId = GetCurrentUserId();
 
         var product = await _productService.GetCatalogProductAsync(id, allowAdultContent);
         if (product is null)
@@ -106,7 +111,7 @@ public class CatalogueController : Controller
             return NotFound();
         }
 
-        var model = MapProduct(product);
+        var model = MapProduct(product,0,0,userId);
         model.LowStockThreshold = await _settingsService.GetIntAsync("BusinessRules", "LowStockThreshold", 5);
         var catalog = await _productService.GetCatalogAsync(allowAdultContent: allowAdultContent);
         model.EstimatedDeliveryStart = DateTime.Today.AddDays(2);
@@ -200,6 +205,7 @@ public class CatalogueController : Controller
     [Route("SearchSuggestions")]
     public async Task<IActionResult> SearchSuggestions(string? term)
     {
+        var userId = GetCurrentUserId();
         if (string.IsNullOrWhiteSpace(term) || term.Trim().Length < 2)
         {
             return Json(new SearchSuggestionsResultViewModel());
@@ -264,7 +270,7 @@ public class CatalogueController : Controller
                 Id = product.Id,
                 Name = product.Name,
                 CategoryName = product.Category?.Name ?? "Без категорії",
-                Price = product.GetEffectiveDiscountPercent() > 0 ? product.GetDiscountedPrice() : product.Price,
+                Price = product.GetEffectiveDiscountPercent(userId) > 0 ? product.GetDiscountedPrice(userId) : product.Price,
                 ImageUrl = product.MainImageUrl
             }).ToList()
         });
@@ -295,9 +301,10 @@ public class CatalogueController : Controller
         return distance[rows - 1, cols - 1];
     }
 
-    private static CatalogProductViewModel MapProduct(Marketplace.Domain.Entities.Product product, double averageRating = 0, int reviewCount = 0)
+    private static CatalogProductViewModel MapProduct(Marketplace.Domain.Entities.Product product, double averageRating = 0, int reviewCount = 0,string userId = null)
     {
-        var discountPercent = product.GetEffectiveDiscountPercent();
+        
+        var discountPercent = product.GetEffectiveDiscountPercent(userId);
         var hasDiscount = discountPercent > 0;
 
         return new CatalogProductViewModel
@@ -305,7 +312,7 @@ public class CatalogueController : Controller
             Id = product.Id,
             Name = product.Name,
             Description = product.Description,
-            Price = hasDiscount ? product.GetDiscountedPrice() : product.Price,
+            Price = hasDiscount ? product.GetDiscountedPrice(userId) : product.Price,
             Quantity = product.Quantity,
             CreatedAt = product.CreatedAt,
             MainImageUrl = product.MainImageUrl,

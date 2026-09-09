@@ -71,7 +71,8 @@ public class ProductService : IProductService
                 .ThenInclude(b => b.Discounts)  
             .Include(p => p.Category)
                 .ThenInclude(c => c.Discounts)
-
+            .Include(p => p.Business)
+                .ThenInclude(b => b.UserDiscounts)
             .Include(p => p.Images)
             .Where(p => p.Status == ProductStatus.Active);
 
@@ -103,6 +104,8 @@ public class ProductService : IProductService
                 .ThenInclude(b => b.Discounts)   
             .Include(p => p.Category)
                 .ThenInclude(c => c.Discounts)
+            .Include(p => p.Business)
+                .ThenInclude(b => b.UserDiscounts)
             .Include(p => p.Images)
             .Where(p => p.Status == ProductStatus.Active);
 
@@ -175,6 +178,8 @@ public class ProductService : IProductService
                 .ThenInclude(b => b.Discounts)   
             .Include(p => p.Category)
                 .ThenInclude(c => c.Discounts)
+            .Include(p => p.Business)
+                .ThenInclude(b => b.UserDiscounts)
             .Include(p => p.Images)
             .FirstOrDefaultAsync(p => p.Id == id && p.Status == ProductStatus.Active);
 
@@ -248,6 +253,8 @@ public class ProductService : IProductService
                 .ThenInclude(b => b.Discounts)   
             .Include(p => p.Category)
                 .ThenInclude(c => c.Discounts)
+            .Include(p => p.Business)
+                .ThenInclude(b => b.UserDiscounts)
             .Include(p => p.Images)
             .FirstOrDefaultAsync(p => p.Id == id);
     }

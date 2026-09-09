@@ -5,9 +5,9 @@ namespace Marketplace.Web.Models
 {
     public static class ProductMappingExtensions
     {
-        public static CatalogProductViewModel ToCatalogProductViewModel(this Product product)
+        public static CatalogProductViewModel ToCatalogProductViewModel(this Product product, string? userId = null)
         {
-            var discountPercent = product.GetEffectiveDiscountPercent();
+            var discountPercent = product.GetEffectiveDiscountPercent(userId);
             var hasDiscount = discountPercent > 0;
 
             return new CatalogProductViewModel
@@ -15,7 +15,7 @@ namespace Marketplace.Web.Models
                 Id = product.Id,
                 Name = product.Name,
                 Description = product.Description,
-                Price = hasDiscount ? product.GetDiscountedPrice() : product.Price,
+                Price = hasDiscount ? product.GetDiscountedPrice(userId) : product.Price,
                 Quantity = product.Quantity,
                 MainImageUrl = product.MainImageUrl,
                 CategoryName = product.Category?.Name ?? "Без категорії",

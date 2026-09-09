@@ -48,22 +48,48 @@ namespace Marketplace.BLL.Services
 
                 var categoryDiscount = ci.Product.Category?.Discounts?
                     .FirstOrDefault(d => d.BusinessId == ci.Product.BusinessId && d.CategoryId == ci.Product.CategoryId && d.DiscountType == DiscountType.Category && d.StartDate <= now && d.EndDate >= now);
-
+                var userDiscount = _context.UserDiscounts
+                    .FirstOrDefault(ud => ud.UserId == userId && ud.BusinessId == ci.Product.BusinessId && ud.StartDate <= now && ud.EndDate >= now);
 
                 decimal discountPercent = 0;
 
-                if (productDiscount != null)
+                if (userDiscount != null)
                 {
-                    discountPercent = productDiscount.Percent;
+                    var alldiscounts = new List<decimal>();
+                    if (productDiscount != null)
+                    {
+                        alldiscounts.Add(productDiscount.Percent);
+                    }
+                    if (categoryDiscount != null)
+                    {
+                        alldiscounts.Add(categoryDiscount.Percent);
+                    }
+                    if (userDiscount != null)
+                    {
+                        alldiscounts.Add(userDiscount.Percent);
+                    }
+                    if (businessDiscount != null)
+                    {
+                        alldiscounts.Add(businessDiscount.Percent);
+                    }
+                    discountPercent = alldiscounts.Any() ? alldiscounts.Max() : 0;
                 }
-                else if (categoryDiscount != null)
+                else
                 {
-                    discountPercent = categoryDiscount.Percent;
+                    if (productDiscount != null)
+                    {
+                        discountPercent = productDiscount.Percent;
+                    }
+                    else if (categoryDiscount != null)
+                    {
+                        discountPercent = categoryDiscount.Percent;
 
-                }
-                else if (businessDiscount != null)
-                {
-                    discountPercent = businessDiscount.Percent;
+                    }
+
+                    else if (businessDiscount != null)
+                    {
+                        discountPercent = businessDiscount.Percent;
+                    }
                 }
 
                 decimal finalPrice = discountPercent > 0
