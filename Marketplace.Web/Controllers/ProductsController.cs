@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using Marketplace.BLL.Authorization;
+using Marketplace.BLL.Common;
 using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
 using Marketplace.Domain.Entities;

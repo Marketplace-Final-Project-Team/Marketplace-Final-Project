@@ -871,6 +871,46 @@ namespace Marketplace.DAL.Migrations
                     b.ToTable("UserActionLogs");
                 });
 
+            modelBuilder.Entity("Marketplace.Domain.Entities.UserDiscount", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BusinessId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("Percent")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BusinessId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserDiscounts");
+                });
+
             modelBuilder.Entity("Marketplace.Domain.Entities.Wishlist", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1326,6 +1366,25 @@ namespace Marketplace.DAL.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Marketplace.Domain.Entities.UserDiscount", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.Business", "Business")
+                        .WithMany("UserDiscounts")
+                        .HasForeignKey("BusinessId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Marketplace.Domain.Entities.User", "User")
+                        .WithMany("UserDiscounts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Business");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Marketplace.Domain.Entities.Wishlist", b =>
                 {
                     b.HasOne("Marketplace.Domain.Entities.User", "User")
@@ -1431,6 +1490,8 @@ namespace Marketplace.DAL.Migrations
                     b.Navigation("Members");
 
                     b.Navigation("Products");
+
+                    b.Navigation("UserDiscounts");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Cart", b =>
@@ -1471,6 +1532,8 @@ namespace Marketplace.DAL.Migrations
                     b.Navigation("Addresses");
 
                     b.Navigation("Reviews");
+
+                    b.Navigation("UserDiscounts");
 
                     b.Navigation("WishlistCollections");
 

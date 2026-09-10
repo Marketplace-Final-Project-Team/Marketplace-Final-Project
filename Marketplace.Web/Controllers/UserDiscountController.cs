@@ -1,4 +1,4 @@
-﻿using Marketplace.BLL.Authorization;
+﻿using Marketplace.BLL.Common;
 using Marketplace.BLL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 

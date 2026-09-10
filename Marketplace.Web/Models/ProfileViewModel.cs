@@ -10,6 +10,7 @@
         public int AddressesCount { get; set; }
         public int WishlistCount { get; set; }
 
-        public decimal PersonalDiscountPercent { get; set; } = 15;
+        public List<PersonalDiscountViewModel> PersonalDiscounts { get; set; } = new();
+
     }
 }

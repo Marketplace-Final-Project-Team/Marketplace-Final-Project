@@ -145,13 +145,15 @@
                                                 -@item.DiscountPercent%
                                             </span>
 
-                                            <!-- Кнопка-хрестик для швидкого видалення знижки -->
-                                            <form asp-controller="Discounts" asp-action="Remove" method="post" class="d-inline m-0 p-0" title="Видалити знижку">
-                                                <input type="hidden" name="productId" value="@item.Id" />
-                                                <button type="submit" class="btn btn-link btn-sm text-danger p-0 text-decoration-none fw-bold" style="font-size: 14px; line-height: 1;">
-                                                    &times;
-                                                </button>
-                                            </form>
+                                            <button type="button" class="btn btn-link btn-sm text-danger p-0 text-decoration-none fw-bold"
+                                                    style="font-size: 14px; line-height: 1;"
+                                                    title="Видалити знижку"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteDiscountModal"
+                                                    data-product-id="@item.Id"
+                                                    data-product-name="@item.Name">
+                                                &times;
+                                            </button>
                                         </div>
                                     }
                                 </div>
@@ -172,7 +174,6 @@
                                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Переглянути</a>
                                     <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Редагувати</a>
 
-                                    <!-- Кнопка, що відкриває модальне вікно знижки -->
                                     <button type="button" class="btn btn-sm btn-outline-warning text-dark"
                                             data-bs-toggle="modal"
                                             data-bs-target="#discountModal"
@@ -192,7 +193,7 @@
     }
 </div>
 
-<!-- Модальне вікно для налаштування знижки -->
+
 <div class="modal fade" id="discountModal" tabindex="-1" aria-labelledby="discountModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -228,6 +229,32 @@
     </div>
 </div>
 
+
+<div class="modal fade" id="deleteDiscountModal" tabindex="-1" aria-labelledby="deleteDiscountModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-controller="Discounts" asp-action="Remove" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteDiscountModalLabel">Видалення знижки</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрити"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="deleteModalProductId" name="productId" />
+                    <p class="mb-0">
+                        Ви точно хочете видалити знижку на товар
+                        «<strong id="deleteModalProductName"></strong>»?
+                    </p>
+                    <p class="text-secondary small mb-0 mt-2">Цю дію не можна скасувати.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
+                    <button type="submit" class="btn btn-danger">Видалити знижку</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
         const discountModal = document.getElementById('discountModal');
@@ -238,6 +265,25 @@
                 const inputProductId = discountModal.querySelector('#modalProductId');
                 if (inputProductId) {
                     inputProductId.value = productId;
+                }
+            });
+        }
+
+        const deleteDiscountModal = document.getElementById('deleteDiscountModal');
+        if (deleteDiscountModal) {
+            deleteDiscountModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const productId = button.getAttribute('data-product-id');
+                const productName = button.getAttribute('data-product-name');
+
+                const inputProductId = deleteDiscountModal.querySelector('#deleteModalProductId');
+                const nameSpan = deleteDiscountModal.querySelector('#deleteModalProductName');
+
+                if (inputProductId) {
+                    inputProductId.value = productId;
+                }
+                if (nameSpan) {
+                    nameSpan.textContent = productName;
                 }
             });
         }

@@ -8,6 +8,7 @@ using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Marketplace.Web.Controllers
 {
@@ -42,7 +43,6 @@ namespace Marketplace.Web.Controllers
             _userManager = userManager;
             _emailSender = emailSender;
         }
-
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -59,6 +59,19 @@ namespace Marketplace.Web.Controllers
             var addresses = await _addressRepository.FindAsync(a => a.UserId == userId);
             var wishlist = await _wishlistService.GetWishlistAsync(userId!);
 
+            
+            var now = DateTime.UtcNow;
+            var personalDiscounts = await _context.UserDiscounts
+                .Where(ud => ud.UserId == userId && ud.StartDate <= now && ud.EndDate > now)
+                .OrderByDescending(ud => ud.Percent)
+                .Select(ud => new PersonalDiscountViewModel
+                {
+                    StoreName = ud.Business.StoreName,
+                    Percent = ud.Percent,
+                    EndDate = ud.EndDate
+                })
+                .ToListAsync();
+
             return View(new ProfileViewModel
             {
                 Username = profile.Username,
@@ -66,9 +79,11 @@ namespace Marketplace.Web.Controllers
                 Avatar = profile.Avatar,
                 OrdersCount = orders.Count,
                 AddressesCount = addresses.Count,
-                WishlistCount = wishlist.TotalItems
+                WishlistCount = wishlist.TotalItems,
+                PersonalDiscounts = personalDiscounts
             });
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Activity()
@@ -130,8 +145,6 @@ namespace Marketplace.Web.Controllers
             var items = new List<WishlistItemViewModel>();
             foreach (var item in wishlist.Items)
             {
-                // Raw lookup (no Active/Quantity filter) so we can tell "out of stock" apart
-                // from "still active but temporarily at 0" — both are real, current DB state.
                 var product = await _productService.GetByIdAsync(item.ProductId);
                 items.Add(new WishlistItemViewModel
                 {
