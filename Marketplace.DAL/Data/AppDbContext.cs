@@ -42,6 +42,8 @@ namespace Marketplace.DAL.Data
 
         public DbSet<UserDiscount> UserDiscounts { get; set; }
 
+        public DbSet<WithdrawalRequest> WithdrawalRequests { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -67,6 +69,8 @@ namespace Marketplace.DAL.Data
             builder.Entity<PromoCode>().HasQueryFilter(pc => !pc.IsDeleted);
             builder.Entity<SystemSetting>().HasQueryFilter(s => !s.IsDeleted);
             builder.Entity<MarketplaceBalance>().HasQueryFilter(mb => !mb.IsDeleted);
+
+            
             // UserActionLog / BusinessActionLog are append-only audit trails — no soft-delete filter.
 
 
@@ -269,6 +273,13 @@ namespace Marketplace.DAL.Data
                 .WithMany(b => b.UserDiscounts)
                 .HasForeignKey(ud => ud.BusinessId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<WithdrawalRequest>()
+                .HasOne(wr => wr.Business)
+                .WithMany()
+                .HasForeignKey(wr => wr.BusinessId)
+                .OnDelete(DeleteBehavior.Restrict);
+
 
             builder.Entity<Product>().Navigation(p => p.Category).AutoInclude();
             builder.Entity<Product>().Navigation(p => p.Images).AutoInclude();
