@@ -378,6 +378,14 @@
     margin-bottom: 1rem;
 }
 
+.admin-toolbar--center {
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-line);
+    border-radius: 0.9rem;
+    justify-content: center;
+    padding: 1rem 1.25rem;
+}
+
 .admin-toolbar .admin-search-wrap {
     margin-bottom: 0;
 }

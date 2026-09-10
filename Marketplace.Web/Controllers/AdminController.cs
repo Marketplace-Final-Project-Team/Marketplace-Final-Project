@@ -485,12 +485,14 @@ namespace Marketplace.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Statistics([FromQuery] AdminStatisticsFilterViewModel filter)
         {
-            var overview = await _adminService.GetStatisticsAsync(filter.StartDate, filter.EndDate);
+            var overview = await _adminService.GetStatisticsAsync(filter.StartDate, filter.EndDate, filter.BusinessId);
+            var businesses = await _adminService.GetBusinessesAsync();
 
             return View(new AdminStatisticsPageViewModel
             {
                 Filter = filter,
-                Overview = overview
+                Overview = overview,
+                Businesses = businesses.OrderBy(b => b.Name).ToList()
             });
         }
 

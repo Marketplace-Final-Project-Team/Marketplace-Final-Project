@@ -453,7 +453,7 @@ namespace Marketplace.BLL.Services
         // ever match what Admin/MarketplaceBalance and the seller's own Business/Finance show.
         // Pending orders are excluded even though they're real carts, because no money has
         // actually changed hands yet.
-        public async Task<AdminStatisticsOverviewDto> GetStatisticsAsync(DateTime? startDate, DateTime? endDate)
+        public async Task<AdminStatisticsOverviewDto> GetStatisticsAsync(DateTime? startDate, DateTime? endDate, Guid? businessId = null)
         {
             if (startDate.HasValue && endDate.HasValue && startDate > endDate)
             {
@@ -473,6 +473,10 @@ namespace Marketplace.BLL.Services
             {
                 var endExclusive = endDate.Value.Date.AddDays(1);
                 itemsQuery = itemsQuery.Where(oi => oi.Order.CreatedAt < endExclusive);
+            }
+            if (businessId.HasValue)
+            {
+                itemsQuery = itemsQuery.Where(oi => oi.Product.BusinessId == businessId.Value);
             }
 
             var rows = await itemsQuery

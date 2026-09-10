@@ -43,7 +43,7 @@
                 </div>
             </header>
 
-            <form method="get" asp-action="Statistics" class="admin-toolbar">
+            <form method="get" asp-action="Statistics" class="admin-toolbar admin-toolbar--center">
                 <div>
                     <label for="startDate" class="admin-toolbar__label">З дати</label>
                     <input type="date" id="startDate" class="form-control" name="StartDate" value="@Model.Filter.StartDate?.ToString("yyyy-MM-dd")" />
@@ -52,10 +52,20 @@
                     <label for="endDate" class="admin-toolbar__label">По дату</label>
                     <input type="date" id="endDate" class="form-control" name="EndDate" value="@Model.Filter.EndDate?.ToString("yyyy-MM-dd")" />
                 </div>
+                <div>
+                    <label for="businessId" class="admin-toolbar__label">Магазин</label>
+                    <select id="businessId" name="BusinessId" class="form-select">
+                        <option value="">Усі магазини</option>
+                        @foreach (var business in Model.Businesses)
+                        {
+                            <option value="@business.Id" selected="@(Model.Filter.BusinessId == business.Id)">@(string.IsNullOrWhiteSpace(business.Name) ? "Без назви" : business.Name)</option>
+                        }
+                    </select>
+                </div>
                 <button type="submit" class="btn btn-outline-secondary">Застосувати</button>
-                @if (Model.Filter.StartDate.HasValue || Model.Filter.EndDate.HasValue)
+                @if (Model.Filter.StartDate.HasValue || Model.Filter.EndDate.HasValue || Model.Filter.BusinessId.HasValue)
                 {
-                    <a asp-action="Statistics" class="btn btn-outline-secondary">Весь час</a>
+                    <a asp-action="Statistics" class="btn btn-outline-secondary">Скинути</a>
                 }
             </form>
 
