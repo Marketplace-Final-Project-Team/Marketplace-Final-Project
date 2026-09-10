@@ -19,6 +19,8 @@ namespace Marketplace.BLL.Services
         private readonly UserManager<User> _userManager;
         private readonly IBusinessRepository _businessRepo;
         private readonly IOrderRepository _orderRepository;
+        private readonly IGenericRepository<WithdrawalRequest> _withdrawalRequestRepo;
+        private readonly IPaymentService _paymentService;
         private readonly AppDbContext _context;
 
         public AdminService(
@@ -26,12 +28,16 @@ namespace Marketplace.BLL.Services
             UserManager<User> userManager,
             IBusinessRepository businessRepo,
             IOrderRepository orderRepository,
+            IGenericRepository<WithdrawalRequest> withdrawalRequestRepo,
+            IPaymentService paymentService,
             AppDbContext context)
         {
             _productRepo = productRepo;
             _userManager = userManager;
             _businessRepo = businessRepo;
             _orderRepository = orderRepository;
+            _withdrawalRequestRepo = withdrawalRequestRepo;
+            _paymentService = paymentService;
             _context = context;
         }
 
@@ -605,6 +611,99 @@ namespace Marketplace.BLL.Services
                 ActiveProductCount = products.Count(p => p.Status == ProductStatus.Active),
                 PendingProductCount = products.Count(p => p.Status == ProductStatus.Pending),
                 BannedProductCount = products.Count(p => p.Status == ProductStatus.Banned)
+            };
+        }
+
+        public async Task<IReadOnlyList<WithdrawalRequestAdminDto>> GetWithdrawalRequestsAsync() 
+        {
+            var res = (await _withdrawalRequestRepo.GetAllAsync()).Select(wr => new WithdrawalRequestAdminDto
+            {
+                Id = wr.Id,
+                BusinessId = wr.BusinessId,
+                BusinessName = wr.Business.StoreName,
+                Amount = wr.Amount,
+                CardNumber = wr.CardNumber,
+                RecipientName = wr.RecipientName,
+                Status = wr.Status,
+                RejectionReason = wr.Message
+            }).ToList();
+
+            return res;
+        }
+
+        public async Task<ServiceResult> ApproveWithdrawalRequestAsync(Guid requestId)
+        {
+            var request = await _withdrawalRequestRepo.GetByIdAsync(requestId);
+
+            if (request == null)
+            {
+                throw new Exception("Запит не знайдено.");
+            }
+
+            if (request.Status != WithdrawalRequestStatusEnum.Pending)
+            {
+                throw new Exception("Запит вже оброблено.");
+            }
+
+            request.Status = WithdrawalRequestStatusEnum.Approved;
+
+            _withdrawalRequestRepo.Update(request);
+            await _context.SaveChangesAsync();
+
+            var res = await _paymentService.CreatePayoutAsync(requestId, request.Amount, request.CardNumber, $"Оплата запиту #{requestId}");
+
+            if (!res)
+            {
+                var message = $"Не вдалося здійснити виплату для запиту.";
+
+                request.Status = WithdrawalRequestStatusEnum.Failed;
+                request.Message = message;
+
+                _withdrawalRequestRepo.Update(request);
+                await _context.SaveChangesAsync();
+
+                return new ServiceResult
+                {
+                    Succeeded = false,
+                    Message = message
+                };
+            }
+
+            request.Status = WithdrawalRequestStatusEnum.Completed;
+            _withdrawalRequestRepo.Update(request);
+            await _context.SaveChangesAsync();
+
+            return new ServiceResult
+            {
+                Succeeded = true,
+                Message = string.Empty
+            };
+        }
+
+        public async Task<ServiceResult> RejectWithdrawalRequestAsync(Guid requestId, string reason)
+        {
+            var request = await _withdrawalRequestRepo.GetByIdAsync(requestId);
+
+            if (request == null)
+            {
+                throw new Exception("Запит не знайдено.");
+            }
+  
+            if (request.Status != WithdrawalRequestStatusEnum.Pending)
+            {
+                throw new Exception("Запит вже оброблено.");
+            }
+
+            request.Status = WithdrawalRequestStatusEnum.Rejected;
+            request.Message = reason;
+            
+            _withdrawalRequestRepo.Update(request);
+            await _context.SaveChangesAsync();
+            
+            return new ServiceResult
+            {
+                Succeeded = true,
+                Message = string.Empty
             };
         }
     }
