@@ -30,4 +30,16 @@
             });
         }
     }
+
+    const categoryCanvas = document.getElementById("categoryTurnoverChart");
+    if (categoryCanvas) {
+        const items = MpCharts.readData(categoryCanvas) || [];
+        if (items.length > 0) {
+            MpCharts.doughnut("categoryTurnoverChart", {
+                labels: items.map((c) => c.name),
+                data: items.map((c) => c.turnover),
+                colors: items.map((c) => c.color)
+            });
+        }
+    }
 })();

@@ -1,4 +1,4 @@
-﻿using Marketplace.Domain.Enums;
+using Marketplace.Domain.Enums;
 using AdultContentStatus = Marketplace.Domain.Entities.AdultContentStatus;
 
 namespace Marketplace.BLL.DTOs
@@ -13,12 +13,9 @@ namespace Marketplace.BLL.DTOs
         public BusinessStatus Status { get; set; }
         public decimal CommissionPercent { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string OwnerEmail { get; set; } = string.Empty;
         public AdultContentStatus AdultStatus { get; set; }
         public string? AdultRejectionReason { get; set; }
-
-        public string OwnerId { get; set; } = string.Empty;
-        public string OwnerEmail { get; set; } = string.Empty;
-
         public int TotalProductCount { get; set; }
         public int ActiveProductCount { get; set; }
         public int PendingProductCount { get; set; }

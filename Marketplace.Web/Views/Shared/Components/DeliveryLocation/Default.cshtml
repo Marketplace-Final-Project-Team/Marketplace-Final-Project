@@ -1,0 +1,21 @@
+@model Marketplace.Domain.Entities.Address?
+@{
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+    var locationLabel = Model is not null
+        ? Model.City
+        : (isAuthenticated ? "Оберіть адресу" : "Увійдіть, щоб обрати");
+}
+
+<a class="site-header__delivery"
+   asp-controller="@(isAuthenticated ? "Profile" : "Auth")"
+   asp-action="@(isAuthenticated ? "Addresses" : "SignIn")"
+   title="Змінити адресу доставки">
+    <svg class="site-header__delivery-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" aria-hidden="true">
+        <path d="M12 22s8-7.58 8-13a8 8 0 1 0-16 0c0 5.42 8 13 8 13Z" />
+        <circle cx="12" cy="9" r="2.5" />
+    </svg>
+    <span class="site-header__delivery-text">
+        <small>Доставка</small>
+        <strong>@locationLabel</strong>
+    </span>
+</a>

@@ -368,5 +368,23 @@ namespace Marketplace.BLL.Services
 
 
         }
+
+        public async Task<List<CategoryDiscountDto>> GetActiveCategoryDiscountsForBusiness(Guid businessId)
+        {
+            return await _context.Discounts
+                .Where(d => d.BusinessId == businessId && d.DiscountType == DiscountType.Category && d.EndDate >= DateTime.UtcNow && d.CategoryId != null)
+                .Include(d => d.Category)
+                .Select(d => new CategoryDiscountDto
+                {
+                    CategoryId = d.CategoryId!.Value,
+                    CategoryName = d.Category!.Name,
+                    BusinessId = businessId,
+                    DiscountPercent = d.Percent,
+                    StartDate = d.StartDate,
+                    EndDate = d.EndDate,
+                    IsActive = d.IsActive
+                })
+                .ToListAsync();
+        }
     }
 }

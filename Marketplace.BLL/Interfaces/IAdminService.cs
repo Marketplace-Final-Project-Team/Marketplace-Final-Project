@@ -26,6 +26,5 @@ namespace Marketplace.BLL.Interfaces
         Task<decimal> GetTotalCommissionAsync();
 
         Task<AdminStatisticsOverviewDto> GetStatisticsAsync(DateTime? startDate, DateTime? endDate);
-
     }
 }

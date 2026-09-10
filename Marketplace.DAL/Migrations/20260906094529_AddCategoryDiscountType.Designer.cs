@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Marketplace.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260909114557_AddCategoryDiscountType")]
+    [Migration("20260906094529_AddCategoryDiscountType")]
     partial class AddCategoryDiscountType
     {
         /// <inheritdoc />

@@ -33,6 +33,7 @@ namespace Marketplace.Web.Controllers
         private readonly IActivityLogService _activityLog;
         private readonly IProductAnalyticsService _productAnalyticsService;
         private readonly ISystemSettingsService _settingsService;
+        private readonly ICategoryService _categoryService;
 
         public BusinessController(
             IBusinessService businessService,
@@ -48,7 +49,8 @@ namespace Marketplace.Web.Controllers
             AppDbContext context,
             IActivityLogService activityLog,
             IProductAnalyticsService productAnalyticsService,
-            ISystemSettingsService settingsService)
+            ISystemSettingsService settingsService,
+            ICategoryService categoryService)
         {
             _businessService = businessService;
             _businessAccessService = businessAccessService;
@@ -64,6 +66,7 @@ namespace Marketplace.Web.Controllers
             _activityLog = activityLog;
             _productAnalyticsService = productAnalyticsService;
             _settingsService = settingsService;
+            _categoryService = categoryService;
         }
 
         [HttpGet]
@@ -508,6 +511,83 @@ namespace Marketplace.Web.Controllers
             return RedirectToAction(nameof(Team), new { businessId });
         }
 
+        [HttpGet("business/{businessId}/add-member")]
+        public async Task<IActionResult> AddMember(Guid businessId)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.ManageTeam);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var model = new BusinessMemberCreateViewModel { BusinessId = businessId };
+            return View(model);
+        }
+
+        [HttpPost("business/{businessId}/add-member")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddMember(BusinessMemberCreateViewModel model)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(model.BusinessId, BusinessPermissions.ManageTeam);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var result = await _businessService.AddBusinessMember(new BusinessMemberCreateDto
+            {
+                BusinessId = model.BusinessId,
+                UserId = model.EmployeeId,
+                Role = model.Role
+            });
+
+            if (!result.Succeeded)
+            {
+                ModelState.AddModelError("", result.Message);
+                return View(model);
+            }
+
+            var approveLink = Url.Action("ApproveMembership", "Business", new { businessId = model.BusinessId, userId = model.EmployeeId, token = result.Token, role = model.Role }, Request.Scheme);
+            var denyLink = Url.Action("DenyMembership", "Business", new { businessId = model.BusinessId, userId = model.EmployeeId, token = result.Token, role = model.Role }, Request.Scheme);
+
+            await _emailSender.SendEmailAsync(result.Email!, "Запит на членство",
+                $"Вам було надіслано запит на членство: " +
+                $"<a href='{approveLink}'>Прийняти</a>" +
+                $"<a href='{denyLink}'>Відхилити</a>");
+
+            TempData["Success"] = "Запрошення надіслано.";
+            return RedirectToAction(nameof(Team), new { businessId = model.BusinessId });
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> ApproveMembership(Guid businessId, string userId, string token, BusinessMemberRole role)
+        {
+            var result = await _businessService.ApproveMembership(userId, businessId, token, role);
+            return RedirectToAction("MembershipResult", new { message = result.Message });
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> DenyMembership(Guid businessId, string userId, string token, BusinessMemberRole role)
+        {
+            var result = await _businessService.DenyMembership(userId, businessId, token, role);
+            return RedirectToAction("MembershipResult", new { message = result.Message });
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult MembershipResult(string message)
+        {
+            ViewBag.Message = message;
+            return View();
+        }
+
         [HttpGet]
         public async Task<IActionResult> Finance(Guid businessId)
         {
@@ -609,13 +689,17 @@ namespace Marketplace.Web.Controllers
 
             var promoCodes = await _promoCodeService.GetForBusinessAsync(businessId);
             var businessDiscount = await _discountService.GetBusinessDiscount(businessId);
+            var categoryDiscounts = await _discountService.GetActiveCategoryDiscountsForBusiness(businessId);
+            var categories = await _categoryService.GetAllCategories();
 
             return View(new BusinessPromoCodesPageViewModel
             {
                 BusinessId = businessId,
                 StoreName = business.StoreName,
                 PromoCodes = promoCodes,
-                BusinessDiscount = businessDiscount
+                BusinessDiscount = businessDiscount,
+                CategoryDiscounts = categoryDiscounts,
+                Categories = categories.ToList()
             });
         }
 
@@ -717,18 +801,6 @@ namespace Marketplace.Web.Controllers
             }
 
             return View(new BusinessGrowthViewModel { BusinessId = businessId, StoreName = business.StoreName });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Integrations(Guid businessId)
-        {
-            var business = await GetAccessibleBusinessOrNullAsync(businessId);
-            if (business is null)
-            {
-                return Forbid();
-            }
-
-            return View(new BusinessIntegrationsViewModel { BusinessId = businessId, StoreName = business.StoreName });
         }
 
         [HttpGet]

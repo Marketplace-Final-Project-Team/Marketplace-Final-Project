@@ -399,40 +399,6 @@ namespace Marketplace.BLL.Services
             };
         }
 
-        public async Task<BusinessAdminDetailsDto?> GetBusinessDetailsAsync(Guid businessId)
-        {
-            var business = await _context.Businesses
-                .Include(b => b.Owner)
-                .FirstOrDefaultAsync(b => b.Id == businessId);
-
-            if (business == null)
-            {
-                return null;
-            }
-
-            var products = await _productRepo.FindAsync(p => p.BusinessId == businessId);
-
-            return new BusinessAdminDetailsDto
-            {
-                Id = business.Id,
-                StoreName = business.StoreName,
-                Description = business.Description,
-                LogoUrl = business.LogoUrl,
-                BannerUrl = business.BannerUrl,
-                Status = business.Status,
-                CommissionPercent = business.CommissionPercent,
-                CreatedAt = business.CreatedAt,
-                AdultStatus = business.AdultStatus,
-                AdultRejectionReason = business.AdultRejectionReason,
-                OwnerId = business.OwnerId,
-                OwnerEmail = business.Owner.Email!,
-                TotalProductCount = products.Count,
-                ActiveProductCount = products.Count(p => p.Status == ProductStatus.Active),
-                PendingProductCount = products.Count(p => p.Status == ProductStatus.Pending),
-                BannedProductCount = products.Count(p => p.Status == ProductStatus.Banned)
-            };
-        }
-
         public async Task<DataResult<AdminCommissionStatsDto>> GetCommissionStatsByPeriodAsync(DateTime? startDate, DateTime? endDate)
         {
             var today = DateTime.UtcNow.Date;
@@ -514,6 +480,7 @@ namespace Marketplace.BLL.Services
                 {
                     oi.OrderId,
                     BusinessId = oi.Product.BusinessId,
+                    CategoryId = oi.Product.CategoryId,
                     oi.Order.CreatedAt,
                     LineTotal = oi.UnitPrice * oi.Quantity,
                     oi.Quantity,
@@ -556,6 +523,23 @@ namespace Marketplace.BLL.Services
             .OrderByDescending(b => b.MarketplaceRevenue)
             .ToList();
 
+            var categories = await _context.Categories.AsNoTracking()
+                .Select(c => new { c.Id, c.Name })
+                .ToListAsync();
+
+            var categoryStats = rows
+                .GroupBy(r => r.CategoryId)
+                .Select(g => new CategoryStatisticsDto
+                {
+                    CategoryId = g.Key,
+                    CategoryName = categories.FirstOrDefault(c => c.Id == g.Key)?.Name ?? "Без категорії",
+                    OrdersCount = g.Select(r => r.OrderId).Distinct().Count(),
+                    UnitsSold = g.Sum(r => r.Quantity),
+                    Turnover = g.Sum(r => r.LineTotal)
+                })
+                .OrderByDescending(c => c.Turnover)
+                .ToList();
+
             var groupByMonth = !startDate.HasValue || !endDate.HasValue
                 || (endDate.Value - startDate.Value).TotalDays > 31;
 
@@ -586,8 +570,41 @@ namespace Marketplace.BLL.Services
                 TotalBusinessCount = businesses.Count,
                 TotalProductCount = productCounts.Sum(p => p.Total),
                 Businesses = businessStats,
-                ByPeriod = byPeriod
+                ByPeriod = byPeriod,
+                Categories = categoryStats
+            };
+        }
 
+        public async Task<BusinessAdminDetailsDto?> GetBusinessDetailsAsync(Guid businessId)
+        {
+            var business = await _context.Businesses
+                .Include(b => b.Owner)
+                .FirstOrDefaultAsync(b => b.Id == businessId);
+
+            if (business == null)
+            {
+                return null;
+            }
+
+            var products = await _productRepo.FindAsync(p => p.BusinessId == businessId);
+
+            return new BusinessAdminDetailsDto
+            {
+                Id = business.Id,
+                StoreName = business.StoreName,
+                Description = business.Description,
+                LogoUrl = business.LogoUrl,
+                BannerUrl = business.BannerUrl,
+                Status = business.Status,
+                CommissionPercent = business.CommissionPercent,
+                CreatedAt = business.CreatedAt,
+                OwnerEmail = business.Owner.Email ?? string.Empty,
+                AdultStatus = business.AdultStatus,
+                AdultRejectionReason = business.AdultRejectionReason,
+                TotalProductCount = products.Count,
+                ActiveProductCount = products.Count(p => p.Status == ProductStatus.Active),
+                PendingProductCount = products.Count(p => p.Status == ProductStatus.Pending),
+                BannedProductCount = products.Count(p => p.Status == ProductStatus.Banned)
             };
         }
     }

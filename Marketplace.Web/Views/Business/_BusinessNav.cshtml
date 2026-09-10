@@ -22,7 +22,7 @@
 {
     var role = currentRole.Value;
 
-    <nav class="business-nav" aria-label="Розділы панелі магазину">
+    <nav class="business-nav" aria-label="Розділи панелі магазину">
 
         @if (BusinessPermissions.Statistics.Contains(role))
         {
@@ -42,8 +42,6 @@
         {
             <a class="@ActiveClass("PromoCodes")" asp-action="PromoCodes" asp-route-businessId="@Model">Знижки</a>
         }
-
-        <a class="@ActiveClass("Integrations")" asp-action="Integrations" asp-route-businessId="@Model">Додатки</a>
 
         @if (BusinessPermissions.ManageTeam.Contains(role))
         {

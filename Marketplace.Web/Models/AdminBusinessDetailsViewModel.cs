@@ -1,4 +1,5 @@
-﻿using Marketplace.Domain.Enums;
+using Marketplace.BLL.DTOs;
+using Marketplace.Domain.Enums;
 using AdultContentStatus = Marketplace.Domain.Entities.AdultContentStatus;
 
 namespace Marketplace.Web.Models
@@ -13,19 +14,19 @@ namespace Marketplace.Web.Models
         public BusinessStatus Status { get; set; }
         public decimal CommissionPercent { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string OwnerEmail { get; set; } = string.Empty;
         public AdultContentStatus AdultStatus { get; set; }
         public string? AdultRejectionReason { get; set; }
-
-        public string OwnerId { get; set; } = string.Empty;
-        public string OwnerEmail { get; set; } = string.Empty;
-
         public int TotalProductCount { get; set; }
         public int ActiveProductCount { get; set; }
         public int PendingProductCount { get; set; }
         public int BannedProductCount { get; set; }
 
-        public bool HasActiveDiscount { get; set; }
-        public decimal? DiscountPercent { get; set; }
-        public DateTime? DiscountEndDate { get; set; }
+        public int TotalOrders { get; set; }
+        public int SoldItems { get; set; }
+        public decimal Revenue { get; set; }
+
+        public BusinessDiscountDto? BusinessDiscount { get; set; }
+        public List<CategoryDiscountDto> CategoryDiscounts { get; set; } = new();
     }
 }
