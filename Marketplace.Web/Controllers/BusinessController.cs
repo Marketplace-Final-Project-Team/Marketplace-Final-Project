@@ -1,4 +1,5 @@
-﻿using Marketplace.BLL.DTOs;
+﻿using Marketplace.BLL.Common;
+using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
 using Marketplace.Domain.Entities;
@@ -9,6 +10,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
+using BusinessPermissions = Marketplace.BLL.Common.BusinessPermissions;
+using AdultContentStatus = Marketplace.Domain.Enums.AdultContentStatus;
 
 namespace Marketplace.Web.Controllers
 {
@@ -81,6 +85,10 @@ namespace Marketplace.Web.Controllers
             {
                 var products = await _productService.GetByBusinessAsync(business.Id);
                 var orderSummary = await _orderService.GetBusinessOrderSummary(business.Id);
+
+                var currentRole = await _businessAccessService.GetUserRoleAsync(business.Id, userId)
+                    ?? BusinessMemberRole.Owner;
+
                 businessCards.Add(new BusinessDashboardItemViewModel
                 {
                     Id = business.Id,
@@ -90,9 +98,10 @@ namespace Marketplace.Web.Controllers
                     BannerUrl = business.BannerUrl,
                     Status = business.Status,
                     IsOwner = business.OwnerId == userId,
+                    CurrentUserRole = currentRole,
                     ProductCount = products.Count,
-                    ActiveProductCount = products.Count(product => product.Status == Marketplace.Domain.Enums.ProductStatus.Active),
-                    PendingProductCount = products.Count(product => product.Status == Marketplace.Domain.Enums.ProductStatus.Pending),
+                    ActiveProductCount = products.Count(product => product.Status == ProductStatus.Active),
+                    PendingProductCount = products.Count(product => product.Status == ProductStatus.Pending),
                     OutOfStockProductCount = products.Count(product => product.Quantity <= 0),
                     OrderCount = orderSummary.TotalOrders,
                     AwaitingOrderCount = orderSummary.AwaitingProcessingOrders,
@@ -111,7 +120,7 @@ namespace Marketplace.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Dashboard(Guid businessId, DateTime? startDate, DateTime? endDate)
         {
-            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.Statistics);
             if (business is null)
             {
                 return Forbid();
@@ -181,8 +190,8 @@ namespace Marketplace.Web.Controllers
                 AwaitingOrders = allTimeSummary.AwaitingProcessingOrders,
 
                 TotalProductCount = products.Count,
-                ActiveProductCount = products.Count(p => p.Status == Marketplace.Domain.Enums.ProductStatus.Active),
-                PendingProductCount = products.Count(p => p.Status == Marketplace.Domain.Enums.ProductStatus.Pending),
+                ActiveProductCount = products.Count(p => p.Status == ProductStatus.Active),
+                PendingProductCount = products.Count(p => p.Status == ProductStatus.Pending),
                 OutOfStockProductCount = products.Count(p => p.Quantity <= 0),
                 LowStockProductCount = products.Count(p => p.Quantity > 0 && p.Quantity <= lowStockThreshold),
 
@@ -357,7 +366,6 @@ namespace Marketplace.Web.Controllers
                 return Forbid();
             }
 
-
             var result = await _postSaleService.ResolveRequestAsync(requestId, businessId, decision, sellerResponse);
             if (result.Succeeded)
             {
@@ -382,7 +390,6 @@ namespace Marketplace.Web.Controllers
             {
                 return Forbid();
             }
-
 
             var order = await _orderService.GetBusinessOrderDetails(businessId, orderId);
             if (order is null)
@@ -409,7 +416,7 @@ namespace Marketplace.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Team(Guid businessId)
         {
-            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.ManageTeam);
             if (business is null)
             {
                 return Forbid();
@@ -421,7 +428,7 @@ namespace Marketplace.Web.Controllers
 
             var members = await _context.BusinessMembers
                 .Include(m => m.User)
-                .Where(m => m.BusinessId == businessId)
+                .Where(m => m.BusinessId == businessId && !m.IsDeleted)
                 .OrderByDescending(m => m.IsAccepted)
                 .ThenBy(m => m.Role)
                 .ToListAsync();
@@ -444,17 +451,53 @@ namespace Marketplace.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RemoveMember(Guid businessId, Guid memberId)
+        public async Task<IActionResult> UpdateMemberRole(Guid businessId, Guid memberId, BusinessMemberRole newRole)
         {
-            var userId = _userManager.GetUserId(User)!;
-            var canManage = await _businessAccessService.HasAccessAsync(businessId, userId, BusinessMemberRole.Owner);
-            if (!canManage)
+            var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.ManageTeam);
+            if (business is null)
             {
                 return Forbid();
             }
 
             var member = await _context.BusinessMembers
-                .FirstOrDefaultAsync(m => m.Id == memberId && m.BusinessId == businessId);
+                .FirstOrDefaultAsync(m => m.Id == memberId && m.BusinessId == businessId && !m.IsDeleted);
+
+            if (member is null)
+            {
+                return NotFound();
+            }
+
+
+            if (member.Role == BusinessMemberRole.Owner || newRole == BusinessMemberRole.Owner)
+            {
+                TempData["Error"] = "Неможливо змінити роль власника або призначити нового власника таким способом.";
+                return RedirectToAction(nameof(Team), new { businessId });
+            }
+
+            member.Role = newRole;
+            _context.BusinessMembers.Update(member);
+            await _context.SaveChangesAsync();
+
+            await _activityLog.LogBusinessActionAsync(businessId, "MemberRoleUpdated",
+                $"Роль учасника змінено на «{newRole}».",
+                actorUserId: _userManager.GetUserId(User), relatedEntityId: memberId);
+
+            TempData["Success"] = "Роль учасника успішно оновлено.";
+            return RedirectToAction(nameof(Team), new { businessId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveMember(Guid businessId, Guid memberId)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.ManageTeam);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var member = await _context.BusinessMembers
+                .FirstOrDefaultAsync(m => m.Id == memberId && m.BusinessId == businessId && !m.IsDeleted);
 
             if (member is null)
             {
@@ -468,286 +511,29 @@ namespace Marketplace.Web.Controllers
             return RedirectToAction(nameof(Team), new { businessId });
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Finance(Guid businessId)
-        {
-            var business = await GetAccessibleBusinessOrNullAsync(businessId);
-            if (business is null)
-            {
-                return Forbid();
-            }
-
-            var summary = await _orderService.GetBusinessOrderSummary(businessId);
-            var orders = await _orderService.GetBusinessOrders(businessId);
-
-            var trendEnd = DateTime.UtcNow.Date;
-            var trendStart = trendEnd.AddDays(-29);
-            var trendResult = await _businessService.GetBusinessStatsByPeriodAsync(businessId, trendStart, trendEnd);
-
-            return View(new BusinessFinanceViewModel
-            {
-                BusinessId = businessId,
-                StoreName = business.StoreName,
-                Revenue = summary.Revenue,
-                SoldItems = summary.SoldItems,
-                TotalOrders = summary.TotalOrders,
-                RecentSales = orders
-                    .OrderByDescending(order => order.CreatedAt)
-                    .Take(10)
-                    .Select(order => new BusinessOrderListItemViewModel
-                    {
-                        OrderId = order.OrderId,
-                        CreatedAt = order.CreatedAt,
-                        Status = order.Status,
-                        BuyerName = order.BuyerName,
-                        BuyerEmail = order.BuyerEmail,
-                        ShippingAddress = $"{order.ShippingCity}, {order.ShippingStreet}",
-                        ItemsCount = order.ItemsCount,
-                        LineTotal = order.LineTotal
-                    }).ToList(),
-                RevenueTrend = trendResult.Succeeded
-                    ? trendResult.Data.Stats
-                        .OrderBy(s => s.Date)
-                        .Select(s => new BusinessDashboardChartPointViewModel { Date = s.Date, Revenue = s.Revenue, OrderCount = s.OrderCount })
-                        .ToList()
-                    : new List<BusinessDashboardChartPointViewModel>()
-            });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Performance(Guid businessId)
-        {
-            var business = await GetAccessibleBusinessOrNullAsync(businessId);
-            if (business is null)
-            {
-                return Forbid();
-            }
-
-            var orders = await _orderService.GetBusinessOrders(businessId);
-            var distinctOrders = orders.GroupBy(o => o.OrderId).Select(g => g.First()).ToList();
-
-            var products = await _productService.GetByBusinessAsync(businessId);
-            var allRatings = new List<double>();
-            foreach (var product in products)
-            {
-                var reviews = await _reviewService.GetReviewsByProductId(product.Id);
-                allRatings.AddRange(reviews.Select(r => (double)r.Rating));
-            }
-
-            var ratingDistribution = new int[5];
-            foreach (var rating in allRatings)
-            {
-                var bucket = Math.Clamp((int)Math.Round(rating), 1, 5) - 1;
-                ratingDistribution[bucket]++;
-            }
-
-            return View(new BusinessPerformanceViewModel
-            {
-                BusinessId = businessId,
-                StoreName = business.StoreName,
-                Status = business.Status,
-                TotalOrders = distinctOrders.Count,
-                CanceledOrders = distinctOrders.Count(o => o.Status == OrderStatus.Canceled),
-                AverageRating = allRatings.Count == 0 ? 0 : Math.Round(allRatings.Average(), 1),
-                ReviewCount = allRatings.Count,
-                ProductCount = products.Count,
-                OrdersByStatus = distinctOrders
-                    .GroupBy(o => o.Status)
-                    .ToDictionary(g => g.Key, g => g.Count()),
-                RatingDistribution = ratingDistribution
-            });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> PromoCodes(Guid businessId)
-        {
-            var business = await GetAccessibleBusinessOrNullAsync(businessId);
-            if (business is null)
-            {
-                return Forbid();
-            }
-
-            var promoCodes = await _promoCodeService.GetForBusinessAsync(businessId);
-            var businessDiscount = await _discountService.GetBusinessDiscount(businessId);
-            var categoryDiscounts = await _discountService.GetActiveCategoryDiscountsForBusiness(businessId);
-            var categories = await _categoryService.GetAllCategories();
-
-            return View(new BusinessPromoCodesPageViewModel
-            {
-                BusinessId = businessId,
-                StoreName = business.StoreName,
-                PromoCodes = promoCodes,
-                BusinessDiscount = businessDiscount,
-                CategoryDiscounts = categoryDiscounts,
-                Categories = categories.ToList()
-            });
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SetBusinessDiscount(Guid businessId, decimal discountPercent, DateTime discountStartDate, DateTime discountEndDate)
-        {
-            var business = await GetAccessibleBusinessOrNullAsync(businessId);
-            if (business is null)
-            {
-                return Forbid();
-            }
-
-            var result = await _discountService.SetBusinessDiscount(businessId, discountPercent, discountStartDate, discountEndDate);
-            if (result.Succeeded)
-            {
-                await _activityLog.LogBusinessActionAsync(businessId, "BusinessDiscountSet",
-                    $"Встановлено знижку {discountPercent}% на весь магазин «{business.StoreName}».",
-                    actorUserId: _userManager.GetUserId(User));
-            }
-            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
-
-            return RedirectToAction(nameof(PromoCodes), new { businessId });
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RemoveBusinessDiscount(Guid businessId)
-        {
-            var business = await GetAccessibleBusinessOrNullAsync(businessId);
-            if (business is null)
-            {
-                return Forbid();
-            }
-
-            var result = await _discountService.RemoveBusinessDiscount(businessId);
-            if (result.Succeeded)
-            {
-                await _activityLog.LogBusinessActionAsync(businessId, "BusinessDiscountRemoved",
-                    $"Скасовано знижку на весь магазин «{business.StoreName}».",
-                    actorUserId: _userManager.GetUserId(User));
-            }
-            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
-
-            return RedirectToAction(nameof(PromoCodes), new { businessId });
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreatePromoCode(Guid businessId, string code, int percent, DateTime startDate, DateTime endDate)
-        {
-            var business = await GetAccessibleBusinessOrNullAsync(businessId);
-            if (business is null)
-            {
-                return Forbid();
-            }
-
-            var result = await _promoCodeService.CreateAsync(businessId, code, percent, startDate, endDate);
-            if (result.Succeeded)
-            {
-                await _activityLog.LogBusinessActionAsync(businessId, "PromoCodeCreated",
-                    $"Створено промокод «{code}» (знижка {percent}%).",
-                    actorUserId: _userManager.GetUserId(User), relatedEntityId: result.EntityId);
-            }
-            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
-
-            return RedirectToAction(nameof(PromoCodes), new { businessId });
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeactivatePromoCode(Guid businessId, Guid promoCodeId)
-        {
-            var business = await GetAccessibleBusinessOrNullAsync(businessId);
-            if (business is null)
-            {
-                return Forbid();
-            }
-
-            var result = await _promoCodeService.DeactivateAsync(businessId, promoCodeId);
-            if (result.Succeeded)
-            {
-                await _activityLog.LogBusinessActionAsync(businessId, "PromoCodeDeactivated",
-                    "Промокод деактивовано.",
-                    actorUserId: _userManager.GetUserId(User), relatedEntityId: promoCodeId);
-            }
-            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
-
-            return RedirectToAction(nameof(PromoCodes), new { businessId });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Growth(Guid businessId)
-        {
-            var business = await GetAccessibleBusinessOrNullAsync(businessId);
-            if (business is null)
-            {
-                return Forbid();
-            }
-
-            return View(new BusinessGrowthViewModel { BusinessId = businessId, StoreName = business.StoreName });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Settings(Guid businessId)
-        {
-            var business = await GetAccessibleBusinessOrNullAsync(businessId);
-            if (business is null)
-            {
-                return Forbid();
-            }
-
-            return View(new BusinessSettingsViewModel
-            {
-                BusinessId = businessId,
-                StoreName = business.StoreName,
-                Description = business.Description,
-                AdultStatus = (Marketplace.Domain.Enums.AdultContentStatus)business.AdultStatus
-            });
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Settings(BusinessSettingsViewModel model)
-        {
-            var business = await GetAccessibleBusinessOrNullAsync(model.BusinessId);
-            if (business is null)
-            {
-                return Forbid();
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            business.StoreName = model.StoreName.Trim();
-            business.Description = model.Description.Trim();
-            _context.Businesses.Update(business);
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] = "Дані магазину оновлено.";
-            return RedirectToAction(nameof(Settings), new { businessId = model.BusinessId });
-        }
-
-        private async Task<Business?> GetAccessibleBusinessOrNullAsync(Guid businessId)
-        {
-            var userId = _userManager.GetUserId(User);
-            if (string.IsNullOrWhiteSpace(userId))
-            {
-                return null;
-            }
-
-            var businesses = await _businessAccessService.GetAccessibleBusinessesAsync(userId);
-            return businesses.FirstOrDefault(b => b.Id == businessId);
-        }
-
         [HttpGet("business/{businessId}/add-member")]
-        public IActionResult AddMember(Guid businessId)
+        public async Task<IActionResult> AddMember(Guid businessId)
         {
-            var model = new BusinessMemberCreateViewModel { BusinessId = businessId };
+            var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.ManageTeam);
+            if (business is null)
+            {
+                return Forbid();
+            }
 
+            var model = new BusinessMemberCreateViewModel { BusinessId = businessId };
             return View(model);
         }
 
         [HttpPost("business/{businessId}/add-member")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddMember(BusinessMemberCreateViewModel model)
         {
+            var business = await GetAccessibleBusinessOrNullAsync(model.BusinessId, BusinessPermissions.ManageTeam);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -799,94 +585,299 @@ namespace Marketplace.Web.Controllers
         public IActionResult MembershipResult(string message)
         {
             ViewBag.Message = message;
-
             return View();
         }
 
-        [HttpPost("business/{businessId}/business-stats")]
-        public async Task<IActionResult> GetBusinessStatsByPeriod(BusinessStatsQueryViewModel query)
-        {
-            var result = await _businessService.GetBusinessStatsByPeriodAsync(
-                query.BusinessId, query.StartDate, query.EndDate);
-
-            var pageModel = new BusinessStatsPageViewModel { Query = query };
-
-            if (!result.Succeeded)
-            {
-                pageModel.ErrorMessage = result.Message;
-                return View(pageModel);
-            }
-
-            pageModel.Stats = result.Data;
-            return View(pageModel);
-        }
-
-        [HttpPost("business/{businessId}/products-stats")]
-        public async Task<IActionResult> GetProductsStatsByPeriod(ProductsStatsQueryViewModel query)
-        {
-            var result = await _businessService.GetProductsStatsByPeriodAsnyc(
-                query.BusinessId, query.StartDate, query.EndDate);
-
-            var pageModel = new ProductsStatsPageViewModel { Query = query };
-
-            if (!result.Succeeded)
-            {
-                pageModel.ErrorMessage = result.Message;
-                return View(pageModel);
-            }
-
-            pageModel.Stats = result.Data;
-            return View(pageModel);
-        }
-
-        [HttpPost("business/{businessId}/customers-stats")]
-        public async Task<IActionResult> GetCustomersStatsByPeriod(CustomersStatsQueryViewModel query)
-        {
-            var result = await _businessService.GetCustomersStatsByPeriodAsync(
-                query.BusinessId, query.StartDate, query.EndDate);
-
-            var pageModel = new CustomersStatsPageViewModel { Query = query };
-
-            if (!result.Succeeded)
-            {
-                pageModel.ErrorMessage = result.Message;
-                return View(pageModel);
-            }
-
-            pageModel.Stats = result.Data;
-            return View(pageModel);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RequestAdultStatus(Guid businessId)
-        {
-            var userId = _userManager.GetUserId(User)!;
-            var result = await _businessService.RequestAdultStatusAsync(businessId, userId);
-
-            if (!result.Succeeded)
-            {
-                TempData["Error"] = result.Message;
-            }
-            else
-            {
-                TempData["Success"] = "Заявку на отримання статусу 18+ успішно надіслано адміністратору.";
-            }
-
-            return RedirectToAction("Settings", new { businessId = businessId });
-        }
-
         [HttpGet]
-        public async Task<IActionResult> GetBusinessBalance(Guid businessId)
+        public async Task<IActionResult> Finance(Guid businessId)
         {
-            var hasAccess = await _businessAccessService.HasAccessAsync(businessId, _userManager.GetUserId(User)!, BusinessMemberRole.Owner);
-            if (!hasAccess)
+            var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.Statistics);
+            if (business is null)
             {
                 return Forbid();
             }
 
-            var balance = await _businessService.GetBusinessBalance(businessId);
-            return Json(new { businessId, balance });
+            var summary = await _orderService.GetBusinessOrderSummary(businessId);
+            var orders = await _orderService.GetBusinessOrders(businessId);
+
+            var trendEnd = DateTime.UtcNow.Date;
+            var trendStart = trendEnd.AddDays(-29);
+            var trendResult = await _businessService.GetBusinessStatsByPeriodAsync(businessId, trendStart, trendEnd);
+
+            return View(new BusinessFinanceViewModel
+            {
+                BusinessId = businessId,
+                StoreName = business.StoreName,
+                Revenue = summary.Revenue,
+                SoldItems = summary.SoldItems,
+                TotalOrders = summary.TotalOrders,
+                RecentSales = orders
+                    .OrderByDescending(order => order.CreatedAt)
+                    .Take(10)
+                    .Select(order => new BusinessOrderListItemViewModel
+                    {
+                        OrderId = order.OrderId,
+                        CreatedAt = order.CreatedAt,
+                        Status = order.Status,
+                        BuyerName = order.BuyerName,
+                        BuyerEmail = order.BuyerEmail,
+                        ShippingAddress = $"{order.ShippingCity}, {order.ShippingStreet}",
+                        ItemsCount = order.ItemsCount,
+                        LineTotal = order.LineTotal
+                    }).ToList(),
+                RevenueTrend = trendResult.Succeeded
+                    ? trendResult.Data.Stats
+                        .OrderBy(s => s.Date)
+                        .Select(s => new BusinessDashboardChartPointViewModel { Date = s.Date, Revenue = s.Revenue, OrderCount = s.OrderCount })
+                        .ToList()
+                    : new List<BusinessDashboardChartPointViewModel>()
+            });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Performance(Guid businessId)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.Statistics);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var orders = await _orderService.GetBusinessOrders(businessId);
+            var distinctOrders = orders.GroupBy(o => o.OrderId).Select(g => g.First()).ToList();
+
+            var products = await _productService.GetByBusinessAsync(businessId);
+            var allRatings = new List<double>();
+            foreach (var product in products)
+            {
+                var reviews = await _reviewService.GetReviewsByProductId(product.Id);
+                allRatings.AddRange(reviews.Select(r => (double)r.Rating));
+            }
+
+            var ratingDistribution = new int[5];
+            foreach (var rating in allRatings)
+            {
+                var bucket = Math.Clamp((int)Math.Round(rating), 1, 5) - 1;
+                ratingDistribution[bucket]++;
+            }
+
+            return View(new BusinessPerformanceViewModel
+            {
+                BusinessId = businessId,
+                StoreName = business.StoreName,
+                Status = business.Status,
+                TotalOrders = distinctOrders.Count,
+                CanceledOrders = distinctOrders.Count(o => o.Status == OrderStatus.Canceled),
+                AverageRating = allRatings.Count == 0 ? 0 : Math.Round(allRatings.Average(), 1),
+                ReviewCount = allRatings.Count,
+                ProductCount = products.Count,
+                OrdersByStatus = distinctOrders
+                    .GroupBy(o => o.Status)
+                    .ToDictionary(g => g.Key, g => g.Count()),
+                RatingDistribution = ratingDistribution
+            });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> PromoCodes(Guid businessId)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.PromoCodes);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var promoCodes = await _promoCodeService.GetForBusinessAsync(businessId);
+            var businessDiscount = await _discountService.GetBusinessDiscount(businessId);
+            var categoryDiscounts = await _discountService.GetActiveCategoryDiscountsForBusiness(businessId);
+            var categories = await _categoryService.GetAllCategories();
+
+            return View(new BusinessPromoCodesPageViewModel
+            {
+                BusinessId = businessId,
+                StoreName = business.StoreName,
+                PromoCodes = promoCodes,
+                BusinessDiscount = businessDiscount,
+                CategoryDiscounts = categoryDiscounts,
+                Categories = categories.ToList()
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetBusinessDiscount(Guid businessId, decimal discountPercent, DateTime discountStartDate, DateTime discountEndDate)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.PromoCodes);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var result = await _discountService.SetBusinessDiscount(businessId, discountPercent, discountStartDate, discountEndDate);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "BusinessDiscountSet",
+                    $"Встановлено знижку {discountPercent}% на весь магазин «{business.StoreName}».",
+                    actorUserId: _userManager.GetUserId(User));
+            }
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+
+            return RedirectToAction(nameof(PromoCodes), new { businessId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveBusinessDiscount(Guid businessId)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.PromoCodes);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var result = await _discountService.RemoveBusinessDiscount(businessId);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "BusinessDiscountRemoved",
+                    $"Скасовано знижку на весь магазин «{business.StoreName}».",
+                    actorUserId: _userManager.GetUserId(User));
+            }
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+
+            return RedirectToAction(nameof(PromoCodes), new { businessId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreatePromoCode(Guid businessId, string code, int percent, DateTime startDate, DateTime endDate)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.PromoCodes);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var result = await _promoCodeService.CreateAsync(businessId, code, percent, startDate, endDate);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "PromoCodeCreated",
+                    $"Створено промокод «{code}» (знижка {percent}%).",
+                    actorUserId: _userManager.GetUserId(User), relatedEntityId: result.EntityId);
+            }
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+
+            return RedirectToAction(nameof(PromoCodes), new { businessId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeactivatePromoCode(Guid businessId, Guid promoCodeId)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.PromoCodes);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var result = await _promoCodeService.DeactivateAsync(businessId, promoCodeId);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "PromoCodeDeactivated",
+                    "Промокод деактивовано.",
+                    actorUserId: _userManager.GetUserId(User), relatedEntityId: promoCodeId);
+            }
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+
+            return RedirectToAction(nameof(PromoCodes), new { businessId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Growth(Guid businessId)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.Statistics);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            return View(new BusinessGrowthViewModel { BusinessId = businessId, StoreName = business.StoreName });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Settings(Guid businessId)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.EditBusinessProfile);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            return View(new BusinessSettingsViewModel
+            {
+                BusinessId = businessId,
+                StoreName = business.StoreName,
+                Description = business.Description,
+                AdultStatus = (AdultContentStatus)business.AdultStatus
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Settings(BusinessSettingsViewModel model)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(model.BusinessId, BusinessPermissions.EditBusinessProfile);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            business.StoreName = model.StoreName.Trim();
+            business.Description = model.Description.Trim();
+            _context.Businesses.Update(business);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Дані магазину оновлено.";
+            return RedirectToAction(nameof(Settings), new { businessId = model.BusinessId });
+        }
+
+        private async Task<Business?> GetAccessibleBusinessOrNullAsync(Guid businessId)
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return null;
+            }
+
+            var businesses = await _businessAccessService.GetAccessibleBusinessesAsync(userId);
+            return businesses.FirstOrDefault(b => b.Id == businessId);
+        }
+
+        private async Task<Business?> GetAccessibleBusinessOrNullAsync(Guid businessId, params BusinessMemberRole[] allowedRoles)
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return null;
+            }
+
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return null;
+            }
+
+            var userRole = await _businessAccessService.GetUserRoleAsync(businessId, userId);
+            if (userRole is null || (allowedRoles.Length > 0 && !allowedRoles.Contains(userRole.Value)))
+            {
+                return null;
+            }
+
+            return business;
         }
     }
 }

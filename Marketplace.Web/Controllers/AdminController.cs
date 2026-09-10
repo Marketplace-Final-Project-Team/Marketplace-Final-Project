@@ -476,8 +476,6 @@ namespace Marketplace.Web.Controllers
             });
         }
 
-        // Commission is set per business (see Business.CommissionPercent) rather than
-        // globally, so it's edited from the Businesses list instead of this page.
         [HttpPost]
         public async Task<IActionResult> ChangeBusinessCommission(Guid businessId, decimal commissionPercent, string? returnUrl = null)
         {

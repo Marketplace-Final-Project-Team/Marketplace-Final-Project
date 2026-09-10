@@ -1,7 +1,14 @@
 @model Marketplace.Web.Models.Businesses.BusinessPromoCodesPageViewModel
-
+@using System.Security.Claims
+@using Marketplace.BLL.Interfaces
+@using Marketplace.Web.Models.Businesses
+@inject IBusinessAccessService BusinessAccessService
 @{
     ViewData["Title"] = $"Знижки та промокоди - {Model.StoreName}";
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var currentRole = !string.IsNullOrEmpty(userId)
+        ? await BusinessAccessService.GetUserRoleAsync(Model.BusinessId, userId)
+        : null;
 }
 
 @section Styles {
@@ -13,7 +20,7 @@
 
     <header class="seller-orders-header">
         <div>
-            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Панель продавця</div>
+            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> @BusinessRoleContext.PanelLabel(currentRole)</div>
             <h1>Знижки та промокоди - @Model.StoreName</h1>
             <p>Керуйте знижкою на весь магазин і промокодами, які покупці застосовують при оформленні замовлення.</p>
         </div>

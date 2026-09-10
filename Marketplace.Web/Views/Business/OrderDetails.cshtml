@@ -1,4 +1,8 @@
 @model Marketplace.Web.Models.Businesses.BusinessOrderDetailsViewModel
+@using System.Security.Claims
+@using Marketplace.BLL.Interfaces
+@using Marketplace.Web.Models.Businesses
+@inject IBusinessAccessService BusinessAccessService
 
 @{
     ViewData["Title"] = $"Замовлення #{Model.OrderId.ToString()[..8].ToUpperInvariant()}";

@@ -10,5 +10,7 @@ namespace Marketplace.Web.Models.Products
         public string Status { get; set; } = string.Empty;
         public string CategoryName { get; set; } = string.Empty;
         public string? ModerationReason { get; set; }
+        public bool HasDiscount { get; set; }
+        public int DiscountPercent { get; set; }
     }
 }

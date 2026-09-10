@@ -9,20 +9,20 @@
     padding: 1.4rem 0 3rem;
 }
 
-.profile-page .btn {
-    border-radius: 0.75rem;
-    font-weight: 650;
-}
+    .profile-page .btn {
+        border-radius: 0.75rem;
+        font-weight: 650;
+    }
 
-.profile-page .btn-primary {
-    background: var(--profile-primary);
-    border-color: var(--profile-primary);
-}
+    .profile-page .btn-primary {
+        background: var(--profile-primary);
+        border-color: var(--profile-primary);
+    }
 
-.profile-page .btn-primary:hover {
-    background: var(--profile-primary-dark);
-    border-color: var(--profile-primary-dark);
-}
+        .profile-page .btn-primary:hover {
+            background: var(--profile-primary-dark);
+            border-color: var(--profile-primary-dark);
+        }
 
 .profile-back {
     color: var(--profile-muted);
@@ -33,12 +33,11 @@
     text-decoration: none;
 }
 
-.profile-back:hover {
-    color: var(--profile-primary);
-}
+    .profile-back:hover {
+        color: var(--profile-primary);
+    }
 
 /* ---------- Hub header card ---------- */
-
 .profile-summary {
     background: #fff;
     border: 1px solid var(--profile-line);
@@ -93,8 +92,122 @@
     margin: 0.2rem 0 0;
 }
 
-/* ---------- Nav hub grid ---------- */
+/* ---------- Personal discount widget ---------- */
+.profile-discount-widget {
+    display: inline-block;
+    margin-top: 0.7rem;
+    position: relative;
+}
 
+.profile-discount-widget__badge {
+    align-items: center;
+    background: linear-gradient(135deg, #ff5757 0%, #e2213a 100%);
+    border-radius: 999px;
+    box-shadow: 0 0.4rem 1rem rgba(226, 33, 58, 0.25);
+    color: #fff;
+    cursor: default;
+    display: inline-flex;
+    gap: 0.4rem;
+    padding: 0.4rem 0.9rem 0.4rem 0.55rem;
+}
+
+.profile-discount-widget__icon {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.22);
+    border-radius: 50%;
+    display: flex;
+    flex: 0 0 auto;
+    height: 1.5rem;
+    justify-content: center;
+    opacity: 0.95;
+    width: 1.5rem;
+}
+
+.profile-discount-widget__text {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    white-space: nowrap;
+}
+
+    .profile-discount-widget__text strong {
+        font-size: 0.95rem;
+        font-weight: 850;
+    }
+
+    .profile-discount-widget__text.is-fading {
+        opacity: 0;
+        transform: translateY(3px);
+    }
+
+/* Tooltip — прихований за замовчуванням, з'являється при наведенні на весь віджет */
+.profile-discount-widget__tooltip {
+    background: #fff;
+    border: 1px solid var(--profile-line);
+    border-radius: 0.9rem;
+    box-shadow: 0 0.8rem 2rem rgba(23, 32, 51, 0.16);
+    left: 0;
+    margin-top: 0.6rem;
+    min-width: 16rem;
+    opacity: 0;
+    padding: 0.7rem;
+    pointer-events: none;
+    position: absolute;
+    top: 100%;
+    transform: translateY(-6px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 20;
+}
+
+.profile-discount-widget:hover .profile-discount-widget__tooltip {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.profile-discount-widget__tooltip-title {
+    color: var(--profile-muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: 0.2rem 0.5rem 0.5rem;
+    text-transform: uppercase;
+}
+
+.profile-discount-widget__tooltip-item {
+    align-items: center;
+    border-radius: 0.6rem;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: space-between;
+    padding: 0.5rem 0.5rem;
+}
+
+    .profile-discount-widget__tooltip-item:hover {
+        background: var(--profile-soft);
+    }
+
+.profile-discount-widget__tooltip-store {
+    color: var(--profile-ink);
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 650;
+}
+
+.profile-discount-widget__tooltip-date {
+    color: var(--profile-muted);
+    display: block;
+    font-size: 0.7rem;
+}
+
+.profile-discount-widget__tooltip-item strong {
+    color: #e2213a;
+    flex: 0 0 auto;
+    font-weight: 800;
+}
+
+/* ---------- Nav hub grid ---------- */
 .profile-hub {
     display: grid;
     gap: 1rem;
@@ -115,10 +228,10 @@
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.profile-hub-card:hover {
-    box-shadow: 0 0.65rem 1.6rem rgba(23, 32, 51, 0.1);
-    transform: translateY(-2px);
-}
+    .profile-hub-card:hover {
+        box-shadow: 0 0.65rem 1.6rem rgba(23, 32, 51, 0.1);
+        transform: translateY(-2px);
+    }
 
 .profile-hub-card__icon {
     align-items: center;
@@ -158,8 +271,7 @@
     padding: 0.15rem 0.55rem;
 }
 
-/* ---------- Address book ---------- */
-
+/* ---------- Address book & other sections ---------- */
 .address-list {
     display: grid;
     gap: 0.85rem;
@@ -205,9 +317,9 @@
     justify-content: flex-end;
 }
 
-.address-card__actions form {
-    margin: 0;
-}
+    .address-card__actions form {
+        margin: 0;
+    }
 
 .profile-empty {
     background: var(--profile-soft);
@@ -241,11 +353,11 @@
     padding: clamp(1.5rem, 4vw, 2rem);
 }
 
-.address-form-card h1 {
-    font-size: 1.35rem;
-    font-weight: 780;
-    margin-bottom: 1.4rem;
-}
+    .address-form-card h1 {
+        font-size: 1.35rem;
+        font-weight: 780;
+        margin-bottom: 1.4rem;
+    }
 
 .profile-avatar-upload {
     align-items: center;
@@ -258,25 +370,24 @@
     flex: 0 0 auto;
 }
 
-.profile-avatar-upload__preview img,
-.profile-avatar-upload__preview .profile-avatar {
-    border-radius: 50%;
-    height: 4.5rem;
-    object-fit: cover;
-    width: 4.5rem;
-}
+    .profile-avatar-upload__preview img, .profile-avatar-upload__preview .profile-avatar {
+        border-radius: 50%;
+        height: 4.5rem;
+        object-fit: cover;
+        width: 4.5rem;
+    }
 
-.profile-avatar-upload__preview .profile-avatar--fallback {
-    font-size: 1.6rem;
-}
+    .profile-avatar-upload__preview .profile-avatar--fallback {
+        font-size: 1.6rem;
+    }
 
 .profile-password-field {
     position: relative;
 }
 
-.profile-password-field input {
-    padding-right: 5.5rem;
-}
+    .profile-password-field input {
+        padding-right: 5.5rem;
+    }
 
 .profile-password-toggle {
     background: transparent;
@@ -291,9 +402,9 @@
     transform: translateY(-50%);
 }
 
-.profile-password-toggle:hover {
-    color: var(--profile-primary-dark);
-}
+    .profile-password-toggle:hover {
+        color: var(--profile-primary-dark);
+    }
 
 .profile-form-hint {
     color: var(--profile-muted);
@@ -313,7 +424,6 @@
 }
 
 /* ---------- Wishlist ---------- */
-
 .wishlist-grid {
     display: grid;
     gap: 1rem;
@@ -343,11 +453,11 @@
     text-decoration: none;
 }
 
-.wishlist-card__media img {
-    height: 100%;
-    object-fit: cover;
-    width: 100%;
-}
+    .wishlist-card__media img {
+        height: 100%;
+        object-fit: cover;
+        width: 100%;
+    }
 
 .wishlist-card__body {
     display: flex;
@@ -363,9 +473,9 @@
     text-decoration: none;
 }
 
-.wishlist-card__title:hover {
-    color: var(--profile-primary);
-}
+    .wishlist-card__title:hover {
+        color: var(--profile-primary);
+    }
 
 .wishlist-card__footer {
     align-items: center;
@@ -375,9 +485,9 @@
     margin-top: auto;
 }
 
-.wishlist-card__footer form {
-    margin: 0;
-}
+    .wishlist-card__footer form {
+        margin: 0;
+    }
 
 .wishlist-remove {
     background: transparent;
@@ -389,7 +499,6 @@
 }
 
 /* ---------- Activity feed ---------- */
-
 .activity-card {
     background: #fff;
     border: 1px solid var(--profile-line);

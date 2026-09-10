@@ -1,4 +1,4 @@
-using Marketplace.BLL.Authorization;
+using Marketplace.BLL.Common;
 using Marketplace.BLL.Interfaces;
 using Marketplace.BLL.Services;
 using Marketplace.Domain.Entities;
@@ -60,7 +60,7 @@ namespace Marketplace.Web.Controllers
                 TempData["Error"] = ex.Message;
             }
 
-            return RedirectToAction("Edit", "Products", new { id = productId });
+            return RedirectToAction("Index", "Products");
         }
 
         // POST: /Discounts/Remove
@@ -80,7 +80,7 @@ namespace Marketplace.Web.Controllers
                 actorUserId: CurrentUserId, relatedEntityId: productId);
             TempData["Success"] = "Знижку скасовано.";
 
-            return RedirectToAction("Edit", "Products", new { id = productId });
+            return RedirectToAction("Index", "Products");
         }
         
         [HttpPost]
