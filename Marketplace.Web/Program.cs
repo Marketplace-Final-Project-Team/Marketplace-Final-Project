@@ -1,4 +1,4 @@
-using System.Globalization;
+using Amazon.S3;
 using CloudinaryDotNet;
 using Marketplace.BLL.Common;
 using Marketplace.BLL.Configs;
@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,19 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+//S3
+builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
+builder.Services.AddAWSService<IAmazonS3>();
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddScoped<IImageStorageService, CloudinaryImageStorageService>();
+}
+else
+{
+    builder.Services.AddScoped<IImageStorageService, S3ImageStorageService>();
+}
 
 // Quartz
 builder.Services.AddQuartz(q =>
@@ -84,7 +98,6 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
 builder.Services.AddScoped<IBusinessRepository, BusinessRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IBusinessService, BusinessService>();
