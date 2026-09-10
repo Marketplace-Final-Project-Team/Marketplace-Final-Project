@@ -428,7 +428,7 @@ namespace Marketplace.BLL.Services
             };
         }
 
-        public async Task<IReadOnlyList<BusinessOrderListItemDto>> GetBusinessOrders(Guid businessId, OrderStatus? statusFilter = null, string? search = null, string? searchEmail = null)
+        public async Task<IReadOnlyList<BusinessOrderListItemDto>> GetBusinessOrders(Guid businessId, OrderStatus? statusFilter = null, string? search = null, string? searchEmail = null, decimal? minAmount = null, decimal? maxAmount = null)
         {
             var query = _context.OrderItems
                 .AsNoTracking()
@@ -465,7 +465,7 @@ namespace Marketplace.BLL.Services
                 })
                 .ToListAsync();
 
-            return lines
+            var orders = lines
                 .GroupBy(line => line.OrderId)
                 .Select(group => new BusinessOrderListItemDto
                 {
@@ -480,6 +480,19 @@ namespace Marketplace.BLL.Services
                     ItemsCount = group.Sum(line => line.Quantity),
                     LineTotal = group.Sum(line => line.LineTotal)
                 })
+                .AsEnumerable();
+
+            if (minAmount.HasValue)
+            {
+                orders = orders.Where(o => o.LineTotal >= minAmount.Value);
+            }
+
+            if (maxAmount.HasValue)
+            {
+                orders = orders.Where(o => o.LineTotal <= maxAmount.Value);
+            }
+
+            return orders
                 .OrderByDescending(item => item.CreatedAt)
                 .ToList();
         }

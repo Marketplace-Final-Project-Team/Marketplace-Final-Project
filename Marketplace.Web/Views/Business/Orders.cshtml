@@ -66,8 +66,16 @@
                 }
             </select>
         </div>
+        <div>
+            <label for="min-amount-filter">Сума від</label>
+            <input type="number" id="min-amount-filter" name="minAmount" class="form-control" min="0" step="1" placeholder="0" value="@Model.MinAmount" />
+        </div>
+        <div>
+            <label for="max-amount-filter">Сума до</label>
+            <input type="number" id="max-amount-filter" name="maxAmount" class="form-control" min="0" step="1" placeholder="∞" value="@Model.MaxAmount" />
+        </div>
         <button type="submit" class="seller-button seller-button--secondary">Показати</button>
-        @if (Model.StatusFilter.HasValue || !string.IsNullOrWhiteSpace(Model.Search) || !string.IsNullOrWhiteSpace(Model.SearchEmail))
+        @if (Model.StatusFilter.HasValue || !string.IsNullOrWhiteSpace(Model.Search) || !string.IsNullOrWhiteSpace(Model.SearchEmail) || Model.MinAmount.HasValue || Model.MaxAmount.HasValue)
         {
             <a asp-action="Orders" asp-route-businessId="@Model.BusinessId" class="seller-button seller-button--secondary">Скинути</a>
         }

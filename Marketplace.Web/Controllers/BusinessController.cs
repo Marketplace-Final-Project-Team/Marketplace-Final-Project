@@ -279,7 +279,7 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Orders(Guid businessId, OrderStatus? status, string? search, string? searchEmail)
+        public async Task<IActionResult> Orders(Guid businessId, OrderStatus? status, string? search, string? searchEmail, decimal? minAmount, decimal? maxAmount)
         {
             var business = await GetAccessibleBusinessOrNullAsync(businessId);
             if (business is null)
@@ -287,7 +287,7 @@ namespace Marketplace.Web.Controllers
                 return Forbid();
             }
 
-            var orders = await _orderService.GetBusinessOrders(businessId, status, search, searchEmail);
+            var orders = await _orderService.GetBusinessOrders(businessId, status, search, searchEmail, minAmount, maxAmount);
 
             return View(new BusinessOrdersPageViewModel
             {
@@ -296,6 +296,8 @@ namespace Marketplace.Web.Controllers
                 StatusFilter = status,
                 Search = search,
                 SearchEmail = searchEmail,
+                MinAmount = minAmount,
+                MaxAmount = maxAmount,
                 Orders = orders.Select(order => new BusinessOrderListItemViewModel
                 {
                     OrderId = order.OrderId,
