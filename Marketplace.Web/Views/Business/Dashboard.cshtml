@@ -109,8 +109,9 @@
     </div>
 
     <div class="business-two-col">
-        <section class="business-panel business-chart-card">
+        <section class="business-panel business-chart-card" data-collapsible>
             <h2>Виручка та замовлення за період</h2>
+            <partial name="_CollapseToggle" />
             <p class="business-panel__lead">@Model.Filter.StartDate?.ToString("dd.MM.yyyy") - @Model.Filter.EndDate?.ToString("dd.MM.yyyy")</p>
             @if (Model.Chart.Count == 0)
             {
@@ -124,8 +125,9 @@
             }
         </section>
 
-        <section class="business-panel business-chart-card">
+        <section class="business-panel business-chart-card" data-collapsible>
             <h2>Динаміка середнього чека</h2>
+            <partial name="_CollapseToggle" />
             <p class="business-panel__lead">Виручка / кількість замовлень по днях.</p>
             @if (Model.Chart.Count == 0)
             {
@@ -141,8 +143,9 @@
     </div>
 
     <div class="business-two-col">
-        <section class="business-panel">
+        <section class="business-panel" data-collapsible>
             <h2>Топ товари</h2>
+            <partial name="_CollapseToggle" />
             <p class="business-panel__lead">За виручкою в обраному періоді.</p>
             @if (Model.TopProducts.Count == 0)
             {
@@ -175,8 +178,9 @@
             }
         </section>
 
-        <section class="business-panel">
+        <section class="business-panel" data-collapsible>
             <h2>Топ покупці</h2>
+            <partial name="_CollapseToggle" />
             <p class="business-panel__lead">За виручкою в обраному періоді.</p>
             @if (Model.TopCustomers.Count == 0)
             {
@@ -206,8 +210,9 @@
     </div>
 
     <div class="business-two-col">
-        <section class="business-panel">
+        <section class="business-panel" data-collapsible>
             <h2>Трафік і конверсія</h2>
+            <partial name="_CollapseToggle" />
             <p class="business-panel__lead">Дії покупців з товарами магазину за обраний період.</p>
             <div class="business-chart-card__canvas-wrap business-chart-card__canvas-wrap--short">
                 <canvas id="trafficChart" data-chart='@Html.Raw(trafficJson)'></canvas>
@@ -220,8 +225,9 @@
             </div>
         </section>
 
-        <section class="business-panel">
+        <section class="business-panel" data-collapsible>
             <h2>Асортимент</h2>
+            <partial name="_CollapseToggle" />
             <p class="business-panel__lead">Розподіл товарів магазину за станом.</p>
             <div class="business-chart-card__canvas-wrap business-chart-card__canvas-wrap--short">
                 <canvas id="productStatusChart" data-chart='@Html.Raw(productStatusJson)'></canvas>
@@ -236,8 +242,9 @@
     </div>
 
     <div class="business-two-col">
-        <section class="business-panel">
+        <section class="business-panel" data-collapsible>
             <h2>Продажі за категоріями</h2>
+            <partial name="_CollapseToggle" />
             <p class="business-panel__lead">За виручкою в обраному періоді.</p>
             @if (Model.CategoryStats.Count == 0)
             {
@@ -251,8 +258,9 @@
             }
         </section>
 
-        <section class="business-panel">
+        <section class="business-panel" data-collapsible>
             <h2>Категорії за виручкою</h2>
+            <partial name="_CollapseToggle" />
             <p class="business-panel__lead">Розподіл продажів між категоріями товарів.</p>
             @if (Model.CategoryStats.Count == 0)
             {
@@ -288,8 +296,9 @@
         </section>
     </div>
 
-    <section class="business-panel">
+    <section class="business-panel" data-collapsible>
         <h2>Останні дії</h2>
+        <partial name="_CollapseToggle" />
         @if (Model.RecentActivity.Count == 0)
         {
             <p class="business-empty">Дій поки немає.</p>
@@ -313,4 +322,5 @@
     <script src="~/lib/chartjs/chart.umd.min.js"></script>
     <script src="~/js/chart-helpers.js" asp-append-version="true"></script>
     <script src="~/js/business-dashboard.js" asp-append-version="true"></script>
+    <script src="~/js/business-panel-collapse.js" asp-append-version="true"></script>
 }
