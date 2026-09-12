@@ -11,6 +11,6 @@ namespace Marketplace.BLL.Interfaces
 
         Task<string> GetPrivateKeyAsync();
         Task<bool> RefundPaymentAsync(string orderId, decimal amount);
-        Task<bool> CreatePayoutAsync(Guid requestId, decimal amount, string cardNumber, string description);
+        Task<bool> CreatePayoutAsync(Guid requestId, decimal amount, string cardNumber, string recipientName, string description);
     }
 }

@@ -13,7 +13,10 @@ namespace Marketplace.Domain.Entities
         public string CardNumber { get; set; } = null!;
         public string RecipientName { get; set; } = null!;
 
-        public WithdrawalRequestStatusEnum Status { get; set; } = WithdrawalRequestStatusEnum.Pending;
+        public DateTime ProcessedAt { get; set; }
+        public string ProcessedByUserId { get; set; } = null!;
+
+        public WithdrawalStatus Status { get; set; } = WithdrawalStatus.Pending;
         public string? Message { get; set; }
     }
 }

@@ -121,9 +121,6 @@ namespace Marketplace.BLL.Services
                 {
                     string? status = statusProp.GetString();
 
-                    // Якщо платіжна система підтвердила успіх
-                    // "reversed" — офіційний статус LiqPay для успішно виконаного повернення коштів
-                    // (гроші можуть зараховуватись на картку не миттєво, це нормально)
                     if (status == "success" || status == "wait_accept" || status == "reversed")
                     {
                         return true;
@@ -155,6 +152,7 @@ namespace Marketplace.BLL.Services
             Guid requestId,
             decimal amount,
             string cardNumber,
+            string recipientName,
             string description
             )
         {
@@ -168,6 +166,7 @@ namespace Marketplace.BLL.Services
                 public_key = publicKey,
                 action = "payout",
                 card = cardNumber,
+                receiver_name = recipientName,
                 amount = amount,
                 currency = "UAH",
                 description = description,

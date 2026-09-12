@@ -10,7 +10,7 @@ namespace Marketplace.BLL.DTOs
         public decimal Amount { get; set; }
         public string CardNumber { get; set; } = null!;
         public string RecipientName { get; set; } = null!;
-        public WithdrawalRequestStatusEnum Status { get; set; }
+        public WithdrawalStatus Status { get; set; }
         public string? RejectionReason { get; set; }
     }
 }
