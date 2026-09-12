@@ -11,5 +11,7 @@ namespace Marketplace.BLL.Interfaces
     {
         Task<ServiceResult> Create(Guid businessId, decimal amount, string cardNumber, string recipientName);
         Task<IReadOnlyList<WithdrawalRequestDto>> GetAllWithdrawalsAsync(WithdrawalStatus? status);
+        Task<ServiceResult> ApproveWithdrawalRequestAsync(Guid requestId, string adminUserId);
+        Task<ServiceResult> RejectWithdrawalRequestAsync(Guid requestId, string reason, string adminUserId);
     }
 }
