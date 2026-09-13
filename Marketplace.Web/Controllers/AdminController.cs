@@ -570,6 +570,17 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> SetCategoryAdultStatus(Guid categoryId, bool isAdultOnly)
+        {
+            var result = await _categoryService.SetCategoryAdultStatus(categoryId, isAdultOnly);
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded
+                ? (isAdultOnly ? "Категорію позначено як 18+." : "Позначку 18+ знято з категорії.")
+                : result.Message;
+
+            return RedirectToAction("Categories");
+        }
+
+        [HttpPost]
         public async Task<IActionResult> DeleteCategory(Guid categoryId)
         {
             var result = await _categoryService.DeleteCategory(categoryId);

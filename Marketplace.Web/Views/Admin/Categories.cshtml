@@ -60,6 +60,7 @@
                         <thead>
                             <tr>
                                 <th>Назва</th>
+                                <th>18+</th>
                                 <th class="text-end">Дії</th>
                             </tr>
                         </thead>
@@ -72,6 +73,15 @@
                                             <input type="hidden" name="categoryId" value="@category.Id" />
                                             <input type="text" name="name" value="@category.Name" maxlength="100" required class="admin-inline-form__input" style="width: 16rem;" />
                                             <button type="submit" class="btn btn-sm btn-outline-secondary">Зберегти</button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form asp-action="SetCategoryAdultStatus" method="post">
+                                            <input type="hidden" name="categoryId" value="@category.Id" />
+                                            <input type="hidden" name="isAdultOnly" value="@((!category.IsAdultOnly).ToString())" />
+                                            <button type="submit" class="btn btn-sm @(category.IsAdultOnly ? "btn-warning" : "btn-outline-secondary")">
+                                                @(category.IsAdultOnly ? "Так, 18+" : "Ні")
+                                            </button>
                                         </form>
                                     </td>
                                     <td class="text-end">

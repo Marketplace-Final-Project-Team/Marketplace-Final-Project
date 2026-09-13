@@ -40,9 +40,26 @@ namespace Marketplace.BLL.Services
                 {
                     Id = c.Id,
                     Name = c.Name,
-                    ActiveProductCount = c.Products.Count(p => !p.IsDeleted && p.Status == ProductStatus.Active)
+                    ActiveProductCount = c.Products.Count(p => !p.IsDeleted && p.Status == ProductStatus.Active),
+                    IsAdultOnly = c.IsAdultOnly
                 })
                 .ToListAsync();
+        }
+
+        public async Task<ServiceResult> SetCategoryAdultStatus(Guid categoryId, bool isAdultOnly)
+        {
+            var category = await _categoryRepository.GetByIdAsync(categoryId);
+
+            if (category == null)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Категорії з таким айді не існує" };
+            }
+
+            category.IsAdultOnly = isAdultOnly;
+            _categoryRepository.Update(category);
+            await _context.SaveChangesAsync();
+
+            return new ServiceResult { Succeeded = true, Message = string.Empty };
         }
 
         public async Task<ServiceResult> UpdateCategory(string newCategoryName, Guid categoryId)

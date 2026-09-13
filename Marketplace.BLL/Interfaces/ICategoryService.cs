@@ -8,6 +8,7 @@ namespace Marketplace.BLL.Interfaces
         Task<IReadOnlyList<CategoryDto>> GetAllCategories();
         Task<ServiceResult> CreateCategory(string categoryName);
         Task<ServiceResult> UpdateCategory(string newCategoryName, Guid categoryId);
+        Task<ServiceResult> SetCategoryAdultStatus(Guid categoryId, bool isAdultOnly);
         Task<ServiceResult> DeleteCategory(Guid categoryId);
 
         Task<Category> GetByIdAsync(Guid categoryId);
