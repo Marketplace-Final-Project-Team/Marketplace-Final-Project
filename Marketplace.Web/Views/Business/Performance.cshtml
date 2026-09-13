@@ -1,5 +1,8 @@
 @model Marketplace.Web.Models.Businesses.BusinessPerformanceViewModel
-
+@using System.Security.Claims
+@using Marketplace.BLL.Interfaces
+@using Marketplace.Web.Models.Businesses
+@inject IBusinessAccessService BusinessAccessService
 @{
     ViewData["Title"] = $"Ефективність - {Model.StoreName}";
     var statusClass = Model.Status.ToString().ToLowerInvariant();
@@ -11,6 +14,11 @@
         Marketplace.Domain.Enums.BusinessStatus.Rejected => "Відхилений",
         _ => Model.Status.ToString()
     };
+
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var currentRole = !string.IsNullOrEmpty(userId)
+        ? await BusinessAccessService.GetUserRoleAsync(Model.BusinessId, userId)
+        : null;
 
     string OrderStatusLabel(Marketplace.Domain.Enums.OrderStatus status) => status switch
     {
@@ -43,7 +51,7 @@
 
     <header class="seller-orders-header">
         <div>
-            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Панель продавця</div>
+            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> @BusinessRoleContext.PanelLabel(currentRole)</div>
             <h1>Ефективність акаунта - @Model.StoreName</h1>
             <p>Стан магазину, якість обслуговування та відгуки покупців.</p>
         </div>

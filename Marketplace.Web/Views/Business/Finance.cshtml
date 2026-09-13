@@ -1,7 +1,16 @@
 @model Marketplace.Web.Models.Businesses.BusinessFinanceViewModel
+@using System.Security.Claims
+@using Marketplace.BLL.Interfaces
+@using Marketplace.Web.Models.Businesses
+@inject IBusinessAccessService BusinessAccessService
 
 @{
     ViewData["Title"] = $"Фінанси - {Model.StoreName}";
+
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var currentRole = !string.IsNullOrEmpty(userId)
+        ? await BusinessAccessService.GetUserRoleAsync(Model.BusinessId, userId)
+        : null;
 
     var trendJson = System.Text.Json.JsonSerializer.Serialize(Model.RevenueTrend.Select(c => new
     {
@@ -33,7 +42,7 @@
 
     <header class="seller-orders-header">
         <div>
-            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Панель продавця</div>
+            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> @BusinessRoleContext.PanelLabel(currentRole)</div>
             <h1>Фінанси - @Model.StoreName</h1>
             <p>Оборот, продажі та стан виплат магазину.</p>
         </div>
@@ -102,7 +111,14 @@
             <strong>Як це працює зараз</strong>
             Кошти за продані товари обробляються вручну командою маркетплейсу. Комісія платформи стягується автоматично з кожного продажу та відображається в деталях виплати, коли функціонал буде запущено.
         </div>
-        <button type="button" class="seller-button seller-button--secondary mt-3" data-open-payout-request>Запросити виплату</button>
+        @if (BusinessRoleContext.CanRequestPayout(currentRole))
+        {
+            <button type="button" class="seller-button seller-button--secondary mt-3" data-open-payout-request>Запросити виплату</button>
+        }
+        else
+        {
+            <p class="business-empty">Запит на виплату може подати лише власник магазину.</p>
+        }
     </section>
 
     <section class="business-panel">

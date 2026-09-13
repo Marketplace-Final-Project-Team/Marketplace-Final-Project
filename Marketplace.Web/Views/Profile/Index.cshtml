@@ -30,9 +30,47 @@
                     </svg>
                 </span>
             </a>
-            <div>
+            <div class="flex-grow-1">
                 <h1>@Model.Username</h1>
-                <p>@Model.Email</p>
+                <p class="mb-2">@Model.Email</p>
+
+                @if (Model.PersonalDiscounts.Count > 0)
+                {
+                    var discountsJson = System.Text.Json.JsonSerializer.Serialize(
+                        Model.PersonalDiscounts.Select(d => new
+                        {
+                            store = d.StoreName,
+                            percent = d.Percent,
+                            until = d.EndDate.ToLocalTime().ToString("dd.MM.yyyy")
+                        }));
+
+                    <div class="profile-discount-widget" data-discounts='@Html.Raw(discountsJson)'>
+                        <div class="profile-discount-widget__badge">
+                            <span class="profile-discount-widget__icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11">
+                                    <path d="m12 2 2.4 4.86 5.37.78-3.89 3.79.92 5.35L12 14.27l-4.8 2.51.92-5.35-3.89-3.79 5.37-.78L12 2Z" />
+                                </svg>
+                            </span>
+                            <span class="profile-discount-widget__text" data-discount-display>
+                                <strong>-@Model.PersonalDiscounts[0].Percent.ToString("0.##")%</strong> в «@Model.PersonalDiscounts[0].StoreName»
+                            </span>
+                        </div>
+
+                        <div class="profile-discount-widget__tooltip">
+                            <div class="profile-discount-widget__tooltip-title">Ваші персональні знижки</div>
+                            @foreach (var discount in Model.PersonalDiscounts)
+                            {
+                                <div class="profile-discount-widget__tooltip-item">
+                                    <div>
+                                        <span class="profile-discount-widget__tooltip-store">@discount.StoreName</span>
+                                        <span class="profile-discount-widget__tooltip-date">до @discount.EndDate.ToLocalTime().ToString("dd.MM.yyyy")</span>
+                                    </div>
+                                    <strong>-@discount.Percent.ToString("0.##")%</strong>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -148,5 +186,11 @@
         </a>
     </div>
 
-    <a asp-action="ChangeEmail" class="btn btn-outline-secondary">Змінити Email</a>
+    <div class="mt-3">
+        <a asp-action="ChangeEmail" class="btn btn-outline-secondary">Змінити Email</a>
+    </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/profile-discounts.js" asp-append-version="true"></script>
+}

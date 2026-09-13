@@ -1,16 +1,25 @@
 @model Marketplace.Web.Models.Businesses.BusinessTeamViewModel
+@using System.Security.Claims
+@using Marketplace.BLL.Interfaces
+@using Marketplace.Web.Models.Businesses
+@using Marketplace.Domain.Enums
+@inject IBusinessAccessService BusinessAccessService
 
 @{
     ViewData["Title"] = $"Команда - {Model.StoreName}";
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var currentRole = !string.IsNullOrEmpty(userId)
+        ? await BusinessAccessService.GetUserRoleAsync(Model.BusinessId, userId)
+        : null;
 }
 
 @functions {
-    private static string RoleLabel(Marketplace.Domain.Enums.BusinessMemberRole role) => role switch
+    private static string RoleLabel(BusinessMemberRole role) => role switch
     {
-        Marketplace.Domain.Enums.BusinessMemberRole.Owner => "Власник",
-        Marketplace.Domain.Enums.BusinessMemberRole.Admin => "Адміністратор",
-        Marketplace.Domain.Enums.BusinessMemberRole.BusinessAnalyst => "Бізнес-аналітик",
-        Marketplace.Domain.Enums.BusinessMemberRole.ProductManager => "Менеджер товарів",
+        BusinessMemberRole.Owner => "Власник",
+        BusinessMemberRole.Admin => "Адміністратор",
+        BusinessMemberRole.BusinessAnalyst => "Бізнес-аналітик",
+        BusinessMemberRole.ProductManager => "Менеджер товарів",
         _ => role.ToString()
     };
 }
@@ -19,12 +28,14 @@
     <link rel="stylesheet" href="~/css/business.css" asp-append-version="true" />
 }
 
+}
+
 <div class="seller-dashboard">
     <a asp-action="Index" class="seller-order-back">← До панелі продавця</a>
 
     <header class="seller-orders-header">
         <div>
-            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Панель продавця</div>
+            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> @BusinessRoleContext.PanelLabel(currentRole)</div>
             <h1>Команда - @Model.StoreName</h1>
             <p>Хто має доступ до керування цим магазином.</p>
         </div>
@@ -46,6 +57,14 @@
         </div>
     }
 
+    @if (TempData["Error"] is string error)
+    {
+        <div class="seller-alert seller-alert--danger" role="status">
+            <span aria-hidden="true">!</span>
+            <p><strong>Помилка</strong>@error</p>
+        </div>
+    }
+
     <div class="seller-orders-panel table-responsive">
         <table class="table seller-orders-table">
             <thead>
@@ -62,7 +81,7 @@
             <tbody>
                 <tr>
                     <td class="fw-semibold">@Model.OwnerEmail</td>
-                    <td>Власник</td>
+                    <td><span class="badge bg-secondary text-white px-2 py-1">Власник</span></td>
                     <td><span class="order-status order-status--delivered">Активний</span></td>
                     @if (Model.CanManage)
                     {
@@ -73,7 +92,26 @@
                 {
                     <tr>
                         <td class="fw-semibold">@member.Email</td>
-                        <td>@RoleLabel(member.Role)</td>
+                        <td>
+                            @if (Model.CanManage)
+                            {
+                                <form asp-action="UpdateMemberRole" method="post" class="d-inline-block">
+                                    <input type="hidden" name="businessId" value="@Model.BusinessId" />
+                                    <input type="hidden" name="memberId" value="@member.Id" />
+                                    <div class="role-select-wrapper">
+                                        <select name="newRole" class="role-select" onchange="this.form.submit()">
+                                            <option value="@BusinessMemberRole.Admin" selected="@(member.Role == BusinessMemberRole.Admin)">Адміністратор</option>
+                                            <option value="@BusinessMemberRole.ProductManager" selected="@(member.Role == BusinessMemberRole.ProductManager)">Менеджер товарів</option>
+                                            <option value="@BusinessMemberRole.BusinessAnalyst" selected="@(member.Role == BusinessMemberRole.BusinessAnalyst)">Бізнес-аналітик</option>
+                                        </select>
+                                    </div>
+                                </form>
+                            }
+                            else
+                            {
+                                @RoleLabel(member.Role)
+                            }
+                        </td>
                         <td>
                             @if (member.IsAccepted)
                             {
@@ -87,7 +125,7 @@
                         @if (Model.CanManage)
                         {
                             <td class="text-end">
-                                <form asp-action="RemoveMember" method="post" onsubmit="return confirm('Видалити цього учасника з команди?');">
+                                <form asp-action="RemoveMember" method="post" class="d-inline" onsubmit="return confirm('Видалити цього учасника з команди?');">
                                     <input type="hidden" name="businessId" value="@Model.BusinessId" />
                                     <input type="hidden" name="memberId" value="@member.Id" />
                                     <button type="submit" class="btn btn-sm btn-outline-danger">Видалити</button>

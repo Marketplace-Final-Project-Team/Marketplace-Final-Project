@@ -1,18 +1,41 @@
 @model Marketplace.Web.Models.Businesses.BusinessDashboardViewModel
+@using Marketplace.BLL.Common
 
 @{
-    ViewData["Title"] = "Панель продавця";
+    var businesses = Model.Businesses ?? [];
+
+    var ownerAccess = businesses.Any(b => b.CurrentUserRole == Marketplace.Domain.Enums.BusinessMemberRole.Owner);
+    var adminAccess = businesses.Any(b => b.CurrentUserRole == Marketplace.Domain.Enums.BusinessMemberRole.Admin);
+    var productManagerAccess = businesses.Any(b => b.CurrentUserRole == Marketplace.Domain.Enums.BusinessMemberRole.ProductManager);
+    var analystAccess = businesses.Any(b => b.CurrentUserRole == Marketplace.Domain.Enums.BusinessMemberRole.BusinessAnalyst);
+
+    var pageTitle = ownerAccess ? "Панель продавця"
+        : adminAccess ? "Панель адміністратора"
+        : productManagerAccess ? "Панель менеджера товарів"
+        : analystAccess ? "Панель аналітика"
+        : "Панель продавця";
+
+    ViewData["Title"] = pageTitle;
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/css/business.css" asp-append-version="true" />
+    <style>
+        .seller-store__role--staff {
+            background: #e6f4ff;
+            color: #0958d9;
+            padding: 2px 10px;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+    </style>
 }
 
 <div class="seller-dashboard">
     <header class="seller-dashboard__heading">
         <div>
-            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Панель продавця</div>
-            <h1>Панель продавця</h1>
+            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> @pageTitle</div>
+            <h1>@pageTitle</h1>
             <p>Контролюйте асортимент, замовлення та стан магазину в одному робочому просторі.</p>
         </div>
         @if (Model.CanCreateBusiness)
@@ -27,11 +50,11 @@
     {
         <div class="seller-alert" role="status">
             <span aria-hidden="true">✓</span>
-            <p><strong>Успішно</strong>@success</p>
+            <p><strong>Успішно!</strong> @success</p>
         </div>
     }
 
-    @if (Model.Businesses.Count == 0)
+    @if (businesses.Count == 0)
     {
         <section class="seller-empty">
             <div class="seller-empty__visual" aria-hidden="true">
@@ -50,7 +73,7 @@
     else
     {
         <div class="seller-store-list">
-            @foreach (var business in Model.Businesses)
+            @foreach (var business in businesses)
             {
                 var statusClass = business.Status.ToString().ToLowerInvariant();
                 var statusLabel = business.Status switch
@@ -77,6 +100,9 @@
                     : (int)Math.Round(business.ActiveProductCount * 100d / business.ProductCount);
                 var inStockCount = Math.Max(0, business.ProductCount - business.OutOfStockProductCount);
 
+                var rawId = business.Id.ToString();
+                var displayId = rawId.Length >= 8 ? rawId[..8].ToUpperInvariant() : rawId.ToUpperInvariant();
+
                 <article class="seller-store">
                     <div class="seller-store__cover">
                         @if (!string.IsNullOrWhiteSpace(business.BannerUrl))
@@ -85,7 +111,7 @@
                         }
                         <div class="seller-store__cover-pattern" aria-hidden="true"></div>
                         <div class="seller-store__cover-topline">
-                            <span class="seller-store__id">ID · @business.Id.ToString()[..8].ToUpperInvariant()</span>
+                            <span class="seller-store__id">ID · @displayId</span>
                             <span class="seller-status seller-status--@statusClass">
                                 <span aria-hidden="true"></span>@statusLabel
                             </span>
@@ -104,31 +130,47 @@
                                     <span class="seller-store__logo seller-store__logo--fallback" aria-hidden="true">@storeInitial</span>
                                 }
                                 <div>
-                                    <span class="seller-store__role">@(business.IsOwner ? "Ваш магазин" : "Командний доступ")</span>
+                                    @{
+                                        var roleLabel = business.CurrentUserRole switch
+                                        {
+                                            Marketplace.Domain.Enums.BusinessMemberRole.Owner => "Ваш магазин",
+                                            Marketplace.Domain.Enums.BusinessMemberRole.Admin => "Адміністратор магазину",
+                                            Marketplace.Domain.Enums.BusinessMemberRole.ProductManager => "Менеджер товарів",
+                                            Marketplace.Domain.Enums.BusinessMemberRole.BusinessAnalyst => "Бізнес-аналітик",
+                                            _ => "Командний доступ"
+                                        };
+                                        var roleClass = business.CurrentUserRole == Marketplace.Domain.Enums.BusinessMemberRole.Owner
+                                            ? "seller-store__role"
+                                            : "seller-store__role seller-store__role--staff";
+                                    }
+                                    <span class="@roleClass">@roleLabel</span>
                                     <h2>@business.StoreName</h2>
                                     <p>@business.Description</p>
                                 </div>
                             </div>
 
                             <div class="seller-store__primary-actions">
-                                <a asp-controller="Products"
-                                   asp-action="Create"
-                                   asp-route-businessId="@business.Id"
-                                   class="seller-button seller-button--primary">
-                                    <span aria-hidden="true">＋</span> Додати товар
-                                </a>
-                                <a asp-controller="Products"
-                                   asp-action="Index"
-                                   asp-route-businessId="@business.Id"
-                                   class="seller-button seller-button--secondary">
-                                    Відкрити товари <span aria-hidden="true">→</span>
-                                </a>
+                                @if (BusinessPermissions.ProductCrud.Contains(business.CurrentUserRole))
+                                {
+                                    <a asp-controller="Products"
+                                       asp-action="Create"
+                                       asp-route-businessId="@business.Id"
+                                       class="seller-button seller-button--primary">
+                                        <span aria-hidden="true">＋</span> Додати товар
+                                    </a>
+                                    <a asp-controller="Products"
+                                       asp-action="Index"
+                                       asp-route-businessId="@business.Id"
+                                       class="seller-button seller-button--secondary">
+                                        Відкрити товари <span aria-hidden="true">→</span>
+                                    </a>
+                                }
                             </div>
                         </div>
 
                         <div class="seller-state-note seller-state-note--@statusClass">
                             <span class="seller-state-note__icon" aria-hidden="true">@(business.Status == Marketplace.Domain.Enums.BusinessStatus.Active ? "✓" : "i")</span>
-                            <p><strong>Статус: @statusLabel</strong>@statusDescription</p>
+                            <p><strong>Статус: @statusLabel</strong> @statusDescription</p>
                         </div>
 
                         <section class="seller-kpis" aria-label="Основні показники магазину @business.StoreName">
@@ -148,10 +190,13 @@
                                 <span class="seller-kpi__icon" aria-hidden="true">▣</span>
                                 <div><span>Замовлення</span><strong>@business.OrderCount</strong><small>@business.AwaitingOrderCount очікують дій</small></div>
                             </div>
-                            <div class="seller-kpi seller-kpi--dark">
-                                <span class="seller-kpi__icon" aria-hidden="true">₴</span>
-                                <div><span>Оборот</span><strong>@business.Revenue.ToString("N0") ₴</strong><small>@business.SoldItemCount продано одиниць</small></div>
-                            </div>
+                            @if (BusinessPermissions.Statistics.Contains(business.CurrentUserRole))
+                            {
+                                <div class="seller-kpi seller-kpi--dark">
+                                    <span class="seller-kpi__icon" aria-hidden="true">₴</span>
+                                    <div><span>Оборот</span><strong>@business.Revenue.ToString("N0") ₴</strong><small>@business.SoldItemCount продано одиниць</small></div>
+                                </div>
+                            }
                         </section>
 
                         <div class="seller-workspace-grid">
@@ -201,30 +246,45 @@
                                 <span class="seller-panel__label">Швидкі дії</span>
                                 <h3>Продовжити роботу</h3>
                                 <nav aria-label="Швидкі дії магазину @business.StoreName">
-                                    <a asp-action="Dashboard" asp-route-businessId="@business.Id">
-                                        <span aria-hidden="true">◫</span><div><strong>Дашборд</strong><small>Продажі, товари, трафік у графіках</small></div><b aria-hidden="true">→</b>
-                                    </a>
-                                    <a asp-controller="Products" asp-action="Create" asp-route-businessId="@business.Id">
-                                        <span aria-hidden="true">＋</span><div><strong>Новий товар</strong><small>Створити картку товару</small></div><b aria-hidden="true">→</b>
-                                    </a>
-                                    <a asp-controller="Products" asp-action="Index" asp-route-businessId="@business.Id">
-                                        <span aria-hidden="true">▦</span><div><strong>Асортимент</strong><small>Редагувати товари та залишки</small></div><b aria-hidden="true">→</b>
-                                    </a>
+                                    @if (BusinessPermissions.Statistics.Contains(business.CurrentUserRole))
+                                    {
+                                        <a asp-action="Dashboard" asp-route-businessId="@business.Id">
+                                            <span aria-hidden="true">◫</span><div><strong>Дашборд</strong><small>Продажі, товари, трафік у графіках</small></div><b aria-hidden="true">→</b>
+                                        </a>
+                                    }
+                                    @if (BusinessPermissions.ProductCrud.Contains(business.CurrentUserRole))
+                                    {
+                                        <a asp-controller="Products" asp-action="Create" asp-route-businessId="@business.Id">
+                                            <span aria-hidden="true">＋</span><div><strong>Новий товар</strong><small>Створити картку товару</small></div><b aria-hidden="true">→</b>
+                                        </a>
+                                        <a asp-controller="Products" asp-action="Index" asp-route-businessId="@business.Id">
+                                            <span aria-hidden="true">▦</span><div><strong>Асортимент</strong><small>Редагувати товари та залишки</small></div><b aria-hidden="true">→</b>
+                                        </a>
+                                    }
                                     <a asp-action="Orders" asp-route-businessId="@business.Id">
                                         <span aria-hidden="true">▣</span><div><strong>Замовлення</strong><small>Обробка та зміна статусу</small></div><b aria-hidden="true">→</b>
                                     </a>
-                                    <a asp-action="Finance" asp-route-businessId="@business.Id">
-                                        <span aria-hidden="true">₴</span><div><strong>Фінанси</strong><small>Оборот, продажі та виплати</small></div><b aria-hidden="true">→</b>
-                                    </a>
-                                    <a asp-action="Performance" asp-route-businessId="@business.Id">
-                                        <span aria-hidden="true">◈</span><div><strong>Ефективність</strong><small>Стан акаунта та рейтинг</small></div><b aria-hidden="true">→</b>
-                                    </a>
-                                    <a asp-action="Team" asp-route-businessId="@business.Id">
-                                        <span aria-hidden="true">☺</span><div><strong>Команда</strong><small>Учасники та доступи</small></div><b aria-hidden="true">→</b>
-                                    </a>
-                                    <a asp-action="Settings" asp-route-businessId="@business.Id">
-                                        <span aria-hidden="true">⚙</span><div><strong>Налаштування</strong><small>Дані компанії та платежі</small></div><b aria-hidden="true">→</b>
-                                    </a>
+                                    @if (BusinessPermissions.Statistics.Contains(business.CurrentUserRole))
+                                    {
+                                        <a asp-action="Finance" asp-route-businessId="@business.Id">
+                                            <span aria-hidden="true">₴</span><div><strong>Фінанси</strong><small>Оборот, продажі та виплати</small></div><b aria-hidden="true">→</b>
+                                        </a>
+                                        <a asp-action="Performance" asp-route-businessId="@business.Id">
+                                            <span aria-hidden="true">◈</span><div><strong>Ефективність</strong><small>Стан акаунта та рейтинг</small></div><b aria-hidden="true">→</b>
+                                        </a>
+                                    }
+                                    @if (BusinessPermissions.ManageTeam.Contains(business.CurrentUserRole))
+                                    {
+                                        <a asp-action="Team" asp-route-businessId="@business.Id">
+                                            <span aria-hidden="true">☺</span><div><strong>Команда</strong><small>Учасники та доступи</small></div><b aria-hidden="true">→</b>
+                                        </a>
+                                    }
+                                    @if (BusinessPermissions.EditBusinessProfile.Contains(business.CurrentUserRole))
+                                    {
+                                        <a asp-action="Settings" asp-route-businessId="@business.Id">
+                                            <span aria-hidden="true">⚙</span><div><strong>Налаштування</strong><small>Дані компанії та платежі</small></div><b aria-hidden="true">→</b>
+                                        </a>
+                                    }
                                     <a asp-controller="Catalog" asp-action="Index">
                                         <span aria-hidden="true">◎</span><div><strong>Вітрина</strong><small>Переглянути каталог покупця</small></div><b aria-hidden="true">→</b>
                                     </a>

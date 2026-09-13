@@ -1,4 +1,9 @@
 @model Guid
+@using System.Security.Claims
+@using Marketplace.BLL.Common
+@using Marketplace.BLL.Interfaces
+@using Marketplace.Domain.Enums
+@inject IBusinessAccessService BusinessAccessService
 
 @{
     var current = ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty;
@@ -6,15 +11,46 @@
     string ActiveClass(string action) => string.Equals(current, action, StringComparison.OrdinalIgnoreCase)
         ? "is-active"
         : string.Empty;
+
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var currentRole = !string.IsNullOrEmpty(userId)
+        ? await BusinessAccessService.GetUserRoleAsync(Model, userId)
+        : null;
 }
 
-<nav class="business-nav" aria-label="Розділи панелі магазину">
-    <a class="@ActiveClass("Dashboard")" asp-action="Dashboard" asp-route-businessId="@Model">Дашборд</a>
-    <a class="@ActiveClass("Orders")" asp-action="Orders" asp-route-businessId="@Model">Замовлення</a>
-    <a class="@ActiveClass("Finance")" asp-action="Finance" asp-route-businessId="@Model">Фінанси</a>
-    <a class="@ActiveClass("Performance")" asp-action="Performance" asp-route-businessId="@Model">Ефективність</a>
-    <a class="@ActiveClass("Growth")" asp-action="Growth" asp-route-businessId="@Model">Розвиток</a>
-    <a class="@ActiveClass("PromoCodes")" asp-action="PromoCodes" asp-route-businessId="@Model">Знижки</a>
-    <a class="@ActiveClass("Team")" asp-action="Team" asp-route-businessId="@Model">Команда</a>
-    <a class="@ActiveClass("Settings")" asp-action="Settings" asp-route-businessId="@Model">Налаштування</a>
-</nav>
+@if (currentRole.HasValue)
+{
+    var role = currentRole.Value;
+
+    <nav class="business-nav" aria-label="Розділи панелі магазину">
+
+        @if (BusinessPermissions.Statistics.Contains(role))
+        {
+            <a class="@ActiveClass("Dashboard")" asp-action="Dashboard" asp-route-businessId="@Model">Дашборд</a>
+        }
+
+        <a class="@ActiveClass("Orders")" asp-action="Orders" asp-route-businessId="@Model">Замовлення</a>
+
+        @if (BusinessPermissions.Statistics.Contains(role))
+        {
+            <a class="@ActiveClass("Finance")" asp-action="Finance" asp-route-businessId="@Model">Фінанси</a>
+            <a class="@ActiveClass("Performance")" asp-action="Performance" asp-route-businessId="@Model">Ефективність</a>
+            <a class="@ActiveClass("Growth")" asp-action="Growth" asp-route-businessId="@Model">Розвиток</a>
+        }
+
+        @if (BusinessPermissions.PromoCodes.Contains(role))
+        {
+            <a class="@ActiveClass("PromoCodes")" asp-action="PromoCodes" asp-route-businessId="@Model">Знижки</a>
+        }
+
+        @if (BusinessPermissions.ManageTeam.Contains(role))
+        {
+            <a class="@ActiveClass("Team")" asp-action="Team" asp-route-businessId="@Model">Команда</a>
+        }
+
+        @if (BusinessPermissions.EditBusinessProfile.Contains(role))
+        {
+            <a class="@ActiveClass("Settings")" asp-action="Settings" asp-route-businessId="@Model">Налаштування</a>
+        }
+    </nav>
+}

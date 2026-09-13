@@ -19,9 +19,11 @@ namespace Marketplace.BLL.Interfaces
         Task<ServiceResult> ApproveAdultStatusAsync(Guid businessId);
         Task<ServiceResult> RejectAdultStatusAsync(Guid businessId, string reason);
         Task<ServiceResult> ChangeBusinessComission(Guid businessId, decimal commissionPercent);
+
+        Task<BusinessAdminDetailsDto?> GetBusinessDetailsAsync(Guid businessId);
+
         Task<DataResult<AdminCommissionStatsDto>> GetCommissionStatsByPeriodAsync(DateTime? startDate, DateTime? endDate);
         Task<decimal> GetTotalCommissionAsync();
         Task<AdminStatisticsOverviewDto> GetStatisticsAsync(DateTime? startDate, DateTime? endDate, Guid? businessId = null);
-        Task<BusinessAdminDetailsDto?> GetBusinessDetailsAsync(Guid businessId);
     }
 }
