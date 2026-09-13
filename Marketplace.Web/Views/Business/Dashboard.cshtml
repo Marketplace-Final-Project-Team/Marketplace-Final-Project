@@ -24,6 +24,12 @@
         revenue = p.Revenue
     }));
 
+    var topCustomersJson = System.Text.Json.JsonSerializer.Serialize(Model.TopCustomers.Select(c => new
+    {
+        name = c.UserName,
+        revenue = c.Revenue
+    }));
+
     var trafficJson = System.Text.Json.JsonSerializer.Serialize(new
     {
         views = Model.TotalViews,
@@ -188,6 +194,9 @@
             }
             else
             {
+                <div class="business-chart-card__canvas-wrap business-chart-card__canvas-wrap--short">
+                    <canvas id="topCustomersChart" data-chart='@Html.Raw(topCustomersJson)'></canvas>
+                </div>
                 <div class="table-responsive">
                     <table class="business-table">
                         <thead>
