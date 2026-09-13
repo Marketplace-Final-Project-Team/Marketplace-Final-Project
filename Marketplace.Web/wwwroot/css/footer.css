@@ -65,19 +65,6 @@
     color: #3157d7;
 }
 
-.site-footer__social {
-    display: flex;
-    flex-direction: column;
-    gap: 0.55rem;
-    margin-top: 0.3rem;
-}
-
-.site-footer__social-label {
-    color: #667085;
-    font-size: 0.78rem;
-    font-weight: 600;
-}
-
 .site-footer__social-icons {
     display: flex;
     flex-wrap: wrap;
@@ -91,9 +78,9 @@
     border-radius: 50%;
     color: #475467;
     display: inline-flex;
-    height: 2.2rem;
+    height: 1.9rem;
     justify-content: center;
-    width: 2.2rem;
+    width: 1.9rem;
 }
 
 .site-footer__social-icons a:hover {
