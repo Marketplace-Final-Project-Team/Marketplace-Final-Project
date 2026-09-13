@@ -1,0 +1,124 @@
+@model Marketplace.Web.Models.WithdrawalsAdminViewModel
+
+@{
+    ViewData["Title"] = "Виплати - Адмін-панель";
+}
+
+@functions {
+    private static string StatusLabel(Marketplace.Domain.Enums.WithdrawalStatus status) => status switch
+    {
+        Marketplace.Domain.Enums.WithdrawalStatus.Pending => "Очікує розгляду",
+        Marketplace.Domain.Enums.WithdrawalStatus.Processing => "В обробці",
+        Marketplace.Domain.Enums.WithdrawalStatus.Rejected => "Відхилено",
+        Marketplace.Domain.Enums.WithdrawalStatus.Completed => "Виплачено",
+        Marketplace.Domain.Enums.WithdrawalStatus.Failed => "Помилка виплати",
+        _ => status.ToString()
+    };
+
+    private static string MaskCard(string cardNumber) => cardNumber.Length >= 4
+        ? $"•••• {cardNumber[^4..]}"
+        : cardNumber;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+}
+
+<div class="admin-page">
+    <div class="admin-shell">
+        <partial name="~/Views/Admin/_AdminNav.cshtml" />
+
+        <div class="admin-content">
+            <header class="admin-header">
+                <div>
+                    <div class="admin-kicker">Admin</div>
+                    <h1 class="admin-title">Виплати</h1>
+                    <p class="admin-subtitle">Заявки продавців на виведення коштів з балансу магазину на картку.</p>
+                </div>
+            </header>
+
+            @if (TempData["Success"] is string success)
+            {
+                <div class="admin-alert"><span>✓</span><p>@success</p></div>
+            }
+            @if (TempData["Error"] is string error)
+            {
+                <div class="admin-alert admin-alert--error"><span>!</span><p>@error</p></div>
+            }
+
+            <form method="get" asp-action="Withdrawals" class="admin-toolbar admin-toolbar--center">
+                <div>
+                    <label for="status" class="admin-toolbar__label">Статус</label>
+                    <select id="status" name="status" class="form-select">
+                        <option value="">Усі статуси</option>
+                        @foreach (var value in Enum.GetValues<Marketplace.Domain.Enums.WithdrawalStatus>())
+                        {
+                            <option value="@value" selected="@(Model.StatusFilter == value)">@StatusLabel(value)</option>
+                        }
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-outline-secondary">Застосувати</button>
+                @if (Model.StatusFilter.HasValue)
+                {
+                    <a asp-action="Withdrawals" class="btn btn-outline-secondary">Скинути</a>
+                }
+            </form>
+
+            <section class="admin-panel table-responsive">
+                @if (Model.Withdrawals.Count == 0)
+                {
+                    <p class="admin-empty">Заявок на виплату немає.</p>
+                }
+                else
+                {
+                    <table class="table admin-table">
+                        <thead>
+                            <tr>
+                                <th>Магазин</th>
+                                <th>Сума</th>
+                                <th>Картка</th>
+                                <th>Отримувач</th>
+                                <th>Створено</th>
+                                <th>Статус</th>
+                                <th class="text-end">Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var request in Model.Withdrawals)
+                            {
+                                <tr>
+                                    <td class="admin-entity-name">@request.BusinessName</td>
+                                    <td>@request.Amount.ToString("N2") ₴</td>
+                                    <td>@MaskCard(request.CardNumber)</td>
+                                    <td>@request.RecipientName</td>
+                                    <td>@request.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                                    <td>
+                                        @StatusLabel(Enum.Parse<Marketplace.Domain.Enums.WithdrawalStatus>(request.Status))
+                                        @if (!string.IsNullOrWhiteSpace(request.Message))
+                                        {
+                                            <div class="admin-stat-card__hint">@request.Message</div>
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        @if (request.Status == Marketplace.Domain.Enums.WithdrawalStatus.Pending.ToString())
+                                        {
+                                            <form asp-action="ApproveWithdrawal" method="post" class="d-inline" onsubmit="return confirm('Підтвердити виплату @request.Amount.ToString("N2") ₴ на картку @MaskCard(request.CardNumber)?');">
+                                                <input type="hidden" name="requestId" value="@request.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-success">Виплатити</button>
+                                            </form>
+                                            <form asp-action="RejectWithdrawal" method="post" class="admin-inline-form">
+                                                <input type="hidden" name="requestId" value="@request.Id" />
+                                                <input type="text" name="reason" placeholder="Причина відхилення" class="admin-inline-form__input" required />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Відхилити</button>
+                                            </form>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </section>
+        </div>
+    </div>
+</div>

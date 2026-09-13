@@ -35,7 +35,6 @@ namespace Marketplace.Web.Controllers
             {
                 return BadRequest("Amount must be greater than zero.");
             }
-            Console.WriteLine("VSEEEE OK ");
             var business = await _businessService.GetByIdAsync(businessId);
             if (business == null)
             {
@@ -67,7 +66,21 @@ namespace Marketplace.Web.Controllers
             return Ok(withdrawals);
         }
 
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Withdrawals(WithdrawalStatus? status)
+        {
+            var withdrawals = await _withdrawalService.GetAllWithdrawalsAsync(status);
+            return View(new Marketplace.Web.Models.WithdrawalsAdminViewModel
+            {
+                StatusFilter = status,
+                Withdrawals = withdrawals
+            });
+        }
+
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ApproveWithdrawal(Guid requestId)
         {
             var currentAdminId = _userManager.GetUserId(User);
@@ -87,6 +100,8 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RejectWithdrawal(Guid requestId, string reason)
         {
             var currentAdminId = _userManager.GetUserId(User);

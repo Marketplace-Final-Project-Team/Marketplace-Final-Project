@@ -35,6 +35,7 @@ namespace Marketplace.Web.Controllers
         private readonly ISystemSettingsService _settingsService;
         private readonly ICategoryService _categoryService;
         private readonly IUserDiscountService _userDiscountService;
+        private readonly IWithdrawalService _withdrawalService;
 
         public BusinessController(
             IBusinessService businessService,
@@ -52,7 +53,8 @@ namespace Marketplace.Web.Controllers
             IProductAnalyticsService productAnalyticsService,
             ISystemSettingsService settingsService,
             ICategoryService categoryService,
-            IUserDiscountService userDiscountService)
+            IUserDiscountService userDiscountService,
+            IWithdrawalService withdrawalService)
         {
             _businessService = businessService;
             _businessAccessService = businessAccessService;
@@ -70,6 +72,7 @@ namespace Marketplace.Web.Controllers
             _settingsService = settingsService;
             _categoryService = categoryService;
             _userDiscountService = userDiscountService;
+            _withdrawalService = withdrawalService;
         }
 
         [HttpGet]
@@ -624,6 +627,11 @@ namespace Marketplace.Web.Controllers
             var trendStart = trendEnd.AddDays(-29);
             var trendResult = await _businessService.GetBusinessStatsByPeriodAsync(businessId, trendStart, trendEnd);
 
+            var withdrawals = await _withdrawalService.GetForBusinessAsync(businessId);
+            var pendingWithdrawalsTotal = withdrawals
+                .Where(w => w.Status == WithdrawalStatus.Pending.ToString())
+                .Sum(w => w.Amount);
+
             return View(new BusinessFinanceViewModel
             {
                 BusinessId = businessId,
@@ -650,7 +658,10 @@ namespace Marketplace.Web.Controllers
                         .OrderBy(s => s.Date)
                         .Select(s => new BusinessDashboardChartPointViewModel { Date = s.Date, Revenue = s.Revenue, OrderCount = s.OrderCount })
                         .ToList()
-                    : new List<BusinessDashboardChartPointViewModel>()
+                    : new List<BusinessDashboardChartPointViewModel>(),
+                AvailableBalance = business.Balance,
+                PendingWithdrawalsTotal = pendingWithdrawalsTotal,
+                Withdrawals = withdrawals.ToList()
             });
         }
 

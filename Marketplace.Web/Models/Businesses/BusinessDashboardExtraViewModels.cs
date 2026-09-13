@@ -13,6 +13,9 @@ namespace Marketplace.Web.Models.Businesses
         public decimal AverageOrderValue => TotalOrders == 0 ? 0 : Revenue / TotalOrders;
         public List<BusinessOrderListItemViewModel> RecentSales { get; set; } = new();
         public List<BusinessDashboardChartPointViewModel> RevenueTrend { get; set; } = new();
+        public decimal AvailableBalance { get; set; }
+        public decimal PendingWithdrawalsTotal { get; set; }
+        public List<Marketplace.BLL.DTOs.WithdrawalRequestDto> Withdrawals { get; set; } = new();
     }
 
     public class BusinessPerformanceViewModel

@@ -30,6 +30,20 @@
         Marketplace.Domain.Enums.OrderStatus.Canceled => "Скасовано",
         _ => status.ToString()
     };
+
+    private static string WithdrawalStatusLabel(string status) => status switch
+    {
+        "Pending" => "Очікує розгляду",
+        "Processing" => "В обробці",
+        "Rejected" => "Відхилено",
+        "Completed" => "Виплачено",
+        "Failed" => "Помилка виплати",
+        _ => status
+    };
+
+    private static string MaskCard(string cardNumber) => cardNumber.Length >= 4
+        ? $"•••• {cardNumber[^4..]}"
+        : cardNumber;
 }
 
 @section Styles {
@@ -55,6 +69,7 @@
         <div class="business-kpi"><span>Продано одиниць</span><strong>@Model.SoldItems</strong></div>
         <div class="business-kpi"><span>Замовлень</span><strong>@Model.TotalOrders</strong></div>
         <div class="business-kpi"><span>Середній чек</span><strong>@Model.AverageOrderValue.ToString("N0") ₴</strong></div>
+        <div class="business-kpi"><span>Доступно до виплати</span><strong>@Model.AvailableBalance.ToString("N2") ₴</strong></div>
     </div>
 
     <section class="business-panel business-chart-card">
@@ -104,20 +119,50 @@
         }
     </section>
 
-    <section class="business-panel">
+    <section class="business-panel" data-collapsible>
+        <partial name="_CollapseToggle" />
         <h2>Виплати</h2>
-        <p class="business-panel__lead">Автоматичні виплати на банківський рахунок ще не підключені.</p>
-        <div class="business-note">
-            <strong>Як це працює зараз</strong>
-            Кошти за продані товари обробляються вручну командою маркетплейсу. Комісія платформи стягується автоматично з кожного продажу та відображається в деталях виплати, коли функціонал буде запущено.
-        </div>
+        <p class="business-panel__lead">Доступний баланс: <strong>@Model.AvailableBalance.ToString("N2") ₴</strong>@(Model.PendingWithdrawalsTotal > 0 ? $" (з них {Model.PendingWithdrawalsTotal:N2} ₴ вже в заявках на розгляді)" : "")</p>
         @if (BusinessRoleContext.CanRequestPayout(currentRole))
         {
-            <button type="button" class="seller-button seller-button--secondary mt-3" data-open-payout-request>Запросити виплату</button>
+            <button type="button" class="seller-button seller-button--secondary mt-2" data-open-payout-request>Запросити виплату</button>
         }
         else
         {
             <p class="business-empty">Запит на виплату може подати лише власник магазину.</p>
+        }
+
+        @if (Model.Withdrawals.Count == 0)
+        {
+            <p class="business-empty mt-3">Заявок на виплату ще не було.</p>
+        }
+        else
+        {
+            <div class="table-responsive mt-3">
+                <table class="business-table">
+                    <thead>
+                        <tr><th>Дата</th><th>Сума</th><th>Картка</th><th>Отримувач</th><th>Статус</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var withdrawal in Model.Withdrawals)
+                        {
+                            <tr>
+                                <td>@withdrawal.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                                <td>@withdrawal.Amount.ToString("N2") ₴</td>
+                                <td>@MaskCard(withdrawal.CardNumber)</td>
+                                <td>@withdrawal.RecipientName</td>
+                                <td>
+                                    @WithdrawalStatusLabel(withdrawal.Status)
+                                    @if (!string.IsNullOrWhiteSpace(withdrawal.Message))
+                                    {
+                                        <div class="business-panel__lead" style="margin:0;">@withdrawal.Message</div>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         }
     </section>
 
@@ -128,20 +173,31 @@
     </section>
 </div>
 
+<form id="antiforgeryForm">@Html.AntiForgeryToken()</form>
+
 <div class="postsale-modal" data-payout-modal hidden>
     <div class="postsale-modal__card">
         <button type="button" class="postsale-modal__close" aria-label="Закрити" data-close-payout>×</button>
         <div data-payout-form>
             <h3>Запит на виплату</h3>
-            <p>Магазин «@Model.StoreName»</p>
-            <label class="form-label mt-2">Сума до виплати</label>
-            <input type="text" class="form-control" value="@Model.Revenue.ToString("N2") ₴" disabled />
+            <p>Магазин «@Model.StoreName». Доступно: @Model.AvailableBalance.ToString("N2") ₴.</p>
+            <p class="text-danger" data-payout-error hidden></p>
+
+            <label class="form-label mt-2">Сума до виплати, ₴</label>
+            <input type="number" class="form-control" data-payout-amount min="0.01" max="@Model.AvailableBalance.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)" step="0.01" value="@Model.AvailableBalance.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)" />
+
+            <label class="form-label mt-2">Номер картки</label>
+            <input type="text" class="form-control" data-payout-card placeholder="0000 0000 0000 0000" maxlength="19" />
+
+            <label class="form-label mt-2">Отримувач</label>
+            <input type="text" class="form-control" data-payout-recipient placeholder="Прізвище Ім'я" />
+
             <button type="button" class="btn btn-primary mt-3 w-100" data-submit-payout>Надіслати запит</button>
         </div>
         <div class="postsale-modal__success" data-payout-success hidden>
             <span aria-hidden="true">✓</span>
             <h3>Запит надіслано</h3>
-            <p>Команда підтримки маркетплейсу зв'яжеться з вами для уточнення реквізитів виплати.</p>
+            <p>Заявку передано на розгляд адміністрації маркетплейсу.</p>
             <button type="button" class="btn btn-outline-secondary" data-close-payout>Закрити</button>
         </div>
     </div>
@@ -151,5 +207,9 @@
     <script src="~/lib/chartjs/chart.umd.min.js"></script>
     <script src="~/js/chart-helpers.js" asp-append-version="true"></script>
     <script src="~/js/business-finance-chart.js" asp-append-version="true"></script>
+    <script src="~/js/business-panel-collapse.js" asp-append-version="true"></script>
+    <script>
+        window.__withdrawalBusinessId = "@Model.BusinessId";
+    </script>
     <script src="~/js/business-finance.js" asp-append-version="true"></script>
 }
