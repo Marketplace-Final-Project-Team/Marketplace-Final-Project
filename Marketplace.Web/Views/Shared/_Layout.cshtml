@@ -14,7 +14,7 @@
     var isAuthenticated = User.Identity?.IsAuthenticated == true;
     var headerCategories = await CategoryService.GetAllCategories();
 }
-<html lang="uk">
+<html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -33,7 +33,7 @@
     <header class="site-header">
         <div class="site-header__top">
             <div class="site-header__inner">
-                <button class="site-header__toggle" type="button" data-bs-toggle="collapse" data-bs-target="#siteHeaderCollapse" aria-controls="siteHeaderCollapse" aria-expanded="false" aria-label="Меню">
+                <button class="site-header__toggle" type="button" data-bs-toggle="collapse" data-bs-target="#siteHeaderCollapse" aria-controls="siteHeaderCollapse" aria-expanded="false" aria-label="@SharedLocalizer["Меню"]">
                     <span></span><span></span><span></span>
                 </button>
 
@@ -44,15 +44,15 @@
                 </div>
 
                 <form asp-controller="Catalog" asp-action="Index" method="get" class="site-header__search" role="search" data-search-wrapper>
-                    <select name="CategoryId" class="site-header__search-category" aria-label="Категорія пошуку">
-                        <option value="">Усі категорії</option>
+                    <select name="CategoryId" class="site-header__search-category" aria-label="@SharedLocalizer["Категорія пошуку"]">
+                        <option value="">@SharedLocalizer["Усі категорії"]</option>
                         @foreach (var category in headerCategories)
                         {
                             <option value="@category.Id">@category.Name</option>
                         }
                     </select>
-                    <input type="text" name="Search" class="site-header__search-input" placeholder="Пошук товарів на MarketPlace" aria-label="Пошук товарів" autocomplete="off" data-search-autocomplete />
-                    <button type="submit" class="site-header__search-btn" aria-label="Шукати">
+                    <input type="text" name="Search" class="site-header__search-input" placeholder="@SharedLocalizer["Пошук товарів на MarketPlace"]" aria-label="@SharedLocalizer["Пошук товарів"]" autocomplete="off" data-search-autocomplete />
+                    <button type="submit" class="site-header__search-btn" aria-label="@SharedLocalizer["Шукати"]">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" aria-hidden="true">
                             <circle cx="11" cy="11" r="8" />
                             <path d="m21 21-4.3-4.3" />
@@ -61,30 +61,38 @@
                 </form>
 
                 <div class="site-header__actions">
-                    <div id="google_translate_element" class="site-header__lang" title="Мова сайту"></div>
+                    <form asp-controller="Culture" asp-action="SetCulture" method="post" class="site-header__lang">
+                        <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                        <select name="culture" class="site-header__lang-select" onchange="this.form.submit()" aria-label="@SharedLocalizer["Мова сайту"]">
+                            @foreach (var lang in LayoutCultures.Supported)
+                            {
+                                <option value="@lang.Code" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == lang.Code)">@lang.NativeName</option>
+                            }
+                        </select>
+                    </form>
 
                     @if (isAuthenticated)
                     {
                         <div class="site-header__account dropdown">
                             <button class="site-header__account-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="@fullUserName">
-                                <small>Вітаємо,</small>
+                                <small>@SharedLocalizer["Вітаємо,"]</small>
                                 <strong><span class="nav-user-chip__avatar" aria-hidden="true">@userInitial</span> @compactUserName</strong>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end site-header__account-menu">
-                                <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index">Мій профіль</a></li>
-                                <li><a class="dropdown-item" asp-controller="Order" asp-action="Index">Мої замовлення</a></li>
-                                <li><a class="dropdown-item" asp-controller="Profile" asp-action="Wishlist">Список бажань</a></li>
-                                <li><a class="dropdown-item" asp-controller="Profile" asp-action="Addresses">Адреси доставки</a></li>
-                                <li><a class="dropdown-item" asp-controller="Business" asp-action="Index">Панель продавця</a></li>
-                                <li><a class="dropdown-item" asp-controller="Products" asp-action="Index">Мої товари</a></li>
+                                <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index">@SharedLocalizer["Мій профіль"]</a></li>
+                                <li><a class="dropdown-item" asp-controller="Order" asp-action="Index">@SharedLocalizer["Мої замовлення"]</a></li>
+                                <li><a class="dropdown-item" asp-controller="Profile" asp-action="Wishlist">@SharedLocalizer["Список бажань"]</a></li>
+                                <li><a class="dropdown-item" asp-controller="Profile" asp-action="Addresses">@SharedLocalizer["Адреси доставки"]</a></li>
+                                <li><a class="dropdown-item" asp-controller="Business" asp-action="Index">@SharedLocalizer["Панель продавця"]</a></li>
+                                <li><a class="dropdown-item" asp-controller="Products" asp-action="Index">@SharedLocalizer["Мої товари"]</a></li>
                                 @if (User.IsInRole("Admin"))
                                 {
-                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Index">Адмін-панель</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Index">@SharedLocalizer["Адмін-панель"]</a></li>
                                 }
                                 <li><hr class="dropdown-divider" /></li>
                                 <li>
                                     <form asp-controller="Auth" asp-action="Logout" method="post">
-                                        <button type="submit" class="dropdown-item nav-user-menu__logout">Вийти</button>
+                                        <button type="submit" class="dropdown-item nav-user-menu__logout">@SharedLocalizer["Вийти"]</button>
                                     </form>
                                 </li>
                             </ul>
@@ -94,19 +102,19 @@
                     {
                         <div class="site-header__account dropdown">
                             <button class="site-header__account-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <small>Вітаємо,</small>
-                                <strong>Увійти ⌄</strong>
+                                <small>@SharedLocalizer["Вітаємо,"]</small>
+                                <strong>@SharedLocalizer["Увійти"] ⌄</strong>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end site-header__account-menu">
-                                <li><a class="dropdown-item" asp-controller="Auth" asp-action="SignIn">Увійти</a></li>
-                                <li><a class="dropdown-item" asp-controller="Auth" asp-action="SignUp">Створити акаунт</a></li>
+                                <li><a class="dropdown-item" asp-controller="Auth" asp-action="SignIn">@SharedLocalizer["Увійти"]</a></li>
+                                <li><a class="dropdown-item" asp-controller="Auth" asp-action="SignUp">@SharedLocalizer["Створити акаунт"]</a></li>
                             </ul>
                         </div>
                     }
 
                     <a class="site-header__orders" asp-controller="Order" asp-action="Index">
-                        <small>Повернення та</small>
-                        <strong>Замовлення</strong>
+                        <small>@SharedLocalizer["Повернення та"]</small>
+                        <strong>@SharedLocalizer["Замовлення"]</strong>
                     </a>
 
                     @await Component.InvokeAsync("CartSummary")
@@ -114,7 +122,7 @@
             </div>
         </div>
 
-        <nav class="site-header__bottom" aria-label="Категорії">
+        <nav class="site-header__bottom" aria-label="@SharedLocalizer["Категорії"]">
             <div class="site-header__inner">
                 <ul class="site-header__links">
                     <li>
@@ -122,18 +130,18 @@
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
                                 <path d="M4 6h16M4 12h16M4 18h16" />
                             </svg>
-                            Усі товари
+                            @SharedLocalizer["Усі товари"]
                         </a>
                     </li>
-                    <li><a asp-controller="Home" asp-action="Index">Головна</a></li>
+                    <li><a asp-controller="Home" asp-action="Index">@SharedLocalizer["Головна"]</a></li>
                     @foreach (var category in headerCategories.Take(6))
                     {
                         <li><a asp-controller="Catalog" asp-action="Index" asp-route-CategoryId="@category.Id">@category.Name</a></li>
                     }
                     @if (isAuthenticated)
                     {
-                        <li><a asp-controller="Business" asp-action="Index">Панель продавця</a></li>
-                        <li><a asp-controller="Products" asp-action="Index">Мої товари</a></li>
+                        <li><a asp-controller="Business" asp-action="Index">@SharedLocalizer["Панель продавця"]</a></li>
+                        <li><a asp-controller="Products" asp-action="Index">@SharedLocalizer["Мої товари"]</a></li>
                     }
                 </ul>
             </div>
@@ -147,28 +155,28 @@
                 <div class="site-header__collapse-section">
                     @if (isAuthenticated)
                     {
-                        <a class="site-header__collapse-link" asp-controller="Profile" asp-action="Index">Мій профіль</a>
-                        <a class="site-header__collapse-link" asp-controller="Order" asp-action="Index">Мої замовлення</a>
-                        <a class="site-header__collapse-link" asp-controller="Profile" asp-action="Wishlist">Список бажань</a>
-                        <a class="site-header__collapse-link" asp-controller="Business" asp-action="Index">Панель продавця</a>
-                        <a class="site-header__collapse-link" asp-controller="Products" asp-action="Index">Мої товари</a>
+                        <a class="site-header__collapse-link" asp-controller="Profile" asp-action="Index">@SharedLocalizer["Мій профіль"]</a>
+                        <a class="site-header__collapse-link" asp-controller="Order" asp-action="Index">@SharedLocalizer["Мої замовлення"]</a>
+                        <a class="site-header__collapse-link" asp-controller="Profile" asp-action="Wishlist">@SharedLocalizer["Список бажань"]</a>
+                        <a class="site-header__collapse-link" asp-controller="Business" asp-action="Index">@SharedLocalizer["Панель продавця"]</a>
+                        <a class="site-header__collapse-link" asp-controller="Products" asp-action="Index">@SharedLocalizer["Мої товари"]</a>
                         @if (User.IsInRole("Admin"))
                         {
-                            <a class="site-header__collapse-link" asp-controller="Admin" asp-action="Index">Адмін-панель</a>
+                            <a class="site-header__collapse-link" asp-controller="Admin" asp-action="Index">@SharedLocalizer["Адмін-панель"]</a>
                         }
                         <form asp-controller="Auth" asp-action="Logout" method="post">
-                            <button type="submit" class="site-header__collapse-link border-0 bg-transparent text-start w-100">Вийти</button>
+                            <button type="submit" class="site-header__collapse-link border-0 bg-transparent text-start w-100">@SharedLocalizer["Вийти"]</button>
                         </form>
                     }
                     else
                     {
-                        <a class="site-header__collapse-link" asp-controller="Auth" asp-action="SignIn">Увійти</a>
-                        <a class="site-header__collapse-link" asp-controller="Auth" asp-action="SignUp">Реєстрація</a>
+                        <a class="site-header__collapse-link" asp-controller="Auth" asp-action="SignIn">@SharedLocalizer["Увійти"]</a>
+                        <a class="site-header__collapse-link" asp-controller="Auth" asp-action="SignUp">@SharedLocalizer["Реєстрація"]</a>
                     }
                 </div>
                 <div class="site-header__collapse-section">
-                    <a class="site-header__collapse-link" asp-controller="Home" asp-action="Index">Головна</a>
-                    <a class="site-header__collapse-link" asp-controller="Catalog" asp-action="Index">Усі товари</a>
+                    <a class="site-header__collapse-link" asp-controller="Home" asp-action="Index">@SharedLocalizer["Головна"]</a>
+                    <a class="site-header__collapse-link" asp-controller="Catalog" asp-action="Index">@SharedLocalizer["Усі товари"]</a>
                     @foreach (var category in headerCategories)
                     {
                         <a class="site-header__collapse-link" asp-controller="Catalog" asp-action="Index" asp-route-CategoryId="@category.Id">@category.Name</a>
@@ -188,7 +196,7 @@
             <div class="site-footer__inner">
                 <div class="site-footer__brand">
                     <a class="site-footer__logo" asp-controller="Home" asp-action="Index">Market<span>Place</span></a>
-                    <p class="site-footer__tagline">Маркетплейс, де покупці знаходять потрібне, а продавці розвивають свій бізнес.</p>
+                    <p class="site-footer__tagline">@SharedLocalizer["Маркетплейс, де покупці знаходять потрібне, а продавці розвивають свій бізнес."]</p>
                     <div class="site-footer__contacts">
                         <a href="mailto:support@marketplace.local">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-10 5L2 7" /></svg>
@@ -202,32 +210,32 @@
                 </div>
 
                 <div class="site-footer__col">
-                    <h3>Покупцям</h3>
-                    <a asp-controller="Catalog" asp-action="Index">Каталог товарів</a>
-                    <a asp-controller="Cart" asp-action="Index">Кошик</a>
-                    <a asp-controller="Profile" asp-action="Wishlist">Список бажань</a>
-                    <a asp-controller="Order" asp-action="Index">Мої замовлення</a>
+                    <h3>@SharedLocalizer["Покупцям"]</h3>
+                    <a asp-controller="Catalog" asp-action="Index">@SharedLocalizer["Каталог товарів"]</a>
+                    <a asp-controller="Cart" asp-action="Index">@SharedLocalizer["Кошик"]</a>
+                    <a asp-controller="Profile" asp-action="Wishlist">@SharedLocalizer["Список бажань"]</a>
+                    <a asp-controller="Order" asp-action="Index">@SharedLocalizer["Мої замовлення"]</a>
                 </div>
 
                 <div class="site-footer__col">
-                    <h3>Допомога</h3>
-                    <a asp-controller="Home" asp-action="ShippingPolicy">Доставка та оплата</a>
-                    <a asp-controller="Home" asp-action="ReturnsPolicy">Повернення та обмін</a>
-                    <a asp-controller="Home" asp-action="Support">Підтримка та FAQ</a>
+                    <h3>@SharedLocalizer["Допомога"]</h3>
+                    <a asp-controller="Home" asp-action="ShippingPolicy">@SharedLocalizer["Доставка та оплата"]</a>
+                    <a asp-controller="Home" asp-action="ReturnsPolicy">@SharedLocalizer["Повернення та обмін"]</a>
+                    <a asp-controller="Home" asp-action="Support">@SharedLocalizer["Підтримка та FAQ"]</a>
                 </div>
 
                 <div class="site-footer__col">
-                    <h3>Продавцям</h3>
-                    <a asp-controller="Business" asp-action="Index">Панель продавця</a>
-                    <a asp-controller="Business" asp-action="Create">Створити магазин</a>
-                    <a asp-controller="Home" asp-action="SellerRules">Правила для продавців</a>
+                    <h3>@SharedLocalizer["Продавцям"]</h3>
+                    <a asp-controller="Business" asp-action="Index">@SharedLocalizer["Панель продавця"]</a>
+                    <a asp-controller="Business" asp-action="Create">@SharedLocalizer["Створити магазин"]</a>
+                    <a asp-controller="Home" asp-action="SellerRules">@SharedLocalizer["Правила для продавців"]</a>
                 </div>
 
                 <div class="site-footer__col">
-                    <h3>Правова інформація</h3>
-                    <a asp-controller="Home" asp-action="Terms">Умови використання</a>
-                    <a asp-controller="Home" asp-action="Privacy">Конфіденційність</a>
-                    <a asp-controller="Home" asp-action="CookiePolicy">Політика кукі</a>
+                    <h3>@SharedLocalizer["Правова інформація"]</h3>
+                    <a asp-controller="Home" asp-action="Terms">@SharedLocalizer["Умови використання"]</a>
+                    <a asp-controller="Home" asp-action="Privacy">@SharedLocalizer["Конфіденційність"]</a>
+                    <a asp-controller="Home" asp-action="CookiePolicy">@SharedLocalizer["Політика кукі"]</a>
                 </div>
             </div>
         </div>
@@ -256,7 +264,7 @@
                     </a>
                 </div>
                 <div class="site-footer__payments">
-                    <span>Оплата карткою через LiqPay:</span>
+                    <span>@SharedLocalizer["Оплата карткою через LiqPay:"]</span>
                     <span class="site-footer__payment-badge">VISA</span>
                     <span class="site-footer__payment-badge">Mastercard</span>
                 </div>
@@ -271,7 +279,6 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/cookie-consent.js" asp-append-version="true"></script>
     <script src="~/js/search-autocomplete.js" asp-append-version="true"></script>
-    <script src="~/js/site-header.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
 

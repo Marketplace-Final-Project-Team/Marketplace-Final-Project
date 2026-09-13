@@ -168,12 +168,28 @@
 }
 
 .site-header__lang {
+    align-items: center;
     background: #fff;
+    border: 1px solid var(--sh-border);
     border-radius: 0.4rem;
+    display: flex;
     min-height: 1.9rem;
     min-width: 6rem;
-    overflow: hidden;
+}
+
+.site-header__lang-select {
+    background: transparent;
+    border: none;
+    color: var(--sh-text);
+    cursor: pointer;
+    font-size: 0.78rem;
+    height: 100%;
     padding: 0.1rem 0.35rem;
+    width: 100%;
+}
+
+.site-header__lang-select:focus {
+    outline: none;
 }
 
 .site-header__account {
@@ -374,28 +390,6 @@
     font-weight: 600;
     padding: 0.4rem 0;
     text-decoration: none;
-}
-
-/* Google Translate injects an automatic top banner as an iframe appended
-   directly to <body>, alongside a `top` offset on <body> itself to make room
-   for it. The offset is neutralized so the header doesn't visibly jump when a
-   translation is active. The banner iframe itself is intentionally NOT hidden
-   here anymore: Google renders more than one `iframe.skiptranslate` as a body
-   child, and the SIMPLE widget's own language-picker popup is one of them -
-   blanket-hiding by that class also hid the popup, breaking language
-   selection entirely. Trade-off accepted: the banner briefly shows while a
-   translation is active, same as on most other sites using this widget. */
-body {
-    top: 0 !important;
-}
-
-.goog-te-gadget {
-    font-size: 0.72rem !important;
-}
-
-.goog-te-gadget .goog-te-combo {
-    margin: 0.15rem 0 !important;
-    max-width: 6rem;
 }
 
 /* ---------- Responsive ---------- */
