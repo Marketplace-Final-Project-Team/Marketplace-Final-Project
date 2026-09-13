@@ -887,6 +887,31 @@ namespace Marketplace.Web.Controllers
             return RedirectToAction(nameof(Settings), new { businessId = model.BusinessId });
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RequestAdultStatus(Guid businessId)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.EditBusinessProfile);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var userId = _userManager.GetUserId(User);
+            var result = await _businessService.RequestAdultStatusAsync(businessId, userId!);
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded
+                ? "Заявку на розміщення 18+ контенту подано на розгляд адміністрації."
+                : result.Message;
+
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "AdultStatusRequested",
+                    "Магазин подав заявку на верифікацію 18+ контенту.", actorUserId: userId);
+            }
+
+            return RedirectToAction(nameof(Settings), new { businessId });
+        }
+
         private async Task<Business?> GetAccessibleBusinessOrNullAsync(Guid businessId)
         {
             var userId = _userManager.GetUserId(User);

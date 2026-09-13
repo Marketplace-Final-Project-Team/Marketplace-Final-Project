@@ -28,8 +28,6 @@
     <link rel="stylesheet" href="~/css/business.css" asp-append-version="true" />
 }
 
-}
-
 <div class="seller-dashboard">
     <a asp-action="Index" class="seller-order-back">← До панелі продавця</a>
 
@@ -48,6 +46,24 @@
     </header>
 
     <partial name="_BusinessNav" model="Model.BusinessId" />
+
+    <section class="business-panel" data-collapsible>
+        <partial name="_CollapseToggle" />
+        <h2>Що дозволяє кожна роль</h2>
+        <div class="table-responsive">
+            <table class="business-table">
+                <thead>
+                    <tr><th>Роль</th><th>Статистика й фінанси</th><th>Товари, промокоди та знижки</th><th>Команда</th><th>Налаштування магазину</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Власник</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+                    <tr><td>Адміністратор</td><td>✓</td><td>✓</td><td>✓</td><td>—</td></tr>
+                    <tr><td>Менеджер товарів</td><td>—</td><td>✓</td><td>—</td><td>—</td></tr>
+                    <tr><td>Бізнес-аналітик</td><td>✓</td><td>—</td><td>—</td><td>—</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
 
     @if (TempData["Success"] is string success)
     {

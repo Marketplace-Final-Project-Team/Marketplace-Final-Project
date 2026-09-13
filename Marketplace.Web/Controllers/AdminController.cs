@@ -25,6 +25,7 @@ namespace Marketplace.Web.Controllers
         private readonly ISchedulerFactory _schedulerFactory;
         private readonly IDiscountService _discountService;
         private readonly IOrderService _orderService;
+        private readonly IWithdrawalService _withdrawalService;
 
         public AdminController(
             IAdminService adminService,
@@ -36,7 +37,8 @@ namespace Marketplace.Web.Controllers
             ISchedulerFactory schedulerFactory,
             IBusinessService businessService,
             IDiscountService discountService,
-            IOrderService orderService)
+            IOrderService orderService,
+            IWithdrawalService withdrawalService)
         {
             _adminService = adminService;
             _settingsService = settingsService;
@@ -48,6 +50,7 @@ namespace Marketplace.Web.Controllers
             _businessService = businessService;
             _discountService = discountService;
             _orderService = orderService;
+            _withdrawalService = withdrawalService;
         }
 
         private string? CurrentAdminId => User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -57,6 +60,8 @@ namespace Marketplace.Web.Controllers
             var users = _adminService.GetUsers();
             var products = await _adminService.GetProductsAsync();
             var businesses = await _adminService.GetBusinessesAsync();
+            var adultRequests = await _adminService.GetPendingAdultRequestsAsync();
+            var pendingWithdrawals = await _withdrawalService.GetAllWithdrawalsAsync(WithdrawalStatus.Pending);
 
             var model = new AdminDashboardViewModel
             {
@@ -67,6 +72,9 @@ namespace Marketplace.Web.Controllers
                 BannedProducts = products.Count(p => p.Status == ProductStatus.Banned),
                 TotalBusinesses = businesses.Count,
                 PendingBusinesses = businesses.Count(b => b.Status == BusinessStatus.Pending),
+                PendingAdultRequests = adultRequests.Count,
+                AdultRequestsQueue = adultRequests.ToList(),
+                PendingWithdrawals = pendingWithdrawals.Count,
                 MarketplaceBalance = await _marketplaceBalanceService.GetBalanceAsync(),
             };
 
