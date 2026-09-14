@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Фінанси" xml:space="preserve">
+    <value>Finances</value>
+  </data>
+  <data name="Очікує підтвердження" xml:space="preserve">
+    <value>En attente de confirmation</value>
+  </data>
+  <data name="Підтверджено" xml:space="preserve">
+    <value>Confirmée</value>
+  </data>
+  <data name="Відправлено" xml:space="preserve">
+    <value>Expédiée</value>
+  </data>
+  <data name="Доставлено" xml:space="preserve">
+    <value>Livrée</value>
+  </data>
+  <data name="Скасовано" xml:space="preserve">
+    <value>Annulée</value>
+  </data>
+  <data name="Очікує розгляду" xml:space="preserve">
+    <value>En attente d'examen</value>
+  </data>
+  <data name="В обробці" xml:space="preserve">
+    <value>En cours de traitement</value>
+  </data>
+  <data name="Відхилено" xml:space="preserve">
+    <value>Rejetée</value>
+  </data>
+  <data name="Виплачено" xml:space="preserve">
+    <value>Payée</value>
+  </data>
+  <data name="Помилка виплати" xml:space="preserve">
+    <value>Erreur de paiement</value>
+  </data>
+  <data name="Оборот, продажі та стан виплат магазину." xml:space="preserve">
+    <value>Chiffre d'affaires, ventes et statut des paiements de la boutique.</value>
+  </data>
+  <data name="Оборот" xml:space="preserve">
+    <value>Chiffre d'affaires</value>
+  </data>
+  <data name="Продано одиниць" xml:space="preserve">
+    <value>Unités vendues</value>
+  </data>
+  <data name="Замовлень" xml:space="preserve">
+    <value>Commandes</value>
+  </data>
+  <data name="Середній чек" xml:space="preserve">
+    <value>Panier moyen</value>
+  </data>
+  <data name="Доступно до виплати" xml:space="preserve">
+    <value>Disponible pour paiement</value>
+  </data>
+  <data name="Динаміка обороту" xml:space="preserve">
+    <value>Évolution du chiffre d'affaires</value>
+  </data>
+  <data name="Виручка та замовлення за останні 30 днів." xml:space="preserve">
+    <value>Chiffre d'affaires et commandes des 30 derniers jours.</value>
+  </data>
+  <data name="Даних за останні 30 днів немає." xml:space="preserve">
+    <value>Aucune donnée pour les 30 derniers jours.</value>
+  </data>
+  <data name="Історія продажів" xml:space="preserve">
+    <value>Historique des ventes</value>
+  </data>
+  <data name="Останні замовлення, що містять товари цього магазину." xml:space="preserve">
+    <value>Dernières commandes contenant des produits de cette boutique.</value>
+  </data>
+  <data name="Продажів поки немає." xml:space="preserve">
+    <value>Aucune vente pour le moment.</value>
+  </data>
+  <data name="Замовлення" xml:space="preserve">
+    <value>Commande</value>
+  </data>
+  <data name="Дата" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="Статус" xml:space="preserve">
+    <value>Statut</value>
+  </data>
+  <data name="Товарів" xml:space="preserve">
+    <value>Articles</value>
+  </data>
+  <data name="Сума" xml:space="preserve">
+    <value>Montant</value>
+  </data>
+  <data name="Виплати" xml:space="preserve">
+    <value>Paiements</value>
+  </data>
+  <data name="Доступний баланс:" xml:space="preserve">
+    <value>Solde disponible :</value>
+  </data>
+  <data name="з них" xml:space="preserve">
+    <value>dont</value>
+  </data>
+  <data name="вже в заявках на розгляді" xml:space="preserve">
+    <value>déjà en demandes en attente</value>
+  </data>
+  <data name="Запросити виплату" xml:space="preserve">
+    <value>Demander un paiement</value>
+  </data>
+  <data name="Запит на виплату може подати лише власник магазину." xml:space="preserve">
+    <value>Seul le propriétaire de la boutique peut demander un paiement.</value>
+  </data>
+  <data name="Заявок на виплату ще не було." xml:space="preserve">
+    <value>Aucune demande de paiement pour le moment.</value>
+  </data>
+  <data name="Картка" xml:space="preserve">
+    <value>Carte</value>
+  </data>
+  <data name="Отримувач" xml:space="preserve">
+    <value>Bénéficiaire</value>
+  </data>
+  <data name="Податкові документи" xml:space="preserve">
+    <value>Documents fiscaux</value>
+  </data>
+  <data name="Акти, довідки та звіти для бухгалтерії." xml:space="preserve">
+    <value>Attestations, relevés et rapports pour la comptabilité.</value>
+  </data>
+  <data name="Документи з'являться тут після підключення автоматичних виплат." xml:space="preserve">
+    <value>Les documents apparaîtront ici une fois les paiements automatiques activés.</value>
+  </data>
+  <data name="Закрити" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="Запит на виплату" xml:space="preserve">
+    <value>Demande de paiement</value>
+  </data>
+  <data name="Магазин" xml:space="preserve">
+    <value>Boutique</value>
+  </data>
+  <data name="Доступно:" xml:space="preserve">
+    <value>Disponible :</value>
+  </data>
+  <data name="Сума до виплати, ₴" xml:space="preserve">
+    <value>Montant à payer, ₴</value>
+  </data>
+  <data name="Номер картки" xml:space="preserve">
+    <value>Numéro de carte</value>
+  </data>
+  <data name="Прізвище Ім'я" xml:space="preserve">
+    <value>Nom Prénom</value>
+  </data>
+  <data name="Надіслати запит" xml:space="preserve">
+    <value>Envoyer la demande</value>
+  </data>
+  <data name="Запит надіслано" xml:space="preserve">
+    <value>Demande envoyée</value>
+  </data>
+  <data name="Заявку передано на розгляд адміністрації маркетплейсу." xml:space="preserve">
+    <value>La demande a été transmise à l'administration de la marketplace pour examen.</value>
+  </data>
+</root>

@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Доступ заборонено";
+    ViewData["Title"] = Localizer["Доступ заборонено"].Value;
 }
 
 @section Styles {
@@ -17,15 +17,15 @@
         </div>
 
         <div class="error-copy">
-            <div class="error-kicker">Недостатньо прав</div>
-            <h1>Ця сторінка закрита</h1>
+            <div class="error-kicker">@Localizer["Недостатньо прав"]</div>
+            <h1>@Localizer["Ця сторінка закрита"]</h1>
             <p>
-                Ви увійшли до системи, але не маєте дозволу на цю дію.
-                Поверніться на головну або відкрийте доступний розділ.
+                @Localizer["Ви увійшли до системи, але не маєте дозволу на цю дію."]
+                @Localizer["Поверніться на головну або відкрийте доступний розділ."]
             </p>
             <div class="error-actions">
-                <a asp-controller="Home" asp-action="Index" class="btn btn-primary">На головну</a>
-                <a asp-controller="Catalog" asp-action="Index" class="btn btn-outline-secondary">До каталогу</a>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary">@Localizer["На головну"]</a>
+                <a asp-controller="Catalog" asp-action="Index" class="btn btn-outline-secondary">@Localizer["До каталогу"]</a>
             </div>
         </div>
     </section>

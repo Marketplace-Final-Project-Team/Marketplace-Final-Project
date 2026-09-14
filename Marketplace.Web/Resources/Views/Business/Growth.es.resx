@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Розвиток бізнесу" xml:space="preserve">
+    <value>Crecimiento del negocio</value>
+  </data>
+  <data name="Поради, які допомагають продавцям на платформі зростати." xml:space="preserve">
+    <value>Consejos que ayudan a los vendedores a crecer en la plataforma.</value>
+  </data>
+  <data name="Поради для зростання" xml:space="preserve">
+    <value>Consejos de crecimiento</value>
+  </data>
+  <data name="Загальні рекомендації - не персоналізована аналітика." xml:space="preserve">
+    <value>Recomendaciones generales - no es un análisis personalizado.</value>
+  </data>
+  <data name="Розширюйте асортимент" xml:space="preserve">
+    <value>Amplíe su surtido</value>
+  </data>
+  <data name="Магазини з ширшим вибором товарів частіше з'являються в результатах пошуку каталогу." xml:space="preserve">
+    <value>Las tiendas con una selección más amplia de productos aparecen más a menudo en los resultados de búsqueda del catálogo.</value>
+  </data>
+  <data name="Стежте за рейтингом" xml:space="preserve">
+    <value>Vigile su valoración</value>
+  </data>
+  <data name="Швидко реагуйте на відгуки та запитання покупців - це напряму впливає на довіру до магазину." xml:space="preserve">
+    <value>Responda rápidamente a las reseñas y preguntas de los clientes - esto afecta directamente a la confianza en la tienda.</value>
+  </data>
+  <data name="Тримайте залишки актуальними" xml:space="preserve">
+    <value>Mantenga el stock actualizado</value>
+  </data>
+  <data name="Товари з нульовим залишком не показуються покупцям - регулярно оновлюйте наявність." xml:space="preserve">
+    <value>Los productos sin stock no se muestran a los clientes - actualice la disponibilidad con regularidad.</value>
+  </data>
+  <data name="Прискорюйте обробку замовлень" xml:space="preserve">
+    <value>Acelere el procesamiento de pedidos</value>
+  </data>
+  <data name="Швидка зміна статусу замовлення покращує враження покупця та знижує ризик скасувань." xml:space="preserve">
+    <value>Actualizar rápidamente el estado del pedido mejora la experiencia del cliente y reduce el riesgo de cancelaciones.</value>
+  </data>
+  <data name="Плануйте вихід на нові ринки" xml:space="preserve">
+    <value>Planifique la expansión a nuevos mercados</value>
+  </data>
+  <data name="Міжнародні продажі та інтеграції з іншими майданчиками - у розробці платформи." xml:space="preserve">
+    <value>Las ventas internacionales y las integraciones con otras plataformas están en desarrollo.</value>
+  </data>
+  <data name="Розвивайте команду" xml:space="preserve">
+    <value>Haga crecer su equipo</value>
+  </data>
+  <data name="Додавайте учасників з ролями в розділі «Команда», щоб розподілити керування магазином." xml:space="preserve">
+    <value>Añada miembros con roles en la sección «Equipo» para repartir la gestión de la tienda.</value>
+  </data>
+</root>

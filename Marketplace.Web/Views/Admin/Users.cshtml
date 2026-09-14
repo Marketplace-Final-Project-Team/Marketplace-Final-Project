@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.AdminUsersPageViewModel
 
 @{
-    ViewData["Title"] = "Користувачі - Адмін-панель";
+    ViewData["Title"] = $"{Localizer["Користувачі"].Value} - {SharedLocalizer["Адмін-панель"].Value}";
     var users = Model.Result.Items;
 }
 
@@ -10,10 +10,10 @@
 }
 
 @functions {
-    private static string StatusLabel(Marketplace.Domain.Enums.UserStatus status) => status switch
+    private string StatusLabel(Marketplace.Domain.Enums.UserStatus status) => status switch
     {
-        Marketplace.Domain.Enums.UserStatus.Active => "Активний",
-        Marketplace.Domain.Enums.UserStatus.Banned => "Заблокований",
+        Marketplace.Domain.Enums.UserStatus.Active => Localizer["Активний"].Value,
+        Marketplace.Domain.Enums.UserStatus.Banned => Localizer["Заблокований"].Value,
         _ => status.ToString()
     };
 }
@@ -26,8 +26,8 @@
             <header class="admin-header">
                 <div>
                     <div class="admin-kicker">Admin</div>
-                    <h1 class="admin-title">Користувачі</h1>
-                    <p class="admin-subtitle">Знайдено <strong>@Model.Result.TotalItems</strong> користувачів.</p>
+                    <h1 class="admin-title">@Localizer["Користувачі"]</h1>
+                    <p class="admin-subtitle">@Localizer["Знайдено"] <strong>@Model.Result.TotalItems</strong> @Localizer["користувачів."]</p>
                 </div>
             </header>
 
@@ -37,24 +37,24 @@
                         <circle cx="11" cy="11" r="8" />
                         <path d="m21 21-4.3-4.3" />
                     </svg>
-                    <input type="search" class="form-control admin-search" name="Search" value="@Model.Filter.Search" placeholder="Пошук за email..." aria-label="Пошук користувачів" />
+                    <input type="search" class="form-control admin-search" name="Search" value="@Model.Filter.Search" placeholder="@Localizer["Пошук за email..."]" aria-label="@Localizer["Пошук користувачів"]" />
                 </div>
-                <select class="form-select" name="Status" aria-label="Фільтр за статусом" onchange="this.form.submit()">
-                    <option value="">Усі статуси</option>
-                    <option value="Active" selected="@(Model.Filter.Status == Marketplace.Domain.Enums.UserStatus.Active)">Активний</option>
-                    <option value="Banned" selected="@(Model.Filter.Status == Marketplace.Domain.Enums.UserStatus.Banned)">Заблокований</option>
+                <select class="form-select" name="Status" aria-label="@Localizer["Фільтр за статусом"]" onchange="this.form.submit()">
+                    <option value="">@Localizer["Усі статуси"]</option>
+                    <option value="Active" selected="@(Model.Filter.Status == Marketplace.Domain.Enums.UserStatus.Active)">@Localizer["Активний"]</option>
+                    <option value="Banned" selected="@(Model.Filter.Status == Marketplace.Domain.Enums.UserStatus.Banned)">@Localizer["Заблокований"]</option>
                 </select>
-                <select class="form-select" name="SortDescending" aria-label="Сортування" onchange="this.form.submit()">
-                    <option value="true" selected="@(Model.Filter.SortDescending != false)">Спочатку нові</option>
-                    <option value="false" selected="@(Model.Filter.SortDescending == false)">Спочатку старі</option>
+                <select class="form-select" name="SortDescending" aria-label="@Localizer["Сортування"]" onchange="this.form.submit()">
+                    <option value="true" selected="@(Model.Filter.SortDescending != false)">@Localizer["Спочатку нові"]</option>
+                    <option value="false" selected="@(Model.Filter.SortDescending == false)">@Localizer["Спочатку старі"]</option>
                 </select>
-                <button type="submit" class="btn btn-outline-secondary">Застосувати</button>
+                <button type="submit" class="btn btn-outline-secondary">@Localizer["Застосувати"]</button>
             </form>
 
             @if (users.Count == 0)
             {
                 <div class="admin-panel">
-                    <p class="admin-empty">Нічого не знайдено за цим запитом.</p>
+                    <p class="admin-empty">@Localizer["Нічого не знайдено за цим запитом."]</p>
                 </div>
             }
             else
@@ -64,8 +64,8 @@
                         <thead>
                             <tr>
                                 <th>Email</th>
-                                <th>Статус</th>
-                                <th class="text-end">Дії</th>
+                                <th>@Localizer["Статус"]</th>
+                                <th class="text-end">@Localizer["Дії"]</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -83,7 +83,7 @@
                                                 <form asp-action="ChangeUserStatus" method="post">
                                                     <input type="hidden" name="userId" value="@user.Id" />
                                                     <input type="hidden" name="status" value="Banned" />
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Заблокувати</button>
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">@Localizer["Заблокувати"]</button>
                                                 </form>
                                             }
                                             else
@@ -91,7 +91,7 @@
                                                 <form asp-action="ChangeUserStatus" method="post">
                                                     <input type="hidden" name="userId" value="@user.Id" />
                                                     <input type="hidden" name="status" value="Active" />
-                                                    <button type="submit" class="btn btn-sm btn-outline-success">Активувати</button>
+                                                    <button type="submit" class="btn btn-sm btn-outline-success">@Localizer["Активувати"]</button>
                                                 </form>
                                             }
                                         </div>

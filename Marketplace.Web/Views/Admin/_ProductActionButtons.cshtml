@@ -5,7 +5,7 @@
     <form asp-controller="Admin" asp-action="ChangeProductStatus" method="post">
         <input type="hidden" name="productId" value="@Model.Id" />
         <input type="hidden" name="status" value="Active" />
-        <button type="submit" class="btn btn-sm btn-outline-success">Активувати</button>
+        <button type="submit" class="btn btn-sm btn-outline-success">@Localizer["Активувати"]</button>
     </form>
 }
 @if (Model.Status != Marketplace.Domain.Enums.ProductStatus.Pending)
@@ -13,7 +13,7 @@
     <form asp-controller="Admin" asp-action="ChangeProductStatus" method="post">
         <input type="hidden" name="productId" value="@Model.Id" />
         <input type="hidden" name="status" value="Pending" />
-        <button type="submit" class="btn btn-sm btn-outline-secondary">На модерацію</button>
+        <button type="submit" class="btn btn-sm btn-outline-secondary">@Localizer["На модерацію"]</button>
     </form>
 }
 @if (Model.Status != Marketplace.Domain.Enums.ProductStatus.Banned)
@@ -21,6 +21,6 @@
     <form asp-controller="Admin" asp-action="ChangeProductStatus" method="post">
         <input type="hidden" name="productId" value="@Model.Id" />
         <input type="hidden" name="status" value="Banned" />
-        <button type="submit" class="btn btn-sm btn-outline-danger">Заблокувати</button>
+        <button type="submit" class="btn btn-sm btn-outline-danger">@Localizer["Заблокувати"]</button>
     </form>
 }

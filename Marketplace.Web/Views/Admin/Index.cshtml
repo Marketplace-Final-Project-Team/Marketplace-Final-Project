@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.AdminDashboardViewModel
 
 @{
-    ViewData["Title"] = "Адмін-панель";
+    ViewData["Title"] = SharedLocalizer["Адмін-панель"];
 }
 
 @section Styles {
@@ -16,8 +16,8 @@
             <header class="admin-header">
                 <div>
                     <div class="admin-kicker">Admin</div>
-                    <h1 class="admin-title">Дашборд</h1>
-                    <p class="admin-subtitle">Загальний стан маркетплейсу: користувачі, товари та магазини, що потребують уваги.</p>
+                    <h1 class="admin-title">@Localizer["Дашборд"]</h1>
+                    <p class="admin-subtitle">@Localizer["Загальний стан маркетплейсу: користувачі, товари та магазини, що потребують уваги."]</p>
                 </div>
             </header>
 
@@ -30,7 +30,7 @@
                 <div class="admin-alert admin-alert--error"><span>!</span><p>@error</p></div>
             }
 
-            <div class="admin-stats" aria-label="Загальна статистика">
+            <div class="admin-stats" aria-label="@Localizer["Загальна статистика"]">
                 <div class="admin-stat-card">
                     <span class="admin-stat-card__icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
@@ -41,9 +41,9 @@
                         </svg>
                     </span>
                     <div class="admin-stat-card__body">
-                        <span class="admin-stat-card__label">Користувачі</span>
+                        <span class="admin-stat-card__label">@Localizer["Користувачі"]</span>
                         <strong class="admin-stat-card__value">@Model.TotalUsers</strong>
-                        <span class="admin-stat-card__hint"><strong>@Model.BannedUsers</strong> заблоковано</span>
+                        <span class="admin-stat-card__hint"><strong>@Model.BannedUsers</strong> @Localizer["заблоковано"]</span>
                     </div>
                 </div>
                 <div class="admin-stat-card @(Model.PendingProducts > 0 ? "admin-stat-card--warning" : null)">
@@ -55,9 +55,9 @@
                         </svg>
                     </span>
                     <div class="admin-stat-card__body">
-                        <span class="admin-stat-card__label">Товари на модерації</span>
+                        <span class="admin-stat-card__label">@Localizer["Товари на модерації"]</span>
                         <strong class="admin-stat-card__value">@Model.PendingProducts</strong>
-                        <span class="admin-stat-card__hint">з <strong>@Model.TotalProducts</strong> усього · @Model.BannedProducts заблоковано</span>
+                        <span class="admin-stat-card__hint">@Localizer["з"] <strong>@Model.TotalProducts</strong> @Localizer["усього ·"] @Model.BannedProducts @Localizer["заблоковано"]</span>
                     </div>
                 </div>
                 <div class="admin-stat-card @(Model.PendingBusinesses > 0 ? "admin-stat-card--warning" : null)">
@@ -70,9 +70,9 @@
                         </svg>
                     </span>
                     <div class="admin-stat-card__body">
-                        <span class="admin-stat-card__label">Магазини на перевірці</span>
+                        <span class="admin-stat-card__label">@Localizer["Магазини на перевірці"]</span>
                         <strong class="admin-stat-card__value">@Model.PendingBusinesses</strong>
-                        <span class="admin-stat-card__hint">з <strong>@Model.TotalBusinesses</strong> усього</span>
+                        <span class="admin-stat-card__hint">@Localizer["з"] <strong>@Model.TotalBusinesses</strong> @Localizer["усього"]</span>
                     </div>
                 </div>
                 <div class="admin-stat-card @(Model.PendingAdultRequests > 0 ? "admin-stat-card--warning" : null)">
@@ -84,9 +84,9 @@
                         </svg>
                     </span>
                     <div class="admin-stat-card__body">
-                        <span class="admin-stat-card__label">Очікують верифікації 18+</span>
+                        <span class="admin-stat-card__label">@Localizer["Очікують верифікації 18+"]</span>
                         <strong class="admin-stat-card__value">@Model.PendingAdultRequests</strong>
-                        <span class="admin-stat-card__hint">Заявки магазинів на розміщення 18+ контенту</span>
+                        <span class="admin-stat-card__hint">@Localizer["Заявки магазинів на розміщення 18+ контенту"]</span>
                     </div>
                 </div>
                 <div class="admin-stat-card @(Model.PendingWithdrawals > 0 ? "admin-stat-card--warning" : null)">
@@ -98,9 +98,9 @@
                         </svg>
                     </span>
                     <div class="admin-stat-card__body">
-                        <span class="admin-stat-card__label">Заявки на виплату</span>
+                        <span class="admin-stat-card__label">@Localizer["Заявки на виплату"]</span>
                         <strong class="admin-stat-card__value">@Model.PendingWithdrawals</strong>
-                        <span class="admin-stat-card__hint"><a asp-controller="Withdrawal" asp-action="Withdrawals">Переглянути →</a></span>
+                        <span class="admin-stat-card__hint"><a asp-controller="Withdrawal" asp-action="Withdrawals">@Localizer["Переглянути →"]</a></span>
                     </div>
                 </div>
                 <div class="admin-stat-card">
@@ -111,38 +111,38 @@
                         </svg>
                     </span>
                     <div class="admin-stat-card__body">
-                        <span class="admin-stat-card__label">Баланс маркетплейсу</span>
+                        <span class="admin-stat-card__label">@Localizer["Баланс маркетплейсу"]</span>
                         <strong class="admin-stat-card__value">@Model.MarketplaceBalance.ToString("N0") ₴</strong>
-                        <span class="admin-stat-card__hint">Накопичена комісія з продажів</span>
+                        <span class="admin-stat-card__hint">@Localizer["Накопичена комісія з продажів"]</span>
                     </div>
                 </div>
             </div>
 
             @if (Model.AdultRequestsQueue.Count > 0)
             {
-                <h2 class="admin-section-heading">Заявки на 18+ контент</h2>
+                <h2 class="admin-section-heading">@Localizer["Заявки на 18+ контент"]</h2>
                 <section class="admin-panel table-responsive">
                     <table class="table admin-table">
                         <thead>
-                            <tr><th>Магазин</th><th>Власник</th><th class="text-end">Дії</th></tr>
+                            <tr><th>@Localizer["Магазин"]</th><th>@Localizer["Власник"]</th><th class="text-end">@Localizer["Дії"]</th></tr>
                         </thead>
                         <tbody>
                             @foreach (var business in Model.AdultRequestsQueue)
                             {
                                 <tr>
-                                    <td class="admin-entity-name">@(string.IsNullOrWhiteSpace(business.Name) ? "Без назви" : business.Name)</td>
+                                    <td class="admin-entity-name">@(string.IsNullOrWhiteSpace(business.Name) ? Localizer["Без назви"] : business.Name)</td>
                                     <td>@business.Owner</td>
                                     <td class="text-end">
                                         <form asp-action="ApproveAdultStatus" method="post" class="d-inline">
                                             <input type="hidden" name="businessId" value="@business.Id" />
                                             <input type="hidden" name="returnUrl" value="@Url.Action("Index")" />
-                                            <button type="submit" class="btn btn-sm btn-outline-success">Підтвердити 18+</button>
+                                            <button type="submit" class="btn btn-sm btn-outline-success">@Localizer["Підтвердити 18+"]</button>
                                         </form>
                                         <form asp-action="RejectAdultStatus" method="post" class="admin-inline-form">
                                             <input type="hidden" name="businessId" value="@business.Id" />
                                             <input type="hidden" name="returnUrl" value="@Url.Action("Index")" />
-                                            <input type="text" name="reason" placeholder="Причина відхилення" class="admin-inline-form__input" required />
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">Відхилити</button>
+                                            <input type="text" name="reason" placeholder="@Localizer["Причина відхилення"]" class="admin-inline-form__input" required />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">@Localizer["Відхилити"]</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -152,7 +152,7 @@
                 </section>
             }
 
-            <h2 class="admin-section-heading">Швидкі дії</h2>
+            <h2 class="admin-section-heading">@Localizer["Швидкі дії"]</h2>
             <div class="admin-quick-links">
                 <a class="admin-quick-link" asp-action="Users">
                     <span class="admin-quick-link__icon" aria-hidden="true">
@@ -164,8 +164,8 @@
                         </svg>
                     </span>
                     <div>
-                        <strong>Керувати користувачами</strong>
-                        <span>Блокування та відновлення акаунтів</span>
+                        <strong>@Localizer["Керувати користувачами"]</strong>
+                        <span>@Localizer["Блокування та відновлення акаунтів"]</span>
                     </div>
                     <span class="admin-quick-link__arrow" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
@@ -183,8 +183,8 @@
                         </svg>
                     </span>
                     <div>
-                        <strong>Модерувати товари</strong>
-                        <span>Активація, модерація, блокування</span>
+                        <strong>@Localizer["Модерувати товари"]</strong>
+                        <span>@Localizer["Активація, модерація, блокування"]</span>
                     </div>
                     <span class="admin-quick-link__arrow" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
@@ -203,8 +203,8 @@
                         </svg>
                     </span>
                     <div>
-                        <strong>Перевіряти магазини</strong>
-                        <span>Схвалення та призупинення бізнесів</span>
+                        <strong>@Localizer["Перевіряти магазини"]</strong>
+                        <span>@Localizer["Схвалення та призупинення бізнесів"]</span>
                     </div>
                     <span class="admin-quick-link__arrow" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
@@ -223,8 +223,8 @@
                         </svg>
                     </span>
                     <div>
-                        <strong>Статистика</strong>
-                        <span>Оборот і дохід по магазинах та в часі</span>
+                        <strong>@Localizer["Статистика"]</strong>
+                        <span>@Localizer["Оборот і дохід по магазинах та в часі"]</span>
                     </div>
                     <span class="admin-quick-link__arrow" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
@@ -235,7 +235,7 @@
                 </a>
             </div>
 
-            <h2 class="admin-section-heading">Система</h2>
+            <h2 class="admin-section-heading">@Localizer["Система"]</h2>
             <div class="admin-quick-links">
                 <a class="admin-quick-link" asp-controller="Withdrawal" asp-action="Withdrawals">
                     <span class="admin-quick-link__icon" aria-hidden="true">
@@ -246,8 +246,8 @@
                         </svg>
                     </span>
                     <div>
-                        <strong>Виплати</strong>
-                        <span>Заявки продавців на виведення коштів</span>
+                        <strong>@Localizer["Виплати"]</strong>
+                        <span>@Localizer["Заявки продавців на виведення коштів"]</span>
                     </div>
                     <span class="admin-quick-link__arrow" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
@@ -264,8 +264,8 @@
                         </svg>
                     </span>
                     <div>
-                        <strong>Фонові задачі</strong>
-                        <span>Розклад, статус, ручний запуск</span>
+                        <strong>@Localizer["Фонові задачі"]</strong>
+                        <span>@Localizer["Розклад, статус, ручний запуск"]</span>
                     </div>
                     <span class="admin-quick-link__arrow" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
@@ -282,8 +282,8 @@
                         </svg>
                     </span>
                     <div>
-                        <strong>Ліміти бізнесу</strong>
-                        <span>Товари, знижки, промокоди</span>
+                        <strong>@Localizer["Ліміти бізнесу"]</strong>
+                        <span>@Localizer["Товари, знижки, промокоди"]</span>
                     </div>
                     <span class="admin-quick-link__arrow" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
@@ -300,8 +300,8 @@
                         </svg>
                     </span>
                     <div>
-                        <strong>Баланс маркетплейсу</strong>
-                        <span>Комісія з продажів, ставка</span>
+                        <strong>@Localizer["Баланс маркетплейсу"]</strong>
+                        <span>@Localizer["Комісія з продажів, ставка"]</span>
                     </div>
                     <span class="admin-quick-link__arrow" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
@@ -320,8 +320,8 @@
                         </svg>
                     </span>
                     <div>
-                        <strong>Журнал користувачів</strong>
-                        <span>Реєстрації, входи, замовлення</span>
+                        <strong>@Localizer["Журнал користувачів"]</strong>
+                        <span>@Localizer["Реєстрації, входи, замовлення"]</span>
                     </div>
                     <span class="admin-quick-link__arrow" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
@@ -340,8 +340,8 @@
                         </svg>
                     </span>
                     <div>
-                        <strong>Журнал бізнесів</strong>
-                        <span>Товари, знижки, промокоди, статуси</span>
+                        <strong>@Localizer["Журнал бізнесів"]</strong>
+                        <span>@Localizer["Товари, знижки, промокоди, статуси"]</span>
                     </div>
                     <span class="admin-quick-link__arrow" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">

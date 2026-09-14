@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.BusinessCreateViewModel
 
 @{
-    ViewData["Title"] = "Створення бізнесу";
+    ViewData["Title"] = Localizer["Створення бізнесу"];
 }
 
 @section Styles {
@@ -9,45 +9,45 @@
 }
 
 <div class="seller-dashboard">
-    <a asp-action="Index" class="seller-form-back">← До панелі продавця</a>
+    <a asp-action="Index" class="seller-form-back">← @SharedLocalizer["Панель продавця"]</a>
 
     <div class="seller-form-card">
-        <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Панель продавця</div>
-        <h1>Створення бізнесу</h1>
-        <p>Заповніть основну інформацію - після створення магазин відправиться на перевірку.</p>
+        <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> @SharedLocalizer["Панель продавця"]</div>
+        <h1>@Localizer["Створення бізнесу"]</h1>
+        <p>@Localizer["Заповніть основну інформацію - після створення магазин відправиться на перевірку."]</p>
 
         <form asp-controller="Business" asp-action="Create" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
             <div class="seller-form-field">
-                <label asp-for="StoreName" class="form-label">Назва магазину</label>
-                <input asp-for="StoreName" class="form-control" placeholder="Назва вашого магазину" />
+                <label asp-for="StoreName" class="form-label">@Localizer["Назва магазину"]</label>
+                <input asp-for="StoreName" class="form-control" placeholder="@Localizer["Назва вашого магазину"]" />
                 <span asp-validation-for="StoreName" class="text-danger small"></span>
             </div>
 
             <div class="seller-form-field">
-                <label asp-for="Description" class="form-label">Опис бізнесу</label>
-                <textarea asp-for="Description" class="form-control" rows="4" placeholder="Опишіть свій бізнес"></textarea>
+                <label asp-for="Description" class="form-label">@Localizer["Опис бізнесу"]</label>
+                <textarea asp-for="Description" class="form-control" rows="4" placeholder="@Localizer["Опишіть свій бізнес"]"></textarea>
                 <span asp-validation-for="Description" class="text-danger small"></span>
             </div>
 
             <div class="seller-form-field">
-                <label asp-for="Logo" class="form-label">Логотип</label>
+                <label asp-for="Logo" class="form-label">@Localizer["Логотип"]</label>
                 <input asp-for="Logo" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
                 <span asp-validation-for="Logo" class="text-danger small"></span>
-                <p class="seller-form-hint">JPG, PNG або WEBP, до 5 МБ</p>
+                <p class="seller-form-hint">@Localizer["JPG, PNG або WEBP, до 5 МБ"]</p>
             </div>
 
             <div class="seller-form-field">
-                <label asp-for="Banner" class="form-label">Банер</label>
+                <label asp-for="Banner" class="form-label">@Localizer["Банер"]</label>
                 <input asp-for="Banner" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp" />
                 <span asp-validation-for="Banner" class="text-danger small"></span>
-                <p class="seller-form-hint">JPG, PNG або WEBP, до 5 МБ</p>
+                <p class="seller-form-hint">@Localizer["JPG, PNG або WEBP, до 5 МБ"]</p>
             </div>
 
             <div class="seller-form-actions">
-                <a asp-action="Index" class="seller-button seller-button--secondary">Скасувати</a>
-                <button type="submit" class="seller-button seller-button--primary">Створити</button>
+                <a asp-action="Index" class="seller-button seller-button--secondary">@Localizer["Скасувати"]</a>
+                <button type="submit" class="seller-button seller-button--primary">@Localizer["Створити"]</button>
             </div>
         </form>
     </div>

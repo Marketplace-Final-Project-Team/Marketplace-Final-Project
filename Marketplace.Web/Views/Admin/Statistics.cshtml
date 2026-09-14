@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.AdminStatisticsPageViewModel
 
 @{
-    ViewData["Title"] = "Статистика - Адмін-панель";
+    ViewData["Title"] = $"{Localizer["Статистика"].Value} - {SharedLocalizer["Адмін-панель"].Value}";
     var overview = Model.Overview;
 
     var periodJson = System.Text.Json.JsonSerializer.Serialize(overview.ByPeriod.Select(p => new
@@ -13,7 +13,7 @@
 
     var businessesJson = System.Text.Json.JsonSerializer.Serialize(overview.Businesses.Take(10).Select(b => new
     {
-        name = string.IsNullOrWhiteSpace(b.StoreName) ? "Без назви" : b.StoreName,
+        name = string.IsNullOrWhiteSpace(b.StoreName) ? Localizer["Без назви"].Value : b.StoreName,
         turnover = b.Turnover
     }));
 
@@ -38,38 +38,38 @@
             <header class="admin-header">
                 <div>
                     <div class="admin-kicker">Admin</div>
-                    <h1 class="admin-title">Статистика</h1>
-                    <p class="admin-subtitle">Товарооборот і дохід маркетплейсу за період - по магазинах і в часі. Враховує лише замовлення, що дійшли принаймні до статусу «Підтверджено».</p>
+                    <h1 class="admin-title">@Localizer["Статистика"]</h1>
+                    <p class="admin-subtitle">@Localizer["Товарооборот і дохід маркетплейсу за період - по магазинах і в часі. Враховує лише замовлення, що дійшли принаймні до статусу «Підтверджено»."]</p>
                 </div>
             </header>
 
             <form method="get" asp-action="Statistics" class="admin-toolbar admin-toolbar--center">
                 <div>
-                    <label for="startDate" class="admin-toolbar__label">З дати</label>
+                    <label for="startDate" class="admin-toolbar__label">@Localizer["З дати"]</label>
                     <input type="date" id="startDate" class="form-control" name="StartDate" value="@Model.Filter.StartDate?.ToString("yyyy-MM-dd")" />
                 </div>
                 <div>
-                    <label for="endDate" class="admin-toolbar__label">По дату</label>
+                    <label for="endDate" class="admin-toolbar__label">@Localizer["По дату"]</label>
                     <input type="date" id="endDate" class="form-control" name="EndDate" value="@Model.Filter.EndDate?.ToString("yyyy-MM-dd")" />
                 </div>
                 <div>
-                    <label for="businessId" class="admin-toolbar__label">Магазин</label>
+                    <label for="businessId" class="admin-toolbar__label">@Localizer["Магазин"]</label>
                     <select id="businessId" name="BusinessId" class="form-select">
-                        <option value="">Усі магазини</option>
+                        <option value="">@Localizer["Усі магазини"]</option>
                         @foreach (var business in Model.Businesses)
                         {
-                            <option value="@business.Id" selected="@(Model.Filter.BusinessId == business.Id)">@(string.IsNullOrWhiteSpace(business.Name) ? "Без назви" : business.Name)</option>
+                            <option value="@business.Id" selected="@(Model.Filter.BusinessId == business.Id)">@(string.IsNullOrWhiteSpace(business.Name) ? Localizer["Без назви"] : business.Name)</option>
                         }
                     </select>
                 </div>
-                <button type="submit" class="btn btn-outline-secondary">Застосувати</button>
+                <button type="submit" class="btn btn-outline-secondary">@Localizer["Застосувати"]</button>
                 @if (Model.Filter.StartDate.HasValue || Model.Filter.EndDate.HasValue || Model.Filter.BusinessId.HasValue)
                 {
-                    <a asp-action="Statistics" class="btn btn-outline-secondary">Скинути</a>
+                    <a asp-action="Statistics" class="btn btn-outline-secondary">@Localizer["Скинути"]</a>
                 }
             </form>
 
-            <div class="admin-stats" aria-label="Загальна статистика">
+            <div class="admin-stats" aria-label="@Localizer["Загальна статистика"]">
                 <div class="admin-stat-card">
                     <span class="admin-stat-card__icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
@@ -80,9 +80,9 @@
                         </svg>
                     </span>
                     <div class="admin-stat-card__body">
-                        <span class="admin-stat-card__label">Товарооборот</span>
+                        <span class="admin-stat-card__label">@Localizer["Товарооборот"]</span>
                         <strong class="admin-stat-card__value">@overview.TotalTurnover.ToString("N2") ₴</strong>
-                        <span class="admin-stat-card__hint">Сума всіх позицій продажів</span>
+                        <span class="admin-stat-card__hint">@Localizer["Сума всіх позицій продажів"]</span>
                     </div>
                 </div>
                 <div class="admin-stat-card">
@@ -93,9 +93,9 @@
                         </svg>
                     </span>
                     <div class="admin-stat-card__body">
-                        <span class="admin-stat-card__label">Дохід маркетплейсу</span>
+                        <span class="admin-stat-card__label">@Localizer["Дохід маркетплейсу"]</span>
                         <strong class="admin-stat-card__value">@overview.TotalMarketplaceRevenue.ToString("N2") ₴</strong>
-                        <span class="admin-stat-card__hint">Комісія з продажів за період</span>
+                        <span class="admin-stat-card__hint">@Localizer["Комісія з продажів за період"]</span>
                     </div>
                 </div>
                 <div class="admin-stat-card">
@@ -107,9 +107,9 @@
                         </svg>
                     </span>
                     <div class="admin-stat-card__body">
-                        <span class="admin-stat-card__label">Продажів</span>
+                        <span class="admin-stat-card__label">@Localizer["Продажів"]</span>
                         <strong class="admin-stat-card__value">@overview.TotalOrders</strong>
-                        <span class="admin-stat-card__hint">@overview.TotalUnitsSold шт. товарів</span>
+                        <span class="admin-stat-card__hint">@overview.TotalUnitsSold @Localizer["шт. товарів"]</span>
                     </div>
                 </div>
                 <div class="admin-stat-card">
@@ -121,19 +121,19 @@
                         </svg>
                     </span>
                     <div class="admin-stat-card__body">
-                        <span class="admin-stat-card__label">Магазинів</span>
+                        <span class="admin-stat-card__label">@Localizer["Магазинів"]</span>
                         <strong class="admin-stat-card__value">@overview.ActiveBusinessCount / @overview.TotalBusinessCount</strong>
-                        <span class="admin-stat-card__hint">Активних із загальної кількості - @overview.TotalProductCount товарів</span>
+                        <span class="admin-stat-card__hint">@Localizer["Активних із загальної кількості - {0} товарів", overview.TotalProductCount]</span>
                     </div>
                 </div>
             </div>
 
             <div class="admin-two-col">
                 <div class="admin-panel admin-chart-card">
-                    <h2 class="admin-section-heading admin-section-heading--tight">Товарооборот у часі</h2>
+                    <h2 class="admin-section-heading admin-section-heading--tight">@Localizer["Товарооборот у часі"]</h2>
                     @if (overview.ByPeriod.Count == 0)
                     {
-                        <p class="admin-empty">За обраний період продажів немає.</p>
+                        <p class="admin-empty">@Localizer["За обраний період продажів немає."]</p>
                     }
                     else
                     {
@@ -143,10 +143,10 @@
                     }
                 </div>
                 <div class="admin-panel admin-chart-card">
-                    <h2 class="admin-section-heading admin-section-heading--tight">Оборот за магазинами</h2>
+                    <h2 class="admin-section-heading admin-section-heading--tight">@Localizer["Оборот за магазинами"]</h2>
                     @if (overview.Businesses.Count == 0)
                     {
-                        <p class="admin-empty">За обраний період продажів немає.</p>
+                        <p class="admin-empty">@Localizer["За обраний період продажів немає."]</p>
                     }
                     else
                     {
@@ -156,10 +156,10 @@
                     }
                 </div>
                 <div class="admin-panel admin-chart-card">
-                    <h2 class="admin-section-heading admin-section-heading--tight">Продажі за категоріями</h2>
+                    <h2 class="admin-section-heading admin-section-heading--tight">@Localizer["Продажі за категоріями"]</h2>
                     @if (overview.Categories.Count == 0)
                     {
-                        <p class="admin-empty">За обраний період продажів немає.</p>
+                        <p class="admin-empty">@Localizer["За обраний період продажів немає."]</p>
                     }
                     else
                     {
@@ -170,11 +170,11 @@
                 </div>
             </div>
 
-            <h2 class="admin-section-heading">За магазинами</h2>
+            <h2 class="admin-section-heading">@Localizer["За магазинами"]</h2>
             @if (overview.Businesses.Count == 0)
             {
                 <div class="admin-panel">
-                    <p class="admin-empty">За обраний період продажів немає.</p>
+                    <p class="admin-empty">@Localizer["За обраний період продажів немає."]</p>
                 </div>
             }
             else
@@ -183,19 +183,19 @@
                     <table class="table admin-table">
                         <thead>
                             <tr>
-                                <th>Магазин</th>
-                                <th>Товарів</th>
-                                <th>Продажів</th>
-                                <th>Одиниць</th>
-                                <th>Оборот</th>
-                                <th>Дохід маркетплейсу</th>
-                                <th>Середній чек</th>
+                                <th>@Localizer["Магазин"]</th>
+                                <th>@Localizer["Товарів"]</th>
+                                <th>@Localizer["Продажів"]</th>
+                                <th>@Localizer["Одиниць"]</th>
+                                <th>@Localizer["Оборот"]</th>
+                                <th>@Localizer["Дохід маркетплейсу"]</th>
+                                <th>@Localizer["Середній чек"]</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var b in overview.Businesses)
                             {
-                                var name = string.IsNullOrWhiteSpace(b.StoreName) ? "Без назви" : b.StoreName;
+                                var name = string.IsNullOrWhiteSpace(b.StoreName) ? Localizer["Без назви"].Value : b.StoreName;
                                 var initial = name[..1].ToUpperInvariant();
 
                                 <tr>
@@ -225,11 +225,11 @@
                 </div>
             }
 
-            <h2 class="admin-section-heading">За категоріями</h2>
+            <h2 class="admin-section-heading">@Localizer["За категоріями"]</h2>
             @if (overview.Categories.Count == 0)
             {
                 <div class="admin-panel">
-                    <p class="admin-empty">За обраний період продажів немає.</p>
+                    <p class="admin-empty">@Localizer["За обраний період продажів немає."]</p>
                 </div>
             }
             else
@@ -238,10 +238,10 @@
                     <table class="table admin-table">
                         <thead>
                             <tr>
-                                <th>Категорія</th>
-                                <th>Продажів</th>
-                                <th>Одиниць</th>
-                                <th>Оборот</th>
+                                <th>@Localizer["Категорія"]</th>
+                                <th>@Localizer["Продажів"]</th>
+                                <th>@Localizer["Одиниць"]</th>
+                                <th>@Localizer["Оборот"]</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -259,11 +259,11 @@
                 </div>
             }
 
-            <h2 class="admin-section-heading">У часі</h2>
+            <h2 class="admin-section-heading">@Localizer["У часі"]</h2>
             @if (overview.ByPeriod.Count == 0)
             {
                 <div class="admin-panel">
-                    <p class="admin-empty">За обраний період продажів немає.</p>
+                    <p class="admin-empty">@Localizer["За обраний період продажів немає."]</p>
                 </div>
             }
             else
@@ -272,10 +272,10 @@
                     <table class="table admin-table">
                         <thead>
                             <tr>
-                                <th>Період</th>
-                                <th>Продажів</th>
-                                <th>Оборот</th>
-                                <th>Дохід маркетплейсу</th>
+                                <th>@Localizer["Період"]</th>
+                                <th>@Localizer["Продажів"]</th>
+                                <th>@Localizer["Оборот"]</th>
+                                <th>@Localizer["Дохід маркетплейсу"]</th>
                             </tr>
                         </thead>
                         <tbody>

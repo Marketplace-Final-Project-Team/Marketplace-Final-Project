@@ -1,7 +1,7 @@
 @model ProfileViewModel
 
 @{
-    ViewData["Title"] = "Мій профіль";
+    ViewData["Title"] = SharedLocalizer["Мій профіль"];
     var profileInitial = string.IsNullOrWhiteSpace(Model.Username)
         ? "U"
         : Model.Username[..1].ToUpperInvariant();
@@ -14,14 +14,14 @@
 <div class="profile-page">
     <div class="profile-summary">
         <div class="profile-summary__row">
-            <a asp-action="UpdateProfile" class="profile-avatar-wrap" aria-label="Змінити аватар">
+            <a asp-action="UpdateProfile" class="profile-avatar-wrap" aria-label="@Localizer["Змінити аватар"]">
                 @if (!string.IsNullOrEmpty(Model.Avatar))
                 {
-                    <img src="@Model.Avatar" class="profile-avatar" alt="Аватар користувача @Model.Username" />
+                    <img src="@Model.Avatar" class="profile-avatar" alt="@Localizer["Аватар користувача"] @Model.Username" />
                 }
                 else
                 {
-                    <span class="profile-avatar profile-avatar--fallback" role="img" aria-label="Аватар користувача @Model.Username">@profileInitial</span>
+                    <span class="profile-avatar profile-avatar--fallback" role="img" aria-label="@Localizer["Аватар користувача"] @Model.Username">@profileInitial</span>
                 }
                 <span class="profile-avatar-edit" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
@@ -52,18 +52,18 @@
                                 </svg>
                             </span>
                             <span class="profile-discount-widget__text" data-discount-display>
-                                <strong>-@Model.PersonalDiscounts[0].Percent.ToString("0.##")%</strong> в «@Model.PersonalDiscounts[0].StoreName»
+                                <strong>-@Model.PersonalDiscounts[0].Percent.ToString("0.##")%</strong> @Localizer["в"] «@Model.PersonalDiscounts[0].StoreName»
                             </span>
                         </div>
 
                         <div class="profile-discount-widget__tooltip">
-                            <div class="profile-discount-widget__tooltip-title">Ваші персональні знижки</div>
+                            <div class="profile-discount-widget__tooltip-title">@Localizer["Ваші персональні знижки"]</div>
                             @foreach (var discount in Model.PersonalDiscounts)
                             {
                                 <div class="profile-discount-widget__tooltip-item">
                                     <div>
                                         <span class="profile-discount-widget__tooltip-store">@discount.StoreName</span>
-                                        <span class="profile-discount-widget__tooltip-date">до @discount.EndDate.ToLocalTime().ToString("dd.MM.yyyy")</span>
+                                        <span class="profile-discount-widget__tooltip-date">@Localizer["до"] @discount.EndDate.ToLocalTime().ToString("dd.MM.yyyy")</span>
                                     </div>
                                     <strong>-@discount.Percent.ToString("0.##")%</strong>
                                 </div>
@@ -85,8 +85,8 @@
                 </svg>
             </span>
             <div>
-                <strong>Мої замовлення</strong>
-                <span>Історія покупок і статус доставки</span>
+                <strong>@SharedLocalizer["Мої замовлення"]</strong>
+                <span>@Localizer["Історія покупок і статус доставки"]</span>
                 <span class="profile-hub-card__badge">@Model.OrdersCount</span>
             </div>
         </a>
@@ -99,8 +99,8 @@
                 </svg>
             </span>
             <div>
-                <strong>Адреси</strong>
-                <span>Керуйте адресами доставки</span>
+                <strong>@Localizer["Адреси"]</strong>
+                <span>@Localizer["Керуйте адресами доставки"]</span>
                 <span class="profile-hub-card__badge">@Model.AddressesCount</span>
             </div>
         </a>
@@ -112,8 +112,8 @@
                 </svg>
             </span>
             <div>
-                <strong>Список бажань</strong>
-                <span>Товари, які ви зберегли</span>
+                <strong>@SharedLocalizer["Список бажань"]</strong>
+                <span>@Localizer["Товари, які ви зберегли"]</span>
                 <span class="profile-hub-card__badge">@Model.WishlistCount</span>
             </div>
         </a>
@@ -126,8 +126,8 @@
                 </svg>
             </span>
             <div>
-                <strong>Мої знижки</strong>
-                <span>Персональні знижки від продавців</span>
+                <strong>@Localizer["Мої знижки"]</strong>
+                <span>@Localizer["Персональні знижки від продавців"]</span>
                 <span class="profile-hub-card__badge">@Model.DiscountsCount</span>
             </div>
         </a>
@@ -141,8 +141,8 @@
                 </svg>
             </span>
             <div>
-                <strong>Колекції бажань</strong>
-                <span>Групуйте товари за своїми списками</span>
+                <strong>@Localizer["Колекції бажань"]</strong>
+                <span>@Localizer["Групуйте товари за своїми списками"]</span>
             </div>
         </a>
 
@@ -154,8 +154,8 @@
                 </svg>
             </span>
             <div>
-                <strong>Сповіщення</strong>
-                <span>Останні події за вашими замовленнями</span>
+                <strong>@Localizer["Сповіщення"]</strong>
+                <span>@Localizer["Останні події за вашими замовленнями"]</span>
             </div>
         </a>
 
@@ -167,8 +167,8 @@
                 </svg>
             </span>
             <div>
-                <strong>Налаштування профілю</strong>
-                <span>Ім'я користувача та аватар</span>
+                <strong>@Localizer["Налаштування профілю"]</strong>
+                <span>@Localizer["Ім'я користувача та аватар"]</span>
             </div>
         </a>
 
@@ -180,14 +180,14 @@
                 </svg>
             </span>
             <div>
-                <strong>Зміна пароля</strong>
-                <span>Оновіть пароль для входу</span>
+                <strong>@Localizer["Зміна пароля"]</strong>
+                <span>@Localizer["Оновіть пароль для входу"]</span>
             </div>
         </a>
     </div>
 
     <div class="mt-3">
-        <a asp-action="ChangeEmail" class="btn btn-outline-secondary">Змінити Email</a>
+        <a asp-action="ChangeEmail" class="btn btn-outline-secondary">@Localizer["Змінити Email"]</a>
     </div>
 </div>
 

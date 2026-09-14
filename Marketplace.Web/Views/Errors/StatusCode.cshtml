@@ -1,7 +1,7 @@
 @model int
 
 @{
-    ViewData["Title"] = "Помилка";
+    ViewData["Title"] = Localizer["Помилка"].Value;
 }
 
 @section Styles {
@@ -14,11 +14,11 @@
             <span class="error-code">@Model</span>
         </div>
         <div class="error-copy">
-            <div class="error-kicker">Щось пішло не так</div>
-            <h1>Не вдалося відкрити сторінку</h1>
-            <p>Спробуйте повернутися на головну та повторити дію.</p>
+            <div class="error-kicker">@Localizer["Щось пішло не так"]</div>
+            <h1>@Localizer["Не вдалося відкрити сторінку"]</h1>
+            <p>@Localizer["Спробуйте повернутися на головну та повторити дію."]</p>
             <div class="error-actions">
-                <a asp-controller="Home" asp-action="Index" class="btn btn-primary">На головну</a>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary">@Localizer["На головну"]</a>
             </div>
         </div>
     </section>

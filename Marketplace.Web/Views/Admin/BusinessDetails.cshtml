@@ -1,15 +1,15 @@
 @model Marketplace.Web.Models.AdminBusinessDetailsViewModel
 
 @{
-    ViewData["Title"] = $"{Model.StoreName} - Адмін-панель";
+    ViewData["Title"] = $"{Model.StoreName} - {SharedLocalizer["Адмін-панель"].Value}";
     var statusClass = Model.Status.ToString().ToLowerInvariant();
 
     string StatusLabel(Marketplace.Domain.Enums.BusinessStatus status) => status switch
     {
-        Marketplace.Domain.Enums.BusinessStatus.Pending => "На перевірці",
-        Marketplace.Domain.Enums.BusinessStatus.Active => "Активний",
-        Marketplace.Domain.Enums.BusinessStatus.Suspended => "Призупинений",
-        Marketplace.Domain.Enums.BusinessStatus.Rejected => "Відхилений",
+        Marketplace.Domain.Enums.BusinessStatus.Pending => Localizer["На перевірці"].Value,
+        Marketplace.Domain.Enums.BusinessStatus.Active => Localizer["Активний"].Value,
+        Marketplace.Domain.Enums.BusinessStatus.Suspended => Localizer["Призупинений"].Value,
+        Marketplace.Domain.Enums.BusinessStatus.Rejected => Localizer["Відхилений"].Value,
         _ => status.ToString()
     };
 }
@@ -23,7 +23,7 @@
         <partial name="_AdminNav" />
 
         <div class="admin-content">
-            <a asp-action="Businesses" class="btn btn-sm btn-outline-secondary">← До списку бізнесів</a>
+            <a asp-action="Businesses" class="btn btn-sm btn-outline-secondary">← @Localizer["До списку бізнесів"]</a>
 
             <header class="admin-header">
                 <div class="admin-entity-cell">
@@ -53,48 +53,48 @@
             }
 
             <section class="admin-panel" style="padding: 1.25rem 1.5rem;">
-                <p>@(string.IsNullOrWhiteSpace(Model.Description) ? "Опис відсутній." : Model.Description)</p>
-                <p class="admin-entity-meta">Власник: <strong>@Model.OwnerEmail</strong></p>
-                <p class="admin-entity-meta">Дата реєстрації: @Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
+                <p>@(string.IsNullOrWhiteSpace(Model.Description) ? Localizer["Опис відсутній."] : Model.Description)</p>
+                <p class="admin-entity-meta">@Localizer["Власник:"] <strong>@Model.OwnerEmail</strong></p>
+                <p class="admin-entity-meta">@Localizer["Дата реєстрації:"] @Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
             </section>
 
-            <div class="admin-stats" aria-label="Показники магазину">
+            <div class="admin-stats" aria-label="@Localizer["Показники магазину"]">
                 <div class="admin-stat-card">
                     <div class="admin-stat-card__body">
-                        <span class="admin-stat-card__label">Товари всього</span>
+                        <span class="admin-stat-card__label">@Localizer["Товари всього"]</span>
                         <strong class="admin-stat-card__value">@Model.TotalProductCount</strong>
-                        <span class="admin-stat-card__hint">Активні: @Model.ActiveProductCount · На модерації: @Model.PendingProductCount · Заблоковані: @Model.BannedProductCount</span>
+                        <span class="admin-stat-card__hint">@Localizer["Активні:"] @Model.ActiveProductCount · @Localizer["На модерації:"] @Model.PendingProductCount · @Localizer["Заблоковані:"] @Model.BannedProductCount</span>
                     </div>
                 </div>
                 <div class="admin-stat-card">
                     <div class="admin-stat-card__body">
-                        <span class="admin-stat-card__label">Замовлення всього</span>
+                        <span class="admin-stat-card__label">@Localizer["Замовлення всього"]</span>
                         <strong class="admin-stat-card__value">@Model.TotalOrders</strong>
-                        <span class="admin-stat-card__hint">Продано одиниць: @Model.SoldItems</span>
+                        <span class="admin-stat-card__hint">@Localizer["Продано одиниць:"] @Model.SoldItems</span>
                     </div>
                 </div>
                 <div class="admin-stat-card">
                     <div class="admin-stat-card__body">
-                        <span class="admin-stat-card__label">Виручка магазину</span>
+                        <span class="admin-stat-card__label">@Localizer["Виручка магазину"]</span>
                         <strong class="admin-stat-card__value">@Model.Revenue.ToString("N0") ₴</strong>
-                        <span class="admin-stat-card__hint">За весь час</span>
+                        <span class="admin-stat-card__hint">@Localizer["За весь час"]</span>
                     </div>
                 </div>
             </div>
 
             <div class="admin-two-col">
                 <section class="admin-panel" style="padding: 1.25rem 1.5rem;">
-                    <h2 class="admin-title" style="font-size: 1.1rem;">Комісія</h2>
+                    <h2 class="admin-title" style="font-size: 1.1rem;">@Localizer["Комісія"]</h2>
                     <form asp-action="ChangeBusinessCommission" method="post" class="admin-inline-form">
                         <input type="hidden" name="businessId" value="@Model.Id" />
                         <input type="hidden" name="returnUrl" value="@Url.Action("BusinessDetails", new { businessId = Model.Id })" />
-                        <input type="number" name="commissionPercent" min="0" max="100" step="0.1" value="@Model.CommissionPercent.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)" class="admin-inline-form__input" aria-label="Комісія, %" />
-                        <button type="submit" class="btn btn-sm btn-outline-secondary">Зберегти</button>
+                        <input type="number" name="commissionPercent" min="0" max="100" step="0.1" value="@Model.CommissionPercent.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)" class="admin-inline-form__input" aria-label="@Localizer["Комісія, %"]" />
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">@Localizer["Зберегти"]</button>
                     </form>
                 </section>
 
                 <section class="admin-panel" style="padding: 1.25rem 1.5rem;">
-                    <h2 class="admin-title" style="font-size: 1.1rem;">Статус магазину</h2>
+                    <h2 class="admin-title" style="font-size: 1.1rem;">@Localizer["Статус магазину"]</h2>
                     <form asp-action="ChangeBusinessStatus" method="post" class="admin-inline-form">
                         <input type="hidden" name="businessId" value="@Model.Id" />
                         <input type="hidden" name="returnUrl" value="@Url.Action("BusinessDetails", new { businessId = Model.Id })" />
@@ -104,22 +104,22 @@
                                 <option value="@s" selected="@(s == Model.Status)">@StatusLabel(s)</option>
                             }
                         </select>
-                        <button type="submit" class="btn btn-sm btn-outline-secondary">Змінити</button>
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">@Localizer["Змінити"]</button>
                     </form>
                 </section>
             </div>
 
             <section class="admin-panel" style="padding: 1.25rem 1.5rem;">
-                <h2 class="admin-title" style="font-size: 1.1rem;">Знижки</h2>
-                <p class="admin-subtitle">Знижки встановлює сам продавець у своїй панелі - тут лише перегляд.</p>
+                <h2 class="admin-title" style="font-size: 1.1rem;">@Localizer["Знижки"]</h2>
+                <p class="admin-subtitle">@Localizer["Знижки встановлює сам продавець у своїй панелі - тут лише перегляд."]</p>
 
                 @if (Model.BusinessDiscount?.IsActive == true)
                 {
-                    <p><span class="admin-status admin-status--active">Весь магазин −@Model.BusinessDiscount.DiscountPercent.ToString("0.##")%</span> до @Model.BusinessDiscount.EndDate?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
+                    <p><span class="admin-status admin-status--active">@Localizer["Весь магазин −"]@Model.BusinessDiscount.DiscountPercent.ToString("0.##")%</span> @Localizer["до"] @Model.BusinessDiscount.EndDate?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
                 }
                 else
                 {
-                    <p class="admin-entity-meta">Знижки на весь магазин зараз немає.</p>
+                    <p class="admin-entity-meta">@Localizer["Знижки на весь магазин зараз немає."]</p>
                 }
 
                 @if (Model.CategoryDiscounts.Any())
@@ -127,7 +127,7 @@
                     <ul style="margin: 0.5rem 0 0; padding-left: 1.1rem;">
                         @foreach (var cd in Model.CategoryDiscounts)
                         {
-                            <li>@cd.CategoryName: −@cd.DiscountPercent.ToString("0.##")% до @cd.EndDate?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</li>
+                            <li>@cd.CategoryName: −@cd.DiscountPercent.ToString("0.##")% @Localizer["до"] @cd.EndDate?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</li>
                         }
                     </ul>
                 }
@@ -136,23 +136,23 @@
             @if (Model.AdultStatus != Marketplace.Domain.Entities.AdultContentStatus.None)
             {
                 <section class="admin-panel" style="padding: 1.25rem 1.5rem;">
-                    <h2 class="admin-title" style="font-size: 1.1rem;">Статус 18+</h2>
-                    <p>Поточний статус: <strong>@Model.AdultStatus</strong></p>
+                    <h2 class="admin-title" style="font-size: 1.1rem;">@Localizer["Статус 18+"]</h2>
+                    <p>@Localizer["Поточний статус:"] <strong>@Model.AdultStatus</strong></p>
                     @if (!string.IsNullOrWhiteSpace(Model.AdultRejectionReason))
                     {
-                        <p class="admin-entity-meta">Причина відхилення: @Model.AdultRejectionReason</p>
+                        <p class="admin-entity-meta">@Localizer["Причина відхилення:"] @Model.AdultRejectionReason</p>
                     }
 
                     @if (Model.AdultStatus == Marketplace.Domain.Entities.AdultContentStatus.Pending)
                     {
                         <form asp-action="ApproveAdultStatus" method="post" class="mb-2">
                             <input type="hidden" name="businessId" value="@Model.Id" />
-                            <button type="submit" class="btn btn-sm btn-outline-success">Підтвердити 18+</button>
+                            <button type="submit" class="btn btn-sm btn-outline-success">@Localizer["Підтвердити 18+"]</button>
                         </form>
                         <form asp-action="RejectAdultStatus" method="post" class="admin-inline-form">
                             <input type="hidden" name="businessId" value="@Model.Id" />
-                            <input type="text" name="reason" placeholder="Причина відхилення" class="admin-inline-form__input" required />
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Відхилити</button>
+                            <input type="text" name="reason" placeholder="@Localizer["Причина відхилення"]" class="admin-inline-form__input" required />
+                            <button type="submit" class="btn btn-sm btn-outline-danger">@Localizer["Відхилити"]</button>
                         </form>
                     }
                 </section>

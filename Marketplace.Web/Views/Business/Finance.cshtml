@@ -5,7 +5,7 @@
 @inject IBusinessAccessService BusinessAccessService
 
 @{
-    ViewData["Title"] = $"Фінанси - {Model.StoreName}";
+    ViewData["Title"] = $"{Localizer["Фінанси"].Value} - {Model.StoreName}";
 
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
     var currentRole = !string.IsNullOrEmpty(userId)
@@ -21,23 +21,23 @@
 }
 
 @functions {
-    private static string StatusLabel(Marketplace.Domain.Enums.OrderStatus status) => status switch
+    private string StatusLabel(Marketplace.Domain.Enums.OrderStatus status) => status switch
     {
-        Marketplace.Domain.Enums.OrderStatus.Pending => "Очікує підтвердження",
-        Marketplace.Domain.Enums.OrderStatus.Confirmed => "Підтверджено",
-        Marketplace.Domain.Enums.OrderStatus.Shipped => "Відправлено",
-        Marketplace.Domain.Enums.OrderStatus.Delivered => "Доставлено",
-        Marketplace.Domain.Enums.OrderStatus.Canceled => "Скасовано",
+        Marketplace.Domain.Enums.OrderStatus.Pending => Localizer["Очікує підтвердження"].Value,
+        Marketplace.Domain.Enums.OrderStatus.Confirmed => Localizer["Підтверджено"].Value,
+        Marketplace.Domain.Enums.OrderStatus.Shipped => Localizer["Відправлено"].Value,
+        Marketplace.Domain.Enums.OrderStatus.Delivered => Localizer["Доставлено"].Value,
+        Marketplace.Domain.Enums.OrderStatus.Canceled => Localizer["Скасовано"].Value,
         _ => status.ToString()
     };
 
-    private static string WithdrawalStatusLabel(string status) => status switch
+    private string WithdrawalStatusLabel(string status) => status switch
     {
-        "Pending" => "Очікує розгляду",
-        "Processing" => "В обробці",
-        "Rejected" => "Відхилено",
-        "Completed" => "Виплачено",
-        "Failed" => "Помилка виплати",
+        "Pending" => Localizer["Очікує розгляду"].Value,
+        "Processing" => Localizer["В обробці"].Value,
+        "Rejected" => Localizer["Відхилено"].Value,
+        "Completed" => Localizer["Виплачено"].Value,
+        "Failed" => Localizer["Помилка виплати"].Value,
         _ => status
     };
 
@@ -52,32 +52,32 @@
 }
 
 <div class="seller-dashboard">
-    <a asp-action="Index" class="seller-order-back">← До панелі продавця</a>
+    <a asp-action="Index" class="seller-order-back">← @SharedLocalizer["Панель продавця"]</a>
 
     <header class="seller-orders-header">
         <div>
             <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> @BusinessRoleContext.PanelLabel(currentRole)</div>
-            <h1>Фінанси - @Model.StoreName</h1>
-            <p>Оборот, продажі та стан виплат магазину.</p>
+            <h1>@Localizer["Фінанси"] - @Model.StoreName</h1>
+            <p>@Localizer["Оборот, продажі та стан виплат магазину."]</p>
         </div>
     </header>
 
     <partial name="_BusinessNav" model="Model.BusinessId" />
 
     <div class="business-kpis">
-        <div class="business-kpi"><span>Оборот</span><strong>@Model.Revenue.ToString("N0") ₴</strong></div>
-        <div class="business-kpi"><span>Продано одиниць</span><strong>@Model.SoldItems</strong></div>
-        <div class="business-kpi"><span>Замовлень</span><strong>@Model.TotalOrders</strong></div>
-        <div class="business-kpi"><span>Середній чек</span><strong>@Model.AverageOrderValue.ToString("N0") ₴</strong></div>
-        <div class="business-kpi"><span>Доступно до виплати</span><strong>@Model.AvailableBalance.ToString("N2") ₴</strong></div>
+        <div class="business-kpi"><span>@Localizer["Оборот"]</span><strong>@Model.Revenue.ToString("N0") ₴</strong></div>
+        <div class="business-kpi"><span>@Localizer["Продано одиниць"]</span><strong>@Model.SoldItems</strong></div>
+        <div class="business-kpi"><span>@Localizer["Замовлень"]</span><strong>@Model.TotalOrders</strong></div>
+        <div class="business-kpi"><span>@Localizer["Середній чек"]</span><strong>@Model.AverageOrderValue.ToString("N0") ₴</strong></div>
+        <div class="business-kpi"><span>@Localizer["Доступно до виплати"]</span><strong>@Model.AvailableBalance.ToString("N2") ₴</strong></div>
     </div>
 
     <section class="business-panel business-chart-card">
-        <h2>Динаміка обороту</h2>
-        <p class="business-panel__lead">Виручка та замовлення за останні 30 днів.</p>
+        <h2>@Localizer["Динаміка обороту"]</h2>
+        <p class="business-panel__lead">@Localizer["Виручка та замовлення за останні 30 днів."]</p>
         @if (Model.RevenueTrend.Count == 0)
         {
-            <p class="business-empty">Даних за останні 30 днів немає.</p>
+            <p class="business-empty">@Localizer["Даних за останні 30 днів немає."]</p>
         }
         else
         {
@@ -88,19 +88,19 @@
     </section>
 
     <section class="business-panel">
-        <h2>Історія продажів</h2>
-        <p class="business-panel__lead">Останні замовлення, що містять товари цього магазину.</p>
+        <h2>@Localizer["Історія продажів"]</h2>
+        <p class="business-panel__lead">@Localizer["Останні замовлення, що містять товари цього магазину."]</p>
 
         @if (Model.RecentSales.Count == 0)
         {
-            <p class="business-empty">Продажів поки немає.</p>
+            <p class="business-empty">@Localizer["Продажів поки немає."]</p>
         }
         else
         {
             <div class="table-responsive">
                 <table class="business-table">
                     <thead>
-                        <tr><th>Замовлення</th><th>Дата</th><th>Статус</th><th>Товарів</th><th>Сума</th></tr>
+                        <tr><th>@Localizer["Замовлення"]</th><th>@Localizer["Дата"]</th><th>@Localizer["Статус"]</th><th>@Localizer["Товарів"]</th><th>@Localizer["Сума"]</th></tr>
                     </thead>
                     <tbody>
                         @foreach (var order in Model.RecentSales)
@@ -121,27 +121,27 @@
 
     <section class="business-panel" data-collapsible>
         <partial name="_CollapseToggle" />
-        <h2>Виплати</h2>
-        <p class="business-panel__lead">Доступний баланс: <strong>@Model.AvailableBalance.ToString("N2") ₴</strong>@(Model.PendingWithdrawalsTotal > 0 ? $" (з них {Model.PendingWithdrawalsTotal:N2} ₴ вже в заявках на розгляді)" : "")</p>
+        <h2>@Localizer["Виплати"]</h2>
+        <p class="business-panel__lead">@Localizer["Доступний баланс:"] <strong>@Model.AvailableBalance.ToString("N2") ₴</strong>@(Model.PendingWithdrawalsTotal > 0 ? $" ({Localizer["з них"].Value} {Model.PendingWithdrawalsTotal:N2} ₴ {Localizer["вже в заявках на розгляді"].Value})" : "")</p>
         @if (BusinessRoleContext.CanRequestPayout(currentRole))
         {
-            <button type="button" class="seller-button seller-button--secondary mt-2" data-open-payout-request>Запросити виплату</button>
+            <button type="button" class="seller-button seller-button--secondary mt-2" data-open-payout-request>@Localizer["Запросити виплату"]</button>
         }
         else
         {
-            <p class="business-empty">Запит на виплату може подати лише власник магазину.</p>
+            <p class="business-empty">@Localizer["Запит на виплату може подати лише власник магазину."]</p>
         }
 
         @if (Model.Withdrawals.Count == 0)
         {
-            <p class="business-empty mt-3">Заявок на виплату ще не було.</p>
+            <p class="business-empty mt-3">@Localizer["Заявок на виплату ще не було."]</p>
         }
         else
         {
             <div class="table-responsive mt-3">
                 <table class="business-table">
                     <thead>
-                        <tr><th>Дата</th><th>Сума</th><th>Картка</th><th>Отримувач</th><th>Статус</th></tr>
+                        <tr><th>@Localizer["Дата"]</th><th>@Localizer["Сума"]</th><th>@Localizer["Картка"]</th><th>@Localizer["Отримувач"]</th><th>@Localizer["Статус"]</th></tr>
                     </thead>
                     <tbody>
                         @foreach (var withdrawal in Model.Withdrawals)
@@ -167,9 +167,9 @@
     </section>
 
     <section class="business-panel">
-        <h2>Податкові документи</h2>
-        <p class="business-panel__lead">Акти, довідки та звіти для бухгалтерії.</p>
-        <p class="business-empty">Документи з'являться тут після підключення автоматичних виплат.</p>
+        <h2>@Localizer["Податкові документи"]</h2>
+        <p class="business-panel__lead">@Localizer["Акти, довідки та звіти для бухгалтерії."]</p>
+        <p class="business-empty">@Localizer["Документи з'являться тут після підключення автоматичних виплат."]</p>
     </section>
 </div>
 
@@ -177,28 +177,28 @@
 
 <div class="postsale-modal" data-payout-modal hidden>
     <div class="postsale-modal__card">
-        <button type="button" class="postsale-modal__close" aria-label="Закрити" data-close-payout>×</button>
+        <button type="button" class="postsale-modal__close" aria-label="@Localizer["Закрити"]" data-close-payout>×</button>
         <div data-payout-form>
-            <h3>Запит на виплату</h3>
-            <p>Магазин «@Model.StoreName». Доступно: @Model.AvailableBalance.ToString("N2") ₴.</p>
+            <h3>@Localizer["Запит на виплату"]</h3>
+            <p>@Localizer["Магазин"] «@Model.StoreName». @Localizer["Доступно:"] @Model.AvailableBalance.ToString("N2") ₴.</p>
             <p class="text-danger" data-payout-error hidden></p>
 
-            <label class="form-label mt-2">Сума до виплати, ₴</label>
+            <label class="form-label mt-2">@Localizer["Сума до виплати, ₴"]</label>
             <input type="number" class="form-control" data-payout-amount min="0.01" max="@Model.AvailableBalance.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)" step="0.01" value="@Model.AvailableBalance.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)" />
 
-            <label class="form-label mt-2">Номер картки</label>
+            <label class="form-label mt-2">@Localizer["Номер картки"]</label>
             <input type="text" class="form-control" data-payout-card placeholder="0000 0000 0000 0000" maxlength="19" />
 
-            <label class="form-label mt-2">Отримувач</label>
-            <input type="text" class="form-control" data-payout-recipient placeholder="Прізвище Ім'я" />
+            <label class="form-label mt-2">@Localizer["Отримувач"]</label>
+            <input type="text" class="form-control" data-payout-recipient placeholder="@Localizer["Прізвище Ім'я"]" />
 
-            <button type="button" class="btn btn-primary mt-3 w-100" data-submit-payout>Надіслати запит</button>
+            <button type="button" class="btn btn-primary mt-3 w-100" data-submit-payout>@Localizer["Надіслати запит"]</button>
         </div>
         <div class="postsale-modal__success" data-payout-success hidden>
             <span aria-hidden="true">✓</span>
-            <h3>Запит надіслано</h3>
-            <p>Заявку передано на розгляд адміністрації маркетплейсу.</p>
-            <button type="button" class="btn btn-outline-secondary" data-close-payout>Закрити</button>
+            <h3>@Localizer["Запит надіслано"]</h3>
+            <p>@Localizer["Заявку передано на розгляд адміністрації маркетплейсу."]</p>
+            <button type="button" class="btn btn-outline-secondary" data-close-payout>@Localizer["Закрити"]</button>
         </div>
     </div>
 </div>

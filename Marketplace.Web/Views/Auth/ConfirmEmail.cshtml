@@ -1,7 +1,7 @@
 @{
     var succeeded = ViewBag.Succeeded is bool value && value;
-    var message = ViewBag.Message as string ?? "Не вдалося підтвердити електронну пошту.";
-    ViewData["Title"] = succeeded ? "Email підтверджено" : "Помилка підтвердження";
+    var message = ViewBag.Message as string ?? Localizer["Не вдалося підтвердити електронну пошту."].Value;
+    ViewData["Title"] = succeeded ? Localizer["Email підтверджено"].Value : Localizer["Помилка підтвердження"].Value;
 }
 
 <section class="auth-card auth-card--status" aria-labelledby="confirmation-title">
@@ -9,10 +9,10 @@
         @(succeeded ? "✓" : "!")
     </div>
     <p class="auth-kicker @(succeeded ? "auth-kicker--success" : "auth-kicker--error")">
-        @(succeeded ? "Підтверджено" : "Посилання не спрацювало")
+        @(succeeded ? Localizer["Підтверджено"] : Localizer["Посилання не спрацювало"])
     </p>
     <h2 id="confirmation-title">
-        @(succeeded ? "Електронну пошту підтверджено" : "Не вдалося підтвердити email")
+        @(succeeded ? Localizer["Електронну пошту підтверджено"] : Localizer["Не вдалося підтвердити email"])
     </h2>
     <p class="status-copy">@message</p>
 
@@ -20,22 +20,22 @@
     {
         <div class="auth-success-panel">
             <span aria-hidden="true">✓</span>
-            <p><strong>Акаунт готовий до роботи</strong>Тепер ви можете входити, купувати товари та створювати власний магазин.</p>
+            <p><strong>@Localizer["Акаунт готовий до роботи"]</strong>@Localizer["Тепер ви можете входити, купувати товари та створювати власний магазин."]</p>
         </div>
         <div class="auth-status-actions">
-            <a asp-action="SignIn" class="button button--primary">Увійти до акаунта <span aria-hidden="true">→</span></a>
-            <a asp-controller="Home" asp-action="Index" class="button button--secondary">На головну</a>
+            <a asp-action="SignIn" class="button button--primary">@Localizer["Увійти до акаунта"] <span aria-hidden="true">→</span></a>
+            <a asp-controller="Home" asp-action="Index" class="button button--secondary">@Localizer["На головну"]</a>
         </div>
     }
     else
     {
         <div class="auth-error-panel">
             <span aria-hidden="true">!</span>
-            <p><strong>Що могло статися?</strong>Посилання пошкоджене, уже використане або термін його дії завершився.</p>
+            <p><strong>@Localizer["Що могло статися?"]</strong>@Localizer["Посилання пошкоджене, уже використане або термін його дії завершився."]</p>
         </div>
         <div class="auth-status-actions">
-            <a asp-action="SignUp" class="button button--primary">Створити акаунт ще раз <span aria-hidden="true">→</span></a>
-            <a asp-action="SignIn" class="button button--secondary">Повернутися до входу</a>
+            <a asp-action="SignUp" class="button button--primary">@Localizer["Створити акаунт ще раз"] <span aria-hidden="true">→</span></a>
+            <a asp-action="SignIn" class="button button--secondary">@Localizer["Повернутися до входу"]</a>
         </div>
     }
 </section>

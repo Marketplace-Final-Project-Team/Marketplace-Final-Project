@@ -1,7 +1,7 @@
 @model ChangeEmailViewModel
 
 @{
-    ViewData["Title"] = "Зміна Email";
+    ViewData["Title"] = Localizer["Зміна Email"];
 }
 
 @section Styles {
@@ -9,33 +9,33 @@
 }
 
 <div class="profile-page">
-    <a asp-action="Index" class="profile-back">← До кабінету</a>
+    <a asp-action="Index" class="profile-back">← @Localizer["До кабінету"]</a>
 
     <div class="address-form-card">
-        <h1>Зміна Email</h1>
-        <p class="profile-form-hint mb-4">Ми надішлемо лист із підтвердженням на нову адресу - доки ви його не підтвердите, вхід залишиться доступний за поточним email.</p>
+        <h1>@Localizer["Зміна Email"]</h1>
+        <p class="profile-form-hint mb-4">@Localizer["Ми надішлемо лист із підтвердженням на нову адресу - доки ви його не підтвердите, вхід залишиться доступний за поточним email."]</p>
 
         <form asp-action="ChangeEmail" method="post">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
             <div class="address-form-field">
-                <label asp-for="NewEmail" class="form-label">Нова електронна пошта</label>
+                <label asp-for="NewEmail" class="form-label">@Localizer["Нова електронна пошта"]</label>
                 <input asp-for="NewEmail" class="form-control" placeholder="name@example.com" autocomplete="email" />
                 <span asp-validation-for="NewEmail" class="text-danger small"></span>
             </div>
 
             <div class="address-form-field">
-                <label asp-for="CurrentPassword" class="form-label">Поточний пароль</label>
+                <label asp-for="CurrentPassword" class="form-label">@Localizer["Поточний пароль"]</label>
                 <div class="profile-password-field">
                     <input asp-for="CurrentPassword" class="form-control" data-password-input autocomplete="current-password" />
-                    <button type="button" class="profile-password-toggle" data-password-toggle aria-pressed="false">Показати</button>
+                    <button type="button" class="profile-password-toggle" data-password-toggle aria-pressed="false">@Localizer["Показати"]</button>
                 </div>
                 <span asp-validation-for="CurrentPassword" class="text-danger small"></span>
             </div>
 
             <div class="address-form-actions">
-                <a asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
-                <button type="submit" class="btn btn-primary">Надіслати лист підтвердження</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">@Localizer["Скасувати"]</a>
+                <button type="submit" class="btn btn-primary">@Localizer["Надіслати лист підтвердження"]</button>
             </div>
         </form>
     </div>

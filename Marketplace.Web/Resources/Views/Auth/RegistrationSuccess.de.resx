@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Завершіть реєстрацію" xml:space="preserve">
+    <value>Registrierung abschließen</value>
+  </data>
+  <data name="Ще один крок" xml:space="preserve">
+    <value>Noch ein Schritt</value>
+  </data>
+  <data name="Підтвердьте свою пошту" xml:space="preserve">
+    <value>Bestätigen Sie Ihre E-Mail</value>
+  </data>
+  <data name="Акаунт створено. Ми надіслали лист із посиланням для підтвердження електронної пошти." xml:space="preserve">
+    <value>Ihr Konto wurde erstellt. Wir haben Ihnen eine E-Mail mit einem Bestätigungslink gesendet.</value>
+  </data>
+  <data name="Як завершити реєстрацію" xml:space="preserve">
+    <value>So schließen Sie die Registrierung ab</value>
+  </data>
+  <data name="Знайдіть лист Marketplace" xml:space="preserve">
+    <value>Suchen Sie die E-Mail von Marketplace</value>
+  </data>
+  <data name="Якщо його не видно, перевірте папку «Спам»." xml:space="preserve">
+    <value>Falls Sie sie nicht sehen, prüfen Sie den Ordner „Spam&quot;.</value>
+  </data>
+  <data name="Підтвердьте адресу" xml:space="preserve">
+    <value>Bestätigen Sie Ihre Adresse</value>
+  </data>
+  <data name="Натисніть кнопку або посилання всередині листа." xml:space="preserve">
+    <value>Klicken Sie auf die Schaltfläche oder den Link in der E-Mail.</value>
+  </data>
+  <data name="Увійдіть до акаунта" xml:space="preserve">
+    <value>Melden Sie sich an</value>
+  </data>
+  <data name="Після підтвердження стануть доступні покупки й кабінет продавця." xml:space="preserve">
+    <value>Nach der Bestätigung stehen Ihnen Einkäufe und das Verkäufer-Dashboard zur Verfügung.</value>
+  </data>
+  <data name="Перейти до входу" xml:space="preserve">
+    <value>Zur Anmeldung</value>
+  </data>
+  <data name="На головну" xml:space="preserve">
+    <value>Zur Startseite</value>
+  </data>
+  <data name="Лист може надійти протягом кількох хвилин." xml:space="preserve">
+    <value>Die E-Mail kann einige Minuten dauern.</value>
+  </data>
+</root>

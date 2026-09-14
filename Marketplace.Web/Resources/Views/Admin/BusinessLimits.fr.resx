@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Ліміти бізнесу" xml:space="preserve">
+    <value>Limites des entreprises</value>
+  </data>
+  <data name="Правила, які обмежують продавців на платформі - застосовуються до всіх бізнесів однаково." xml:space="preserve">
+    <value>Règles qui limitent les vendeurs sur la plateforme - appliquées de la même manière à toutes les entreprises.</value>
+  </data>
+  <data name="Значення зберігаються реально" xml:space="preserve">
+    <value>Les valeurs sont réellement enregistrées</value>
+  </data>
+  <data name="Ліміти зберігаються в таблиці" xml:space="preserve">
+    <value>Les limites sont stockées dans la table</value>
+  </data>
+  <data name="і застосовуються одразу: обмежують знижки на товар і за промокодом, кількість товарів та активних промокодів на бізнес, а також автоматично скасовують прострочені замовлення «Очікує»." xml:space="preserve">
+    <value>et appliquées immédiatement : elles limitent les remises par produit et par code promo, le nombre de produits et de codes promo actifs par entreprise, et annulent automatiquement les commandes en retard au statut « En attente ».</value>
+  </data>
+  <data name="Макс. товарів на бізнес" xml:space="preserve">
+    <value>Nb max. de produits par entreprise</value>
+  </data>
+  <data name="Макс. знижка на товар, %" xml:space="preserve">
+    <value>Remise max. par produit, %</value>
+  </data>
+  <data name="Макс. знижка за промокодом, %" xml:space="preserve">
+    <value>Remise max. par code promo, %</value>
+  </data>
+  <data name="Макс. активних промокодів на бізнес" xml:space="preserve">
+    <value>Nb max. de codes promo actifs par entreprise</value>
+  </data>
+  <data name="Термін дії замовлення «Очікує», год." xml:space="preserve">
+    <value>Durée de validité de la commande « En attente », h</value>
+  </data>
+  <data name="Після цього часу замовлення автоматично скасовується (задача «Скасування прострочених замовлень»)." xml:space="preserve">
+    <value>Après ce délai, la commande est automatiquement annulée (tâche « Annulation des commandes en retard »).</value>
+  </data>
+  <data name="Поріг низького залишку, шт." xml:space="preserve">
+    <value>Seuil de stock faible, unités</value>
+  </data>
+  <data name="Нижче цього значення на сторінці товару з'являється позначка «мало на складі»." xml:space="preserve">
+    <value>En dessous de cette valeur, la mention « stock faible » apparaît sur la page du produit.</value>
+  </data>
+  <data name="Зберегти ліміти" xml:space="preserve">
+    <value>Enregistrer les limites</value>
+  </data>
+</root>

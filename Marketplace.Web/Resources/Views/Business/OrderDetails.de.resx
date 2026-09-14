@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Очікує підтвердження" xml:space="preserve">
+    <value>Wartet auf Bestätigung</value>
+  </data>
+  <data name="Підтверджено" xml:space="preserve">
+    <value>Bestätigt</value>
+  </data>
+  <data name="Відправлено" xml:space="preserve">
+    <value>Versandt</value>
+  </data>
+  <data name="Доставлено" xml:space="preserve">
+    <value>Geliefert</value>
+  </data>
+  <data name="Скасовано" xml:space="preserve">
+    <value>Storniert</value>
+  </data>
+  <data name="Очікує розгляду" xml:space="preserve">
+    <value>Wartet auf Bearbeitung</value>
+  </data>
+  <data name="До списку замовлень" xml:space="preserve">
+    <value>Zurück zur Bestellliste</value>
+  </data>
+  <data name="Створено" xml:space="preserve">
+    <value>Erstellt</value>
+  </data>
+  <data name="Успішно" xml:space="preserve">
+    <value>Erfolgreich</value>
+  </data>
+  <data name="Змішане замовлення" xml:space="preserve">
+    <value>Gemischte Bestellung</value>
+  </data>
+  <data name="Це замовлення містить також товари інших продавців - вони показані нижче, але статус змінюється для всього замовлення одразу." xml:space="preserve">
+    <value>Diese Bestellung enthält auch Produkte anderer Verkäufer - sie werden unten angezeigt, aber der Status ändert sich für die gesamte Bestellung gleichzeitig.</value>
+  </data>
+  <data name="Товари в замовленні" xml:space="preserve">
+    <value>Artikel in der Bestellung</value>
+  </data>
+  <data name="інший продавець" xml:space="preserve">
+    <value>anderer Verkäufer</value>
+  </data>
+  <data name="шт." xml:space="preserve">
+    <value>Stk.</value>
+  </data>
+  <data name="Отримувач і доставка" xml:space="preserve">
+    <value>Empfänger und Lieferung</value>
+  </data>
+  <data name="Покупець" xml:space="preserve">
+    <value>Kunde</value>
+  </data>
+  <data name="Телефон" xml:space="preserve">
+    <value>Telefon</value>
+  </data>
+  <data name="не вказано" xml:space="preserve">
+    <value>nicht angegeben</value>
+  </data>
+  <data name="Адреса" xml:space="preserve">
+    <value>Adresse</value>
+  </data>
+  <data name="Сума замовлення" xml:space="preserve">
+    <value>Bestellsumme</value>
+  </data>
+  <data name="Змінити статус" xml:space="preserve">
+    <value>Status ändern</value>
+  </data>
+  <data name="Статус замовлення:" xml:space="preserve">
+    <value>Bestellstatus:</value>
+  </data>
+  <data name="(кінцевий, змінити неможливо)" xml:space="preserve">
+    <value>(endgültig, kann nicht geändert werden)</value>
+  </data>
+  <data name="Заявки на повернення" xml:space="preserve">
+    <value>Rückgabeanträge</value>
+  </data>
+  <data name="Повернення:" xml:space="preserve">
+    <value>Rückgabe:</value>
+  </data>
+  <data name="Фото до заявки" xml:space="preserve">
+    <value>Foto zum Antrag</value>
+  </data>
+  <data name="Коментар покупцю (необов'язково)" xml:space="preserve">
+    <value>Kommentar an den Kunden (optional)</value>
+  </data>
+  <data name="Підтвердити й повернути кошти" xml:space="preserve">
+    <value>Bestätigen und Geld zurückerstatten</value>
+  </data>
+  <data name="Відхилити" xml:space="preserve">
+    <value>Ablehnen</value>
+  </data>
+  <data name="Ваша відповідь:" xml:space="preserve">
+    <value>Ihre Antwort:</value>
+  </data>
+</root>

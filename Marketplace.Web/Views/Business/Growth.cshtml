@@ -5,7 +5,7 @@
 @inject IBusinessAccessService BusinessAccessService
 
 @{
-    ViewData["Title"] = $"Розвиток бізнесу - {Model.StoreName}";
+    ViewData["Title"] = $"{Localizer["Розвиток бізнесу"].Value} - {Model.StoreName}";
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
     var currentRole = !string.IsNullOrEmpty(userId)
         ? await BusinessAccessService.GetUserRoleAsync(Model.BusinessId, userId)
@@ -17,52 +17,52 @@
 }
 
 <div class="seller-dashboard">
-    <a asp-action="Index" class="seller-order-back">← До панелі продавця</a>
+    <a asp-action="Index" class="seller-order-back">← @SharedLocalizer["Панель продавця"]</a>
 
     <header class="seller-orders-header">
         <div>
             <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> @BusinessRoleContext.PanelLabel(currentRole)</div>
-            <h1>Розвиток бізнесу - @Model.StoreName</h1>
-            <p>Поради, які допомагають продавцям на платформі зростати.</p>
+            <h1>@Localizer["Розвиток бізнесу"] - @Model.StoreName</h1>
+            <p>@Localizer["Поради, які допомагають продавцям на платформі зростати."]</p>
         </div>
     </header>
 
     <partial name="_BusinessNav" model="Model.BusinessId" />
 
     <section class="business-panel">
-        <h2>Поради для зростання</h2>
-        <p class="business-panel__lead">Загальні рекомендації - не персоналізована аналітика.</p>
+        <h2>@Localizer["Поради для зростання"]</h2>
+        <p class="business-panel__lead">@Localizer["Загальні рекомендації - не персоналізована аналітика."]</p>
 
         <div class="business-tip-grid">
             <div class="business-tip-card">
                 <span class="business-tip-card__icon" aria-hidden="true">🧭</span>
-                <h3>Розширюйте асортимент</h3>
-                <p>Магазини з ширшим вибором товарів частіше з'являються в результатах пошуку каталогу.</p>
+                <h3>@Localizer["Розширюйте асортимент"]</h3>
+                <p>@Localizer["Магазини з ширшим вибором товарів частіше з'являються в результатах пошуку каталогу."]</p>
             </div>
             <div class="business-tip-card">
                 <span class="business-tip-card__icon" aria-hidden="true">⭐</span>
-                <h3>Стежте за рейтингом</h3>
-                <p>Швидко реагуйте на відгуки та запитання покупців - це напряму впливає на довіру до магазину.</p>
+                <h3>@Localizer["Стежте за рейтингом"]</h3>
+                <p>@Localizer["Швидко реагуйте на відгуки та запитання покупців - це напряму впливає на довіру до магазину."]</p>
             </div>
             <div class="business-tip-card">
                 <span class="business-tip-card__icon" aria-hidden="true">📦</span>
-                <h3>Тримайте залишки актуальними</h3>
-                <p>Товари з нульовим залишком не показуються покупцям - регулярно оновлюйте наявність.</p>
+                <h3>@Localizer["Тримайте залишки актуальними"]</h3>
+                <p>@Localizer["Товари з нульовим залишком не показуються покупцям - регулярно оновлюйте наявність."]</p>
             </div>
             <div class="business-tip-card">
                 <span class="business-tip-card__icon" aria-hidden="true">🚚</span>
-                <h3>Прискорюйте обробку замовлень</h3>
-                <p>Швидка зміна статусу замовлення покращує враження покупця та знижує ризик скасувань.</p>
+                <h3>@Localizer["Прискорюйте обробку замовлень"]</h3>
+                <p>@Localizer["Швидка зміна статусу замовлення покращує враження покупця та знижує ризик скасувань."]</p>
             </div>
             <div class="business-tip-card">
                 <span class="business-tip-card__icon" aria-hidden="true">🌍</span>
-                <h3>Плануйте вихід на нові ринки</h3>
-                <p>Міжнародні продажі та інтеграції з іншими майданчиками - у розробці платформи.</p>
+                <h3>@Localizer["Плануйте вихід на нові ринки"]</h3>
+                <p>@Localizer["Міжнародні продажі та інтеграції з іншими майданчиками - у розробці платформи."]</p>
             </div>
             <div class="business-tip-card">
                 <span class="business-tip-card__icon" aria-hidden="true">🤝</span>
-                <h3>Розвивайте команду</h3>
-                <p>Додавайте учасників з ролями в розділі «Команда», щоб розподілити керування магазином.</p>
+                <h3>@Localizer["Розвивайте команду"]</h3>
+                <p>@Localizer["Додавайте учасників з ролями в розділі «Команда», щоб розподілити керування магазином."]</p>
             </div>
         </div>
     </section>

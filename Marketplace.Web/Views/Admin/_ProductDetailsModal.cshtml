@@ -4,9 +4,9 @@
     var statusClass = Model.Status.ToString().ToLowerInvariant();
     var statusLabel = Model.Status switch
     {
-        Marketplace.Domain.Enums.ProductStatus.Active => "Активний",
-        Marketplace.Domain.Enums.ProductStatus.Pending => "На модерації",
-        Marketplace.Domain.Enums.ProductStatus.Banned => "Заблокований",
+        Marketplace.Domain.Enums.ProductStatus.Active => Localizer["Активний"].Value,
+        Marketplace.Domain.Enums.ProductStatus.Pending => Localizer["На модерації"].Value,
+        Marketplace.Domain.Enums.ProductStatus.Banned => Localizer["Заблокований"].Value,
         _ => Model.Status.ToString()
     };
     var gallery = new[] { Model.MainImageUrl }.Concat(Model.AdditionalImageUrls)
@@ -24,7 +24,7 @@
 {
     <div class="admin-alert admin-alert--error">
         <span>!</span>
-        <p><strong>Причина:</strong> @Model.ModerationReason</p>
+        <p><strong>@Localizer["Причина:"]</strong> @Model.ModerationReason</p>
     </div>
 }
 
@@ -33,7 +33,7 @@
     <div class="admin-product-modal__gallery">
         @foreach (var url in gallery)
         {
-            <a href="@url" target="_blank" rel="noopener" title="Відкрити зображення на весь розмір">
+            <a href="@url" target="_blank" rel="noopener" title="@Localizer["Відкрити зображення на весь розмір"]">
                 <img src="@url" alt="@Model.Name" />
             </a>
         }
@@ -41,35 +41,35 @@
 }
 else
 {
-    <p class="admin-empty">Без зображень.</p>
+    <p class="admin-empty">@Localizer["Без зображень."]</p>
 }
 
 <dl class="admin-product-modal__facts">
     <div>
-        <dt>Ціна</dt>
+        <dt>@Localizer["Ціна"]</dt>
         <dd>@Model.Price.ToString("N2") ₴</dd>
     </div>
     <div>
-        <dt>Кількість на складі</dt>
-        <dd>@Model.Quantity шт.</dd>
+        <dt>@Localizer["Кількість на складі"]</dt>
+        <dd>@Model.Quantity @Localizer["шт."]</dd>
     </div>
     <div>
-        <dt>Категорія</dt>
+        <dt>@Localizer["Категорія"]</dt>
         <dd>@Model.CategoryName</dd>
     </div>
     <div>
-        <dt>Магазин</dt>
+        <dt>@Localizer["Магазин"]</dt>
         <dd><a asp-controller="Admin" asp-action="Businesses" asp-route-Search="@Model.BusinessName">@Model.BusinessName</a></dd>
     </div>
     <div>
-        <dt>Додано</dt>
+        <dt>@Localizer["Додано"]</dt>
         <dd>@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</dd>
     </div>
 </dl>
 
 <div class="admin-product-modal__description">
-    <h4>Опис</h4>
-    <p>@(string.IsNullOrWhiteSpace(Model.Description) ? "Продавець не додав опис." : Model.Description)</p>
+    <h4>@Localizer["Опис"]</h4>
+    <p>@(string.IsNullOrWhiteSpace(Model.Description) ? Localizer["Продавець не додав опис."] : Model.Description)</p>
 </div>
 
 <div class="admin-product-modal__actions">
@@ -78,7 +78,7 @@ else
         <form asp-controller="Admin" asp-action="ChangeProductStatus" method="post">
             <input type="hidden" name="productId" value="@Model.Id" />
             <input type="hidden" name="status" value="Active" />
-            <button type="submit" class="btn btn-outline-success">Погодити</button>
+            <button type="submit" class="btn btn-outline-success">@Localizer["Погодити"]</button>
         </form>
     }
     @if (Model.Status != Marketplace.Domain.Enums.ProductStatus.Pending)
@@ -86,7 +86,7 @@ else
         <form asp-controller="Admin" asp-action="ChangeProductStatus" method="post">
             <input type="hidden" name="productId" value="@Model.Id" />
             <input type="hidden" name="status" value="Pending" />
-            <button type="submit" class="btn btn-outline-secondary">Залишити на розгляді</button>
+            <button type="submit" class="btn btn-outline-secondary">@Localizer["Залишити на розгляді"]</button>
         </form>
     }
     @if (Model.Status != Marketplace.Domain.Enums.ProductStatus.Banned)
@@ -94,7 +94,7 @@ else
         <form asp-controller="Admin" asp-action="ChangeProductStatus" method="post">
             <input type="hidden" name="productId" value="@Model.Id" />
             <input type="hidden" name="status" value="Banned" />
-            <button type="submit" class="btn btn-outline-danger">Відхилити</button>
+            <button type="submit" class="btn btn-outline-danger">@Localizer["Відхилити"]</button>
         </form>
     }
 </div>

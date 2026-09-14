@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Дашборд" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
+  <data name="Загальний стан маркетплейсу: користувачі, товари та магазини, що потребують уваги." xml:space="preserve">
+    <value>Allgemeiner Status des Marktplatzes: Nutzer, Produkte und Shops, die Aufmerksamkeit benötigen.</value>
+  </data>
+  <data name="Загальна статистика" xml:space="preserve">
+    <value>Allgemeine Statistik</value>
+  </data>
+  <data name="Користувачі" xml:space="preserve">
+    <value>Nutzer</value>
+  </data>
+  <data name="заблоковано" xml:space="preserve">
+    <value>gesperrt</value>
+  </data>
+  <data name="Товари на модерації" xml:space="preserve">
+    <value>Produkte in Prüfung</value>
+  </data>
+  <data name="з" xml:space="preserve">
+    <value>von</value>
+  </data>
+  <data name="усього ·" xml:space="preserve">
+    <value>gesamt ·</value>
+  </data>
+  <data name="Магазини на перевірці" xml:space="preserve">
+    <value>Shops in Prüfung</value>
+  </data>
+  <data name="усього" xml:space="preserve">
+    <value>gesamt</value>
+  </data>
+  <data name="Очікують верифікації 18+" xml:space="preserve">
+    <value>Warten auf 18+-Verifizierung</value>
+  </data>
+  <data name="Заявки магазинів на розміщення 18+ контенту" xml:space="preserve">
+    <value>Anträge von Shops zur Freigabe von 18+-Inhalten</value>
+  </data>
+  <data name="Заявки на виплату" xml:space="preserve">
+    <value>Auszahlungsanträge</value>
+  </data>
+  <data name="Переглянути →" xml:space="preserve">
+    <value>Ansehen →</value>
+  </data>
+  <data name="Баланс маркетплейсу" xml:space="preserve">
+    <value>Marktplatz-Guthaben</value>
+  </data>
+  <data name="Накопичена комісія з продажів" xml:space="preserve">
+    <value>Angesammelte Provision aus Verkäufen</value>
+  </data>
+  <data name="Заявки на 18+ контент" xml:space="preserve">
+    <value>Anträge für 18+-Inhalte</value>
+  </data>
+  <data name="Магазин" xml:space="preserve">
+    <value>Shop</value>
+  </data>
+  <data name="Власник" xml:space="preserve">
+    <value>Inhaber</value>
+  </data>
+  <data name="Дії" xml:space="preserve">
+    <value>Aktionen</value>
+  </data>
+  <data name="Без назви" xml:space="preserve">
+    <value>Unbenannt</value>
+  </data>
+  <data name="Підтвердити 18+" xml:space="preserve">
+    <value>18+ bestätigen</value>
+  </data>
+  <data name="Причина відхилення" xml:space="preserve">
+    <value>Ablehnungsgrund</value>
+  </data>
+  <data name="Відхилити" xml:space="preserve">
+    <value>Ablehnen</value>
+  </data>
+  <data name="Швидкі дії" xml:space="preserve">
+    <value>Schnellzugriffe</value>
+  </data>
+  <data name="Керувати користувачами" xml:space="preserve">
+    <value>Nutzer verwalten</value>
+  </data>
+  <data name="Блокування та відновлення акаунтів" xml:space="preserve">
+    <value>Konten sperren und wiederherstellen</value>
+  </data>
+  <data name="Модерувати товари" xml:space="preserve">
+    <value>Produkte moderieren</value>
+  </data>
+  <data name="Активація, модерація, блокування" xml:space="preserve">
+    <value>Aktivierung, Moderation, Sperrung</value>
+  </data>
+  <data name="Перевіряти магазини" xml:space="preserve">
+    <value>Shops prüfen</value>
+  </data>
+  <data name="Схвалення та призупинення бізнесів" xml:space="preserve">
+    <value>Unternehmen genehmigen und sperren</value>
+  </data>
+  <data name="Статистика" xml:space="preserve">
+    <value>Statistik</value>
+  </data>
+  <data name="Оборот і дохід по магазинах та в часі" xml:space="preserve">
+    <value>Umsatz und Einnahmen nach Shop und im Zeitverlauf</value>
+  </data>
+  <data name="Система" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="Виплати" xml:space="preserve">
+    <value>Auszahlungen</value>
+  </data>
+  <data name="Заявки продавців на виведення коштів" xml:space="preserve">
+    <value>Verkäuferanträge zur Auszahlung von Geldern</value>
+  </data>
+  <data name="Фонові задачі" xml:space="preserve">
+    <value>Hintergrundaufgaben</value>
+  </data>
+  <data name="Розклад, статус, ручний запуск" xml:space="preserve">
+    <value>Zeitplan, Status, manueller Start</value>
+  </data>
+  <data name="Ліміти бізнесу" xml:space="preserve">
+    <value>Unternehmenslimits</value>
+  </data>
+  <data name="Товари, знижки, промокоди" xml:space="preserve">
+    <value>Produkte, Rabatte, Aktionscodes</value>
+  </data>
+  <data name="Комісія з продажів, ставка" xml:space="preserve">
+    <value>Verkaufsprovision, Satz</value>
+  </data>
+  <data name="Журнал користувачів" xml:space="preserve">
+    <value>Nutzerprotokoll</value>
+  </data>
+  <data name="Реєстрації, входи, замовлення" xml:space="preserve">
+    <value>Registrierungen, Anmeldungen, Bestellungen</value>
+  </data>
+  <data name="Журнал бізнесів" xml:space="preserve">
+    <value>Unternehmensprotokoll</value>
+  </data>
+  <data name="Товари, знижки, промокоди, статуси" xml:space="preserve">
+    <value>Produkte, Rabatte, Aktionscodes, Status</value>
+  </data>
+</root>

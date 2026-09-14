@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.OrderDetailsViewModel
 
 @{
-    ViewData["Title"] = "Доставка замовлення";
+    ViewData["Title"] = Localizer["Доставка замовлення"];
     var currentStep = Model.Status switch
     {
         Marketplace.Domain.Enums.OrderStatus.Pending => 0,
@@ -12,10 +12,10 @@
     };
     var steps = new[]
     {
-        ("Замовлення створено", "Ми отримали ваше замовлення."),
-        ("Замовлення підтверджено", "Продавець готує товари до відправлення."),
-        ("Передано в доставку", "Посилка вже прямує до вас."),
-        ("Доставлено", "Замовлення успішно отримано.")
+        (Localizer["Замовлення створено"].Value, Localizer["Ми отримали ваше замовлення."].Value),
+        (Localizer["Замовлення підтверджено"].Value, Localizer["Продавець готує товари до відправлення."].Value),
+        (Localizer["Передано в доставку"].Value, Localizer["Посилка вже прямує до вас."].Value),
+        (Localizer["Доставлено"].Value, Localizer["Замовлення успішно отримано."].Value)
     };
 }
 
@@ -24,24 +24,24 @@
 }
 
 <div class="shop-page">
-    <a asp-action="Details" asp-route-id="@Model.Id" class="shop-back">← До замовлення</a>
+    <a asp-action="Details" asp-route-id="@Model.Id" class="shop-back">← @Localizer["До замовлення"]</a>
     <header class="shop-header">
         <div>
-            <div class="shop-kicker">Замовлення #@Model.Id.ToString()[..8].ToUpperInvariant()</div>
-            <h1 class="shop-title">Доставка товару</h1>
-            <p class="shop-subtitle">Статус і маршрут доставки вашого замовлення.</p>
+            <div class="shop-kicker">@Localizer["Замовлення #"]@Model.Id.ToString()[..8].ToUpperInvariant()</div>
+            <h1 class="shop-title">@Localizer["Доставка товару"]</h1>
+            <p class="shop-subtitle">@Localizer["Статус і маршрут доставки вашого замовлення."]</p>
         </div>
     </header>
 
     <section class="shop-panel delivery-card">
         @if (Model.Status == Marketplace.Domain.Enums.OrderStatus.Canceled)
         {
-            <div class="alert alert-danger mb-0">Замовлення скасовано. Доставка не виконується.</div>
+            <div class="alert alert-danger mb-0">@Localizer["Замовлення скасовано. Доставка не виконується."]</div>
         }
         else
         {
             <div class="delivery-address">
-                <div class="text-secondary small mb-1">Адреса доставки</div>
+                <div class="text-secondary small mb-1">@Localizer["Адреса доставки"]</div>
                 <strong>@Model.ShippingCountry, @Model.ShippingCity, @Model.ShippingStreet</strong>
             </div>
 

@@ -1,7 +1,7 @@
 @model List<Marketplace.BLL.DTOs.UserDiscountGetDto>
 
 @{
-    ViewData["Title"] = "Мої знижки";
+    ViewData["Title"] = Localizer["Мої знижки"];
 }
 
 @section Styles {
@@ -9,12 +9,12 @@
 }
 
 <div class="profile-page">
-    <a asp-action="Index" class="profile-back">← До кабінету</a>
+    <a asp-action="Index" class="profile-back">← @Localizer["До кабінету"]</a>
 
     <div class="profile-summary">
         <div>
-            <h1>Мої знижки</h1>
-            <p>Персональні знижки, які магазини надали саме вам - діють на всі товари магазину, поки не мине термін.</p>
+            <h1>@Localizer["Мої знижки"]</h1>
+            <p>@Localizer["Персональні знижки, які магазини надали саме вам - діють на всі товари магазину, поки не мине термін."]</p>
         </div>
     </div>
 
@@ -22,9 +22,9 @@
     {
         <div class="profile-empty">
             <div class="profile-empty__icon" aria-hidden="true">%</div>
-            <h2>Персональних знижок поки немає</h2>
-            <p>Коли продавець надасть вам персональну знижку, вона з'явиться тут.</p>
-            <a asp-controller="Catalog" asp-action="Index" class="btn btn-primary">До каталогу</a>
+            <h2>@Localizer["Персональних знижок поки немає"]</h2>
+            <p>@Localizer["Коли продавець надасть вам персональну знижку, вона з'явиться тут."]</p>
+            <a asp-controller="Catalog" asp-action="Index" class="btn btn-primary">@Localizer["До каталогу"]</a>
         </div>
     }
     else
@@ -36,7 +36,7 @@
                     <div class="address-card__lines">
                         <span class="address-card__badge">−@discount.Percent.ToString("0.##")%</span>
                         <strong>@discount.StoreName</strong>
-                        <p>Діє до @discount.EndDate?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
+                        <p>@Localizer["Діє до"] @discount.EndDate?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
                     </div>
                 </div>
             }

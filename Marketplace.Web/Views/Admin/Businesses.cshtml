@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.AdminBusinessesPageViewModel
 
 @{
-    ViewData["Title"] = "Бізнеси - Адмін-панель";
+    ViewData["Title"] = $"{Localizer["Бізнеси"].Value} - {SharedLocalizer["Адмін-панель"].Value}";
     var businesses = Model.Result.Items;
 }
 
@@ -10,12 +10,12 @@
 }
 
 @functions {
-    private static string StatusLabel(Marketplace.Domain.Enums.BusinessStatus status) => status switch
+    private string StatusLabel(Marketplace.Domain.Enums.BusinessStatus status) => status switch
     {
-        Marketplace.Domain.Enums.BusinessStatus.Pending => "На перевірці",
-        Marketplace.Domain.Enums.BusinessStatus.Active => "Активний",
-        Marketplace.Domain.Enums.BusinessStatus.Suspended => "Призупинений",
-        Marketplace.Domain.Enums.BusinessStatus.Rejected => "Відхилений",
+        Marketplace.Domain.Enums.BusinessStatus.Pending => Localizer["На перевірці"].Value,
+        Marketplace.Domain.Enums.BusinessStatus.Active => Localizer["Активний"].Value,
+        Marketplace.Domain.Enums.BusinessStatus.Suspended => Localizer["Призупинений"].Value,
+        Marketplace.Domain.Enums.BusinessStatus.Rejected => Localizer["Відхилений"].Value,
         _ => status.ToString()
     };
 }
@@ -28,8 +28,8 @@
             <header class="admin-header">
                 <div>
                     <div class="admin-kicker">Admin</div>
-                    <h1 class="admin-title">Бізнеси</h1>
-                    <p class="admin-subtitle">Знайдено <strong>@Model.Result.TotalItems</strong> магазинів.</p>
+                    <h1 class="admin-title">@Localizer["Бізнеси"]</h1>
+                    <p class="admin-subtitle">@Localizer["Знайдено"] <strong>@Model.Result.TotalItems</strong> @Localizer["магазинів."]</p>
                 </div>
             </header>
 
@@ -44,40 +44,40 @@
                         <circle cx="11" cy="11" r="8" />
                         <path d="m21 21-4.3-4.3" />
                     </svg>
-                    <input type="search" class="form-control admin-search" name="Search" value="@Model.Filter.Search" placeholder="Пошук за назвою" aria-label="Пошук магазинів" />
+                    <input type="search" class="form-control admin-search" name="Search" value="@Model.Filter.Search" placeholder="@Localizer["Пошук за назвою"]" aria-label="@Localizer["Пошук магазинів"]" />
                 </div>
                 <div class="admin-search-wrap">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
                         <circle cx="11" cy="11" r="8" />
                         <path d="m21 21-4.3-4.3" />
                     </svg>
-                    <input type="search" class="form-control admin-search" name="SearchEmail" value="@Model.Filter.SearchEmail" placeholder="Пошук за email" aria-label="Пошук за email власника" />
+                    <input type="search" class="form-control admin-search" name="SearchEmail" value="@Model.Filter.SearchEmail" placeholder="@Localizer["Пошук за email"]" aria-label="@Localizer["Пошук за email власника"]" />
                 </div>
-                <select class="form-select" name="Status" aria-label="Фільтр за статусом" onchange="this.form.submit()">
-                    <option value="">Усі статуси</option>
-                    <option value="Active" selected="@(Model.Filter.Status == Marketplace.Domain.Enums.BusinessStatus.Active)">Активний</option>
-                    <option value="Pending" selected="@(Model.Filter.Status == Marketplace.Domain.Enums.BusinessStatus.Pending)">На перевірці</option>
-                    <option value="Suspended" selected="@(Model.Filter.Status == Marketplace.Domain.Enums.BusinessStatus.Suspended)">Призупинений</option>
-                    <option value="Rejected" selected="@(Model.Filter.Status == Marketplace.Domain.Enums.BusinessStatus.Rejected)">Відхилений</option>
+                <select class="form-select" name="Status" aria-label="@Localizer["Фільтр за статусом"]" onchange="this.form.submit()">
+                    <option value="">@Localizer["Усі статуси"]</option>
+                    <option value="Active" selected="@(Model.Filter.Status == Marketplace.Domain.Enums.BusinessStatus.Active)">@Localizer["Активний"]</option>
+                    <option value="Pending" selected="@(Model.Filter.Status == Marketplace.Domain.Enums.BusinessStatus.Pending)">@Localizer["На перевірці"]</option>
+                    <option value="Suspended" selected="@(Model.Filter.Status == Marketplace.Domain.Enums.BusinessStatus.Suspended)">@Localizer["Призупинений"]</option>
+                    <option value="Rejected" selected="@(Model.Filter.Status == Marketplace.Domain.Enums.BusinessStatus.Rejected)">@Localizer["Відхилений"]</option>
                 </select>
                 <div class="admin-price-range admin-price-range--wide">
-                    <input type="number" class="form-control" name="MinCommission" min="0" max="100" step="0.1" placeholder="Комісія від" aria-label="Комісія від" value="@Model.Filter.MinCommission" />
+                    <input type="number" class="form-control" name="MinCommission" min="0" max="100" step="0.1" placeholder="@Localizer["Комісія від"]" aria-label="@Localizer["Комісія від"]" value="@Model.Filter.MinCommission" />
                     <span aria-hidden="true">-</span>
-                    <input type="number" class="form-control" name="MaxCommission" min="0" max="100" step="0.1" placeholder="Комісія до" aria-label="Комісія до" value="@Model.Filter.MaxCommission" />
+                    <input type="number" class="form-control" name="MaxCommission" min="0" max="100" step="0.1" placeholder="@Localizer["Комісія до"]" aria-label="@Localizer["Комісія до"]" value="@Model.Filter.MaxCommission" />
                 </div>
-                <select class="form-select" name="SortOption" aria-label="Сортування" onchange="this.form.submit()">
-                    <option value="CreatedAtDesc" selected="@(Model.Filter.SortOption == Marketplace.Domain.Enums.BusinessSortOption.CreatedAtDesc)">Спочатку нові</option>
-                    <option value="CreatedAtAsc" selected="@(Model.Filter.SortOption == Marketplace.Domain.Enums.BusinessSortOption.CreatedAtAsc)">Спочатку старі</option>
-                    <option value="CommissionAsc" selected="@(Model.Filter.SortOption == Marketplace.Domain.Enums.BusinessSortOption.CommissionAsc)">Спочатку низька комісія</option>
-                    <option value="CommissionDesc" selected="@(Model.Filter.SortOption == Marketplace.Domain.Enums.BusinessSortOption.CommissionDesc)">Спочатку висока комісія</option>
+                <select class="form-select" name="SortOption" aria-label="@Localizer["Сортування"]" onchange="this.form.submit()">
+                    <option value="CreatedAtDesc" selected="@(Model.Filter.SortOption == Marketplace.Domain.Enums.BusinessSortOption.CreatedAtDesc)">@Localizer["Спочатку нові"]</option>
+                    <option value="CreatedAtAsc" selected="@(Model.Filter.SortOption == Marketplace.Domain.Enums.BusinessSortOption.CreatedAtAsc)">@Localizer["Спочатку старі"]</option>
+                    <option value="CommissionAsc" selected="@(Model.Filter.SortOption == Marketplace.Domain.Enums.BusinessSortOption.CommissionAsc)">@Localizer["Спочатку низька комісія"]</option>
+                    <option value="CommissionDesc" selected="@(Model.Filter.SortOption == Marketplace.Domain.Enums.BusinessSortOption.CommissionDesc)">@Localizer["Спочатку висока комісія"]</option>
                 </select>
-                <button type="submit" class="btn btn-outline-secondary">Застосувати</button>
+                <button type="submit" class="btn btn-outline-secondary">@Localizer["Застосувати"]</button>
             </form>
 
             @if (businesses.Count == 0)
             {
                 <div class="admin-panel">
-                    <p class="admin-empty">Нічого не знайдено за цим запитом.</p>
+                    <p class="admin-empty">@Localizer["Нічого не знайдено за цим запитом."]</p>
                 </div>
             }
             else
@@ -86,18 +86,18 @@
                     <table class="table admin-table" id="businesses-table">
                         <thead>
                             <tr>
-                                <th>Магазин</th>
-                                <th>Власник</th>
-                                <th>Статус</th>
-                                <th>Комісія</th>
-                                <th class="text-end">Дії</th>
+                                <th>@Localizer["Магазин"]</th>
+                                <th>@Localizer["Власник"]</th>
+                                <th>@Localizer["Статус"]</th>
+                                <th>@Localizer["Комісія"]</th>
+                                <th class="text-end">@Localizer["Дії"]</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var business in businesses)
                             {
                                 var statusClass = business.Status.ToString().ToLowerInvariant();
-                                var name = string.IsNullOrWhiteSpace(business.Name) ? "Без назви" : business.Name;
+                                var name = string.IsNullOrWhiteSpace(business.Name) ? Localizer["Без назви"].Value : business.Name;
                                 var businessInitial = name[..1].ToUpperInvariant();
 
                                 <tr>
@@ -119,7 +119,7 @@
                                     <td>
                                         <form asp-action="ChangeBusinessCommission" method="post" class="admin-inline-form">
                                             <input type="hidden" name="businessId" value="@business.Id" />
-                                            <input type="number" name="commissionPercent" min="0" max="100" step="0.1" value="@business.CommissionPercent.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)" class="admin-inline-form__input" aria-label="Комісія, %" />
+                                            <input type="number" name="commissionPercent" min="0" max="100" step="0.1" value="@business.CommissionPercent.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)" class="admin-inline-form__input" aria-label="@Localizer["Комісія, %"]" />
                                             <button type="submit" class="btn btn-sm btn-outline-secondary">%</button>
                                         </form>
                                     </td>
@@ -130,7 +130,7 @@
                                                 <form asp-action="ChangeBusinessStatus" method="post">
                                                     <input type="hidden" name="businessId" value="@business.Id" />
                                                     <input type="hidden" name="status" value="Active" />
-                                                    <button type="submit" class="btn btn-sm btn-outline-success">Активувати</button>
+                                                    <button type="submit" class="btn btn-sm btn-outline-success">@Localizer["Активувати"]</button>
                                                 </form>
                                             }
                                             @if (business.Status != Marketplace.Domain.Enums.BusinessStatus.Suspended)
@@ -138,7 +138,7 @@
                                                 <form asp-action="ChangeBusinessStatus" method="post">
                                                     <input type="hidden" name="businessId" value="@business.Id" />
                                                     <input type="hidden" name="status" value="Suspended" />
-                                                    <button type="submit" class="btn btn-sm btn-outline-secondary">Призупинити</button>
+                                                    <button type="submit" class="btn btn-sm btn-outline-secondary">@Localizer["Призупинити"]</button>
                                                 </form>
                                             }
                                             @if (business.Status != Marketplace.Domain.Enums.BusinessStatus.Rejected)
@@ -146,7 +146,7 @@
                                                 <form asp-action="ChangeBusinessStatus" method="post">
                                                     <input type="hidden" name="businessId" value="@business.Id" />
                                                     <input type="hidden" name="status" value="Rejected" />
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Відхилити</button>
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">@Localizer["Відхилити"]</button>
                                                 </form>
                                             }
                                         </div>

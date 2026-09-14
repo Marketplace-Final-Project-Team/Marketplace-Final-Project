@@ -1,25 +1,25 @@
 @{
-    ViewData["Title"] = "Завершіть реєстрацію";
+    ViewData["Title"] = Localizer["Завершіть реєстрацію"].Value;
 }
 
 <section class="auth-card auth-card--status" aria-labelledby="registration-success-title">
     <div class="status-mark status-mark--mail" aria-hidden="true">@@</div>
-    <p class="auth-kicker">Ще один крок</p>
-    <h2 id="registration-success-title">Підтвердьте свою пошту</h2>
+    <p class="auth-kicker">@Localizer["Ще один крок"]</p>
+    <h2 id="registration-success-title">@Localizer["Підтвердьте свою пошту"]</h2>
     <p class="status-copy">
-        Акаунт створено. Ми надіслали лист із посиланням для підтвердження електронної пошти.
+        @Localizer["Акаунт створено. Ми надіслали лист із посиланням для підтвердження електронної пошти."]
     </p>
 
-    <div class="auth-steps" aria-label="Як завершити реєстрацію">
-        <div><span>1</span><p><strong>Знайдіть лист Marketplace</strong>Якщо його не видно, перевірте папку «Спам».</p></div>
-        <div><span>2</span><p><strong>Підтвердьте адресу</strong>Натисніть кнопку або посилання всередині листа.</p></div>
-        <div><span>3</span><p><strong>Увійдіть до акаунта</strong>Після підтвердження стануть доступні покупки й кабінет продавця.</p></div>
+    <div class="auth-steps" aria-label="@Localizer["Як завершити реєстрацію"]">
+        <div><span>1</span><p><strong>@Localizer["Знайдіть лист Marketplace"]</strong>@Localizer["Якщо його не видно, перевірте папку «Спам»."]</p></div>
+        <div><span>2</span><p><strong>@Localizer["Підтвердьте адресу"]</strong>@Localizer["Натисніть кнопку або посилання всередині листа."]</p></div>
+        <div><span>3</span><p><strong>@Localizer["Увійдіть до акаунта"]</strong>@Localizer["Після підтвердження стануть доступні покупки й кабінет продавця."]</p></div>
     </div>
 
     <div class="auth-status-actions">
-        <a asp-action="SignIn" class="button button--primary">Перейти до входу <span aria-hidden="true">→</span></a>
-        <a asp-controller="Home" asp-action="Index" class="button button--secondary">На головну</a>
+        <a asp-action="SignIn" class="button button--primary">@Localizer["Перейти до входу"] <span aria-hidden="true">→</span></a>
+        <a asp-controller="Home" asp-action="Index" class="button button--secondary">@Localizer["На головну"]</a>
     </div>
 
-    <p class="auth-status-hint">Лист може надійти протягом кількох хвилин.</p>
+    <p class="auth-status-hint">@Localizer["Лист може надійти протягом кількох хвилин."]</p>
 </section>

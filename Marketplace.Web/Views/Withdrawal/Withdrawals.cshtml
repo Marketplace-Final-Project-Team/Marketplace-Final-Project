@@ -1,17 +1,17 @@
 @model Marketplace.Web.Models.WithdrawalsAdminViewModel
 
 @{
-    ViewData["Title"] = "Виплати - Адмін-панель";
+    ViewData["Title"] = Localizer["Виплати - Адмін-панель"].Value;
 }
 
 @functions {
-    private static string StatusLabel(Marketplace.Domain.Enums.WithdrawalStatus status) => status switch
+    private string StatusLabel(Marketplace.Domain.Enums.WithdrawalStatus status) => status switch
     {
-        Marketplace.Domain.Enums.WithdrawalStatus.Pending => "Очікує розгляду",
-        Marketplace.Domain.Enums.WithdrawalStatus.Processing => "В обробці",
-        Marketplace.Domain.Enums.WithdrawalStatus.Rejected => "Відхилено",
-        Marketplace.Domain.Enums.WithdrawalStatus.Completed => "Виплачено",
-        Marketplace.Domain.Enums.WithdrawalStatus.Failed => "Помилка виплати",
+        Marketplace.Domain.Enums.WithdrawalStatus.Pending => Localizer["Очікує розгляду"].Value,
+        Marketplace.Domain.Enums.WithdrawalStatus.Processing => Localizer["В обробці"].Value,
+        Marketplace.Domain.Enums.WithdrawalStatus.Rejected => Localizer["Відхилено"].Value,
+        Marketplace.Domain.Enums.WithdrawalStatus.Completed => Localizer["Виплачено"].Value,
+        Marketplace.Domain.Enums.WithdrawalStatus.Failed => Localizer["Помилка виплати"].Value,
         _ => status.ToString()
     };
 
@@ -32,8 +32,8 @@
             <header class="admin-header">
                 <div>
                     <div class="admin-kicker">Admin</div>
-                    <h1 class="admin-title">Виплати</h1>
-                    <p class="admin-subtitle">Заявки продавців на виведення коштів з балансу магазину на картку.</p>
+                    <h1 class="admin-title">@Localizer["Виплати"]</h1>
+                    <p class="admin-subtitle">@Localizer["Заявки продавців на виведення коштів з балансу магазину на картку."]</p>
                 </div>
             </header>
 
@@ -48,39 +48,39 @@
 
             <form method="get" asp-action="Withdrawals" class="admin-toolbar admin-toolbar--center">
                 <div>
-                    <label for="status" class="admin-toolbar__label">Статус</label>
+                    <label for="status" class="admin-toolbar__label">@Localizer["Статус"]</label>
                     <select id="status" name="status" class="form-select">
-                        <option value="">Усі статуси</option>
+                        <option value="">@Localizer["Усі статуси"]</option>
                         @foreach (var value in Enum.GetValues<Marketplace.Domain.Enums.WithdrawalStatus>())
                         {
                             <option value="@value" selected="@(Model.StatusFilter == value)">@StatusLabel(value)</option>
                         }
                     </select>
                 </div>
-                <button type="submit" class="btn btn-outline-secondary">Застосувати</button>
+                <button type="submit" class="btn btn-outline-secondary">@Localizer["Застосувати"]</button>
                 @if (Model.StatusFilter.HasValue)
                 {
-                    <a asp-action="Withdrawals" class="btn btn-outline-secondary">Скинути</a>
+                    <a asp-action="Withdrawals" class="btn btn-outline-secondary">@Localizer["Скинути"]</a>
                 }
             </form>
 
             <section class="admin-panel table-responsive">
                 @if (Model.Withdrawals.Count == 0)
                 {
-                    <p class="admin-empty">Заявок на виплату немає.</p>
+                    <p class="admin-empty">@Localizer["Заявок на виплату немає."]</p>
                 }
                 else
                 {
                     <table class="table admin-table">
                         <thead>
                             <tr>
-                                <th>Магазин</th>
-                                <th>Сума</th>
-                                <th>Картка</th>
-                                <th>Отримувач</th>
-                                <th>Створено</th>
-                                <th>Статус</th>
-                                <th class="text-end">Дії</th>
+                                <th>@Localizer["Магазин"]</th>
+                                <th>@Localizer["Сума"]</th>
+                                <th>@Localizer["Картка"]</th>
+                                <th>@Localizer["Отримувач"]</th>
+                                <th>@Localizer["Створено"]</th>
+                                <th>@Localizer["Статус"]</th>
+                                <th class="text-end">@Localizer["Дії"]</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -102,14 +102,14 @@
                                     <td class="text-end">
                                         @if (request.Status == Marketplace.Domain.Enums.WithdrawalStatus.Pending.ToString())
                                         {
-                                            <form asp-action="ApproveWithdrawal" method="post" class="d-inline" onsubmit="return confirm('Підтвердити виплату @request.Amount.ToString("N2") ₴ на картку @MaskCard(request.CardNumber)?');">
+                                            <form asp-action="ApproveWithdrawal" method="post" class="d-inline" onsubmit="return confirm('@Localizer["Підтвердити виплату {0} ₴ на картку {1}?", request.Amount.ToString("N2"), MaskCard(request.CardNumber)]');">
                                                 <input type="hidden" name="requestId" value="@request.Id" />
-                                                <button type="submit" class="btn btn-sm btn-outline-success">Виплатити</button>
+                                                <button type="submit" class="btn btn-sm btn-outline-success">@Localizer["Виплатити"]</button>
                                             </form>
                                             <form asp-action="RejectWithdrawal" method="post" class="admin-inline-form">
                                                 <input type="hidden" name="requestId" value="@request.Id" />
-                                                <input type="text" name="reason" placeholder="Причина відхилення" class="admin-inline-form__input" required />
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">Відхилити</button>
+                                                <input type="text" name="reason" placeholder="@Localizer["Причина відхилення"]" class="admin-inline-form__input" required />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">@Localizer["Відхилити"]</button>
                                             </form>
                                         }
                                     </td>

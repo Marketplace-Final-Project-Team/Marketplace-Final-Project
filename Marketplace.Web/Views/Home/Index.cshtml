@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.HomeViewModel
 
 @{
-    ViewData["Title"] = "Головна";
+    ViewData["Title"] = SharedLocalizer["Головна"].Value;
     var topProduct = Model.TopProduct;
 }
 
@@ -12,39 +12,39 @@
 <div class="home-page">
     <section class="home-hero">
         <div class="home-hero__content">
-            <div class="home-pill"><span></span> Покупки без зайвих кроків</div>
-            <h1>Усе потрібне - <em>в одному місці</em></h1>
-            <p>Знаходьте товари для роботи, дому й відпочинку. Порівнюйте пропозиції, додавайте до кошика та стежте за доставкою.</p>
+            <div class="home-pill"><span></span> @Localizer["Покупки без зайвих кроків"]</div>
+            <h1>@Localizer["Усе потрібне - <em>в одному місці</em>"]</h1>
+            <p>@Localizer["Знаходьте товари для роботи, дому й відпочинку. Порівнюйте пропозиції, додавайте до кошика та стежте за доставкою."]</p>
 
             <form asp-controller="Catalog" asp-action="Index" method="get" class="home-search" role="search" data-search-wrapper>
                 <span aria-hidden="true">⌕</span>
-                <input name="Search" id="homeSearchInput" placeholder="Що ви шукаєте?" aria-label="Пошук товарів" data-search-autocomplete autocomplete="off" />
-                <button type="submit">Знайти</button>
+                <input name="Search" id="homeSearchInput" placeholder="@Localizer["Що ви шукаєте?"]" aria-label="@SharedLocalizer["Пошук товарів"]" data-search-autocomplete autocomplete="off" />
+                <button type="submit">@Localizer["Знайти"]</button>
             </form>
 
             <div class="home-hero__actions">
-                <a asp-controller="Catalogue" asp-action="Index" class="home-button home-button--primary">Перейти до каталогу <span>→</span></a>
+                <a asp-controller="Catalogue" asp-action="Index" class="home-button home-button--primary">@Localizer["Перейти до каталогу"] <span>→</span></a>
                 @if (User.Identity?.IsAuthenticated != true)
                 {
-                    <a asp-controller="Auth" asp-action="SignUp" class="home-button home-button--ghost">Створити акаунт</a>
+                    <a asp-controller="Auth" asp-action="SignUp" class="home-button home-button--ghost">@SharedLocalizer["Створити акаунт"]</a>
                 }
                 else
                 {
-                    <a asp-controller="Order" asp-action="Index" class="home-button home-button--ghost">Мої замовлення</a>
+                    <a asp-controller="Order" asp-action="Index" class="home-button home-button--ghost">@SharedLocalizer["Мої замовлення"]</a>
                 }
             </div>
 
             <div class="home-hero__proof">
-                <div><strong>Зручно для кожного</strong><small>від пошуку до доставки</small></div>
+                <div><strong>@Localizer["Зручно для кожного"]</strong><small>@Localizer["від пошуку до доставки"]</small></div>
             </div>
         </div>
 
-        <div class="home-hero__visual" aria-label="Популярні пропозиції">
+        <div class="home-hero__visual" aria-label="@Localizer["Популярні пропозиції"]">
             <div class="visual-orbit visual-orbit--one"></div>
             <div class="visual-orbit visual-orbit--two"></div>
 
             <div class="visual-main-card position-relative">
-            
+
                 @if (topProduct is not null && topProduct.IsAgeRestricted)
                 {
                     <span class="position-absolute top-0 end-0 bg-danger text-white text-xs fw-bold px-2 py-1 rounded-pill z-1 m-2 shadow">
@@ -53,7 +53,7 @@
                 }
 
                 <div class="visual-main-card__top">
-                    <span class="visual-tag">@(topProduct is not null ? "Популярний вибір" : "Каталог")</span>
+                    <span class="visual-tag">@(topProduct is not null ? Localizer["Популярний вибір"].Value : Localizer["Каталог"].Value)</span>
                     <span class="visual-heart" aria-hidden="true">♡</span>
                 </div>
                 <div class="visual-product">
@@ -80,16 +80,16 @@
                                 <span class="text-muted text-decoration-line-through small ms-1">@topProduct.OriginalPrice.Value.ToString("N0") ₴</span>
                             }
                         </strong>
-                        <button type="button" class="btn btn-link p-0 text-start text-decoration-none" 
+                        <button type="button" class="btn btn-link p-0 text-start text-decoration-none"
                                 onclick="checkAgeAndAction('@topProduct.Id', @topProduct.IsAgeRestricted.ToString().ToLower())">
-                            Переглянути товар →
+                            @Localizer["Переглянути товар →"]
                         </button>
                     }
                     else
                     {
                         <small>Marketplace</small>
-                        <strong>Товари ще завантажуються</strong>
-                        <a asp-controller="Catalogue" asp-action="Index">Перейти до каталогу →</a>
+                        <strong>@Localizer["Товари ще завантажуються"]</strong>
+                        <a asp-controller="Catalogue" asp-action="Index">@Localizer["Перейти до каталогу →"]</a>
                     }
                 </div>
             </div>
@@ -98,39 +98,39 @@
                 <span class="visual-float-card__icon">★</span>
                 @if (Model.AverageRating.HasValue)
                 {
-                    <div><strong>@Model.AverageRating.Value.ToString("0.0")</strong><small>@Model.ReviewCount відгуків покупців</small></div>
+                    <div><strong>@Model.AverageRating.Value.ToString("0.0")</strong><small>@Model.ReviewCount @Localizer["відгуків покупців"]</small></div>
                 }
                 else
                 {
-                    <div><strong>Новий каталог</strong><small>Будьте першим, хто залишить відгук</small></div>
+                    <div><strong>@Localizer["Новий каталог"]</strong><small>@Localizer["Будьте першим, хто залишить відгук"]</small></div>
                 }
             </div>
             <div class="visual-float-card visual-float-card--delivery">
                 <span class="visual-float-card__icon">✓</span>
-                <div><strong>Швидка доставка</strong><small>статус завжди під рукою</small></div>
+                <div><strong>@Localizer["Швидка доставка"]</strong><small>@Localizer["статус завжди під рукою"]</small></div>
             </div>
         </div>
     </section>
 
-    <section class="home-benefits" aria-label="Переваги маркетплейсу">
-        <div><span>✓</span><p><strong>Перевірені товари</strong><small>зрозумілий статус наявності</small></p></div>
-        <div><span>↺</span><p><strong>Просте повернення</strong><small>прозорий процес покупки</small></p></div>
-        <div><span>□</span><p><strong>Зручний кошик</strong><small>керуйте кількістю онлайн</small></p></div>
-        <div><span>→</span><p><strong>Контроль доставки</strong><small>від замовлення до отримання</small></p></div>
+    <section class="home-benefits" aria-label="@Localizer["Переваги маркетплейсу"]">
+        <div><span>✓</span><p><strong>@Localizer["Перевірені товари"]</strong><small>@Localizer["зрозумілий статус наявності"]</small></p></div>
+        <div><span>↺</span><p><strong>@Localizer["Просте повернення"]</strong><small>@Localizer["прозорий процес покупки"]</small></p></div>
+        <div><span>□</span><p><strong>@Localizer["Зручний кошик"]</strong><small>@Localizer["керуйте кількістю онлайн"]</small></p></div>
+        <div><span>→</span><p><strong>@Localizer["Контроль доставки"]</strong><small>@Localizer["від замовлення до отримання"]</small></p></div>
     </section>
 
     <section class="home-section">
         <div class="home-section__heading">
             <div>
-                <span class="home-section__kicker">Обирайте швидше</span>
-                <h2>Популярні категорії</h2>
+                <span class="home-section__kicker">@Localizer["Обирайте швидше"]</span>
+                <h2>@Localizer["Популярні категорії"]</h2>
             </div>
-            <a asp-controller="Catalogue" asp-action="Index">Увесь каталог →</a>
+            <a asp-controller="Catalogue" asp-action="Index">@Localizer["Увесь каталог →"]</a>
         </div>
 
         @if (Model.Categories.Count == 0)
         {
-            <p class="text-secondary">Категорії ще не додані.</p>
+            <p class="text-secondary">@Localizer["Категорії ще не додані."]</p>
         }
         else
         {
@@ -140,7 +140,7 @@
                     <a asp-controller="Catalogue" asp-action="Index" asp-route-categoryId="@category.Id" class="category-card category-card--@category.ColorClass">
                         <span class="category-card__icon">@category.Icon</span>
                         <strong>@category.Name</strong>
-                        <small>@category.ProductCount @(category.ProductCount == 1 ? "товар" : category.ProductCount is >= 2 and <= 4 ? "товари" : "товарів")</small>
+                        <small>@category.ProductCount @(category.ProductCount == 1 ? Localizer["товар"].Value : category.ProductCount is >= 2 and <= 4 ? Localizer["товари"].Value : Localizer["товарів"].Value)</small>
                     </a>
                 }
             </div>
@@ -152,23 +152,23 @@
         <section class="home-section home-featured">
             <div class="home-section__heading">
                 <div>
-                    <span class="home-section__kicker">Варто переглянути</span>
-                    <h2>Популярне зараз</h2>
+                    <span class="home-section__kicker">@Localizer["Варто переглянути"]</span>
+                    <h2>@Localizer["Популярне зараз"]</h2>
                 </div>
-                <a asp-controller="Catalogue" asp-action="Index" asp-route-Sort="Popularity">Дивитися більше →</a>
+                <a asp-controller="Catalogue" asp-action="Index" asp-route-Sort="Popularity">@Localizer["Дивитися більше →"]</a>
             </div>
 
-            <div class="home-view-toggle" role="group" aria-label="Режим перегляду товарів">
-                <button type="button" class="home-view-toggle__btn" data-view-toggle="grid" aria-label="Плитка">
+            <div class="home-view-toggle" role="group" aria-label="@Localizer["Режим перегляду товарів"]">
+                <button type="button" class="home-view-toggle__btn" data-view-toggle="grid" aria-label="@Localizer["Плитка"]">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
                         <rect x="3" y="3" width="7" height="7" rx="1.2" />
                         <rect x="14" y="3" width="7" height="7" rx="1.2" />
                         <rect x="14" y="14" width="7" height="7" rx="1.2" />
                         <rect x="3" y="14" width="7" height="7" rx="1.2" />
                     </svg>
-                    <span>Плитка</span>
+                    <span>@Localizer["Плитка"]</span>
                 </button>
-                <button type="button" class="home-view-toggle__btn" data-view-toggle="list" aria-label="Список">
+                <button type="button" class="home-view-toggle__btn" data-view-toggle="list" aria-label="@Localizer["Список"]">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
                         <path d="M8 6h13" />
                         <path d="M8 12h13" />
@@ -177,15 +177,15 @@
                         <path d="M3 12h.01" />
                         <path d="M3 18h.01" />
                     </svg>
-                    <span>Список</span>
+                    <span>@Localizer["Список"]</span>
                 </button>
-                <button type="button" class="home-view-toggle__btn" data-view-toggle="slider" aria-label="Слайдер">
+                <button type="button" class="home-view-toggle__btn" data-view-toggle="slider" aria-label="@Localizer["Слайдер"]">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
                         <rect x="7" y="4" width="10" height="16" rx="1.5" />
                         <path d="M2 8v8" />
                         <path d="M22 8v8" />
                     </svg>
-                    <span>Слайдер</span>
+                    <span>@Localizer["Слайдер"]</span>
                 </button>
             </div>
 
@@ -215,7 +215,7 @@
                                 {
                                     <span>@product.Name[..1].ToUpperInvariant()</span>
                                 }
-                                <small>@(product.Quantity > 0 ? "В наявності" : "Немає в наявності")</small>
+                                <small>@(product.Quantity > 0 ? Localizer["В наявності"].Value : Localizer["Немає в наявності"].Value)</small>
                             </button>
 
                             <div class="home-product__body">
@@ -247,7 +247,7 @@
                                     <form asp-controller="Cart" asp-action="Add" method="post">
                                         <input type="hidden" name="productId" value="@product.Id" />
                                         <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                                        <button type="submit" aria-label="Додати @product.Name до кошика">+</button>
+                                        <button type="submit" aria-label="@Localizer["Додати"] @product.Name @Localizer["до кошика"]">+</button>
                                     </form>
                                 </div>
                             </div>
@@ -302,7 +302,7 @@
                             <form asp-controller="Cart" asp-action="Add" method="post">
                                 <input type="hidden" name="productId" value="@product.Id" />
                                 <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                                <button type="submit" class="home-product-list__add" aria-label="Додати @product.Name до кошика">+</button>
+                                <button type="submit" class="home-product-list__add" aria-label="@Localizer["Додати"] @product.Name @Localizer["до кошика"]">+</button>
                             </form>
                         </div>
                     }
@@ -355,7 +355,7 @@
                                             <form asp-controller="Cart" asp-action="Add" method="post">
                                                 <input type="hidden" name="productId" value="@product.Id" />
                                                 <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                                                <button type="submit" aria-label="Додати @product.Name до кошика">+</button>
+                                                <button type="submit" aria-label="@Localizer["Додати"] @product.Name @Localizer["до кошика"]">+</button>
                                             </form>
                                         </div>
                                     </div>
@@ -365,11 +365,11 @@
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#homeFeaturedCarousel" data-bs-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Попередній</span>
+                        <span class="visually-hidden">@Localizer["Попередній"]</span>
                     </button>
                     <button class="carousel-control-next" type="button" data-bs-target="#homeFeaturedCarousel" data-bs-slide="next">
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Наступний</span>
+                        <span class="visually-hidden">@Localizer["Наступний"]</span>
                     </button>
                 </div>
             </div>
@@ -381,10 +381,10 @@
         <section class="home-section">
             <div class="home-section__heading">
                 <div>
-                    <span class="home-section__kicker">Ваша історія</span>
-                    <h2>Нещодавно переглянуті</h2>
+                    <span class="home-section__kicker">@Localizer["Ваша історія"]</span>
+                    <h2>@Localizer["Нещодавно переглянуті"]</h2>
                 </div>
-                <a asp-controller="Catalog" asp-action="Index">Увесь каталог →</a>
+                <a asp-controller="Catalog" asp-action="Index">@Localizer["Увесь каталог →"]</a>
             </div>
             <div class="home-products">
                 @for (var index = 0; index < Model.RecentlyViewed.Count; index++)
@@ -401,7 +401,7 @@
                             {
                                 <span>@product.Name[..1].ToUpperInvariant()</span>
                             }
-                            <small>Переглянуто</small>
+                            <small>@Localizer["Переглянуто"]</small>
                         </a>
                         <div class="home-product__body">
                             <div class="home-product__category">@product.CategoryName</div>
@@ -418,27 +418,27 @@
 
     <section class="home-promo">
         <div class="home-promo__content">
-            <span class="home-section__kicker">Для продавців</span>
-            <h2>Перетворіть ідею на власний магазин</h2>
-            <p>Додавайте товари, керуйте залишками та отримуйте замовлення в одному робочому просторі.</p>
+            <span class="home-section__kicker">@Localizer["Для продавців"]</span>
+            <h2>@Localizer["Перетворіть ідею на власний магазин"]</h2>
+            <p>@Localizer["Додавайте товари, керуйте залишками та отримуйте замовлення в одному робочому просторі."]</p>
             @if (User.Identity?.IsAuthenticated == true)
             {
-                <a asp-controller="Business" asp-action="Create" class="home-button home-button--light">Створити бізнес →</a>
+                <a asp-controller="Business" asp-action="Create" class="home-button home-button--light">@Localizer["Створити бізнес →"]</a>
             }
             else
             {
-                <a asp-controller="Auth" asp-action="SignUp" class="home-button home-button--light">Почати продавати →</a>
+                <a asp-controller="Auth" asp-action="SignUp" class="home-button home-button--light">@Localizer["Почати продавати →"]</a>
             }
         </div>
         <div class="home-promo__visual" aria-hidden="true">
             <div class="home-promo__glow"></div>
             <div class="home-promo__badge home-promo__badge--growth">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="m17 7-9.5 9.5L3 12" /><path d="m22 7-9.5 9.5" /></svg>
-                +24% цього тижня
+                @Localizer["+24% цього тижня"]
             </div>
             <div class="home-promo__badge home-promo__badge--order">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" /></svg>
-                Нове замовлення
+                @Localizer["Нове замовлення"]
             </div>
             <div class="home-promo__dashboard">
                 <div class="dashboard-top"><span></span><span></span><span></span></div>
@@ -463,24 +463,24 @@
         </div>
     </section>
 
-    <section class="home-steps" aria-label="Як почати продавати">
-        <span class="home-section__kicker">Три кроки</span>
-        <h2>Від ідеї до першого продажу</h2>
+    <section class="home-steps" aria-label="@Localizer["Як почати продавати"]">
+        <span class="home-section__kicker">@Localizer["Три кроки"]</span>
+        <h2>@Localizer["Від ідеї до першого продажу"]</h2>
         <div class="home-steps__grid">
             <div class="home-step">
                 <span class="home-step__number">1</span>
-                <h3>Створіть магазин</h3>
-                <p>Назва, опис і логотип - займає кілька хвилин.</p>
+                <h3>@Localizer["Створіть магазин"]</h3>
+                <p>@Localizer["Назва, опис і логотип - займає кілька хвилин."]</p>
             </div>
             <div class="home-step">
                 <span class="home-step__number">2</span>
-                <h3>Додайте товари</h3>
-                <p>Фото, ціна, категорія - і товар вже в каталозі.</p>
+                <h3>@Localizer["Додайте товари"]</h3>
+                <p>@Localizer["Фото, ціна, категорія - і товар вже в каталозі."]</p>
             </div>
             <div class="home-step">
                 <span class="home-step__number">3</span>
-                <h3>Отримуйте замовлення</h3>
-                <p>Керуйте продажами й доставкою з панелі продавця.</p>
+                <h3>@Localizer["Отримуйте замовлення"]</h3>
+                <p>@Localizer["Керуйте продажами й доставкою з панелі продавця."]</p>
             </div>
         </div>
     </section>
@@ -492,13 +492,13 @@
         <div class="mx-auto d-flex align-items-center justify-content-center rounded-circle bg-danger bg-opacity-10 text-danger fs-3 fw-bold mb-3" style="width: 64px; height: 64px;">
             18+
         </div>
-        <h3 class="fs-4 fw-bold text-dark mb-2">Підтвердження віку</h3>
+        <h3 class="fs-4 fw-bold text-dark mb-2">@Localizer["Підтвердження віку"]</h3>
         <p class="text-secondary small mb-4">
-            Цей контент містить товари для повнолітніх. Вам вже виповнилося 18 років?
+            @Localizer["Цей контент містить товари для повнолітніх. Вам вже виповнилося 18 років?"]
         </p>
         <div class="d-flex gap-2 justify-content-center">
-            <button onclick="confirmAge(false)" class="btn btn-light w-100 fw-medium">Ні, мені менше 18</button>
-            <button onclick="confirmAge(true)" class="btn btn-danger w-100 fw-medium">Так, мені є 18</button>
+            <button onclick="confirmAge(false)" class="btn btn-light w-100 fw-medium">@Localizer["Ні, мені менше 18"]</button>
+            <button onclick="confirmAge(true)" class="btn btn-danger w-100 fw-medium">@Localizer["Так, мені є 18"]</button>
         </div>
     </div>
 </div>
@@ -523,12 +523,12 @@
             if (isAdult) {
                 localStorage.setItem('age_verified', 'true');
                 modal.classList.add('d-none');
-                
+
                 if (pendingTargetUrl) {
                     window.location.href = pendingTargetUrl;
                 }
             } else {
-                alert("Доступ обмежено для осіб молодше 18 років.");
+                alert("@Localizer["Доступ обмежено для осіб молодше 18 років."]");
                 modal.classList.add('d-none');
             }
         }

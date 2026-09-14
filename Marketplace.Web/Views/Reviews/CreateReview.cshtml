@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.ReviewCreateViewModel
 
 @{
-    ViewData["Title"] = "Написати відгук";
+    ViewData["Title"] = Localizer["Написати відгук"];
 }
 
 @section Styles {
@@ -9,42 +9,42 @@
 }
 
 <div class="review-form-page">
-    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@Model.ProductId" class="review-form-back">← Назад до товару</a>
+    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@Model.ProductId" class="review-form-back">← @Localizer["Назад до товару"]</a>
 
     <div class="review-form-card">
-        <h1>Залишити відгук</h1>
-        <p>Поділіться враженням від товару - це допоможе іншим покупцям.</p>
+        <h1>@Localizer["Залишити відгук"]</h1>
+        <p>@Localizer["Поділіться враженням від товару - це допоможе іншим покупцям."]</p>
 
         <form asp-controller="Reviews" asp-action="CreateReview" method="post">
             <input type="hidden" asp-for="ProductId" />
             <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
             <div class="review-form-field">
-                <label>Оцінка</label>
+                <label>@Localizer["Оцінка"]</label>
                 <div class="star-rating">
                     <input type="radio" asp-for="Rating" value="5" id="create-star-5" />
-                    <label for="create-star-5" title="5 з 5">★</label>
+                    <label for="create-star-5" title="@Localizer["5 з 5"]">★</label>
                     <input type="radio" asp-for="Rating" value="4" id="create-star-4" />
-                    <label for="create-star-4" title="4 з 5">★</label>
+                    <label for="create-star-4" title="@Localizer["4 з 5"]">★</label>
                     <input type="radio" asp-for="Rating" value="3" id="create-star-3" />
-                    <label for="create-star-3" title="3 з 5">★</label>
+                    <label for="create-star-3" title="@Localizer["3 з 5"]">★</label>
                     <input type="radio" asp-for="Rating" value="2" id="create-star-2" />
-                    <label for="create-star-2" title="2 з 5">★</label>
+                    <label for="create-star-2" title="@Localizer["2 з 5"]">★</label>
                     <input type="radio" asp-for="Rating" value="1" id="create-star-1" />
-                    <label for="create-star-1" title="1 з 5">★</label>
+                    <label for="create-star-1" title="@Localizer["1 з 5"]">★</label>
                 </div>
                 <span asp-validation-for="Rating" class="text-danger small"></span>
             </div>
 
             <div class="review-form-field">
-                <label asp-for="Body">Ваш відгук</label>
-                <textarea asp-for="Body" maxlength="300" placeholder="Що вам сподобалось чи не сподобалось?"></textarea>
+                <label asp-for="Body">@Localizer["Ваш відгук"]</label>
+                <textarea asp-for="Body" maxlength="300" placeholder="@Localizer["Що вам сподобалось чи не сподобалось?"]"></textarea>
                 <span asp-validation-for="Body" class="text-danger small"></span>
             </div>
 
             <div class="review-form-actions">
-                <a asp-controller="Catalog" asp-action="Details" asp-route-id="@Model.ProductId" class="btn btn-outline-secondary">Скасувати</a>
-                <button type="submit" class="btn btn-primary">Опублікувати відгук</button>
+                <a asp-controller="Catalog" asp-action="Details" asp-route-id="@Model.ProductId" class="btn btn-outline-secondary">@Localizer["Скасувати"]</a>
+                <button type="submit" class="btn btn-primary">@Localizer["Опублікувати відгук"]</button>
             </div>
         </form>
     </div>

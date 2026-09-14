@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.Products.ProductDetailsViewModel
 
 @{
-    ViewData["Title"] = "Видалення товару";
+    ViewData["Title"] = Localizer["Видалення товару"];
 }
 
 @section Styles {
@@ -9,35 +9,35 @@
 }
 
 <div class="products-page">
-    <a asp-action="Details" asp-route-id="@Model.Id" class="products-back">← Назад до товару</a>
+    <a asp-action="Details" asp-route-id="@Model.Id" class="products-back">← @Localizer["Назад до товару"]</a>
 
     <section class="product-delete-card">
         <div class="product-delete-card__accent" aria-hidden="true">!</div>
         <div class="product-delete-card__body">
-            <h1>Видалити товар?</h1>
+            <h1>@Localizer["Видалити товар?"]</h1>
             <p class="text-secondary">
-                Товар <strong class="text-dark">«@Model.Name»</strong> буде видалено зі списку.
-                Цю дію не можна скасувати через інтерфейс.
+                @Localizer["Товар"] <strong class="text-dark">«@Model.Name»</strong> @Localizer["буде видалено зі списку."]
+                @Localizer["Цю дію не можна скасувати через інтерфейс."]
             </p>
 
             <div class="product-meta">
                 <div class="product-meta__row">
-                    <span class="product-meta__label">Категорія</span>
+                    <span class="product-meta__label">@Localizer["Категорія"]</span>
                     <strong>@Model.CategoryName</strong>
                 </div>
                 <div class="product-meta__row">
-                    <span class="product-meta__label">Ціна</span>
+                    <span class="product-meta__label">@Localizer["Ціна"]</span>
                     <strong>@Model.Price.ToString("N2") ₴</strong>
                 </div>
                 <div class="product-meta__row">
-                    <span class="product-meta__label">Залишок</span>
-                    <strong>@Model.Quantity шт.</strong>
+                    <span class="product-meta__label">@Localizer["Залишок"]</span>
+                    <strong>@Model.Quantity @Localizer["шт."]</strong>
                 </div>
             </div>
 
             <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="product-delete-card__actions">
-                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Скасувати</a>
-                <button type="submit" class="btn btn-danger">Так, видалити</button>
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">@Localizer["Скасувати"]</a>
+                <button type="submit" class="btn btn-danger">@Localizer["Так, видалити"]</button>
             </form>
         </div>
     </section>
