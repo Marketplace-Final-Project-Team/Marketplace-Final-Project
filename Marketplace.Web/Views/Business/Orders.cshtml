@@ -5,7 +5,7 @@
 @inject IBusinessAccessService BusinessAccessService
 
 @{
-    ViewData["Title"] = $"Замовлення - {Model.StoreName}";
+    ViewData["Title"] = $"{SharedLocalizer["Замовлення"].Value} - {Model.StoreName}";
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
     var currentRole = !string.IsNullOrEmpty(userId)
         ? await BusinessAccessService.GetUserRoleAsync(Model.BusinessId, userId)
@@ -13,13 +13,13 @@
 }
 
 @functions {
-    private static string StatusLabel(Marketplace.Domain.Enums.OrderStatus status) => status switch
+    private string StatusLabel(Marketplace.Domain.Enums.OrderStatus status) => status switch
     {
-        Marketplace.Domain.Enums.OrderStatus.Pending => "Очікує підтвердження",
-        Marketplace.Domain.Enums.OrderStatus.Confirmed => "Підтверджено",
-        Marketplace.Domain.Enums.OrderStatus.Shipped => "Відправлено",
-        Marketplace.Domain.Enums.OrderStatus.Delivered => "Доставлено",
-        Marketplace.Domain.Enums.OrderStatus.Canceled => "Скасовано",
+        Marketplace.Domain.Enums.OrderStatus.Pending => Localizer["Очікує підтвердження"].Value,
+        Marketplace.Domain.Enums.OrderStatus.Confirmed => Localizer["Підтверджено"].Value,
+        Marketplace.Domain.Enums.OrderStatus.Shipped => Localizer["Відправлено"].Value,
+        Marketplace.Domain.Enums.OrderStatus.Delivered => Localizer["Доставлено"].Value,
+        Marketplace.Domain.Enums.OrderStatus.Canceled => Localizer["Скасовано"].Value,
         _ => status.ToString()
     };
 }
@@ -30,13 +30,13 @@
 }
 
 <div class="seller-dashboard">
-    <a asp-action="Index" class="seller-order-back">← До панелі продавця</a>
+    <a asp-action="Index" class="seller-order-back">← @SharedLocalizer["Панель продавця"]</a>
 
     <header class="seller-orders-header">
         <div>
             <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> @BusinessRoleContext.PanelLabel(currentRole)</div>
-            <h1>Замовлення - @Model.StoreName</h1>
-            <p>Список замовлень, що містять товари цього магазину.</p>
+            <h1>@SharedLocalizer["Замовлення"] - @Model.StoreName</h1>
+            <p>@Localizer["Список замовлень, що містять товари цього магазину."]</p>
         </div>
     </header>
 
@@ -46,7 +46,7 @@
     {
         <div class="seller-alert" role="status">
             <span aria-hidden="true">✓</span>
-            <p><strong>Успішно</strong>@success</p>
+            <p><strong>@Localizer["Успішно"]</strong>@success</p>
         </div>
     }
     @if (TempData["Error"] is string error)
@@ -57,26 +57,42 @@
     <form asp-action="Orders" method="get" class="seller-orders-filter">
         <input type="hidden" name="businessId" value="@Model.BusinessId" />
         <div>
-            <label for="status-filter">Статус</label>
+            <label for="search-filter">@Localizer["Покупець"]</label>
+            <input type="search" id="search-filter" name="search" class="form-control" placeholder="@Localizer["Ім'я покупця"]" value="@Model.Search" />
+        </div>
+        <div>
+            <label for="search-email-filter">Email</label>
+            <input type="search" id="search-email-filter" name="searchEmail" class="form-control" placeholder="@Localizer["Email покупця"]" value="@Model.SearchEmail" />
+        </div>
+        <div>
+            <label for="status-filter">@Localizer["Статус"]</label>
             <select id="status-filter" name="status" class="form-select">
-                <option value="">Усі статуси</option>
+                <option value="">@Localizer["Усі статуси"]</option>
                 @foreach (var option in Enum.GetValues<Marketplace.Domain.Enums.OrderStatus>())
                 {
                     <option value="@option" selected="@(Model.StatusFilter == option)">@StatusLabel(option)</option>
                 }
             </select>
         </div>
-        <button type="submit" class="seller-button seller-button--secondary">Показати</button>
-        @if (Model.StatusFilter.HasValue)
+        <div>
+            <label for="min-amount-filter">@Localizer["Сума від"]</label>
+            <input type="number" id="min-amount-filter" name="minAmount" class="form-control" min="0" step="1" placeholder="0" value="@Model.MinAmount" />
+        </div>
+        <div>
+            <label for="max-amount-filter">@Localizer["Сума до"]</label>
+            <input type="number" id="max-amount-filter" name="maxAmount" class="form-control" min="0" step="1" placeholder="∞" value="@Model.MaxAmount" />
+        </div>
+        <button type="submit" class="seller-button seller-button--secondary">@Localizer["Показати"]</button>
+        @if (Model.StatusFilter.HasValue || !string.IsNullOrWhiteSpace(Model.Search) || !string.IsNullOrWhiteSpace(Model.SearchEmail) || Model.MinAmount.HasValue || Model.MaxAmount.HasValue)
         {
-            <a asp-action="Orders" asp-route-businessId="@Model.BusinessId" class="seller-button seller-button--secondary">Скинути</a>
+            <a asp-action="Orders" asp-route-businessId="@Model.BusinessId" class="seller-button seller-button--secondary">@Localizer["Скинути"]</a>
         }
     </form>
 
     @if (Model.Orders.Count == 0)
     {
         <div class="seller-orders-panel">
-            <p class="seller-orders-empty">Замовлень із цим фільтром не знайдено.</p>
+            <p class="seller-orders-empty">@Localizer["Замовлень із цим фільтром не знайдено."]</p>
         </div>
     }
     else
@@ -85,13 +101,13 @@
             <table class="table seller-orders-table">
                 <thead>
                     <tr>
-                        <th>Замовлення</th>
-                        <th>Покупець</th>
-                        <th>Доставка</th>
-                        <th>Товарів</th>
-                        <th>Сума</th>
-                        <th>Статус</th>
-                        <th class="text-end">Дії</th>
+                        <th>@SharedLocalizer["Замовлення"]</th>
+                        <th>@Localizer["Покупець"]</th>
+                        <th>@Localizer["Доставка"]</th>
+                        <th>@Localizer["Товарів"]</th>
+                        <th>@Localizer["Сума"]</th>
+                        <th>@Localizer["Статус"]</th>
+                        <th class="text-end">@Localizer["Дії"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -107,11 +123,11 @@
                                 <span>@order.BuyerEmail</span>
                             </td>
                             <td>@order.ShippingAddress</td>
-                            <td>@order.ItemsCount шт.</td>
+                            <td>@order.ItemsCount @Localizer["шт."]</td>
                             <td class="fw-semibold">@order.LineTotal.ToString("N2") ₴</td>
                             <td><span class="order-status order-status--@order.Status.ToString().ToLowerInvariant()">@StatusLabel(order.Status)</span></td>
                             <td class="text-end">
-                                <a asp-action="OrderDetails" asp-route-businessId="@Model.BusinessId" asp-route-orderId="@order.OrderId" class="btn btn-sm btn-outline-primary">Деталі</a>
+                                <a asp-action="OrderDetails" asp-route-businessId="@Model.BusinessId" asp-route-orderId="@order.OrderId" class="btn btn-sm btn-outline-primary">@Localizer["Деталі"]</a>
                             </td>
                         </tr>
                     }

@@ -1,63 +1,67 @@
-﻿using Marketplace.BLL.Common;
+﻿using System.Security.Claims;
+using Marketplace.BLL.Common;
 using Marketplace.BLL.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marketplace.Web.Controllers
 {
+    [Authorize]
     public class UserDiscountController : Controller
     {
         private readonly IBusinessAccessService _businessAccessService;
-        public readonly IUserDiscountService _userDiscountService;
-        public readonly IBusinessService _businessService;
-        public UserDiscountController(IBusinessAccessService businessAccessService, IUserDiscountService userDiscountService,IBusinessService businessService)
+        private readonly IUserDiscountService _userDiscountService;
+
+        public UserDiscountController(IBusinessAccessService businessAccessService, IUserDiscountService userDiscountService)
         {
             _businessAccessService = businessAccessService;
             _userDiscountService = userDiscountService;
-            _businessService = businessService;
         }
+
+        private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SetUserDiscount(string userId,Guid businessId, decimal percent, DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> SetUserDiscount(string userId, Guid businessId, decimal percent, DateTime startDate, DateTime endDate, string? returnUrl = null)
         {
-            Console.WriteLine(percent);
-            var business = await _businessService.GetByIdAsync(businessId);
-            var hasAcces = await _businessAccessService.HasAccessAsync(businessId, business.OwnerId, BusinessPermissions.ProductCrud);
-            if (!hasAcces) {
+            var hasAcces = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.ProductCrud);
+            if (!hasAcces)
+            {
                 return Forbid();
             }
             var result = await _userDiscountService.SetUserDiscount(userId, businessId, percent, startDate, endDate);
-            if (!result.Succeeded)
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
             {
-                Console.WriteLine(result.Message);
-                return BadRequest(result.Message);
+                return Redirect(returnUrl);
             }
-            
-            return Ok();
+            return RedirectToAction("PromoCodes", "Business", new { businessId });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RemoveUserDiscount(string userId, Guid businessId)
+        public async Task<IActionResult> RemoveUserDiscount(string userId, Guid businessId, string? returnUrl = null)
         {
-            var business = await _businessService.GetByIdAsync(businessId);
-            var hasAcces = await _businessAccessService.HasAccessAsync(businessId, business.OwnerId, BusinessPermissions.ProductCrud);
+            var hasAcces = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.ProductCrud);
             if (!hasAcces)
             {
                 return Forbid();
             }
             var result = await _userDiscountService.RemoveUserDiscount(userId, businessId);
-            if (!result.Succeeded)
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
             {
-                return BadRequest(result.Message);
+                return Redirect(returnUrl);
             }
-            return Ok();
+            return RedirectToAction("PromoCodes", "Business", new { businessId });
         }
+
         [HttpGet]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> GetUserDiscount(string userId, Guid businessId)
         {
-            var business = await _businessService.GetByIdAsync(businessId);
-            var hasAcces = await _businessAccessService.HasAccessAsync(businessId, business.OwnerId, BusinessPermissions.Statistics);
+            var hasAcces = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.Statistics);
             if (!hasAcces)
             {
                 return Forbid();

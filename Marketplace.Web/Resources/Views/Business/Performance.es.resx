@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Ефективність" xml:space="preserve">
+    <value>Rendimiento</value>
+  </data>
+  <data name="На перевірці" xml:space="preserve">
+    <value>En revisión</value>
+  </data>
+  <data name="Активний" xml:space="preserve">
+    <value>Activo</value>
+  </data>
+  <data name="Призупинений" xml:space="preserve">
+    <value>Suspendido</value>
+  </data>
+  <data name="Відхилений" xml:space="preserve">
+    <value>Rechazado</value>
+  </data>
+  <data name="Очікує підтвердження" xml:space="preserve">
+    <value>Esperando confirmación</value>
+  </data>
+  <data name="Підтверджено" xml:space="preserve">
+    <value>Confirmado</value>
+  </data>
+  <data name="Відправлено" xml:space="preserve">
+    <value>Enviado</value>
+  </data>
+  <data name="Доставлено" xml:space="preserve">
+    <value>Entregado</value>
+  </data>
+  <data name="Скасовано" xml:space="preserve">
+    <value>Cancelado</value>
+  </data>
+  <data name="Ефективність акаунта" xml:space="preserve">
+    <value>Rendimiento de la cuenta</value>
+  </data>
+  <data name="Стан магазину, якість обслуговування та відгуки покупців." xml:space="preserve">
+    <value>Estado de la tienda, calidad del servicio y reseñas de clientes.</value>
+  </data>
+  <data name="Стан акаунта" xml:space="preserve">
+    <value>Estado de la cuenta</value>
+  </data>
+  <data name="Рівень скасувань" xml:space="preserve">
+    <value>Tasa de cancelación</value>
+  </data>
+  <data name="Скасовано / усього" xml:space="preserve">
+    <value>Canceladas / total</value>
+  </data>
+  <data name="Середній рейтинг товарів" xml:space="preserve">
+    <value>Valoración media de productos</value>
+  </data>
+  <data name="Відгуків усього" xml:space="preserve">
+    <value>Total de reseñas</value>
+  </data>
+  <data name="Замовлення за статусами" xml:space="preserve">
+    <value>Pedidos por estado</value>
+  </data>
+  <data name="Розподіл усіх замовлень магазину." xml:space="preserve">
+    <value>Distribución de todos los pedidos de la tienda.</value>
+  </data>
+  <data name="Замовлень поки немає." xml:space="preserve">
+    <value>Aún no hay pedidos.</value>
+  </data>
+  <data name="Розподіл рейтингів" xml:space="preserve">
+    <value>Distribución de valoraciones</value>
+  </data>
+  <data name="Кількість відгуків за оцінкою (1-5)." xml:space="preserve">
+    <value>Número de reseñas por valoración (1-5).</value>
+  </data>
+  <data name="Відгуків поки немає." xml:space="preserve">
+    <value>Aún no hay reseñas.</value>
+  </data>
+  <data name="Претензії та повернення" xml:space="preserve">
+    <value>Reclamaciones y devoluciones</value>
+  </data>
+  <data name="Обробка вручну" xml:space="preserve">
+    <value>Procesamiento manual</value>
+  </data>
+  <data name="Заявки на повернення та спірні питання наразі опрацьовує команда підтримки маркетплейсу вручну - окрема статистика за цим розділом ще не збирається автоматично." xml:space="preserve">
+    <value>Las solicitudes de devolución y las disputas las gestiona actualmente de forma manual el equipo de soporte del marketplace - las estadísticas separadas de esta sección aún no se recopilan automáticamente.</value>
+  </data>
+</root>

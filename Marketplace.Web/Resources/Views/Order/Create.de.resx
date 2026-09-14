@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Оформлення замовлення" xml:space="preserve">
+    <value>Kasse</value>
+  </data>
+  <data name="Назад до кошика" xml:space="preserve">
+    <value>Zurück zum Warenkorb</value>
+  </data>
+  <data name="Оформлення" xml:space="preserve">
+    <value>Kasse</value>
+  </data>
+  <data name="Оберіть адресу, перевірте доставку й оплату, підтвердіть замовлення." xml:space="preserve">
+    <value>Wählen Sie eine Adresse, prüfen Sie Lieferung und Zahlung und bestätigen Sie Ihre Bestellung.</value>
+  </data>
+  <data name="Кроки оформлення замовлення" xml:space="preserve">
+    <value>Schritte zur Bestellung</value>
+  </data>
+  <data name="Адреса" xml:space="preserve">
+    <value>Adresse</value>
+  </data>
+  <data name="Доставка" xml:space="preserve">
+    <value>Lieferung</value>
+  </data>
+  <data name="Оплата" xml:space="preserve">
+    <value>Zahlung</value>
+  </data>
+  <data name="Огляд" xml:space="preserve">
+    <value>Überprüfung</value>
+  </data>
+  <data name="Адреса доставки" xml:space="preserve">
+    <value>Lieferadresse</value>
+  </data>
+  <data name="Основна" xml:space="preserve">
+    <value>Standard</value>
+  </data>
+  <data name="Нова адреса" xml:space="preserve">
+    <value>Neue Adresse</value>
+  </data>
+  <data name="Вкажіть іншу адресу доставки" xml:space="preserve">
+    <value>Geben Sie eine andere Lieferadresse an</value>
+  </data>
+  <data name="Країна" xml:space="preserve">
+    <value>Land</value>
+  </data>
+  <data name="Місто" xml:space="preserve">
+    <value>Stadt</value>
+  </data>
+  <data name="Київ" xml:space="preserve">
+    <value>Kyjiw</value>
+  </data>
+  <data name="Вулиця, будинок, квартира" xml:space="preserve">
+    <value>Straße, Hausnummer, Wohnung</value>
+  </data>
+  <data name="вул. Хрещатик, 1, кв. 10" xml:space="preserve">
+    <value>Chreschtschatyk-Straße 1, Wohnung 10</value>
+  </data>
+  <data name="Спосіб доставки" xml:space="preserve">
+    <value>Versandart</value>
+  </data>
+  <data name="Нова пошта" xml:space="preserve">
+    <value>Nova Poshta</value>
+  </data>
+  <data name="Доставка у відділення або поштомат" xml:space="preserve">
+    <value>Lieferung an eine Filiale oder einen Paketautomaten</value>
+  </data>
+  <data name="Укрпошта" xml:space="preserve">
+    <value>Ukrposhta</value>
+  </data>
+  <data name="Доставка на вказану адресу" xml:space="preserve">
+    <value>Lieferung an die angegebene Adresse</value>
+  </data>
+  <data name="Почніть вводити назву міста" xml:space="preserve">
+    <value>Beginnen Sie mit der Eingabe des Stadtnamens</value>
+  </data>
+  <data name="Відділення / поштомат" xml:space="preserve">
+    <value>Filiale / Paketautomat</value>
+  </data>
+  <data name="Спочатку оберіть місто" xml:space="preserve">
+    <value>Wählen Sie zuerst eine Stadt</value>
+  </data>
+  <data name="Оберіть відділення Нової пошти" xml:space="preserve">
+    <value>Wählen Sie eine Nova-Poshta-Filiale</value>
+  </data>
+  <data name="Кур'єрська доставка. Орієнтовний термін - 3–5 робочих днів." xml:space="preserve">
+    <value>Kurierlieferung. Voraussichtliche Dauer - 3-5 Werktage.</value>
+  </data>
+  <data name="Кур'єрська доставка. Орієнтовний термін - 2–4 робочі дні." xml:space="preserve">
+    <value>Kurierlieferung. Voraussichtliche Dauer - 2-4 Werktage.</value>
+  </data>
+  <data name="Місто доставки" xml:space="preserve">
+    <value>Lieferstadt</value>
+  </data>
+  <data name="Наприклад, Львів" xml:space="preserve">
+    <value>Zum Beispiel Lwiw</value>
+  </data>
+  <data name="Спосіб оплати" xml:space="preserve">
+    <value>Zahlungsmethode</value>
+  </data>
+  <data name="Онлайн-оплата через LiqPay" xml:space="preserve">
+    <value>Online-Zahlung über LiqPay</value>
+  </data>
+  <data name="Після підтвердження ви перейдете на безпечну сторінку оплати" xml:space="preserve">
+    <value>Nach der Bestätigung werden Sie zu einer sicheren Zahlungsseite weitergeleitet</value>
+  </data>
+  <data name="Оплата при отриманні" xml:space="preserve">
+    <value>Zahlung bei Lieferung</value>
+  </data>
+  <data name="Готівкою або карткою кур'єру чи у відділенні" xml:space="preserve">
+    <value>Bar oder mit Karte an den Kurier oder in der Filiale</value>
+  </data>
+  <data name="Перевірте замовлення" xml:space="preserve">
+    <value>Überprüfen Sie Ihre Bestellung</value>
+  </data>
+  <data name="Доставка та оплата" xml:space="preserve">
+    <value>Lieferung und Zahlung</value>
+  </data>
+  <data name="Промокод" xml:space="preserve">
+    <value>Aktionscode</value>
+  </data>
+  <data name="Введіть промокод" xml:space="preserve">
+    <value>Aktionscode eingeben</value>
+  </data>
+  <data name="Застосувати" xml:space="preserve">
+    <value>Anwenden</value>
+  </data>
+  <data name="Знижка застосовується лише до товарів магазину, який видав промокод." xml:space="preserve">
+    <value>Der Rabatt gilt nur für Artikel des Shops, der den Aktionscode ausgestellt hat.</value>
+  </data>
+  <data name="Товари у замовленні" xml:space="preserve">
+    <value>Artikel in der Bestellung</value>
+  </data>
+  <data name="Товари від {0} продавців - оформлюються одним замовленням." xml:space="preserve">
+    <value>Artikel von {0} Verkäufern - werden als eine Bestellung aufgegeben.</value>
+  </data>
+  <data name="шт." xml:space="preserve">
+    <value>Stk.</value>
+  </data>
+  <data name="Назад" xml:space="preserve">
+    <value>Zurück</value>
+  </data>
+  <data name="Далі →" xml:space="preserve">
+    <value>Weiter →</value>
+  </data>
+  <data name="Підтвердити замовлення" xml:space="preserve">
+    <value>Bestellung bestätigen</value>
+  </data>
+  <data name="Ваше замовлення" xml:space="preserve">
+    <value>Ihre Bestellung</value>
+  </data>
+  <data name="Товарів" xml:space="preserve">
+    <value>Artikel</value>
+  </data>
+  <data name="Безкоштовно" xml:space="preserve">
+    <value>Kostenlos</value>
+  </data>
+  <data name="Знижка за промокодом" xml:space="preserve">
+    <value>Rabatt durch Aktionscode</value>
+  </data>
+  <data name="До сплати" xml:space="preserve">
+    <value>Zu zahlen</value>
+  </data>
+</root>

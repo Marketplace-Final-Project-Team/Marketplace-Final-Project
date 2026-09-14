@@ -18,7 +18,7 @@ namespace Marketplace.BLL.Services
             _settingsService = settingsService;
         }
 
-        public async Task<ServiceResult> CreateAsync(Guid businessId, string code, int percent, DateTime startDate, DateTime endDate)
+        public async Task<ServiceResult> CreateAsync(Guid businessId, string code, int percent, DateTime startDate, DateTime endDate, bool isSingleUse = false)
         {
             var normalizedCode = (code ?? string.Empty).Trim().ToUpperInvariant();
 
@@ -59,7 +59,8 @@ namespace Marketplace.BLL.Services
                 Code = normalizedCode,
                 Percent = percent,
                 StartDate = startDate,
-                EndDate = endDate
+                EndDate = endDate,
+                IsSingleUse = isSingleUse
             };
 
             _context.PromoCodes.Add(promoCode);
@@ -99,6 +100,8 @@ namespace Marketplace.BLL.Services
                 Percent = p.Percent,
                 StartDate = p.StartDate,
                 EndDate = p.EndDate,
+                IsSingleUse = p.IsSingleUse,
+                IsUsed = p.IsUsed,
                 IsActive = p.IsActive
             }).ToList();
         }
@@ -113,7 +116,8 @@ namespace Marketplace.BLL.Services
 
             var now = DateTime.UtcNow;
             return await _context.PromoCodes
-                .FirstOrDefaultAsync(p => p.Code == normalizedCode && p.StartDate <= now && p.EndDate >= now);
+                .FirstOrDefaultAsync(p => p.Code == normalizedCode && p.StartDate <= now && p.EndDate >= now
+                    && !(p.IsSingleUse && p.IsUsed));
         }
 
         public async Task<PromoCodeApplicationDto> PreviewAsync(string userId, string code)

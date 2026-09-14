@@ -2,8 +2,8 @@
 
 <div class="home-section__heading align-items-end mb-4">
     <div>
-        <span class="home-section__kicker">Каталог</span>
-        <h2>Усі товари</h2>
+        <span class="home-section__kicker">@Localizer["Каталог"]</span>
+        <h2>@SharedLocalizer["Усі товари"]</h2>
     </div>
 
     <form method="get" id="sortForm" class="d-flex align-items-center gap-2">
@@ -12,11 +12,11 @@
         {
             <input type="hidden" name="categoryId" value="@Model.CategoryId" />
         }
-        <label for="sortBySelect" class="text-muted small text-nowrap">Сортування:</label>
+        <label for="sortBySelect" class="text-muted small text-nowrap">@Localizer["Сортування:"]</label>
         <select id="sortBySelect" name="sortBy" class="form-select form-select-sm js-async-sort" style="width: auto;">
-            <option value="" selected="@(string.IsNullOrEmpty(Model.SortBy))">Спочатку нові</option>
-            <option value="price_asc" selected="@(Model.SortBy == "price_asc")">Дешевші</option>
-            <option value="price_desc" selected="@(Model.SortBy == "price_desc")">Дорожчі</option>
+            <option value="" selected="@(string.IsNullOrEmpty(Model.SortBy))">@Localizer["Спочатку нові"]</option>
+            <option value="price_asc" selected="@(Model.SortBy == "price_asc")">@Localizer["Дешевші"]</option>
+            <option value="price_desc" selected="@(Model.SortBy == "price_desc")">@Localizer["Дорожчі"]</option>
         </select>
     </form>
 </div>
@@ -25,9 +25,9 @@
 {
     <div class="text-center py-5">
         <div class="fs-1 text-muted mb-2">□</div>
-        <h4>Товарів не знайдено</h4>
-        <p class="text-muted">Спробуйте змінити пошуковий запит або обрати іншу категорію.</p>
-        <a href="javascript:void(0)" class="home-button home-button--ghost mt-2 js-reset-filters">Скинути всі фільтри</a>
+        <h4>@Localizer["Товарів не знайдено"]</h4>
+        <p class="text-muted">@Localizer["Спробуйте змінити пошуковий запит або обрати іншу категорію."]</p>
+        <a href="javascript:void(0)" class="home-button home-button--ghost mt-2 js-reset-filters">@Localizer["Скинути всі фільтри"]</a>
     </div>
 }
 else
@@ -37,23 +37,24 @@ else
         {
             var product = Model.Products[index];
             var colorClass = index % 3 == 0 ? "blue" : index % 3 == 1 ? "violet" : "orange";
+            var productName = (await ProductTranslator.GetLocalizedAsync(product.Id, product.Name, product.Description, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)).Name;
 
             <article class="home-product">
                 <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="home-product__media home-product__media--@colorClass">
                     @if (!string.IsNullOrWhiteSpace(product.MainImageUrl))
                     {
-                        <img src="@product.MainImageUrl" alt="@product.Name" />
+                        <img src="@product.MainImageUrl" alt="@productName" />
                     }
                     else
                     {
-                        <span>@(string.IsNullOrWhiteSpace(product.Name) ? "?" : product.Name[..1].ToUpperInvariant())</span>
+                        <span>@(string.IsNullOrWhiteSpace(productName) ? "?" : productName[..1].ToUpperInvariant())</span>
                     }
-                    <small>В наявності</small>
+                    <small>@Localizer["В наявності"]</small>
                 </a>
                 <div class="home-product__body">
-                    <div class="home-product__category">@(string.IsNullOrEmpty(product.CategoryName) ? "Без категорії" : product.CategoryName)</div>
-                    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="home-product__name">@product.Name</a>
-                    
+                    <div class="home-product__category">@(string.IsNullOrEmpty(product.CategoryName) ? Localizer["Без категорії"].Value : SharedLocalizer[product.CategoryName].Value)</div>
+                    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="home-product__name">@productName</a>
+
                     <div class="home-product__bottom">
                         <div class="home-product__price" style="display: flex; flex-direction: column; justify-content: flex-end; min-height: 40px;">
                             @if (product.HasDiscount && product.OriginalPrice.HasValue)
@@ -75,7 +76,7 @@ else
                         <form asp-controller="Cart" asp-action="Add" method="post">
                             <input type="hidden" name="productId" value="@product.Id" />
                             <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
-                            <button type="submit" aria-label="Додати @product.Name до кошика">+</button>
+                            <button type="submit" aria-label="@Localizer["Додати"] @productName @Localizer["до кошика"]">+</button>
                         </form>
                     </div>
                 </div>

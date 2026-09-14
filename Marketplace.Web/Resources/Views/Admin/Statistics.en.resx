@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Статистика" xml:space="preserve">
+    <value>Statistics</value>
+  </data>
+  <data name="Без назви" xml:space="preserve">
+    <value>Unnamed</value>
+  </data>
+  <data name="Товарооборот і дохід маркетплейсу за період - по магазинах і в часі. Враховує лише замовлення, що дійшли принаймні до статусу «Підтверджено»." xml:space="preserve">
+    <value>Marketplace turnover and revenue for the period - by store and over time. Includes only orders that reached at least the &quot;Confirmed&quot; status.</value>
+  </data>
+  <data name="З дати" xml:space="preserve">
+    <value>From date</value>
+  </data>
+  <data name="По дату" xml:space="preserve">
+    <value>To date</value>
+  </data>
+  <data name="Магазин" xml:space="preserve">
+    <value>Store</value>
+  </data>
+  <data name="Усі магазини" xml:space="preserve">
+    <value>All stores</value>
+  </data>
+  <data name="Застосувати" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="Скинути" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="Загальна статистика" xml:space="preserve">
+    <value>Overall statistics</value>
+  </data>
+  <data name="Товарооборот" xml:space="preserve">
+    <value>Turnover</value>
+  </data>
+  <data name="Сума всіх позицій продажів" xml:space="preserve">
+    <value>Sum of all sales line items</value>
+  </data>
+  <data name="Дохід маркетплейсу" xml:space="preserve">
+    <value>Marketplace revenue</value>
+  </data>
+  <data name="Комісія з продажів за період" xml:space="preserve">
+    <value>Sales commission for the period</value>
+  </data>
+  <data name="Продажів" xml:space="preserve">
+    <value>Sales</value>
+  </data>
+  <data name="шт. товарів" xml:space="preserve">
+    <value>units of products</value>
+  </data>
+  <data name="Магазинів" xml:space="preserve">
+    <value>Stores</value>
+  </data>
+  <data name="Активних із загальної кількості - {0} товарів" xml:space="preserve">
+    <value>Active out of total - {0} products</value>
+  </data>
+  <data name="Товарооборот у часі" xml:space="preserve">
+    <value>Turnover over time</value>
+  </data>
+  <data name="Оборот за магазинами" xml:space="preserve">
+    <value>Turnover by store</value>
+  </data>
+  <data name="Продажі за категоріями" xml:space="preserve">
+    <value>Sales by category</value>
+  </data>
+  <data name="За обраний період продажів немає." xml:space="preserve">
+    <value>There are no sales for the selected period.</value>
+  </data>
+  <data name="За магазинами" xml:space="preserve">
+    <value>By store</value>
+  </data>
+  <data name="Товарів" xml:space="preserve">
+    <value>Products</value>
+  </data>
+  <data name="Одиниць" xml:space="preserve">
+    <value>Units</value>
+  </data>
+  <data name="Оборот" xml:space="preserve">
+    <value>Turnover</value>
+  </data>
+  <data name="Середній чек" xml:space="preserve">
+    <value>Average order value</value>
+  </data>
+  <data name="За категоріями" xml:space="preserve">
+    <value>By category</value>
+  </data>
+  <data name="Категорія" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="У часі" xml:space="preserve">
+    <value>Over time</value>
+  </data>
+  <data name="Період" xml:space="preserve">
+    <value>Period</value>
+  </data>
+</root>

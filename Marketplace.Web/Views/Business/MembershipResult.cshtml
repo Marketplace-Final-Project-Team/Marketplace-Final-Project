@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Результат запиту на членство";
+    ViewData["Title"] = Localizer["Результат запиту на членство"];
 }
 
 @section Styles {
@@ -8,9 +8,9 @@
 
 <div class="seller-dashboard">
     <div class="seller-form-card seller-form-card--center">
-        <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Команда бізнесу</div>
-        <h1>Запит на членство обробено</h1>
+        <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> @Localizer["Команда бізнесу"]</div>
+        <h1>@Localizer["Запит на членство обробено"]</h1>
         <p>@ViewBag.Message</p>
-        <a asp-controller="Home" asp-action="Index" class="seller-button seller-button--primary">На головну</a>
+        <a asp-controller="Home" asp-action="Index" class="seller-button seller-button--primary">@Localizer["На головну"]</a>
     </div>
 </div>

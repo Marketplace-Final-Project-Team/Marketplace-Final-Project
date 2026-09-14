@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.WishlistPageViewModel
 
 @{
-    ViewData["Title"] = "Список бажань";
+    ViewData["Title"] = SharedLocalizer["Список бажань"];
 }
 
 @section Styles {
@@ -10,11 +10,11 @@
 }
 
 <div class="profile-page">
-    <a asp-action="Index" class="profile-back">← До кабінету</a>
+    <a asp-action="Index" class="profile-back">← @Localizer["До кабінету"]</a>
 
     <div class="profile-summary">
-        <h1>Список бажань</h1>
-        <p>Товари, які ви зберегли на потім (@Model.TotalItems).</p>
+        <h1>@SharedLocalizer["Список бажань"]</h1>
+        <p>@Localizer["Товари, які ви зберегли на потім"] (@Model.TotalItems).</p>
     </div>
 
     @if (TempData["Success"] is string success)
@@ -30,23 +30,23 @@
     {
         <div class="profile-empty">
             <div class="profile-empty__icon" aria-hidden="true">♡</div>
-            <h2>Список бажань порожній</h2>
-            <p>Додавайте товари з каталогу, натискаючи "У список бажань" на сторінці товару.</p>
-            <a asp-controller="Catalog" asp-action="Index" class="btn btn-primary">Перейти до каталогу</a>
+            <h2>@Localizer["Список бажань порожній"]</h2>
+            <p>@Localizer["Додавайте товари з каталогу, натискаючи \"У список бажань\" на сторінці товару."]</p>
+            <a asp-controller="Catalog" asp-action="Index" class="btn btn-primary">@Localizer["Перейти до каталогу"]</a>
         </div>
     }
     else
     {
         <p class="text-muted small mb-3">
-            Хочете розкласти товари по категоріях - подарунки, сезонні покупки тощо? Спробуйте
-            <a asp-controller="WishlistCollection" asp-action="Index">колекції бажань</a>.
+            @Localizer["Хочете розкласти товари по категоріях - подарунки, сезонні покупки тощо? Спробуйте"]
+            <a asp-controller="WishlistCollection" asp-action="Index">@Localizer["колекції бажань"]</a>.
         </p>
 
         <div class="wishlist-grid" data-wishlist-grid>
             @foreach (var item in Model.Items)
             {
                 <article class="wishlist-card" data-wishlist-card data-product-id="@item.ProductId" data-price="@item.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)" data-in-stock="@item.InStock.ToString().ToLowerInvariant()">
-                    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.ProductId" class="wishlist-card__media" aria-label="Переглянути @item.ProductName">
+                    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.ProductId" class="wishlist-card__media" aria-label="@Localizer["Переглянути"] @item.ProductName">
                         <span class="wishlist-card__alert" data-wishlist-alert hidden></span>
                         @if (!string.IsNullOrWhiteSpace(item.MainImageUrl))
                         {
@@ -58,7 +58,7 @@
                         }
                         @if (!item.InStock)
                         {
-                            <small class="wishlist-card__stock">Немає в наявності</small>
+                            <small class="wishlist-card__stock">@Localizer["Немає в наявності"]</small>
                         }
                     </a>
                     <div class="wishlist-card__body">
@@ -67,7 +67,7 @@
                             <span class="fw-semibold" data-wishlist-price>@item.Price.ToString("N2") ₴</span>
                             <form asp-action="RemoveFromWishlist" method="post">
                                 <input type="hidden" name="productId" value="@item.ProductId" />
-                                <button type="submit" class="wishlist-remove">Видалити</button>
+                                <button type="submit" class="wishlist-remove">@Localizer["Видалити"]</button>
                             </form>
                         </div>
                     </div>

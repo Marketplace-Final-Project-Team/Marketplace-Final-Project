@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Панель продавця" xml:space="preserve">
+    <value>Verkäufer-Panel</value>
+  </data>
+  <data name="Панель адміністратора" xml:space="preserve">
+    <value>Administrator-Panel</value>
+  </data>
+  <data name="Панель менеджера товарів" xml:space="preserve">
+    <value>Produktmanager-Panel</value>
+  </data>
+  <data name="Панель аналітика" xml:space="preserve">
+    <value>Analysten-Panel</value>
+  </data>
+  <data name="Контролюйте асортимент, замовлення та стан магазину в одному робочому просторі." xml:space="preserve">
+    <value>Verwalten Sie Sortiment, Bestellungen und Shop-Status an einem Ort.</value>
+  </data>
+  <data name="Створити бізнес" xml:space="preserve">
+    <value>Unternehmen erstellen</value>
+  </data>
+  <data name="Успішно!" xml:space="preserve">
+    <value>Erfolgreich!</value>
+  </data>
+  <data name="Почніть продавати" xml:space="preserve">
+    <value>Beginnen Sie mit dem Verkauf</value>
+  </data>
+  <data name="Створіть свій перший магазин" xml:space="preserve">
+    <value>Erstellen Sie Ihren ersten Shop</value>
+  </data>
+  <data name="Додайте інформацію про бізнес, завантажте логотип і переходьте до створення асортименту." xml:space="preserve">
+    <value>Fügen Sie Unternehmensinformationen hinzu, laden Sie ein Logo hoch und beginnen Sie mit dem Aufbau Ihres Sortiments.</value>
+  </data>
+  <data name="На перевірці" xml:space="preserve">
+    <value>In Prüfung</value>
+  </data>
+  <data name="Активний" xml:space="preserve">
+    <value>Aktiv</value>
+  </data>
+  <data name="Призупинений" xml:space="preserve">
+    <value>Ausgesetzt</value>
+  </data>
+  <data name="Відхилений" xml:space="preserve">
+    <value>Abgelehnt</value>
+  </data>
+  <data name="Команда модерації перевіряє дані магазину. Ви вже можете підготувати асортимент." xml:space="preserve">
+    <value>Das Moderationsteam prüft die Shop-Daten. Sie können bereits Ihr Sortiment vorbereiten.</value>
+  </data>
+  <data name="Магазин працює та доступний покупцям. Усі основні функції активні." xml:space="preserve">
+    <value>Der Shop läuft und ist für Kunden verfügbar. Alle Kernfunktionen sind aktiv.</value>
+  </data>
+  <data name="Роботу магазину тимчасово призупинено. Перевірте повідомлення адміністратора." xml:space="preserve">
+    <value>Der Betrieb des Shops ist vorübergehend ausgesetzt. Überprüfen Sie die Nachricht des Administrators.</value>
+  </data>
+  <data name="Дані магазину потребують виправлення перед повторною перевіркою." xml:space="preserve">
+    <value>Die Shop-Daten müssen vor einer erneuten Prüfung korrigiert werden.</value>
+  </data>
+  <data name="Перевірте поточний стан магазину." xml:space="preserve">
+    <value>Überprüfen Sie den aktuellen Status des Shops.</value>
+  </data>
+  <data name="Банер магазину" xml:space="preserve">
+    <value>Shop-Banner</value>
+  </data>
+  <data name="Логотип магазину" xml:space="preserve">
+    <value>Shop-Logo</value>
+  </data>
+  <data name="Ваш магазин" xml:space="preserve">
+    <value>Ihr Shop</value>
+  </data>
+  <data name="Адміністратор магазину" xml:space="preserve">
+    <value>Shop-Administrator</value>
+  </data>
+  <data name="Менеджер товарів" xml:space="preserve">
+    <value>Produktmanager</value>
+  </data>
+  <data name="Бізнес-аналітик" xml:space="preserve">
+    <value>Business-Analyst</value>
+  </data>
+  <data name="Командний доступ" xml:space="preserve">
+    <value>Team-Zugriff</value>
+  </data>
+  <data name="Додати товар" xml:space="preserve">
+    <value>Produkt hinzufügen</value>
+  </data>
+  <data name="Відкрити товари" xml:space="preserve">
+    <value>Produkte öffnen</value>
+  </data>
+  <data name="Статус:" xml:space="preserve">
+    <value>Status:</value>
+  </data>
+  <data name="Основні показники магазину" xml:space="preserve">
+    <value>Wichtige Shop-Kennzahlen</value>
+  </data>
+  <data name="Усього товарів" xml:space="preserve">
+    <value>Produkte insgesamt</value>
+  </data>
+  <data name="у наявності" xml:space="preserve">
+    <value>auf Lager</value>
+  </data>
+  <data name="Активні товари" xml:space="preserve">
+    <value>Aktive Produkte</value>
+  </data>
+  <data name="асортименту" xml:space="preserve">
+    <value>des Sortiments</value>
+  </data>
+  <data name="На модерації" xml:space="preserve">
+    <value>In Prüfung</value>
+  </data>
+  <data name="очікують перевірки" xml:space="preserve">
+    <value>warten auf Prüfung</value>
+  </data>
+  <data name="очікують дій" xml:space="preserve">
+    <value>warten auf Bearbeitung</value>
+  </data>
+  <data name="Оборот" xml:space="preserve">
+    <value>Umsatz</value>
+  </data>
+  <data name="продано одиниць" xml:space="preserve">
+    <value>verkaufte Einheiten</value>
+  </data>
+  <data name="Асортимент" xml:space="preserve">
+    <value>Sortiment</value>
+  </data>
+  <data name="Готовність каталогу" xml:space="preserve">
+    <value>Katalogbereitschaft</value>
+  </data>
+  <data name="Частка активних товарів" xml:space="preserve">
+    <value>Anteil aktiver Produkte</value>
+  </data>
+  <data name="Активні" xml:space="preserve">
+    <value>Aktiv</value>
+  </data>
+  <data name="Немає в наявності" xml:space="preserve">
+    <value>Nicht auf Lager</value>
+  </data>
+  <data name="Поповніть залишки, щоб не втрачати продажі." xml:space="preserve">
+    <value>Füllen Sie den Bestand auf, um keine Verkäufe zu verlieren.</value>
+  </data>
+  <data name="Усі товари мають актуальні залишки." xml:space="preserve">
+    <value>Alle Produkte haben einen aktuellen Lagerbestand.</value>
+  </data>
+  <data name="Активність магазину" xml:space="preserve">
+    <value>Shop-Aktivität</value>
+  </data>
+  <data name="очікують обробки" xml:space="preserve">
+    <value>warten auf Bearbeitung</value>
+  </data>
+  <data name="Усього замовлень" xml:space="preserve">
+    <value>Bestellungen insgesamt</value>
+  </data>
+  <data name="Продано товарів" xml:space="preserve">
+    <value>Verkaufte Produkte</value>
+  </data>
+  <data name="Переглянути замовлення" xml:space="preserve">
+    <value>Bestellungen ansehen</value>
+  </data>
+  <data name="Швидкі дії" xml:space="preserve">
+    <value>Schnellaktionen</value>
+  </data>
+  <data name="Продовжити роботу" xml:space="preserve">
+    <value>Weiterarbeiten</value>
+  </data>
+  <data name="Швидкі дії магазину" xml:space="preserve">
+    <value>Schnellaktionen für den Shop</value>
+  </data>
+  <data name="Дашборд" xml:space="preserve">
+    <value>Dashboard</value>
+  </data>
+  <data name="Продажі, товари, трафік у графіках" xml:space="preserve">
+    <value>Verkäufe, Produkte und Traffic in Diagrammen</value>
+  </data>
+  <data name="Новий товар" xml:space="preserve">
+    <value>Neues Produkt</value>
+  </data>
+  <data name="Створити картку товару" xml:space="preserve">
+    <value>Produktkarte erstellen</value>
+  </data>
+  <data name="Редагувати товари та залишки" xml:space="preserve">
+    <value>Produkte und Lagerbestand bearbeiten</value>
+  </data>
+  <data name="Обробка та зміна статусу" xml:space="preserve">
+    <value>Bearbeitung und Statusänderung</value>
+  </data>
+  <data name="Фінанси" xml:space="preserve">
+    <value>Finanzen</value>
+  </data>
+  <data name="Оборот, продажі та виплати" xml:space="preserve">
+    <value>Umsatz, Verkäufe und Auszahlungen</value>
+  </data>
+  <data name="Ефективність" xml:space="preserve">
+    <value>Leistung</value>
+  </data>
+  <data name="Стан акаунта та рейтинг" xml:space="preserve">
+    <value>Kontostatus und Bewertung</value>
+  </data>
+  <data name="Команда" xml:space="preserve">
+    <value>Team</value>
+  </data>
+  <data name="Учасники та доступи" xml:space="preserve">
+    <value>Mitglieder und Zugriffsrechte</value>
+  </data>
+  <data name="Налаштування" xml:space="preserve">
+    <value>Einstellungen</value>
+  </data>
+  <data name="Дані компанії та платежі" xml:space="preserve">
+    <value>Unternehmensdaten und Zahlungen</value>
+  </data>
+  <data name="Вітрина" xml:space="preserve">
+    <value>Schaufenster</value>
+  </data>
+  <data name="Переглянути каталог покупця" xml:space="preserve">
+    <value>Käuferkatalog ansehen</value>
+  </data>
+</root>

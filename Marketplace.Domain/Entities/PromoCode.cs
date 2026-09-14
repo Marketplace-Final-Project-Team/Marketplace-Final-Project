@@ -13,6 +13,9 @@ namespace Marketplace.Domain.Entities
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 
-        public bool IsActive => StartDate <= DateTime.UtcNow && EndDate >= DateTime.UtcNow;
+        public bool IsSingleUse { get; set; }
+        public bool IsUsed { get; set; }
+
+        public bool IsActive => StartDate <= DateTime.UtcNow && EndDate >= DateTime.UtcNow && !(IsSingleUse && IsUsed);
     }
 }

@@ -100,6 +100,28 @@ namespace Marketplace.BLL.Services
                 .ToListAsync();
         }
 
+        public async Task<IReadOnlyList<WithdrawalRequestDto>> GetForBusinessAsync(Guid businessId)
+        {
+            return await _context.WithdrawalRequests
+                .Where(w => w.BusinessId == businessId)
+                .OrderByDescending(w => w.CreatedAt)
+                .Select(w => new WithdrawalRequestDto
+                {
+                    Id = w.Id,
+                    BusinessId = w.BusinessId,
+                    BusinessName = w.Business.StoreName,
+                    Amount = w.Amount,
+                    CardNumber = w.CardNumber,
+                    RecipientName = w.RecipientName,
+                    Status = w.Status.ToString(),
+                    CreatedAt = w.CreatedAt,
+                    ProcessedAt = w.ProcessedAt,
+                    ProcessedByUserId = w.ProcessedByUserId,
+                    Message = w.Message
+                })
+                .ToListAsync();
+        }
+
         public async Task<ServiceResult> ApproveWithdrawalRequestAsync(Guid requestId, string adminUserId)
         {
             var request = await _withdrawalRequestRepo.GetByIdAsync(requestId);

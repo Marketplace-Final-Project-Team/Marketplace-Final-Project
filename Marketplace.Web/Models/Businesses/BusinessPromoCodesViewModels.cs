@@ -1,4 +1,5 @@
 using Marketplace.BLL.DTOs;
+using Marketplace.DAL.DTOs;
 
 namespace Marketplace.Web.Models.Businesses
 {
@@ -10,5 +11,7 @@ namespace Marketplace.Web.Models.Businesses
         public BusinessDiscountDto? BusinessDiscount { get; set; }
         public List<CategoryDiscountDto> CategoryDiscounts { get; set; } = new();
         public List<CategoryDto> Categories { get; set; } = new();
+        public List<UserDiscountGetDto> PersonalDiscounts { get; set; } = new();
+        public List<CustomerStatsByPeriodDto> Customers { get; set; } = new();
     }
 }

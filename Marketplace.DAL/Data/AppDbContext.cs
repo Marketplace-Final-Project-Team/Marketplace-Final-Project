@@ -14,6 +14,7 @@ namespace Marketplace.DAL.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<ProductTranslation> ProductTranslations { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Order> Orders { get; set; }
@@ -244,6 +245,19 @@ namespace Marketplace.DAL.Data
 
             builder.Entity<SystemSetting>()
                 .HasIndex(s => new { s.Category, s.Key })
+                .IsUnique();
+
+            builder.Entity<ProductTranslation>()
+                .HasQueryFilter(pt => !pt.IsDeleted);
+
+            builder.Entity<ProductTranslation>()
+                .HasOne(pt => pt.Product)
+                .WithMany()
+                .HasForeignKey(pt => pt.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<ProductTranslation>()
+                .HasIndex(pt => new { pt.ProductId, pt.Culture })
                 .IsUnique();
 
             builder.Entity<BusinessActionLog>()

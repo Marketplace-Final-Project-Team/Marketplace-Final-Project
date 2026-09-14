@@ -295,6 +295,27 @@
     color: var(--admin-ink);
 }
 
+.admin-stat-card__hint a {
+    align-items: center;
+    background: #edf1ff;
+    border-radius: 999px;
+    color: var(--admin-primary);
+    display: inline-flex;
+    font-size: 0.78rem;
+    font-weight: 700;
+    gap: 0.3rem;
+    margin-top: 0.5rem;
+    padding: 0.32rem 0.8rem;
+    text-decoration: none;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.admin-stat-card__hint a:hover {
+    background: #dbe4ff;
+    box-shadow: 0 0.25rem 0.6rem rgba(54, 89, 217, 0.18);
+    transform: translateX(2px);
+}
+
 .admin-stat-card--warning .admin-stat-card__value {
     color: #b45309;
 }
@@ -378,6 +399,14 @@
     margin-bottom: 1rem;
 }
 
+.admin-toolbar--center {
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-line);
+    border-radius: 0.9rem;
+    justify-content: center;
+    padding: 1rem 1.25rem;
+}
+
 .admin-toolbar .admin-search-wrap {
     margin-bottom: 0;
 }
@@ -392,22 +421,60 @@
 }
 
 .admin-toolbar input[type="date"] {
-    background-color: var(--admin-surface);
+    accent-color: var(--admin-primary);
+    background-color: var(--admin-soft);
     border: 1px solid var(--admin-line);
     border-radius: 0.6rem;
     color: var(--admin-ink);
+    cursor: pointer;
     font-size: 0.85rem;
     padding: 0.47rem 0.75rem;
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.admin-toolbar input[type="date"]:hover {
+    border-color: var(--admin-primary);
+}
+
+.admin-toolbar input[type="date"]:focus {
+    background-color: var(--admin-surface);
+    border-color: var(--admin-primary);
+    box-shadow: 0 0 0 0.2rem rgba(54, 89, 217, 0.15);
+    outline: none;
+}
+
+.admin-toolbar input[type="date"]::-webkit-calendar-picker-indicator {
+    border-radius: 0.3rem;
+    cursor: pointer;
+    padding: 0.2rem;
+    transition: background-color 0.15s ease;
+}
+
+.admin-toolbar input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    background-color: rgba(54, 89, 217, 0.12);
 }
 
 .admin-toolbar select {
-    background-color: var(--admin-surface);
+    background-color: var(--admin-soft);
     border: 1px solid var(--admin-line);
     border-radius: 0.6rem;
     color: var(--admin-ink);
+    cursor: pointer;
     font-size: 0.85rem;
     min-width: 10rem;
     padding: 0.5rem 0.75rem;
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.admin-toolbar select:hover {
+    border-color: var(--admin-primary);
+}
+
+.admin-toolbar select:focus {
+    background-color: var(--admin-surface);
+    border-color: var(--admin-primary);
+    box-shadow: 0 0 0 0.2rem rgba(54, 89, 217, 0.15);
+    outline: none;
 }
 
 .admin-price-range {

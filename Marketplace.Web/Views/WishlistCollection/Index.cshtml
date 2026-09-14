@@ -1,7 +1,7 @@
 @model IEnumerable<Marketplace.BLL.DTOs.WishlistCollectionDto>
 
 @{
-    ViewData["Title"] = "Колекції бажань";
+    ViewData["Title"] = Localizer["Колекції бажань"];
     var collections = Model.ToList();
 }
 
@@ -11,11 +11,11 @@
 }
 
 <div class="profile-page">
-    <a asp-controller="Profile" asp-action="Index" class="profile-back">← До кабінету</a>
+    <a asp-controller="Profile" asp-action="Index" class="profile-back">← @Localizer["До кабінету"]</a>
 
     <div class="profile-summary">
-        <h1>Колекції бажань</h1>
-        <p>Групуйте товари зі списку бажань у власні колекції - наприклад, подарунки або покупки на сезон.</p>
+        <h1>@Localizer["Колекції бажань"]</h1>
+        <p>@Localizer["Групуйте товари зі списку бажань у власні колекції - наприклад, подарунки або покупки на сезон."]</p>
     </div>
 
     @if (TempData["Success"] is string success)
@@ -28,17 +28,17 @@
     }
 
     <form asp-action="Create" method="post" class="wishlist-collection-create">
-        <label for="new-collection-name">Нова колекція</label>
-        <input type="text" id="new-collection-name" name="name" placeholder="Наприклад: Подарунки" maxlength="40" required />
-        <button type="submit" class="btn btn-primary btn-sm">+ Створити</button>
+        <label for="new-collection-name">@Localizer["Нова колекція"]</label>
+        <input type="text" id="new-collection-name" name="name" placeholder="@Localizer["Наприклад: Подарунки"]" maxlength="40" required />
+        <button type="submit" class="btn btn-primary btn-sm">+ @Localizer["Створити"]</button>
     </form>
 
     @if (collections.Count == 0)
     {
         <div class="profile-empty">
             <div class="profile-empty__icon" aria-hidden="true">☆</div>
-            <h2>Колекцій поки немає</h2>
-            <p>Створіть першу колекцію вище, щоб почати групувати товари зі списку бажань.</p>
+            <h2>@Localizer["Колекцій поки немає"]</h2>
+            <p>@Localizer["Створіть першу колекцію вище, щоб почати групувати товари зі списку бажань."]</p>
         </div>
     }
     else
@@ -49,12 +49,12 @@
                 <div class="wishlist-collection-card">
                     <a asp-action="Details" asp-route-id="@collection.Id" class="wishlist-collection-card__link">
                         <strong>@collection.Name</strong>
-                        <span>@collection.ItemCount @(collection.ItemCount == 1 ? "товар" : "товарів")</span>
+                        <span>@collection.ItemCount @(collection.ItemCount == 1 ? Localizer["товар"] : Localizer["товарів"])</span>
                     </a>
                     <div class="wishlist-collection-card__actions">
-                        <a asp-action="Edit" asp-route-id="@collection.Id" class="btn btn-sm btn-outline-secondary">Перейменувати</a>
-                        <form asp-action="Delete" asp-route-id="@collection.Id" method="post" onsubmit="return confirm('Видалити колекцію «@collection.Name» разом із товарами в ній?');">
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Видалити</button>
+                        <a asp-action="Edit" asp-route-id="@collection.Id" class="btn btn-sm btn-outline-secondary">@Localizer["Перейменувати"]</a>
+                        <form asp-action="Delete" asp-route-id="@collection.Id" method="post" onsubmit="return confirm('@Localizer["Видалити колекцію «{0}» разом із товарами в ній?", collection.Name]');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">@Localizer["Видалити"]</button>
                         </form>
                     </div>
                 </div>

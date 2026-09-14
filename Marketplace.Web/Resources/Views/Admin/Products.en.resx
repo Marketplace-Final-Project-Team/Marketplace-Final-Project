@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Товари" xml:space="preserve">
+    <value>Products</value>
+  </data>
+  <data name="Активний" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="На модерації" xml:space="preserve">
+    <value>Under review</value>
+  </data>
+  <data name="Заблокований" xml:space="preserve">
+    <value>Banned</value>
+  </data>
+  <data name="Ціна: зростання" xml:space="preserve">
+    <value>Price: ascending</value>
+  </data>
+  <data name="Ціна: спадання" xml:space="preserve">
+    <value>Price: descending</value>
+  </data>
+  <data name="Спочатку старі" xml:space="preserve">
+    <value>Oldest first</value>
+  </data>
+  <data name="Спочатку нові" xml:space="preserve">
+    <value>Newest first</value>
+  </data>
+  <data name="Популярність: за зростанням" xml:space="preserve">
+    <value>Popularity: ascending</value>
+  </data>
+  <data name="Популярність: за спаданням" xml:space="preserve">
+    <value>Popularity: descending</value>
+  </data>
+  <data name="Знайдено" xml:space="preserve">
+    <value>Found</value>
+  </data>
+  <data name="товарів." xml:space="preserve">
+    <value>products.</value>
+  </data>
+  <data name="Пошук за назвою" xml:space="preserve">
+    <value>Search by name</value>
+  </data>
+  <data name="Пошук товарів" xml:space="preserve">
+    <value>Search products</value>
+  </data>
+  <data name="Пошук за магазином" xml:space="preserve">
+    <value>Search by store</value>
+  </data>
+  <data name="Фільтр за категорією" xml:space="preserve">
+    <value>Filter by category</value>
+  </data>
+  <data name="Фільтр за статусом" xml:space="preserve">
+    <value>Filter by status</value>
+  </data>
+  <data name="Усі статуси" xml:space="preserve">
+    <value>All statuses</value>
+  </data>
+  <data name="Ціна від" xml:space="preserve">
+    <value>Price from</value>
+  </data>
+  <data name="Ціна до" xml:space="preserve">
+    <value>Price to</value>
+  </data>
+  <data name="Тільки в наявності" xml:space="preserve">
+    <value>In stock only</value>
+  </data>
+  <data name="Сортування" xml:space="preserve">
+    <value>Sorting</value>
+  </data>
+  <data name="Застосувати" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="Нічого не знайдено за цим запитом." xml:space="preserve">
+    <value>No results found for this query.</value>
+  </data>
+  <data name="Режим перегляду товарів" xml:space="preserve">
+    <value>Product view mode</value>
+  </data>
+  <data name="Список" xml:space="preserve">
+    <value>List</value>
+  </data>
+  <data name="Плитка" xml:space="preserve">
+    <value>Grid</value>
+  </data>
+  <data name="Карусель" xml:space="preserve">
+    <value>Carousel</value>
+  </data>
+  <data name="Товар" xml:space="preserve">
+    <value>Product</value>
+  </data>
+  <data name="Ціна" xml:space="preserve">
+    <value>Price</value>
+  </data>
+  <data name="Статус" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Дії" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="Попередній" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="Наступний" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="Закрити" xml:space="preserve">
+    <value>Close</value>
+  </data>
+</root>

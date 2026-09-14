@@ -19,6 +19,10 @@ namespace Marketplace.Web.Models.Businesses
         public Guid BusinessId { get; set; }
         public string StoreName { get; set; } = string.Empty;
         public OrderStatus? StatusFilter { get; set; }
+        public string? Search { get; set; }
+        public string? SearchEmail { get; set; }
+        public decimal? MinAmount { get; set; }
+        public decimal? MaxAmount { get; set; }
         public List<BusinessOrderListItemViewModel> Orders { get; set; } = new();
     }
 

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Панель продавця" xml:space="preserve">
+    <value>Verkäufer-Panel</value>
+  </data>
+  <data name="Керуйте асортиментом: додавайте нові товари, редагуйте наявні та стежте за їхнім статусом." xml:space="preserve">
+    <value>Verwalten Sie Ihr Sortiment: Fügen Sie neue Artikel hinzu, bearbeiten Sie vorhandene und verfolgen Sie ihren Status.</value>
+  </data>
+  <data name="Додати товар" xml:space="preserve">
+    <value>Artikel hinzufügen</value>
+  </data>
+  <data name="Поточний бізнес" xml:space="preserve">
+    <value>Aktuelles Unternehmen</value>
+  </data>
+  <data name="Показати" xml:space="preserve">
+    <value>Anzeigen</value>
+  </data>
+  <data name="Зміни зберігаються одразу" xml:space="preserve">
+    <value>Änderungen werden sofort gespeichert</value>
+  </data>
+  <data name="Статистика товарів" xml:space="preserve">
+    <value>Artikelstatistik</value>
+  </data>
+  <data name="Усього товарів" xml:space="preserve">
+    <value>Artikel insgesamt</value>
+  </data>
+  <data name="Активні" xml:space="preserve">
+    <value>Aktiv</value>
+  </data>
+  <data name="Очікують модерації" xml:space="preserve">
+    <value>In Prüfung</value>
+  </data>
+  <data name="Товарів поки немає" xml:space="preserve">
+    <value>Noch keine Artikel</value>
+  </data>
+  <data name="Додайте свій перший товар, щоб він з'явився в каталозі." xml:space="preserve">
+    <value>Fügen Sie Ihren ersten Artikel hinzu, damit er im Katalog erscheint.</value>
+  </data>
+  <data name="Створити перший товар" xml:space="preserve">
+    <value>Ersten Artikel erstellen</value>
+  </data>
+  <data name="Спочатку створіть бізнес або отримайте доступ до керування товарами." xml:space="preserve">
+    <value>Erstellen Sie zunächst ein Unternehmen oder erhalten Sie Zugriff auf die Artikelverwaltung.</value>
+  </data>
+  <data name="Створити бізнес" xml:space="preserve">
+    <value>Unternehmen erstellen</value>
+  </data>
+  <data name="Товар" xml:space="preserve">
+    <value>Artikel</value>
+  </data>
+  <data name="Ціна" xml:space="preserve">
+    <value>Preis</value>
+  </data>
+  <data name="Залишок" xml:space="preserve">
+    <value>Bestand</value>
+  </data>
+  <data name="Статус" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Дії" xml:space="preserve">
+    <value>Aktionen</value>
+  </data>
+  <data name="Активний" xml:space="preserve">
+    <value>Aktiv</value>
+  </data>
+  <data name="На модерації" xml:space="preserve">
+    <value>In Prüfung</value>
+  </data>
+  <data name="Заблокований" xml:space="preserve">
+    <value>Gesperrt</value>
+  </data>
+  <data name="Без категорії" xml:space="preserve">
+    <value>Keine Kategorie</value>
+  </data>
+  <data name="Видалити знижку" xml:space="preserve">
+    <value>Rabatt entfernen</value>
+  </data>
+  <data name="шт." xml:space="preserve">
+    <value>Stk.</value>
+  </data>
+  <data name="Переглянути" xml:space="preserve">
+    <value>Ansehen</value>
+  </data>
+  <data name="Редагувати" xml:space="preserve">
+    <value>Bearbeiten</value>
+  </data>
+  <data name="Встановити знижку" xml:space="preserve">
+    <value>Rabatt festlegen</value>
+  </data>
+  <data name="Знижка" xml:space="preserve">
+    <value>Rabatt</value>
+  </data>
+  <data name="Видалити" xml:space="preserve">
+    <value>Löschen</value>
+  </data>
+  <data name="Керування знижкою" xml:space="preserve">
+    <value>Rabatt verwalten</value>
+  </data>
+  <data name="Закрити" xml:space="preserve">
+    <value>Schließen</value>
+  </data>
+  <data name="Відсоток знижки (%)" xml:space="preserve">
+    <value>Rabattprozentsatz (%)</value>
+  </data>
+  <data name="Дата початку" xml:space="preserve">
+    <value>Startdatum</value>
+  </data>
+  <data name="Дата закінчення" xml:space="preserve">
+    <value>Enddatum</value>
+  </data>
+  <data name="Скасувати" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="Зберегти знижку" xml:space="preserve">
+    <value>Rabatt speichern</value>
+  </data>
+  <data name="Видалення знижки" xml:space="preserve">
+    <value>Rabatt entfernen</value>
+  </data>
+  <data name="Ви точно хочете видалити знижку на товар" xml:space="preserve">
+    <value>Möchten Sie den Rabatt für den Artikel wirklich entfernen</value>
+  </data>
+  <data name="Цю дію не можна скасувати." xml:space="preserve">
+    <value>Diese Aktion kann nicht rückgängig gemacht werden.</value>
+  </data>
+</root>

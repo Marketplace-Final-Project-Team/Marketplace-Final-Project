@@ -3,8 +3,8 @@
 <a class="nav-link text-dark nav-cart-link"
    asp-controller="Profile"
    asp-action="Wishlist"
-   aria-label="Список бажань, товарів: @Model">
+   aria-label="@Localizer["Список бажань, товарів: {0}", Model]">
     <span aria-hidden="true">♡</span>
-    <span>Бажання</span>
+    <span>@Localizer["Бажання"]</span>
     <span class="nav-cart-count @(Model == 0 ? "is-empty" : null)">@Model</span>
 </a>

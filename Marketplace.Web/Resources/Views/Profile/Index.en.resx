@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Змінити аватар" xml:space="preserve">
+    <value>Change avatar</value>
+  </data>
+  <data name="Аватар користувача" xml:space="preserve">
+    <value>Avatar of user</value>
+  </data>
+  <data name="в" xml:space="preserve">
+    <value>at</value>
+  </data>
+  <data name="Ваші персональні знижки" xml:space="preserve">
+    <value>Your personal discounts</value>
+  </data>
+  <data name="до" xml:space="preserve">
+    <value>until</value>
+  </data>
+  <data name="Історія покупок і статус доставки" xml:space="preserve">
+    <value>Purchase history and delivery status</value>
+  </data>
+  <data name="Адреси" xml:space="preserve">
+    <value>Addresses</value>
+  </data>
+  <data name="Керуйте адресами доставки" xml:space="preserve">
+    <value>Manage your delivery addresses</value>
+  </data>
+  <data name="Товари, які ви зберегли" xml:space="preserve">
+    <value>Products you've saved</value>
+  </data>
+  <data name="Мої знижки" xml:space="preserve">
+    <value>My discounts</value>
+  </data>
+  <data name="Персональні знижки від продавців" xml:space="preserve">
+    <value>Personal discounts from sellers</value>
+  </data>
+  <data name="Колекції бажань" xml:space="preserve">
+    <value>Wishlist collections</value>
+  </data>
+  <data name="Групуйте товари за своїми списками" xml:space="preserve">
+    <value>Group products into your own lists</value>
+  </data>
+  <data name="Сповіщення" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
+  <data name="Останні події за вашими замовленнями" xml:space="preserve">
+    <value>Latest updates on your orders</value>
+  </data>
+  <data name="Налаштування профілю" xml:space="preserve">
+    <value>Profile settings</value>
+  </data>
+  <data name="Ім'я користувача та аватар" xml:space="preserve">
+    <value>Username and avatar</value>
+  </data>
+  <data name="Зміна пароля" xml:space="preserve">
+    <value>Change password</value>
+  </data>
+  <data name="Оновіть пароль для входу" xml:space="preserve">
+    <value>Update your sign-in password</value>
+  </data>
+  <data name="Змінити Email" xml:space="preserve">
+    <value>Change email</value>
+  </data>
+</root>

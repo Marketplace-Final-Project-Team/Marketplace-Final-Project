@@ -31,6 +31,13 @@ namespace Marketplace.Web.Models.Businesses
         public int PurchaseCount { get; set; }
     }
 
+    public class BusinessDashboardCategoryStatViewModel
+    {
+        public string CategoryName { get; set; } = string.Empty;
+        public decimal Revenue { get; set; }
+        public int UnitsSold { get; set; }
+    }
+
     public class BusinessDashboardActivityItemViewModel
     {
         public string Description { get; set; } = string.Empty;
@@ -71,6 +78,7 @@ namespace Marketplace.Web.Models.Businesses
 
         public List<BusinessDashboardTopProductViewModel> TopProducts { get; set; } = new();
         public List<BusinessDashboardTopCustomerViewModel> TopCustomers { get; set; } = new();
+        public List<BusinessDashboardCategoryStatViewModel> CategoryStats { get; set; } = new();
         public List<BusinessDashboardActivityItemViewModel> RecentActivity { get; set; } = new();
     }
 }

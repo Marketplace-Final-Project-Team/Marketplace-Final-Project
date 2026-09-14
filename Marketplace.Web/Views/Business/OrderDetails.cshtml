@@ -5,25 +5,25 @@
 @inject IBusinessAccessService BusinessAccessService
 
 @{
-    ViewData["Title"] = $"Замовлення #{Model.OrderId.ToString()[..8].ToUpperInvariant()}";
+    ViewData["Title"] = $"{SharedLocalizer["Замовлення"].Value} #{Model.OrderId.ToString()[..8].ToUpperInvariant()}";
 }
 
 @functions {
-    private static string StatusLabel(Marketplace.Domain.Enums.OrderStatus status) => status switch
+    private string StatusLabel(Marketplace.Domain.Enums.OrderStatus status) => status switch
     {
-        Marketplace.Domain.Enums.OrderStatus.Pending => "Очікує підтвердження",
-        Marketplace.Domain.Enums.OrderStatus.Confirmed => "Підтверджено",
-        Marketplace.Domain.Enums.OrderStatus.Shipped => "Відправлено",
-        Marketplace.Domain.Enums.OrderStatus.Delivered => "Доставлено",
-        Marketplace.Domain.Enums.OrderStatus.Canceled => "Скасовано",
+        Marketplace.Domain.Enums.OrderStatus.Pending => Localizer["Очікує підтвердження"].Value,
+        Marketplace.Domain.Enums.OrderStatus.Confirmed => Localizer["Підтверджено"].Value,
+        Marketplace.Domain.Enums.OrderStatus.Shipped => Localizer["Відправлено"].Value,
+        Marketplace.Domain.Enums.OrderStatus.Delivered => Localizer["Доставлено"].Value,
+        Marketplace.Domain.Enums.OrderStatus.Canceled => Localizer["Скасовано"].Value,
         _ => status.ToString()
     };
 
-    private static string PostSaleStatusLabel(Marketplace.Domain.Enums.PostSaleRequestStatus status) => status switch
+    private string PostSaleStatusLabel(Marketplace.Domain.Enums.PostSaleRequestStatus status) => status switch
     {
-        Marketplace.Domain.Enums.PostSaleRequestStatus.Approved => "Підтверджено",
-        Marketplace.Domain.Enums.PostSaleRequestStatus.Rejected => "Відхилено",
-        _ => "Очікує розгляду"
+        Marketplace.Domain.Enums.PostSaleRequestStatus.Approved => Localizer["Підтверджено"].Value,
+        Marketplace.Domain.Enums.PostSaleRequestStatus.Rejected => Localizer["Відхилено"].Value,
+        _ => Localizer["Очікує розгляду"].Value
     };
 }
 
@@ -34,13 +34,13 @@
 }
 
 <div class="seller-dashboard">
-    <a asp-action="Orders" asp-route-businessId="@Model.BusinessId" class="seller-order-back">← До списку замовлень</a>
+    <a asp-action="Orders" asp-route-businessId="@Model.BusinessId" class="seller-order-back">← @Localizer["До списку замовлень"]</a>
 
     <header class="seller-orders-header">
         <div>
             <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> @Model.StoreName</div>
-            <h1>Замовлення #@Model.OrderId.ToString()[..8].ToUpperInvariant()</h1>
-            <p>Створено @Model.CreatedAt.ToLocalTime().ToString("dd MMMM yyyy, HH:mm")</p>
+            <h1>@SharedLocalizer["Замовлення"] #@Model.OrderId.ToString()[..8].ToUpperInvariant()</h1>
+            <p>@Localizer["Створено"] @Model.CreatedAt.ToLocalTime().ToString("dd MMMM yyyy, HH:mm")</p>
         </div>
         <span class="order-status order-status--@Model.Status.ToString().ToLowerInvariant()">@StatusLabel(Model.Status)</span>
     </header>
@@ -49,7 +49,7 @@
     {
         <div class="seller-alert" role="status">
             <span aria-hidden="true">✓</span>
-            <p><strong>Успішно</strong>@success</p>
+            <p><strong>@Localizer["Успішно"]</strong>@success</p>
         </div>
     }
     @if (TempData["Error"] is string error)
@@ -61,13 +61,13 @@
     {
         <div class="seller-alert" style="background:#fff9e8;border-color:#f4d77d;color:#755000;">
             <span aria-hidden="true" style="background:#c8870b;">i</span>
-            <p><strong>Змішане замовлення</strong>Це замовлення містить також товари інших продавців - вони показані нижче, але статус змінюється для всього замовлення одразу.</p>
+            <p><strong>@Localizer["Змішане замовлення"]</strong>@Localizer["Це замовлення містить також товари інших продавців - вони показані нижче, але статус змінюється для всього замовлення одразу."]</p>
         </div>
     }
 
     <div class="seller-order-layout">
         <section class="seller-order-card">
-            <h2>Товари в замовленні</h2>
+            <h2>@Localizer["Товари в замовленні"]</h2>
             @foreach (var item in Model.Items)
             {
                 <div class="seller-order-line @(item.BelongsToBusiness ? "" : "seller-order-line--foreign")">
@@ -80,8 +80,8 @@
                         <div class="seller-order-line__media" aria-hidden="true">@item.ProductName[..1].ToUpperInvariant()</div>
                     }
                     <div>
-                        <div>@item.ProductName @if (!item.BelongsToBusiness) { <span class="seller-order-line__badge">інший продавець</span> }</div>
-                        <div class="seller-order-line__meta">@item.Quantity шт. × @item.UnitPrice.ToString("N2") ₴</div>
+                        <div>@item.ProductName @if (!item.BelongsToBusiness) { <span class="seller-order-line__badge">@Localizer["інший продавець"]</span> }</div>
+                        <div class="seller-order-line__meta">@item.Quantity @Localizer["шт."] × @item.UnitPrice.ToString("N2") ₴</div>
                     </div>
                     <div class="seller-order-line__total">@((item.UnitPrice * item.Quantity).ToString("N2")) ₴</div>
                 </div>
@@ -89,10 +89,10 @@
         </section>
 
         <aside class="seller-order-card seller-order-info">
-            <h2>Отримувач і доставка</h2>
+            <h2>@Localizer["Отримувач і доставка"]</h2>
             <dl>
                 <div class="seller-order-info__row">
-                    <dt>Покупець</dt>
+                    <dt>@Localizer["Покупець"]</dt>
                     <dd>@Model.BuyerName</dd>
                 </div>
                 <div class="seller-order-info__row">
@@ -100,15 +100,15 @@
                     <dd>@Model.BuyerEmail</dd>
                 </div>
                 <div class="seller-order-info__row">
-                    <dt>Телефон</dt>
-                    <dd>@(string.IsNullOrWhiteSpace(Model.BuyerPhone) ? "не вказано" : Model.BuyerPhone)</dd>
+                    <dt>@Localizer["Телефон"]</dt>
+                    <dd>@(string.IsNullOrWhiteSpace(Model.BuyerPhone) ? Localizer["не вказано"].Value : Model.BuyerPhone)</dd>
                 </div>
                 <div class="seller-order-info__row">
-                    <dt>Адреса</dt>
+                    <dt>@Localizer["Адреса"]</dt>
                     <dd>@Model.ShippingCountry, @Model.ShippingCity,<br />@Model.ShippingStreet</dd>
                 </div>
                 <div class="seller-order-info__row">
-                    <dt>Сума замовлення</dt>
+                    <dt>@Localizer["Сума замовлення"]</dt>
                     <dd>@Model.OrderTotalAmount.ToString("N2") ₴</dd>
                 </div>
             </dl>
@@ -128,12 +128,12 @@
                             <option value="@option">@StatusLabel(option)</option>
                         }
                     </select>
-                    <button type="submit" class="seller-button seller-button--primary">Змінити статус</button>
+                    <button type="submit" class="seller-button seller-button--primary">@Localizer["Змінити статус"]</button>
                 </form>
             }
             else
             {
-                <p class="seller-order-status-final">Статус замовлення: <strong>@StatusLabel(Model.Status)</strong> (кінцевий, змінити неможливо)</p>
+                <p class="seller-order-status-final">@Localizer["Статус замовлення:"] <strong>@StatusLabel(Model.Status)</strong> @Localizer["(кінцевий, змінити неможливо)"]</p>
             }
         </aside>
     </div>
@@ -141,12 +141,12 @@
     @if (Model.PostSaleRequests.Any())
     {
         <section class="seller-order-card seller-postsale">
-            <h2>Заявки на повернення</h2>
+            <h2>@Localizer["Заявки на повернення"]</h2>
             @foreach (var request in Model.PostSaleRequests)
             {
                 <div class="seller-postsale-item seller-postsale-item--@request.Status.ToString().ToLowerInvariant()">
                     <div class="seller-postsale-item__header">
-                        <strong>Повернення: @request.ProductName</strong>
+                        <strong>@Localizer["Повернення:"] @request.ProductName</strong>
                         <span class="seller-postsale-item__status">@PostSaleStatusLabel(request.Status)</span>
                     </div>
                     <p class="seller-postsale-item__meta">@request.CreatedAt.ToLocalTime().ToString("dd MMMM yyyy, HH:mm") · @request.Reason</p>
@@ -159,7 +159,7 @@
                         <div class="postsale-photos">
                             @foreach (var url in request.PhotoUrls)
                             {
-                                <a href="@url" target="_blank" rel="noopener"><img src="@url" alt="Фото до заявки" /></a>
+                                <a href="@url" target="_blank" rel="noopener"><img src="@url" alt="@Localizer["Фото до заявки"]" /></a>
                             }
                         </div>
                     }
@@ -170,16 +170,16 @@
                             <input type="hidden" name="businessId" value="@Model.BusinessId" />
                             <input type="hidden" name="orderId" value="@Model.OrderId" />
                             <input type="hidden" name="requestId" value="@request.Id" />
-                            <input type="text" name="sellerResponse" class="form-control" placeholder="Коментар покупцю (необов'язково)" />
+                            <input type="text" name="sellerResponse" class="form-control" placeholder="@Localizer["Коментар покупцю (необов'язково)"]" />
                             <div class="seller-postsale-item__buttons">
-                                <button type="submit" name="decision" value="Approved" class="seller-button seller-button--primary">Підтвердити й повернути кошти</button>
-                                <button type="submit" name="decision" value="Rejected" class="seller-button">Відхилити</button>
+                                <button type="submit" name="decision" value="Approved" class="seller-button seller-button--primary">@Localizer["Підтвердити й повернути кошти"]</button>
+                                <button type="submit" name="decision" value="Rejected" class="seller-button">@Localizer["Відхилити"]</button>
                             </div>
                         </form>
                     }
                     else if (!string.IsNullOrWhiteSpace(request.SellerResponse))
                     {
-                        <p class="seller-postsale-item__comment">Ваша відповідь: «@request.SellerResponse»</p>
+                        <p class="seller-postsale-item__comment">@Localizer["Ваша відповідь:"] «@request.SellerResponse»</p>
                     }
                 </div>
             }

@@ -9,11 +9,11 @@
     var productManagerAccess = businesses.Any(b => b.CurrentUserRole == Marketplace.Domain.Enums.BusinessMemberRole.ProductManager);
     var analystAccess = businesses.Any(b => b.CurrentUserRole == Marketplace.Domain.Enums.BusinessMemberRole.BusinessAnalyst);
 
-    var pageTitle = ownerAccess ? "Панель продавця"
-        : adminAccess ? "Панель адміністратора"
-        : productManagerAccess ? "Панель менеджера товарів"
-        : analystAccess ? "Панель аналітика"
-        : "Панель продавця";
+    var pageTitle = ownerAccess ? Localizer["Панель продавця"]
+        : adminAccess ? Localizer["Панель адміністратора"]
+        : productManagerAccess ? Localizer["Панель менеджера товарів"]
+        : analystAccess ? Localizer["Панель аналітика"]
+        : Localizer["Панель продавця"];
 
     ViewData["Title"] = pageTitle;
 }
@@ -36,12 +36,12 @@
         <div>
             <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> @pageTitle</div>
             <h1>@pageTitle</h1>
-            <p>Контролюйте асортимент, замовлення та стан магазину в одному робочому просторі.</p>
+            <p>@Localizer["Контролюйте асортимент, замовлення та стан магазину в одному робочому просторі."]</p>
         </div>
         @if (Model.CanCreateBusiness)
         {
             <a asp-action="Create" class="seller-button seller-button--primary">
-                <span aria-hidden="true">＋</span> Створити бізнес
+                <span aria-hidden="true">＋</span> @Localizer["Створити бізнес"]
             </a>
         }
     </header>
@@ -50,7 +50,7 @@
     {
         <div class="seller-alert" role="status">
             <span aria-hidden="true">✓</span>
-            <p><strong>Успішно!</strong> @success</p>
+            <p><strong>@Localizer["Успішно!"]</strong> @success</p>
         </div>
     }
 
@@ -62,11 +62,11 @@
                 <span class="seller-empty__product seller-empty__product--one"></span>
                 <span class="seller-empty__product seller-empty__product--two"></span>
             </div>
-            <p class="seller-dashboard__eyebrow">Почніть продавати</p>
-            <h2>Створіть свій перший магазин</h2>
-            <p>Додайте інформацію про бізнес, завантажте логотип і переходьте до створення асортименту.</p>
+            <p class="seller-dashboard__eyebrow">@Localizer["Почніть продавати"]</p>
+            <h2>@Localizer["Створіть свій перший магазин"]</h2>
+            <p>@Localizer["Додайте інформацію про бізнес, завантажте логотип і переходьте до створення асортименту."]</p>
             <a asp-action="Create" class="seller-button seller-button--primary">
-                Створити бізнес <span aria-hidden="true">→</span>
+                @Localizer["Створити бізнес"] <span aria-hidden="true">→</span>
             </a>
         </section>
     }
@@ -78,19 +78,19 @@
                 var statusClass = business.Status.ToString().ToLowerInvariant();
                 var statusLabel = business.Status switch
                 {
-                    Marketplace.Domain.Enums.BusinessStatus.Pending => "На перевірці",
-                    Marketplace.Domain.Enums.BusinessStatus.Active => "Активний",
-                    Marketplace.Domain.Enums.BusinessStatus.Suspended => "Призупинений",
-                    Marketplace.Domain.Enums.BusinessStatus.Rejected => "Відхилений",
+                    Marketplace.Domain.Enums.BusinessStatus.Pending => Localizer["На перевірці"].Value,
+                    Marketplace.Domain.Enums.BusinessStatus.Active => Localizer["Активний"].Value,
+                    Marketplace.Domain.Enums.BusinessStatus.Suspended => Localizer["Призупинений"].Value,
+                    Marketplace.Domain.Enums.BusinessStatus.Rejected => Localizer["Відхилений"].Value,
                     _ => business.Status.ToString()
                 };
                 var statusDescription = business.Status switch
                 {
-                    Marketplace.Domain.Enums.BusinessStatus.Pending => "Команда модерації перевіряє дані магазину. Ви вже можете підготувати асортимент.",
-                    Marketplace.Domain.Enums.BusinessStatus.Active => "Магазин працює та доступний покупцям. Усі основні функції активні.",
-                    Marketplace.Domain.Enums.BusinessStatus.Suspended => "Роботу магазину тимчасово призупинено. Перевірте повідомлення адміністратора.",
-                    Marketplace.Domain.Enums.BusinessStatus.Rejected => "Дані магазину потребують виправлення перед повторною перевіркою.",
-                    _ => "Перевірте поточний стан магазину."
+                    Marketplace.Domain.Enums.BusinessStatus.Pending => Localizer["Команда модерації перевіряє дані магазину. Ви вже можете підготувати асортимент."],
+                    Marketplace.Domain.Enums.BusinessStatus.Active => Localizer["Магазин працює та доступний покупцям. Усі основні функції активні."],
+                    Marketplace.Domain.Enums.BusinessStatus.Suspended => Localizer["Роботу магазину тимчасово призупинено. Перевірте повідомлення адміністратора."],
+                    Marketplace.Domain.Enums.BusinessStatus.Rejected => Localizer["Дані магазину потребують виправлення перед повторною перевіркою."],
+                    _ => Localizer["Перевірте поточний стан магазину."]
                 };
                 var storeInitial = string.IsNullOrWhiteSpace(business.StoreName)
                     ? "M"
@@ -107,7 +107,7 @@
                     <div class="seller-store__cover">
                         @if (!string.IsNullOrWhiteSpace(business.BannerUrl))
                         {
-                            <img src="@business.BannerUrl" alt="Банер магазину @business.StoreName" />
+                            <img src="@business.BannerUrl" alt="@Localizer["Банер магазину"] @business.StoreName" />
                         }
                         <div class="seller-store__cover-pattern" aria-hidden="true"></div>
                         <div class="seller-store__cover-topline">
@@ -123,7 +123,7 @@
                             <div class="seller-store__identity">
                                 @if (!string.IsNullOrWhiteSpace(business.LogoUrl))
                                 {
-                                    <img class="seller-store__logo" src="@business.LogoUrl" alt="Логотип магазину @business.StoreName" />
+                                    <img class="seller-store__logo" src="@business.LogoUrl" alt="@Localizer["Логотип магазину"] @business.StoreName" />
                                 }
                                 else
                                 {
@@ -133,11 +133,11 @@
                                     @{
                                         var roleLabel = business.CurrentUserRole switch
                                         {
-                                            Marketplace.Domain.Enums.BusinessMemberRole.Owner => "Ваш магазин",
-                                            Marketplace.Domain.Enums.BusinessMemberRole.Admin => "Адміністратор магазину",
-                                            Marketplace.Domain.Enums.BusinessMemberRole.ProductManager => "Менеджер товарів",
-                                            Marketplace.Domain.Enums.BusinessMemberRole.BusinessAnalyst => "Бізнес-аналітик",
-                                            _ => "Командний доступ"
+                                            Marketplace.Domain.Enums.BusinessMemberRole.Owner => Localizer["Ваш магазин"],
+                                            Marketplace.Domain.Enums.BusinessMemberRole.Admin => Localizer["Адміністратор магазину"],
+                                            Marketplace.Domain.Enums.BusinessMemberRole.ProductManager => Localizer["Менеджер товарів"],
+                                            Marketplace.Domain.Enums.BusinessMemberRole.BusinessAnalyst => Localizer["Бізнес-аналітик"],
+                                            _ => Localizer["Командний доступ"]
                                         };
                                         var roleClass = business.CurrentUserRole == Marketplace.Domain.Enums.BusinessMemberRole.Owner
                                             ? "seller-store__role"
@@ -156,13 +156,13 @@
                                        asp-action="Create"
                                        asp-route-businessId="@business.Id"
                                        class="seller-button seller-button--primary">
-                                        <span aria-hidden="true">＋</span> Додати товар
+                                        <span aria-hidden="true">＋</span> @Localizer["Додати товар"]
                                     </a>
                                     <a asp-controller="Products"
                                        asp-action="Index"
                                        asp-route-businessId="@business.Id"
                                        class="seller-button seller-button--secondary">
-                                        Відкрити товари <span aria-hidden="true">→</span>
+                                        @Localizer["Відкрити товари"] <span aria-hidden="true">→</span>
                                     </a>
                                 }
                             </div>
@@ -170,31 +170,31 @@
 
                         <div class="seller-state-note seller-state-note--@statusClass">
                             <span class="seller-state-note__icon" aria-hidden="true">@(business.Status == Marketplace.Domain.Enums.BusinessStatus.Active ? "✓" : "i")</span>
-                            <p><strong>Статус: @statusLabel</strong> @statusDescription</p>
+                            <p><strong>@Localizer["Статус:"] @statusLabel</strong> @statusDescription</p>
                         </div>
 
-                        <section class="seller-kpis" aria-label="Основні показники магазину @business.StoreName">
+                        <section class="seller-kpis" aria-label="@Localizer["Основні показники магазину"] @business.StoreName">
                             <div class="seller-kpi seller-kpi--blue">
                                 <span class="seller-kpi__icon" aria-hidden="true">▦</span>
-                                <div><span>Усього товарів</span><strong>@business.ProductCount</strong><small>@inStockCount у наявності</small></div>
+                                <div><span>@Localizer["Усього товарів"]</span><strong>@business.ProductCount</strong><small>@inStockCount @Localizer["у наявності"]</small></div>
                             </div>
                             <div class="seller-kpi seller-kpi--green">
                                 <span class="seller-kpi__icon" aria-hidden="true">✓</span>
-                                <div><span>Активні товари</span><strong>@business.ActiveProductCount</strong><small>@activePercent% асортименту</small></div>
+                                <div><span>@Localizer["Активні товари"]</span><strong>@business.ActiveProductCount</strong><small>@activePercent% @Localizer["асортименту"]</small></div>
                             </div>
                             <div class="seller-kpi seller-kpi--amber">
                                 <span class="seller-kpi__icon" aria-hidden="true">◷</span>
-                                <div><span>На модерації</span><strong>@business.PendingProductCount</strong><small>очікують перевірки</small></div>
+                                <div><span>@Localizer["На модерації"]</span><strong>@business.PendingProductCount</strong><small>@Localizer["очікують перевірки"]</small></div>
                             </div>
                             <div class="seller-kpi seller-kpi--violet">
                                 <span class="seller-kpi__icon" aria-hidden="true">▣</span>
-                                <div><span>Замовлення</span><strong>@business.OrderCount</strong><small>@business.AwaitingOrderCount очікують дій</small></div>
+                                <div><span>@SharedLocalizer["Замовлення"]</span><strong>@business.OrderCount</strong><small>@business.AwaitingOrderCount @Localizer["очікують дій"]</small></div>
                             </div>
                             @if (BusinessPermissions.Statistics.Contains(business.CurrentUserRole))
                             {
                                 <div class="seller-kpi seller-kpi--dark">
                                     <span class="seller-kpi__icon" aria-hidden="true">₴</span>
-                                    <div><span>Оборот</span><strong>@business.Revenue.ToString("N0") ₴</strong><small>@business.SoldItemCount продано одиниць</small></div>
+                                    <div><span>@Localizer["Оборот"]</span><strong>@business.Revenue.ToString("N0") ₴</strong><small>@business.SoldItemCount @Localizer["продано одиниць"]</small></div>
                                 </div>
                             }
                         </section>
@@ -203,84 +203,90 @@
                             <section class="seller-panel seller-panel--inventory">
                                 <div class="seller-panel__heading">
                                     <div>
-                                        <span class="seller-panel__label">Асортимент</span>
-                                        <h3>Готовність каталогу</h3>
+                                        <span class="seller-panel__label">@Localizer["Асортимент"]</span>
+                                        <h3>@Localizer["Готовність каталогу"]</h3>
                                     </div>
                                     <strong>@activePercent%</strong>
                                 </div>
-                                <div class="seller-progress" role="progressbar" aria-label="Частка активних товарів" aria-valuenow="@activePercent" aria-valuemin="0" aria-valuemax="100">
+                                <div class="seller-progress" role="progressbar" aria-label="@Localizer["Частка активних товарів"]" aria-valuenow="@activePercent" aria-valuemin="0" aria-valuemax="100">
                                     <span style="width: @activePercent%"></span>
                                 </div>
                                 <div class="seller-inventory-summary">
-                                    <div><span>Активні</span><strong>@business.ActiveProductCount</strong></div>
-                                    <div><span>На модерації</span><strong>@business.PendingProductCount</strong></div>
-                                    <div class="@(business.OutOfStockProductCount > 0 ? "has-warning" : null)"><span>Немає в наявності</span><strong>@business.OutOfStockProductCount</strong></div>
+                                    <div><span>@Localizer["Активні"]</span><strong>@business.ActiveProductCount</strong></div>
+                                    <div><span>@Localizer["На модерації"]</span><strong>@business.PendingProductCount</strong></div>
+                                    <div class="@(business.OutOfStockProductCount > 0 ? "has-warning" : null)"><span>@Localizer["Немає в наявності"]</span><strong>@business.OutOfStockProductCount</strong></div>
                                 </div>
                                 @if (business.OutOfStockProductCount > 0)
                                 {
-                                    <p class="seller-panel__warning"><span aria-hidden="true">!</span> Поповніть залишки, щоб не втрачати продажі.</p>
+                                    <p class="seller-panel__warning"><span aria-hidden="true">!</span> @Localizer["Поповніть залишки, щоб не втрачати продажі."]</p>
                                 }
                                 else
                                 {
-                                    <p class="seller-panel__success"><span aria-hidden="true">✓</span> Усі товари мають актуальні залишки.</p>
+                                    <p class="seller-panel__success"><span aria-hidden="true">✓</span> @Localizer["Усі товари мають актуальні залишки."]</p>
                                 }
                             </section>
 
                             <section class="seller-panel seller-panel--orders">
-                                <span class="seller-panel__label">Замовлення</span>
-                                <h3>Активність магазину</h3>
+                                <span class="seller-panel__label">@SharedLocalizer["Замовлення"]</span>
+                                <h3>@Localizer["Активність магазину"]</h3>
                                 <div class="seller-order-highlight">
                                     <strong>@business.AwaitingOrderCount</strong>
-                                    <span>очікують обробки</span>
+                                    <span>@Localizer["очікують обробки"]</span>
                                 </div>
                                 <div class="seller-order-facts">
-                                    <div><span>Усього замовлень</span><strong>@business.OrderCount</strong></div>
-                                    <div><span>Продано товарів</span><strong>@business.SoldItemCount</strong></div>
+                                    <div><span>@Localizer["Усього замовлень"]</span><strong>@business.OrderCount</strong></div>
+                                    <div><span>@Localizer["Продано товарів"]</span><strong>@business.SoldItemCount</strong></div>
                                 </div>
                                 <a asp-action="Orders" asp-route-businessId="@business.Id" class="seller-button seller-button--secondary mt-2">
-                                    Переглянути замовлення <span aria-hidden="true">→</span>
+                                    @Localizer["Переглянути замовлення"] <span aria-hidden="true">→</span>
                                 </a>
                             </section>
 
                             <aside class="seller-panel seller-panel--quick">
-                                <span class="seller-panel__label">Швидкі дії</span>
-                                <h3>Продовжити роботу</h3>
-                                <nav aria-label="Швидкі дії магазину @business.StoreName">
+                                <span class="seller-panel__label">@Localizer["Швидкі дії"]</span>
+                                <h3>@Localizer["Продовжити роботу"]</h3>
+                                <nav aria-label="@Localizer["Швидкі дії магазину"] @business.StoreName">
+                                    @if (BusinessPermissions.Statistics.Contains(business.CurrentUserRole))
+                                    {
+                                        <a asp-action="Dashboard" asp-route-businessId="@business.Id">
+                                            <span aria-hidden="true">◫</span><div><strong>@Localizer["Дашборд"]</strong><small>@Localizer["Продажі, товари, трафік у графіках"]</small></div><b aria-hidden="true">→</b>
+                                        </a>
+                                    }
                                     @if (BusinessPermissions.ProductCrud.Contains(business.CurrentUserRole))
                                     {
                                         <a asp-controller="Products" asp-action="Create" asp-route-businessId="@business.Id">
-                                            <span aria-hidden="true">＋</span><div><strong>Новий товар</strong><small>Створити картку товару</small></div><b aria-hidden="true">→</b>
+                                            <span aria-hidden="true">＋</span><div><strong>@Localizer["Новий товар"]</strong><small>@Localizer["Створити картку товару"]</small></div><b aria-hidden="true">→</b>
                                         </a>
                                         <a asp-controller="Products" asp-action="Index" asp-route-businessId="@business.Id">
-                                            <span aria-hidden="true">▦</span><div><strong>Асортимент</strong><small>Редагувати товари та залишки</small></div><b aria-hidden="true">→</b>
+                                            <span aria-hidden="true">▦</span><div><strong>@Localizer["Асортимент"]</strong><small>@Localizer["Редагувати товари та залишки"]</small></div><b aria-hidden="true">→</b>
                                         </a>
                                     }
                                     <a asp-action="Orders" asp-route-businessId="@business.Id">
-                                        <span aria-hidden="true">▣</span><div><strong>Замовлення</strong><small>Обробка та зміна статусу</small></div><b aria-hidden="true">→</b>
+                                        <span aria-hidden="true">▣</span><div><strong>@SharedLocalizer["Замовлення"]</strong><small>@Localizer["Обробка та зміна статусу"]</small></div><b aria-hidden="true">→</b>
                                     </a>
                                     @if (BusinessPermissions.Statistics.Contains(business.CurrentUserRole))
                                     {
                                         <a asp-action="Finance" asp-route-businessId="@business.Id">
-                                            <span aria-hidden="true">₴</span><div><strong>Фінанси</strong><small>Оборот, продажі та виплати</small></div><b aria-hidden="true">→</b>
+                                            <span aria-hidden="true">₴</span><div><strong>@Localizer["Фінанси"]</strong><small>@Localizer["Оборот, продажі та виплати"]</small></div><b aria-hidden="true">→</b>
                                         </a>
                                         <a asp-action="Performance" asp-route-businessId="@business.Id">
-                                            <span aria-hidden="true">◈</span><div><strong>Ефективність</strong><small>Стан акаунта та рейтинг</small></div><b aria-hidden="true">→</b>
+                                            <span aria-hidden="true">◈</span><div><strong>@Localizer["Ефективність"]</strong><small>@Localizer["Стан акаунта та рейтинг"]</small></div><b aria-hidden="true">→</b>
                                         </a>
                                     }
                                     @if (BusinessPermissions.ManageTeam.Contains(business.CurrentUserRole))
                                     {
                                         <a asp-action="Team" asp-route-businessId="@business.Id">
-                                            <span aria-hidden="true">☺</span><div><strong>Команда</strong><small>Учасники та доступи</small></div><b aria-hidden="true">→</b>
+                                            <span aria-hidden="true">☺</span><div><strong>@Localizer["Команда"]</strong><small>@Localizer["Учасники та доступи"]</small></div><b aria-hidden="true">→</b>
                                         </a>
                                     }
                                     @if (BusinessPermissions.EditBusinessProfile.Contains(business.CurrentUserRole))
                                     {
                                         <a asp-action="Settings" asp-route-businessId="@business.Id">
-                                            <span aria-hidden="true">⚙</span><div><strong>Налаштування</strong><small>Дані компанії та платежі</small></div><b aria-hidden="true">→</b>
+                                            <span aria-hidden="true">⚙</span><div><strong>@Localizer["Налаштування"]</strong><small>@Localizer["Дані компанії та платежі"]</small></div><b aria-hidden="true">→</b>
                                         </a>
                                     }
                                     <a asp-controller="Catalog" asp-action="Index">
-                                        <span aria-hidden="true">◎</span><div><strong>Вітрина</strong><small>Переглянути каталог покупця</small></div><b aria-hidden="true">→</b>
+                                        <span aria-hidden="true">◎</span><div><strong>@Localizer["Вітрина"]</strong><small>@Localizer["Переглянути каталог покупця"]</small></div><b aria-hidden="true">→</b>
                                     </a>
                                 </nav>
                             </aside>

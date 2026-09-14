@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Нова колекція";
+    ViewData["Title"] = Localizer["Нова колекція"];
 }
 
 @section Styles {
@@ -8,11 +8,11 @@
 }
 
 <div class="profile-page">
-    <a asp-action="Index" class="profile-back">← До колекцій</a>
+    <a asp-action="Index" class="profile-back">← @Localizer["До колекцій"]</a>
 
     <div class="profile-summary">
-        <h1>Нова колекція</h1>
-        <p>Дайте колекції назву, яку легко впізнати пізніше.</p>
+        <h1>@Localizer["Нова колекція"]</h1>
+        <p>@Localizer["Дайте колекції назву, яку легко впізнати пізніше."]</p>
     </div>
 
     @if (TempData["Error"] is string error)
@@ -21,11 +21,11 @@
     }
 
     <form asp-action="Create" method="post" class="wishlist-collection-form">
-        <label for="name">Назва колекції</label>
-        <input type="text" id="name" name="name" placeholder="Наприклад: Подарунки" maxlength="40" required autofocus />
+        <label for="name">@Localizer["Назва колекції"]</label>
+        <input type="text" id="name" name="name" placeholder="@Localizer["Наприклад: Подарунки"]" maxlength="40" required autofocus />
         <div class="wishlist-collection-form__actions">
-            <a asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
-            <button type="submit" class="btn btn-primary">Створити</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">@Localizer["Скасувати"]</a>
+            <button type="submit" class="btn btn-primary">@Localizer["Створити"]</button>
         </div>
     </form>
 </div>

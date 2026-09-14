@@ -17,7 +17,10 @@ using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+builder.Services.AddControllersWithViews()
+    .AddViewLocalization(Microsoft.AspNetCore.Mvc.Razor.LanguageViewLocationExpanderFormat.Suffix)
+    .AddDataAnnotationsLocalization();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -122,6 +125,7 @@ builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
 builder.Services.AddScoped<IMarketplaceBalanceService, MarketplaceBalanceService>();
 
 builder.Services.AddScoped<IContentModerationService, ContentModerationService>();
+builder.Services.AddScoped<IProductTranslationService, ProductTranslationService>();
 
 builder.Services.AddScoped<IUserDiscountService, UserDiscountService>();
 builder.Services.AddScoped<IWithdrawalService, WithdrawalService>();
@@ -150,12 +154,27 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-var defaultCulture = new CultureInfo("uk-UA");
+var defaultCulture = new CultureInfo("uk");
+var supportedCultures = new List<CultureInfo>
+{
+    defaultCulture,
+    new CultureInfo("en"),
+    new CultureInfo("de"),
+    new CultureInfo("fr"),
+    new CultureInfo("es")
+};
 var localizationOptions = new RequestLocalizationOptions
 {
     DefaultRequestCulture = new RequestCulture(defaultCulture),
-    SupportedCultures = new List<CultureInfo> { defaultCulture },
-    SupportedUICultures = new List<CultureInfo> { defaultCulture }
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+};
+// Cookie (the language switcher) takes priority over the browser's own Accept-Language
+// header, so a visitor's explicit choice always wins over auto-detection.
+localizationOptions.RequestCultureProviders = new List<IRequestCultureProvider>
+{
+    new CookieRequestCultureProvider { CookieName = CookieRequestCultureProvider.DefaultCookieName },
+    new AcceptLanguageHeaderRequestCultureProvider()
 };
 
 app.UseRequestLocalization(localizationOptions);

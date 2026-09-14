@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Розділи адмін-панелі" xml:space="preserve">
+    <value>Secciones del panel de administración</value>
+  </data>
+  <data name="Дашборд" xml:space="preserve">
+    <value>Panel</value>
+  </data>
+  <data name="Користувачі" xml:space="preserve">
+    <value>Usuarios</value>
+  </data>
+  <data name="Товари" xml:space="preserve">
+    <value>Productos</value>
+  </data>
+  <data name="Бізнеси" xml:space="preserve">
+    <value>Negocios</value>
+  </data>
+  <data name="Статистика" xml:space="preserve">
+    <value>Estadísticas</value>
+  </data>
+  <data name="Задачі" xml:space="preserve">
+    <value>Tareas</value>
+  </data>
+  <data name="Виплати" xml:space="preserve">
+    <value>Retiros</value>
+  </data>
+  <data name="Ліміти бізнесу" xml:space="preserve">
+    <value>Límites de negocio</value>
+  </data>
+  <data name="Баланс маркетплейсу" xml:space="preserve">
+    <value>Saldo del marketplace</value>
+  </data>
+  <data name="Журнал користувачів" xml:space="preserve">
+    <value>Registro de usuarios</value>
+  </data>
+  <data name="Журнал бізнесів" xml:space="preserve">
+    <value>Registro de negocios</value>
+  </data>
+  <data name="Адміністратор" xml:space="preserve">
+    <value>Administrador</value>
+  </data>
+  <data name="На сайт" xml:space="preserve">
+    <value>Al sitio</value>
+  </data>
+</root>

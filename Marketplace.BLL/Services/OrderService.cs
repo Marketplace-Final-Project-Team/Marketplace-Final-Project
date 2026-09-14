@@ -74,6 +74,7 @@ namespace Marketplace.BLL.Services
                 var promoCode = !string.IsNullOrWhiteSpace(dto.PromoCode)
                     ? await _promoCodeService.FindActiveAsync(dto.PromoCode)
                     : null;
+                var promoCodeApplied = false;
 
                 foreach (var cartItem in cartItems)
                 {
@@ -152,9 +153,12 @@ namespace Marketplace.BLL.Services
 
 
                     var saleDiscountPercent = bestDiscount ?? 0;
-                    var promoPercent = promoCode is not null && promoCode.BusinessId == cartItem.Product.BusinessId
-                        ? promoCode.Percent
-                        : 0;
+                    var promoApplies = promoCode is not null && promoCode.BusinessId == cartItem.Product.BusinessId;
+                    var promoPercent = promoApplies ? promoCode!.Percent : 0;
+                    if (promoApplies)
+                    {
+                        promoCodeApplied = true;
+                    }
                     var effectivePercent = saleDiscountPercent + promoPercent;
                     if (effectivePercent > 100)
                     {
@@ -199,6 +203,11 @@ namespace Marketplace.BLL.Services
 
                 await _orerRepository.AddAsync(order);
                 _cartItemRepository.RemoveRange(cartItems);
+
+                if (promoCodeApplied && promoCode!.IsSingleUse)
+                {
+                    promoCode.IsUsed = true;
+                }
 
                 await _context.SaveChangesAsync();
 
@@ -419,7 +428,7 @@ namespace Marketplace.BLL.Services
             };
         }
 
-        public async Task<IReadOnlyList<BusinessOrderListItemDto>> GetBusinessOrders(Guid businessId, OrderStatus? statusFilter = null)
+        public async Task<IReadOnlyList<BusinessOrderListItemDto>> GetBusinessOrders(Guid businessId, OrderStatus? statusFilter = null, string? search = null, string? searchEmail = null, decimal? minAmount = null, decimal? maxAmount = null)
         {
             var query = _context.OrderItems
                 .AsNoTracking()
@@ -428,6 +437,16 @@ namespace Marketplace.BLL.Services
             if (statusFilter.HasValue)
             {
                 query = query.Where(item => item.Order.Status == statusFilter.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(item => item.Order.User.UserName != null && item.Order.User.UserName.Contains(search));
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchEmail))
+            {
+                query = query.Where(item => item.Order.User.Email != null && item.Order.User.Email.Contains(searchEmail));
             }
 
             var lines = await query
@@ -446,7 +465,7 @@ namespace Marketplace.BLL.Services
                 })
                 .ToListAsync();
 
-            return lines
+            var orders = lines
                 .GroupBy(line => line.OrderId)
                 .Select(group => new BusinessOrderListItemDto
                 {
@@ -461,6 +480,19 @@ namespace Marketplace.BLL.Services
                     ItemsCount = group.Sum(line => line.Quantity),
                     LineTotal = group.Sum(line => line.LineTotal)
                 })
+                .AsEnumerable();
+
+            if (minAmount.HasValue)
+            {
+                orders = orders.Where(o => o.LineTotal >= minAmount.Value);
+            }
+
+            if (maxAmount.HasValue)
+            {
+                orders = orders.Where(o => o.LineTotal <= maxAmount.Value);
+            }
+
+            return orders
                 .OrderByDescending(item => item.CreatedAt)
                 .ToList();
         }

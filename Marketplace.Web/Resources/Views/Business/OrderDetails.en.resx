@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Очікує підтвердження" xml:space="preserve">
+    <value>Awaiting confirmation</value>
+  </data>
+  <data name="Підтверджено" xml:space="preserve">
+    <value>Confirmed</value>
+  </data>
+  <data name="Відправлено" xml:space="preserve">
+    <value>Shipped</value>
+  </data>
+  <data name="Доставлено" xml:space="preserve">
+    <value>Delivered</value>
+  </data>
+  <data name="Скасовано" xml:space="preserve">
+    <value>Canceled</value>
+  </data>
+  <data name="Очікує розгляду" xml:space="preserve">
+    <value>Awaiting review</value>
+  </data>
+  <data name="До списку замовлень" xml:space="preserve">
+    <value>Back to orders list</value>
+  </data>
+  <data name="Створено" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="Успішно" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="Змішане замовлення" xml:space="preserve">
+    <value>Mixed order</value>
+  </data>
+  <data name="Це замовлення містить також товари інших продавців - вони показані нижче, але статус змінюється для всього замовлення одразу." xml:space="preserve">
+    <value>This order also contains products from other sellers - they are shown below, but the status changes for the whole order at once.</value>
+  </data>
+  <data name="Товари в замовленні" xml:space="preserve">
+    <value>Items in the order</value>
+  </data>
+  <data name="інший продавець" xml:space="preserve">
+    <value>another seller</value>
+  </data>
+  <data name="шт." xml:space="preserve">
+    <value>pcs.</value>
+  </data>
+  <data name="Отримувач і доставка" xml:space="preserve">
+    <value>Recipient and delivery</value>
+  </data>
+  <data name="Покупець" xml:space="preserve">
+    <value>Customer</value>
+  </data>
+  <data name="Телефон" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="не вказано" xml:space="preserve">
+    <value>not specified</value>
+  </data>
+  <data name="Адреса" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="Сума замовлення" xml:space="preserve">
+    <value>Order total</value>
+  </data>
+  <data name="Змінити статус" xml:space="preserve">
+    <value>Change status</value>
+  </data>
+  <data name="Статус замовлення:" xml:space="preserve">
+    <value>Order status:</value>
+  </data>
+  <data name="(кінцевий, змінити неможливо)" xml:space="preserve">
+    <value>(final, cannot be changed)</value>
+  </data>
+  <data name="Заявки на повернення" xml:space="preserve">
+    <value>Return requests</value>
+  </data>
+  <data name="Повернення:" xml:space="preserve">
+    <value>Return:</value>
+  </data>
+  <data name="Фото до заявки" xml:space="preserve">
+    <value>Photo for the request</value>
+  </data>
+  <data name="Коментар покупцю (необов'язково)" xml:space="preserve">
+    <value>Comment to customer (optional)</value>
+  </data>
+  <data name="Підтвердити й повернути кошти" xml:space="preserve">
+    <value>Approve and refund</value>
+  </data>
+  <data name="Відхилити" xml:space="preserve">
+    <value>Reject</value>
+  </data>
+  <data name="Ваша відповідь:" xml:space="preserve">
+    <value>Your response:</value>
+  </data>
+</root>

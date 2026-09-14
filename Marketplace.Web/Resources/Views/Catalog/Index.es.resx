@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Дешевші спочатку" xml:space="preserve">
+    <value>Más baratos primero</value>
+  </data>
+  <data name="Дорожчі спочатку" xml:space="preserve">
+    <value>Más caros primero</value>
+  </data>
+  <data name="За рейтингом" xml:space="preserve">
+    <value>Por valoración</value>
+  </data>
+  <data name="За популярністю" xml:space="preserve">
+    <value>Por popularidad</value>
+  </data>
+  <data name="Спочатку нові" xml:space="preserve">
+    <value>Más recientes primero</value>
+  </data>
+  <data name="Оберіть товар, перегляньте деталі та додайте його до кошика." xml:space="preserve">
+    <value>Elige un producto, consulta los detalles y añádelo a tu carrito.</value>
+  </data>
+  <data name="Перейти до кошика" xml:space="preserve">
+    <value>Ir al carrito</value>
+  </data>
+  <data name="Фільтри каталогу" xml:space="preserve">
+    <value>Filtros del catálogo</value>
+  </data>
+  <data name="Пошук" xml:space="preserve">
+    <value>Buscar</value>
+  </data>
+  <data name="Назва, опис або категорія" xml:space="preserve">
+    <value>Nombre, descripción o categoría</value>
+  </data>
+  <data name="Категорія" xml:space="preserve">
+    <value>Categoría</value>
+  </data>
+  <data name="Ціна, ₴" xml:space="preserve">
+    <value>Precio, ₴</value>
+  </data>
+  <data name="від" xml:space="preserve">
+    <value>desde</value>
+  </data>
+  <data name="Мінімальна ціна" xml:space="preserve">
+    <value>Precio mínimo</value>
+  </data>
+  <data name="до" xml:space="preserve">
+    <value>hasta</value>
+  </data>
+  <data name="Максимальна ціна" xml:space="preserve">
+    <value>Precio máximo</value>
+  </data>
+  <data name="Рейтинг" xml:space="preserve">
+    <value>Valoración</value>
+  </data>
+  <data name="Будь-який" xml:space="preserve">
+    <value>Cualquiera</value>
+  </data>
+  <data name="{0}★ і вище" xml:space="preserve">
+    <value>{0}★ o más</value>
+  </data>
+  <data name="Сортування" xml:space="preserve">
+    <value>Ordenar por</value>
+  </data>
+  <data name="Тільки в наявності" xml:space="preserve">
+    <value>Solo en stock</value>
+  </data>
+  <data name="Увімкнути контент 18+" xml:space="preserve">
+    <value>Activar contenido 18+</value>
+  </data>
+  <data name="Контент 18+ увімкнено" xml:space="preserve">
+    <value>Contenido 18+ activado</value>
+  </data>
+  <data name="Скинути фільтри" xml:space="preserve">
+    <value>Restablecer filtros</value>
+  </data>
+  <data name="Зберегти пошук" xml:space="preserve">
+    <value>Guardar búsqueda</value>
+  </data>
+  <data name="Застосувати" xml:space="preserve">
+    <value>Aplicar</value>
+  </data>
+  <data name="Збережені запити" xml:space="preserve">
+    <value>Búsquedas guardadas</value>
+  </data>
+  <data name="Швидко повертайтесь до пошуків, що вас цікавлять - нові товари з часу останнього перегляду позначені міткою «Нове»." xml:space="preserve">
+    <value>Vuelve rápidamente a las búsquedas que te interesan: los productos nuevos desde tu última visita están marcados como "Novedad".</value>
+  </data>
+  <data name="Знайдено товарів:" xml:space="preserve">
+    <value>Productos encontrados:</value>
+  </data>
+  <data name="Товарів не знайдено" xml:space="preserve">
+    <value>No se encontraron productos</value>
+  </data>
+  <data name="Спробуйте змінити фільтри або переглянути весь каталог." xml:space="preserve">
+    <value>Intenta cambiar los filtros o explora todo el catálogo.</value>
+  </data>
+  <data name="Увесь каталог" xml:space="preserve">
+    <value>Todo el catálogo</value>
+  </data>
+  <data name="Нове" xml:space="preserve">
+    <value>Novedad</value>
+  </data>
+  <data name="Переглянути {0}" xml:space="preserve">
+    <value>Ver {0}</value>
+  </data>
+  <data name="Рейтинг {0} з 5, {1} відгуків" xml:space="preserve">
+    <value>Valoración {0} de 5, {1} opiniones</value>
+  </data>
+  <data name="Ще немає відгуків" xml:space="preserve">
+    <value>Aún sin opiniones</value>
+  </data>
+  <data name="До кошика" xml:space="preserve">
+    <value>Al carrito</value>
+  </data>
+  <data name="Сторінки каталогу" xml:space="preserve">
+    <value>Páginas del catálogo</value>
+  </data>
+  <data name="Попередня сторінка" xml:space="preserve">
+    <value>Página anterior</value>
+  </data>
+  <data name="Наступна сторінка" xml:space="preserve">
+    <value>Página siguiente</value>
+  </data>
+  <data name="Підтвердження віку" xml:space="preserve">
+    <value>Verificación de edad</value>
+  </data>
+  <data name="Цей товар має вікове обмеження. Вам вже виповнилося 18 років?" xml:space="preserve">
+    <value>Este producto tiene una restricción de edad. ¿Ya tienes 18 años?</value>
+  </data>
+  <data name="Ні, мені менше 18" xml:space="preserve">
+    <value>No, tengo menos de 18 años</value>
+  </data>
+  <data name="Так, мені є 18" xml:space="preserve">
+    <value>Sí, tengo 18 años</value>
+  </data>
+</root>

@@ -5,9 +5,9 @@
     var statusClass = Model.Status.ToLowerInvariant();
     var statusLabel = Model.Status switch
     {
-        "Active" => "Активний",
-        "Pending" => "На модерації",
-        "Banned" => "Заблокований",
+        "Active" => Localizer["Активний"].Value,
+        "Pending" => Localizer["На модерації"].Value,
+        "Banned" => Localizer["Заблокований"].Value,
         _ => Model.Status
     };
 }
@@ -17,22 +17,22 @@
 }
 
 <div class="products-page">
-    <a asp-action="Index" class="products-back">← Назад до товарів</a>
+    <a asp-action="Index" class="products-back">← @Localizer["Назад до товарів"]</a>
     <header class="products-heading">
         <div>
-            <div class="products-eyebrow">Картка товару</div>
+            <div class="products-eyebrow">@Localizer["Картка товару"]</div>
             <h1 class="products-title">@Model.Name</h1>
         </div>
         <div class="d-flex gap-2">
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Редагувати</a>
-            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Видалити</a>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">@Localizer["Редагувати"]</a>
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">@Localizer["Видалити"]</a>
         </div>
     </header>
 
     @if (Model.Status == "Banned" && !string.IsNullOrWhiteSpace(Model.ModerationReason))
     {
         <div class="alert alert-danger" role="alert">
-            <strong>Товар заблоковано автоматичною модерацією.</strong> @Model.ModerationReason
+            <strong>@Localizer["Товар заблоковано автоматичною модерацією."]</strong> @Model.ModerationReason
         </div>
     }
 
@@ -46,7 +46,7 @@
             {
                 <div class="product-detail-placeholder">
                     <span aria-hidden="true">□</span>
-                    Фото ще не додано
+                    @Localizer["Фото ще не додано"]
                 </div>
             }
         </div>
@@ -54,16 +54,16 @@
         <div class="product-detail-content">
             <span class="product-status product-status--@statusClass">@statusLabel</span>
             <div class="product-detail-price">@Model.Price.ToString("N2") ₴</div>
-            <p>@(string.IsNullOrWhiteSpace(Model.Description) ? "Опис не додано." : Model.Description)</p>
+            <p>@(string.IsNullOrWhiteSpace(Model.Description) ? Localizer["Опис не додано."] : Model.Description)</p>
 
             <div class="product-meta">
                 <div class="product-meta__row">
-                    <span class="product-meta__label">Категорія</span>
-                    <strong>@Model.CategoryName</strong>
+                    <span class="product-meta__label">@Localizer["Категорія"]</span>
+                    <strong>@SharedLocalizer[Model.CategoryName]</strong>
                 </div>
                 <div class="product-meta__row">
-                    <span class="product-meta__label">Кількість</span>
-                    <strong>@Model.Quantity шт.</strong>
+                    <span class="product-meta__label">@Localizer["Кількість"]</span>
+                    <strong>@Model.Quantity @Localizer["шт."]</strong>
                 </div>
                 <div class="product-meta__row">
                     <span class="product-meta__label">ID</span>
@@ -77,12 +77,12 @@
     {
         <section class="products-panel mt-3">
             <div class="product-form-section">
-                <h2 class="mb-0">Додаткові фото</h2>
+                <h2 class="mb-0">@Localizer["Додаткові фото"]</h2>
             </div>
             <div class="product-gallery">
                 @foreach (var url in Model.AdditionalImageUrls)
                 {
-                    <img src="@url" alt="Додаткове фото товару @Model.Name" />
+                    <img src="@url" alt="@Localizer["Додаткове фото товару"] @Model.Name" />
                 }
             </div>
         </section>

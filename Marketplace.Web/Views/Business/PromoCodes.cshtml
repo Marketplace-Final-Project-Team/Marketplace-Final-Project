@@ -4,7 +4,7 @@
 @using Marketplace.Web.Models.Businesses
 @inject IBusinessAccessService BusinessAccessService
 @{
-    ViewData["Title"] = $"Знижки та промокоди - {Model.StoreName}";
+    ViewData["Title"] = $"{Localizer["Знижки та промокоди"].Value} - {Model.StoreName}";
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
     var currentRole = !string.IsNullOrEmpty(userId)
         ? await BusinessAccessService.GetUserRoleAsync(Model.BusinessId, userId)
@@ -16,13 +16,13 @@
 }
 
 <div class="seller-dashboard">
-    <a asp-action="Index" class="seller-order-back">← До панелі продавця</a>
+    <a asp-action="Index" class="seller-order-back">← @SharedLocalizer["Панель продавця"]</a>
 
     <header class="seller-orders-header">
         <div>
             <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> @BusinessRoleContext.PanelLabel(currentRole)</div>
-            <h1>Знижки та промокоди - @Model.StoreName</h1>
-            <p>Керуйте знижкою на весь магазин і промокодами, які покупці застосовують при оформленні замовлення.</p>
+            <h1>@Localizer["Знижки та промокоди"] - @Model.StoreName</h1>
+            <p>@Localizer["Керуйте знижкою на весь магазин і промокодами, які покупці застосовують при оформленні замовлення."]</p>
         </div>
     </header>
 
@@ -38,18 +38,18 @@
     }
 
     <section class="business-panel">
-        <h2>Знижка на весь магазин</h2>
-        <p class="business-panel__lead">Діє одразу на всі товари магазину замість їхніх власних знижок, поки не мине термін дії.</p>
+        <h2>@Localizer["Знижка на весь магазин"]</h2>
+        <p class="business-panel__lead">@Localizer["Діє одразу на всі товари магазину замість їхніх власних знижок, поки не мине термін дії."]</p>
 
         @if (Model.BusinessDiscount?.IsActive == true)
         {
             <div class="business-discount-status">
-                <span class="seller-status seller-status--active"><span></span> Діє знижка −@Model.BusinessDiscount.DiscountPercent.ToString("0.##")%</span>
-                <span class="business-panel__lead">до @Model.BusinessDiscount.EndDate?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                <span class="seller-status seller-status--active"><span></span> @Localizer["Діє знижка"] −@Model.BusinessDiscount.DiscountPercent.ToString("0.##")%</span>
+                <span class="business-panel__lead">@Localizer["до"] @Model.BusinessDiscount.EndDate?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
             </div>
-            <form asp-action="RemoveBusinessDiscount" method="post" onsubmit="return confirm('Скасувати знижку на весь магазин?');">
+            <form asp-action="RemoveBusinessDiscount" method="post" onsubmit="return confirm('@Localizer["Скасувати знижку на весь магазин?"]');">
                 <input type="hidden" name="businessId" value="@Model.BusinessId" />
-                <button type="submit" class="seller-button seller-button--secondary">Скасувати знижку</button>
+                <button type="submit" class="seller-button seller-button--secondary">@Localizer["Скасувати знижку"]</button>
             </form>
         }
         else
@@ -58,39 +58,39 @@
                 <input type="hidden" name="businessId" value="@Model.BusinessId" />
 
                 <div>
-                    <label for="discountPercent">Знижка, %</label>
+                    <label for="discountPercent">@Localizer["Знижка, %"]</label>
                     <input type="number" id="discountPercent" name="discountPercent" min="1" max="100" required />
                 </div>
 
                 <div>
-                    <label for="discountStartDate">Діє з</label>
+                    <label for="discountStartDate">@Localizer["Діє з"]</label>
                     <input type="datetime-local" id="discountStartDate" name="discountStartDate" required value="@DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm")" />
                 </div>
 
                 <div>
-                    <label for="discountEndDate">Діє до</label>
+                    <label for="discountEndDate">@Localizer["Діє до"]</label>
                     <input type="datetime-local" id="discountEndDate" name="discountEndDate" required value="@DateTime.UtcNow.AddDays(3).ToString("yyyy-MM-ddTHH:mm")" />
                 </div>
 
                 <div>
-                    <button type="submit" class="seller-button seller-button--primary">Встановити знижку</button>
+                    <button type="submit" class="seller-button seller-button--primary">@Localizer["Встановити знижку"]</button>
                 </div>
             </form>
         }
     </section>
 
     <section class="business-panel">
-        <h2>Знижки на категорії</h2>
-        <p class="business-panel__lead">Діє на товари вибраної категорії у вашому магазині. Пріоритет знижок: власна знижка товару → знижка категорії → знижка на весь магазин.</p>
+        <h2>@Localizer["Знижки на категорії"]</h2>
+        <p class="business-panel__lead">@Localizer["Діє на товари вибраної категорії у вашому магазині. Пріоритет знижок: власна знижка товару → знижка категорії → знижка на весь магазин."]</p>
 
         @if (Model.CategoryDiscounts.Any())
         {
             <table class="business-table">
                 <thead>
                     <tr>
-                        <th>Категорія</th>
-                        <th>Знижка</th>
-                        <th>Діє до</th>
+                        <th>@Localizer["Категорія"]</th>
+                        <th>@Localizer["Знижка"]</th>
+                        <th>@Localizer["Діє до"]</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -98,14 +98,14 @@
                     @foreach (var cd in Model.CategoryDiscounts)
                     {
                         <tr>
-                            <td><strong>@cd.CategoryName</strong></td>
+                            <td><strong>@SharedLocalizer[cd.CategoryName]</strong></td>
                             <td>−@cd.DiscountPercent.ToString("0.##")%</td>
                             <td>@cd.EndDate?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
                             <td>
-                                <form asp-controller="Discounts" asp-action="RemoveCategoryDiscount" method="post" onsubmit="return confirm('Скасувати знижку на цю категорію?');">
+                                <form asp-controller="Discounts" asp-action="RemoveCategoryDiscount" method="post" onsubmit="return confirm('@Localizer["Скасувати знижку на цю категорію?"]');">
                                     <input type="hidden" name="categoryId" value="@cd.CategoryId" />
                                     <input type="hidden" name="businessId" value="@Model.BusinessId" />
-                                    <button type="submit" class="seller-button seller-button--secondary">Скасувати</button>
+                                    <button type="submit" class="seller-button seller-button--secondary">@Localizer["Скасувати"]</button>
                                 </form>
                             </td>
                         </tr>
@@ -115,7 +115,7 @@
         }
         else
         {
-            <p class="business-empty">Наразі немає активних знижок на категорії.</p>
+            <p class="business-empty">@Localizer["Наразі немає активних знижок на категорії."]</p>
         }
 
         @{
@@ -127,87 +127,178 @@
                 <input type="hidden" name="businessId" value="@Model.BusinessId" />
 
                 <div>
-                    <label for="categoryId">Категорія</label>
+                    <label for="categoryId">@Localizer["Категорія"]</label>
                     <select id="categoryId" name="categoryId" required>
                         @foreach (var category in categoriesWithoutDiscount)
                         {
-                            <option value="@category.Id">@category.Name</option>
+                            <option value="@category.Id">@SharedLocalizer[category.Name]</option>
                         }
                     </select>
                 </div>
 
                 <div>
-                    <label for="categoryDiscountPercent">Знижка, %</label>
+                    <label for="categoryDiscountPercent">@Localizer["Знижка, %"]</label>
                     <input type="number" id="categoryDiscountPercent" name="discountPercent" min="1" max="100" required />
                 </div>
 
                 <div>
-                    <label for="categoryDiscountStartDate">Діє з</label>
+                    <label for="categoryDiscountStartDate">@Localizer["Діє з"]</label>
                     <input type="datetime-local" id="categoryDiscountStartDate" name="discountStartDate" required value="@DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm")" />
                 </div>
 
                 <div>
-                    <label for="categoryDiscountEndDate">Діє до</label>
+                    <label for="categoryDiscountEndDate">@Localizer["Діє до"]</label>
                     <input type="datetime-local" id="categoryDiscountEndDate" name="discountEndDate" required value="@DateTime.UtcNow.AddDays(3).ToString("yyyy-MM-ddTHH:mm")" />
                 </div>
 
                 <div>
-                    <button type="submit" class="seller-button seller-button--primary">Встановити знижку</button>
+                    <button type="submit" class="seller-button seller-button--primary">@Localizer["Встановити знижку"]</button>
                 </div>
             </form>
         }
     </section>
 
     <section class="business-panel">
-        <h2>Новий промокод</h2>
-        <p class="business-panel__lead">Код буде приведено до верхнього регістру. Покупець отримає знижку лише на товари вашого магазину в замовленні.</p>
+        <h2>@Localizer["Персональні знижки клієнтам"]</h2>
+        <p class="business-panel__lead">@Localizer["Знижка діє тільки для одного покупця на всі товари вашого магазину. Пріоритет знижок: власна знижка товару → знижка категорії → персональна знижка клієнта → знижка на весь магазин."]</p>
+
+        @if (Model.PersonalDiscounts.Any())
+        {
+            <table class="business-table">
+                <thead>
+                    <tr>
+                        <th>@Localizer["Покупець"]</th>
+                        <th>@Localizer["Знижка"]</th>
+                        <th>@Localizer["Діє до"]</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pd in Model.PersonalDiscounts)
+                    {
+                        <tr>
+                            <td><strong>@pd.UserName</strong></td>
+                            <td>−@pd.Percent.ToString("0.##")%</td>
+                            <td>@pd.EndDate?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>
+                                <form asp-controller="UserDiscount" asp-action="RemoveUserDiscount" method="post" onsubmit="return confirm('@Localizer["Скасувати персональну знижку цього покупця?"]');">
+                                    <input type="hidden" name="userId" value="@pd.UserId" />
+                                    <input type="hidden" name="businessId" value="@Model.BusinessId" />
+                                    <input type="hidden" name="returnUrl" value="@Url.Action("PromoCodes", "Business", new { businessId = Model.BusinessId })" />
+                                    <button type="submit" class="seller-button seller-button--secondary">@Localizer["Скасувати"]</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="business-empty">@Localizer["Наразі немає активних персональних знижок."]</p>
+        }
+
+        @if (Model.Customers.Any())
+        {
+            <form asp-controller="UserDiscount" asp-action="SetUserDiscount" method="post" class="business-settings-form">
+                <input type="hidden" name="businessId" value="@Model.BusinessId" />
+                <input type="hidden" name="returnUrl" value="@Url.Action("PromoCodes", "Business", new { businessId = Model.BusinessId })" />
+
+                <div>
+                    <label for="userId">@Localizer["Покупець"]</label>
+                    <select id="userId" name="userId" required>
+                        @foreach (var customer in Model.Customers)
+                        {
+                            <option value="@customer.UserId">@customer.UserName</option>
+                        }
+                    </select>
+                </div>
+
+                <div>
+                    <label for="personalDiscountPercent">@Localizer["Знижка, %"]</label>
+                    <input type="number" id="personalDiscountPercent" name="percent" min="1" max="100" required />
+                </div>
+
+                <div>
+                    <label for="personalDiscountStartDate">@Localizer["Діє з"]</label>
+                    <input type="datetime-local" id="personalDiscountStartDate" name="startDate" required value="@DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm")" />
+                </div>
+
+                <div>
+                    <label for="personalDiscountEndDate">@Localizer["Діє до"]</label>
+                    <input type="datetime-local" id="personalDiscountEndDate" name="endDate" required value="@DateTime.UtcNow.AddDays(3).ToString("yyyy-MM-ddTHH:mm")" />
+                </div>
+
+                <div>
+                    <button type="submit" class="seller-button seller-button--primary">@Localizer["Встановити знижку"]</button>
+                </div>
+            </form>
+        }
+        else
+        {
+            <p class="business-empty">@Localizer["Усі ваші покупці вже мають активну персональну знижку, або у вас ще не було покупців."]</p>
+        }
+    </section>
+
+    <section class="business-panel">
+        <h2>@Localizer["Новий промокод"]</h2>
+        <p class="business-panel__lead">@Localizer["Код буде приведено до верхнього регістру. Покупець отримає знижку лише на товари вашого магазину в замовленні."]</p>
 
         <form asp-action="CreatePromoCode" method="post" class="business-settings-form">
             <input type="hidden" name="businessId" value="@Model.BusinessId" />
 
             <div>
-                <label for="code">Код промокоду</label>
-                <input type="text" id="code" name="code" maxlength="30" placeholder="Наприклад, SALE20" required />
+                <label for="code">@Localizer["Код промокоду"]</label>
+                <input type="text" id="code" name="code" maxlength="30" placeholder="@Localizer["Наприклад, SALE20"]" required />
             </div>
 
             <div>
-                <label for="percent">Знижка, %</label>
+                <label for="percent">@Localizer["Знижка, %"]</label>
                 <input type="number" id="percent" name="percent" min="1" max="99" required />
             </div>
 
             <div>
-                <label for="startDate">Діє з</label>
+                <label for="startDate">@Localizer["Діє з"]</label>
                 <input type="datetime-local" id="startDate" name="startDate" required />
             </div>
 
             <div>
-                <label for="endDate">Діє до</label>
+                <label for="endDate">@Localizer["Діє до"]</label>
                 <input type="datetime-local" id="endDate" name="endDate" required />
             </div>
 
             <div>
-                <button type="submit" class="seller-button seller-button--primary">Створити промокод</button>
+                <label for="isSingleUse">@Localizer["Тип використання"]</label>
+                <select id="isSingleUse" name="isSingleUse">
+                    <option value="false">@Localizer["Багаторазовий"]</option>
+                    <option value="true">@Localizer["Одноразовий"]</option>
+                </select>
+            </div>
+
+            <div>
+                <button type="submit" class="seller-button seller-button--primary">@Localizer["Створити промокод"]</button>
             </div>
         </form>
     </section>
 
     <section class="business-panel">
-        <h2>Активні та минулі промокоди</h2>
+        <h2>@Localizer["Активні та минулі промокоди"]</h2>
 
         @if (!Model.PromoCodes.Any())
         {
-            <p class="business-empty">Ви ще не створили жодного промокоду.</p>
+            <p class="business-empty">@Localizer["Ви ще не створили жодного промокоду."]</p>
         }
         else
         {
             <table class="business-table">
                 <thead>
                     <tr>
-                        <th>Код</th>
-                        <th>Знижка</th>
-                        <th>Діє з</th>
-                        <th>Діє до</th>
-                        <th>Статус</th>
+                        <th>@Localizer["Код"]</th>
+                        <th>@Localizer["Знижка"]</th>
+                        <th>@Localizer["Тип"]</th>
+                        <th>@Localizer["Діє з"]</th>
+                        <th>@Localizer["Діє до"]</th>
+                        <th>@Localizer["Статус"]</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -217,25 +308,30 @@
                         <tr>
                             <td><strong>@promo.Code</strong></td>
                             <td>@promo.Percent%</td>
+                            <td>@(promo.IsSingleUse ? Localizer["Одноразовий"] : Localizer["Багаторазовий"])</td>
                             <td>@promo.StartDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
                             <td>@promo.EndDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
                             <td>
                                 @if (promo.IsActive)
                                 {
-                                    <span class="seller-status seller-status--active"><span></span> Активний</span>
+                                    <span class="seller-status seller-status--active"><span></span> @Localizer["Активний"]</span>
+                                }
+                                else if (promo.IsSingleUse && promo.IsUsed)
+                                {
+                                    <span class="seller-status seller-status--suspended"><span></span> @Localizer["Використано"]</span>
                                 }
                                 else
                                 {
-                                    <span class="seller-status seller-status--suspended"><span></span> Неактивний</span>
+                                    <span class="seller-status seller-status--suspended"><span></span> @Localizer["Неактивний"]</span>
                                 }
                             </td>
                             <td>
                                 @if (promo.IsActive)
                                 {
-                                    <form asp-action="DeactivatePromoCode" method="post" onsubmit="return confirm('Деактивувати цей промокод?');">
+                                    <form asp-action="DeactivatePromoCode" method="post" onsubmit="return confirm('@Localizer["Деактивувати цей промокод?"]');">
                                         <input type="hidden" name="businessId" value="@Model.BusinessId" />
                                         <input type="hidden" name="promoCodeId" value="@promo.Id" />
-                                        <button type="submit" class="seller-button seller-button--secondary">Деактивувати</button>
+                                        <button type="submit" class="seller-button seller-button--secondary">@Localizer["Деактивувати"]</button>
                                     </form>
                                 }
                             </td>

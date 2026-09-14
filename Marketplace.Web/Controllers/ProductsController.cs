@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Localization;
 
 namespace Marketplace.Web.Controllers;
 
@@ -20,19 +21,22 @@ public class ProductsController : Controller
     private readonly IBusinessAccessService _businessAccessService;
     private readonly IActivityLogService _activityLog;
     private readonly ISystemSettingsService _settingsService;
+    private readonly IStringLocalizer<SharedResource> _sharedLocalizer;
 
     public ProductsController(
         IProductService productService,
         IGenericRepository<Category> categoryRepository,
         IBusinessAccessService businessAccessService,
         IActivityLogService activityLog,
-        ISystemSettingsService settingsService)
+        ISystemSettingsService settingsService,
+        IStringLocalizer<SharedResource> sharedLocalizer)
     {
         _productService = productService;
         _categoryRepository = categoryRepository;
         _businessAccessService = businessAccessService;
         _activityLog = activityLog;
         _settingsService = settingsService;
+        _sharedLocalizer = sharedLocalizer;
     }
 
     public async Task<IActionResult> Index(Guid? businessId)
@@ -339,7 +343,7 @@ public class ProductsController : Controller
         return categories.OrderBy(category => category.Name).Select(category => new SelectListItem
         {
             Value = category.Id.ToString(),
-            Text = category.IsAdultOnly ? $"{category.Name} (18+)" : category.Name,
+            Text = category.IsAdultOnly ? $"{_sharedLocalizer[category.Name]} (18+)" : _sharedLocalizer[category.Name],
             Selected = category.Id == selectedId
         }).ToList();
     }
