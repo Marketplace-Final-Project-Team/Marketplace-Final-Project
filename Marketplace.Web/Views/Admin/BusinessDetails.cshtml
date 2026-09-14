@@ -127,7 +127,7 @@
                     <ul style="margin: 0.5rem 0 0; padding-left: 1.1rem;">
                         @foreach (var cd in Model.CategoryDiscounts)
                         {
-                            <li>@cd.CategoryName: −@cd.DiscountPercent.ToString("0.##")% @Localizer["до"] @cd.EndDate?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</li>
+                            <li>@SharedLocalizer[cd.CategoryName]: −@cd.DiscountPercent.ToString("0.##")% @Localizer["до"] @cd.EndDate?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</li>
                         }
                     </ul>
                 }

@@ -98,7 +98,7 @@
                     @foreach (var cd in Model.CategoryDiscounts)
                     {
                         <tr>
-                            <td><strong>@cd.CategoryName</strong></td>
+                            <td><strong>@SharedLocalizer[cd.CategoryName]</strong></td>
                             <td>−@cd.DiscountPercent.ToString("0.##")%</td>
                             <td>@cd.EndDate?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
                             <td>
@@ -131,7 +131,7 @@
                     <select id="categoryId" name="categoryId" required>
                         @foreach (var category in categoriesWithoutDiscount)
                         {
-                            <option value="@category.Id">@category.Name</option>
+                            <option value="@category.Id">@SharedLocalizer[category.Name]</option>
                         }
                     </select>
                 </div>

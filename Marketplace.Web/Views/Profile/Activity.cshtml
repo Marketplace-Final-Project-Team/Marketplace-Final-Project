@@ -120,7 +120,7 @@
                             <small>@Localizer["Новинка"]</small>
                         </span>
                         <span class="notif-product-card__body">
-                            <span class="notif-product-card__category">@product.CategoryName</span>
+                            <span class="notif-product-card__category">@SharedLocalizer[product.CategoryName]</span>
                             <span class="notif-product-card__name">@product.Name</span>
                             <strong>@product.Price.ToString("N2") ₴</strong>
                         </span>
@@ -159,7 +159,7 @@
                             <small>@Localizer["Рекомендуємо"]</small>
                         </span>
                         <span class="notif-product-card__body">
-                            <span class="notif-product-card__category">@product.CategoryName</span>
+                            <span class="notif-product-card__category">@SharedLocalizer[product.CategoryName]</span>
                             <span class="notif-product-card__name">@product.Name</span>
                             <strong>@product.Price.ToString("N2") ₴</strong>
                         </span>

@@ -24,7 +24,7 @@
         <span aria-hidden="true">›</span>
         <a asp-action="Index">@Localizer["Каталог"]</a>
         <span aria-hidden="true">›</span>
-        <span aria-current="page">@Model.CategoryName</span>
+        <span aria-current="page">@SharedLocalizer[Model.CategoryName]</span>
     </nav>
 
     @if (TempData["Success"] is string success)
@@ -93,7 +93,7 @@
 
         <section class="product-summary" aria-labelledby="product-title">
             <div class="product-summary__topline">
-                <a asp-action="Index" asp-route-search="@Model.CategoryName" class="product-category">@Model.CategoryName</a>
+                <a asp-action="Index" asp-route-search="@Model.CategoryName" class="product-category">@SharedLocalizer[Model.CategoryName]</a>
                 <span class="product-code">@Localizer["Код:"] @productCode</span>
             </div>
 
@@ -214,7 +214,7 @@
             <span class="product-section-kicker">@Localizer["Деталі"]</span>
             <h2>@Localizer["Характеристики"]</h2>
             <dl>
-                <div><dt>@Localizer["Категорія"]</dt><dd>@Model.CategoryName</dd></div>
+                <div><dt>@Localizer["Категорія"]</dt><dd>@SharedLocalizer[Model.CategoryName]</dd></div>
                 <div><dt>@Localizer["Продавець"]</dt><dd>@Model.StoreName</dd></div>
                 <div><dt>@Localizer["Наявність"]</dt><dd>@Model.Quantity @Localizer["шт."]</dd></div>
                 <div><dt>@Localizer["Код товару"]</dt><dd>@productCode</dd></div>
@@ -351,7 +351,7 @@
                             <small>@(related.Quantity > 0 ? Localizer["В наявності"] : Localizer["Немає в наявності"])</small>
                         </a>
                         <div class="related-card__body">
-                            <span>@related.CategoryName</span>
+                            <span>@SharedLocalizer[related.CategoryName]</span>
                             <a asp-action="Details" asp-route-id="@related.Id">@related.Name</a>
                             <strong>@related.Price.ToString("N2") ₴</strong>
                         </div>

@@ -178,4 +178,19 @@
   <data name="Оплата карткою через LiqPay:" xml:space="preserve">
     <value>Card payment via LiqPay:</value>
   </data>
+  <data name="Електроніка" xml:space="preserve">
+    <value>Electronics</value>
+  </data>
+  <data name="Спорт і відпочинок" xml:space="preserve">
+    <value>Sports &amp; Outdoors</value>
+  </data>
+  <data name="Дом і кухня" xml:space="preserve">
+    <value>Home &amp; Kitchen</value>
+  </data>
+  <data name="Одяг" xml:space="preserve">
+    <value>Clothing</value>
+  </data>
+  <data name="Книги" xml:space="preserve">
+    <value>Books</value>
+  </data>
 </root>

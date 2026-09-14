@@ -51,7 +51,7 @@ else
                     <small>@Localizer["В наявності"]</small>
                 </a>
                 <div class="home-product__body">
-                    <div class="home-product__category">@(string.IsNullOrEmpty(product.CategoryName) ? Localizer["Без категорії"].Value : product.CategoryName)</div>
+                    <div class="home-product__category">@(string.IsNullOrEmpty(product.CategoryName) ? Localizer["Без категорії"].Value : SharedLocalizer[product.CategoryName].Value)</div>
                     <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="home-product__name">@product.Name</a>
 
                     <div class="home-product__bottom">

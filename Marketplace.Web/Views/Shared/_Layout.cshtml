@@ -48,7 +48,7 @@
                         <option value="">@SharedLocalizer["Усі категорії"]</option>
                         @foreach (var category in headerCategories)
                         {
-                            <option value="@category.Id">@category.Name</option>
+                            <option value="@category.Id">@SharedLocalizer[category.Name]</option>
                         }
                     </select>
                     <input type="text" name="Search" class="site-header__search-input" placeholder="@SharedLocalizer["Пошук товарів на MarketPlace"]" aria-label="@SharedLocalizer["Пошук товарів"]" autocomplete="off" data-search-autocomplete />
@@ -144,7 +144,7 @@
                     <li><a asp-controller="Home" asp-action="Index">@SharedLocalizer["Головна"]</a></li>
                     @foreach (var category in headerCategories.Take(6))
                     {
-                        <li><a asp-controller="Catalog" asp-action="Index" asp-route-CategoryId="@category.Id">@category.Name</a></li>
+                        <li><a asp-controller="Catalog" asp-action="Index" asp-route-CategoryId="@category.Id">@SharedLocalizer[category.Name]</a></li>
                     }
                     @if (isAuthenticated)
                     {
@@ -187,7 +187,7 @@
                     <a class="site-header__collapse-link" asp-controller="Catalog" asp-action="Index">@SharedLocalizer["Усі товари"]</a>
                     @foreach (var category in headerCategories)
                     {
-                        <a class="site-header__collapse-link" asp-controller="Catalog" asp-action="Index" asp-route-CategoryId="@category.Id">@category.Name</a>
+                        <a class="site-header__collapse-link" asp-controller="Catalog" asp-action="Index" asp-route-CategoryId="@category.Id">@SharedLocalizer[category.Name]</a>
                     }
                 </div>
             </div>

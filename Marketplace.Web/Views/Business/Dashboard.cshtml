@@ -57,7 +57,7 @@
     var categoryColors = new[] { "#3157d7", "#42a98b", "#e8a33d", "#c65f9e", "#5b8def", "#8a5b00", "#b42318", "#7a89bb" };
     var categoryJson = JsonSerializer.Serialize(Model.CategoryStats.Select((c, i) => new
     {
-        name = c.CategoryName,
+        name = SharedLocalizer[c.CategoryName].Value,
         revenue = c.Revenue,
         color = categoryColors[i % categoryColors.Length]
     }), jsonOptions);
@@ -307,7 +307,7 @@
                                 <tr>
                                     <td>
                                         <span class="business-category-dot" style="background: @categoryColors[i % categoryColors.Length]"></span>
-                                        @category.CategoryName
+                                        @SharedLocalizer[category.CategoryName]
                                     </td>
                                     <td>@category.Revenue.ToString("N0") ₴</td>
                                     <td>@category.UnitsSold</td>

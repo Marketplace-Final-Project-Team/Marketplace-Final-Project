@@ -20,7 +20,7 @@
     var categoryColors = new[] { "#3157d7", "#42a98b", "#e8a33d", "#c65f9e", "#5b8def", "#8a5b00", "#b42318", "#7a89bb" };
     var categoriesJson = System.Text.Json.JsonSerializer.Serialize(overview.Categories.Select((c, i) => new
     {
-        name = c.CategoryName,
+        name = SharedLocalizer[c.CategoryName].Value,
         turnover = c.Turnover,
         color = categoryColors[i % categoryColors.Length]
     }));
@@ -248,7 +248,7 @@
                             @foreach (var c in overview.Categories)
                             {
                                 <tr>
-                                    <td class="admin-entity-name">@c.CategoryName</td>
+                                    <td class="admin-entity-name">@SharedLocalizer[c.CategoryName]</td>
                                     <td>@c.OrdersCount</td>
                                     <td>@c.UnitsSold</td>
                                     <td>@c.Turnover.ToString("N2") ₴</td>

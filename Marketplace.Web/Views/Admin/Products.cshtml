@@ -62,7 +62,7 @@
                     <option value="">@SharedLocalizer["Усі категорії"]</option>
                     @foreach (var category in Model.Categories)
                     {
-                        <option value="@category.Id" selected="@(Model.Filter.CategoryId == category.Id)">@category.Name</option>
+                        <option value="@category.Id" selected="@(Model.Filter.CategoryId == category.Id)">@SharedLocalizer[category.Name]</option>
                     }
                 </select>
                 <select class="form-select" name="Status" aria-label="@Localizer["Фільтр за статусом"]" onchange="this.form.submit()">

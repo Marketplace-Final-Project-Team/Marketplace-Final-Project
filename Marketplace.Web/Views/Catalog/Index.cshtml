@@ -76,7 +76,7 @@
                     <option value="">@SharedLocalizer["Усі категорії"]</option>
                     @foreach (var category in Model.Categories)
                     {
-                        <option value="@category.Value" selected="@(category.Value == filter.CategoryId?.ToString())">@category.Text</option>
+                        <option value="@category.Value" selected="@(category.Value == filter.CategoryId?.ToString())">@SharedLocalizer[category.Text]</option>
                     }
                 </select>
             </div>
@@ -191,7 +191,7 @@
                     </button>
 
                     <div class="catalog-card__body">
-                        <div class="catalog-card__category">@product.CategoryName</div>
+                        <div class="catalog-card__category">@SharedLocalizer[product.CategoryName]</div>
                         @if (product.ReviewCount > 0)
                         {
                             var filledStars = (int)Math.Round(product.AverageRating);
