@@ -157,4 +157,19 @@
   <data name="Опис" xml:space="preserve">
     <value>Beschreibung</value>
   </data>
+  <data name="Регулярні задачі" xml:space="preserve">
+    <value>Wiederkehrende Aufgaben</value>
+  </data>
+  <data name="Регулярних задач не знайдено." xml:space="preserve">
+    <value>Keine wiederkehrenden Aufgaben gefunden.</value>
+  </data>
+  <data name="Останній запуск" xml:space="preserve">
+    <value>Letzte Ausführung</value>
+  </data>
+  <data name="Наступний запуск" xml:space="preserve">
+    <value>Nächste Ausführung</value>
+  </data>
+  <data name="ще не запускалась" xml:space="preserve">
+    <value>noch nicht ausgeführt</value>
+  </data>
 </root>

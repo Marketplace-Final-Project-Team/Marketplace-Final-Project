@@ -118,6 +118,48 @@
                 }
             </section>
 
+            <section class="admin-panel table-responsive">
+                <div class="admin-header" style="padding: 1rem 1.25rem 0;">
+                    <h2 class="admin-title" style="font-size: 1.1rem;">@Localizer["Регулярні задачі"]</h2>
+                </div>
+                @if (Model.RecurringJobs.Count == 0)
+                {
+                    <p class="admin-empty">@Localizer["Регулярних задач не знайдено."]</p>
+                }
+                else
+                {
+                    <table class="table admin-table">
+                        <thead>
+                            <tr>
+                                <th>@Localizer["Назва"]</th>
+                                <th>@Localizer["Опис"]</th>
+                                <th>@Localizer["Останній запуск"]</th>
+                                <th>@Localizer["Наступний запуск"]</th>
+                                <th class="text-end">@Localizer["Дії"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var job in Model.RecurringJobs)
+                            {
+                                <tr>
+                                    <td class="admin-entity-name">@job.DisplayName</td>
+                                    <td>@job.Description</td>
+                                    <td>@(job.PreviousRunAtUtc?.ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss") ?? Localizer["ще не запускалась"].Value)</td>
+                                    <td>@(job.NextRunAtUtc?.ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss") ?? "-")</td>
+                                    <td class="text-end">
+                                        <form asp-action="RunRecurringJobNow" method="post" class="d-inline">
+                                            <input type="hidden" name="groupName" value="@job.GroupName" />
+                                            <input type="hidden" name="jobName" value="@job.JobName" />
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">@Localizer["Запустити зараз"]</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </section>
+
             <section class="admin-panel" style="padding: 1.25rem 1.5rem;">
                 <h2 class="admin-title" style="font-size: 1.1rem;">@Localizer["Налаштування Gemini API"]</h2>
                 <p class="admin-subtitle">@Localizer["Ключ і модель, які використовує автоматична модерація товарів."] @(Model.HasCustomApiKey ? Localizer["Зараз використовується ключ, збережений тут."] : Localizer["Зараз використовується ключ із конфігурації сервера."])</p>

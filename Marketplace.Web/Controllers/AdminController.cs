@@ -407,6 +407,37 @@ namespace Marketplace.Web.Controllers
                 });
             }
 
+            var recurringJobs = new List<RecurringJobViewModel>();
+            var cleanupJobKey = new JobKey("pending-order-expiry-job", "cleanup");
+            if (await scheduler.CheckExists(cleanupJobKey))
+            {
+                var cleanupTriggers = await scheduler.GetTriggersOfJob(cleanupJobKey);
+                var nextRun = cleanupTriggers
+                    .Select(t => t.GetNextFireTimeUtc())
+                    .Where(t => t.HasValue)
+                    .Select(t => t!.Value.UtcDateTime)
+                    .OrderBy(t => t)
+                    .Cast<DateTime?>()
+                    .FirstOrDefault();
+                var previousRun = cleanupTriggers
+                    .Select(t => t.GetPreviousFireTimeUtc())
+                    .Where(t => t.HasValue)
+                    .Select(t => t!.Value.UtcDateTime)
+                    .OrderByDescending(t => t)
+                    .Cast<DateTime?>()
+                    .FirstOrDefault();
+
+                recurringJobs.Add(new RecurringJobViewModel
+                {
+                    GroupName = cleanupJobKey.Group,
+                    JobName = cleanupJobKey.Name,
+                    DisplayName = "Автоскасування прострочених замовлень",
+                    Description = "Щогодини скасовує замовлення зі статусом «Очікує підтвердження», якщо оплата не надійшла протягом налаштованого часу (за замовчуванням 48 год.).",
+                    NextRunAtUtc = nextRun,
+                    PreviousRunAtUtc = previousRun
+                });
+            }
+
             var recentDecisions = (await _activityLog.GetRecentBusinessActionsAsync())
                 .Where(l => l.Action == ProductModerationJob.ActivityLogAction)
                 .Take(30)
@@ -424,6 +455,7 @@ namespace Marketplace.Web.Controllers
             {
                 IsSchedulerRunning = scheduler.IsStarted && !scheduler.InStandbyMode && !scheduler.IsShutdown,
                 ScheduledJobs = scheduledJobs.OrderBy(j => j.NextRunAtUtc).ToList(),
+                RecurringJobs = recurringJobs,
                 RecentDecisions = recentDecisions,
                 HasCustomApiKey = !string.IsNullOrEmpty(await _settingsService.GetAsync("GoogleAI", "ApiKey")),
                 ModerationModel = await _settingsService.GetAsync("GoogleAI", "Model")
@@ -704,6 +736,28 @@ namespace Marketplace.Web.Controllers
 
             await _activityLog.LogUserActionAsync(CurrentAdminId!, "ModerationJobTriggeredManually",
                 $"Модерацію ({entityType}) {entityId} запущено вручну адміністратором.",
+                actorUserId: CurrentAdminId);
+
+            TempData["Success"] = "Задачу запущено негайно.";
+            return RedirectToAction("Jobs");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RunRecurringJobNow(string groupName, string jobName)
+        {
+            var scheduler = await _schedulerFactory.GetScheduler();
+            var jobKey = new JobKey(jobName, groupName);
+
+            if (!await scheduler.CheckExists(jobKey))
+            {
+                TempData["Error"] = "Задачу не знайдено.";
+                return RedirectToAction("Jobs");
+            }
+
+            await scheduler.TriggerJob(jobKey);
+
+            await _activityLog.LogUserActionAsync(CurrentAdminId!, "RecurringJobTriggeredManually",
+                $"Задачу «{jobName}» запущено вручну адміністратором (позачергово, регулярний розклад не порушено).",
                 actorUserId: CurrentAdminId);
 
             TempData["Success"] = "Задачу запущено негайно.";
