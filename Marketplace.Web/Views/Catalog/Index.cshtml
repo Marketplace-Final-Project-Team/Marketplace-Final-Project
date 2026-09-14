@@ -166,6 +166,8 @@
         <div class="catalog-grid">
             @foreach (var product in Model.Products)
             {
+                var (productName, productDescription) = await ProductTranslator.GetLocalizedAsync(
+                    product.Id, product.Name, product.Description, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
                 <article class="catalog-card position-relative" data-product-id="@product.Id">
                     <span class="catalog-card__new-badge" data-new-badge hidden>@Localizer["Нове"]</span>
 
@@ -178,15 +180,15 @@
 
                     <button type="button"
                             class="catalog-card__media border-0 p-0 text-start bg-transparent w-100 position-relative"
-                            aria-label="@Localizer["Переглянути {0}", product.Name]"
+                            aria-label="@Localizer["Переглянути {0}", productName]"
                             onclick="checkAgeAndNavigate('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
                         @if (!string.IsNullOrWhiteSpace(product.MainImageUrl))
                         {
-                            <img src="@product.MainImageUrl" alt="@product.Name" />
+                            <img src="@product.MainImageUrl" alt="@productName" />
                         }
                         else
                         {
-                            <span aria-hidden="true">@product.Name[..1].ToUpperInvariant()</span>
+                            <span aria-hidden="true">@productName[..1].ToUpperInvariant()</span>
                         }
                     </button>
 
@@ -208,10 +210,10 @@
                         <button type="button" 
                                 class="catalog-card__title border-0 p-0 text-start bg-transparent text-primary fw-semibold w-100" 
                                 onclick="checkAgeAndNavigate('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
-                            @product.Name
+                            @productName
                         </button>
 
-                        <p class="catalog-card__description">@product.Description</p>
+                        <p class="catalog-card__description">@productDescription</p>
                         <div class="catalog-card__footer">
                             <div class="shop-price-container d-flex align-items-center gap-2">
                                 @if (product.OriginalPrice.HasValue && product.OriginalPrice.Value > product.Price)

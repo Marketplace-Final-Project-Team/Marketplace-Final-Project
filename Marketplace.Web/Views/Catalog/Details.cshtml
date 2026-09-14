@@ -1,7 +1,9 @@
 @model Marketplace.Web.Models.CatalogProductViewModel
 
 @{
-    ViewData["Title"] = Model.Name;
+    var (localizedName, localizedDescription) = await ProductTranslator.GetLocalizedAsync(
+        Model.Id, Model.Name, Model.Description, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
+    ViewData["Title"] = localizedName;
     var gallery = Model.GalleryImageUrls;
     var mainImage = gallery.FirstOrDefault();
     var productInitial = string.IsNullOrWhiteSpace(Model.Name) ? "M" : Model.Name[..1].ToUpperInvariant();
@@ -97,8 +99,8 @@
                 <span class="product-code">@Localizer["Код:"] @productCode</span>
             </div>
 
-            <h1 id="product-title">@Model.Name</h1>
-            <p class="product-summary__lead">@Model.Description</p>
+            <h1 id="product-title">@localizedName</h1>
+            <p class="product-summary__lead">@localizedDescription</p>
 
             <div class="product-price-block">
                 <span class="product-price-block__label">@Localizer["Ціна"]</span>
@@ -202,7 +204,7 @@
         <section class="product-content-card product-description-card">
             <span class="product-section-kicker">@Localizer["Про товар"]</span>
             <h2>@Localizer["Опис"]</h2>
-            <p>@Model.Description</p>
+            <p>@localizedDescription</p>
             <div class="product-benefits">
                 <div><span aria-hidden="true">✓</span><p><strong>@Localizer["Перевірена наявність"]</strong>@Localizer["Актуальний залишок синхронізований із каталогом."]</p></div>
                 <div><span aria-hidden="true">↺</span><p><strong>@Localizer["Зручне повернення"]</strong>@Localizer["Зрозумілий процес повернення після покупки."]</p></div>
@@ -338,11 +340,12 @@
                 @foreach (var related in Model.RelatedProducts)
                 {
                     var relatedInitial = string.IsNullOrWhiteSpace(related.Name) ? "M" : related.Name[..1].ToUpperInvariant();
+                    var relatedName = (await ProductTranslator.GetLocalizedAsync(related.Id, related.Name, string.Empty, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)).Name;
                     <article class="related-card">
-                        <a asp-action="Details" asp-route-id="@related.Id" class="related-card__media" aria-label="@Localizer["Переглянути {0}", related.Name]">
+                        <a asp-action="Details" asp-route-id="@related.Id" class="related-card__media" aria-label="@Localizer["Переглянути {0}", relatedName]">
                             @if (!string.IsNullOrWhiteSpace(related.MainImageUrl))
                             {
-                                <img src="@related.MainImageUrl" alt="@related.Name" loading="lazy" />
+                                <img src="@related.MainImageUrl" alt="@relatedName" loading="lazy" />
                             }
                             else
                             {
@@ -352,7 +355,7 @@
                         </a>
                         <div class="related-card__body">
                             <span>@SharedLocalizer[related.CategoryName]</span>
-                            <a asp-action="Details" asp-route-id="@related.Id">@related.Name</a>
+                            <a asp-action="Details" asp-route-id="@related.Id">@relatedName</a>
                             <strong>@related.Price.ToString("N2") ₴</strong>
                         </div>
                     </article>

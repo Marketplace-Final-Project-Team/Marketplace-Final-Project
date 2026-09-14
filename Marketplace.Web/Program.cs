@@ -125,6 +125,7 @@ builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
 builder.Services.AddScoped<IMarketplaceBalanceService, MarketplaceBalanceService>();
 
 builder.Services.AddScoped<IContentModerationService, ContentModerationService>();
+builder.Services.AddScoped<IProductTranslationService, ProductTranslationService>();
 
 builder.Services.AddScoped<IUserDiscountService, UserDiscountService>();
 builder.Services.AddScoped<IWithdrawalService, WithdrawalService>();

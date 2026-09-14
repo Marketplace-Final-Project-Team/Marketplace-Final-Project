@@ -107,21 +107,22 @@
             <div class="notif-product-grid">
                 @foreach (var product in Model.NewProducts)
                 {
+                    var productName = (await ProductTranslator.GetLocalizedAsync(product.Id, product.Name, string.Empty, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)).Name;
                     <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="notif-product-card">
                         <span class="notif-product-card__media">
                             @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
                             {
-                                <img src="@product.ImageUrl" alt="@product.Name" />
+                                <img src="@product.ImageUrl" alt="@productName" />
                             }
                             else
                             {
-                                <span aria-hidden="true">@product.Name[..1].ToUpperInvariant()</span>
+                                <span aria-hidden="true">@productName[..1].ToUpperInvariant()</span>
                             }
                             <small>@Localizer["Новинка"]</small>
                         </span>
                         <span class="notif-product-card__body">
                             <span class="notif-product-card__category">@SharedLocalizer[product.CategoryName]</span>
-                            <span class="notif-product-card__name">@product.Name</span>
+                            <span class="notif-product-card__name">@productName</span>
                             <strong>@product.Price.ToString("N2") ₴</strong>
                         </span>
                     </a>
@@ -146,21 +147,22 @@
             <div class="notif-product-grid">
                 @foreach (var product in Model.RecommendedProducts)
                 {
+                    var productName = (await ProductTranslator.GetLocalizedAsync(product.Id, product.Name, string.Empty, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)).Name;
                     <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="notif-product-card">
                         <span class="notif-product-card__media">
                             @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
                             {
-                                <img src="@product.ImageUrl" alt="@product.Name" />
+                                <img src="@product.ImageUrl" alt="@productName" />
                             }
                             else
                             {
-                                <span aria-hidden="true">@product.Name[..1].ToUpperInvariant()</span>
+                                <span aria-hidden="true">@productName[..1].ToUpperInvariant()</span>
                             }
                             <small>@Localizer["Рекомендуємо"]</small>
                         </span>
                         <span class="notif-product-card__body">
                             <span class="notif-product-card__category">@SharedLocalizer[product.CategoryName]</span>
-                            <span class="notif-product-card__name">@product.Name</span>
+                            <span class="notif-product-card__name">@productName</span>
                             <strong>@product.Price.ToString("N2") ₴</strong>
                         </span>
                     </a>

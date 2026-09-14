@@ -62,6 +62,35 @@ public class ProductService : IProductService
         await scheduler.ScheduleJob(job, trigger);
     }
 
+    private async Task ScheduleTranslationJobAsync(Guid productId)
+    {
+        var scheduler = await _schedulerFactory.GetScheduler();
+
+        var jobKey = new JobKey($"product-translation-job-{productId}", "translation");
+
+        if (await scheduler.CheckExists(jobKey))
+        {
+            await scheduler.DeleteJob(jobKey);
+        }
+
+        var jobData = new JobDataMap
+        {
+            { "ProductId", productId }
+        };
+
+        var job = JobBuilder.Create<ProductTranslationJob>()
+            .WithIdentity(jobKey)
+            .UsingJobData(jobData)
+            .Build();
+
+        var trigger = TriggerBuilder.Create()
+            .WithIdentity($"product-translation-trigger-{productId}", "translation")
+            .StartAt(DateBuilder.FutureDate(7, IntervalUnit.Second))
+            .Build();
+
+        await scheduler.ScheduleJob(job, trigger);
+    }
+
     public async Task<IReadOnlyList<Product>> GetCatalogAsync(string? search = null, bool allowAdultContent = false)
     {
         var query = _context.Products
@@ -294,6 +323,7 @@ public class ProductService : IProductService
         await _context.SaveChangesAsync();
 
         await ScheduleModerationJobAsync(product.Id);
+        await ScheduleTranslationJobAsync(product.Id);
 
         return product;
     }
@@ -319,6 +349,7 @@ public class ProductService : IProductService
         await _context.SaveChangesAsync();
 
         await ScheduleModerationJobAsync(product.Id);
+        await ScheduleTranslationJobAsync(product.Id);
 
         return product;
     }

@@ -37,22 +37,23 @@ else
         {
             var product = Model.Products[index];
             var colorClass = index % 3 == 0 ? "blue" : index % 3 == 1 ? "violet" : "orange";
+            var productName = (await ProductTranslator.GetLocalizedAsync(product.Id, product.Name, product.Description, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)).Name;
 
             <article class="home-product">
                 <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="home-product__media home-product__media--@colorClass">
                     @if (!string.IsNullOrWhiteSpace(product.MainImageUrl))
                     {
-                        <img src="@product.MainImageUrl" alt="@product.Name" />
+                        <img src="@product.MainImageUrl" alt="@productName" />
                     }
                     else
                     {
-                        <span>@(string.IsNullOrWhiteSpace(product.Name) ? "?" : product.Name[..1].ToUpperInvariant())</span>
+                        <span>@(string.IsNullOrWhiteSpace(productName) ? "?" : productName[..1].ToUpperInvariant())</span>
                     }
                     <small>@Localizer["В наявності"]</small>
                 </a>
                 <div class="home-product__body">
                     <div class="home-product__category">@(string.IsNullOrEmpty(product.CategoryName) ? Localizer["Без категорії"].Value : SharedLocalizer[product.CategoryName].Value)</div>
-                    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="home-product__name">@product.Name</a>
+                    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="home-product__name">@productName</a>
 
                     <div class="home-product__bottom">
                         <div class="home-product__price" style="display: flex; flex-direction: column; justify-content: flex-end; min-height: 40px;">
@@ -75,7 +76,7 @@ else
                         <form asp-controller="Cart" asp-action="Add" method="post">
                             <input type="hidden" name="productId" value="@product.Id" />
                             <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
-                            <button type="submit" aria-label="@Localizer["Додати"] @product.Name @Localizer["до кошика"]">+</button>
+                            <button type="submit" aria-label="@Localizer["Додати"] @productName @Localizer["до кошика"]">+</button>
                         </form>
                     </div>
                 </div>
