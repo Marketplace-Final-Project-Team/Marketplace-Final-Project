@@ -295,6 +295,27 @@
     color: var(--admin-ink);
 }
 
+.admin-stat-card__hint a {
+    align-items: center;
+    background: #edf1ff;
+    border-radius: 999px;
+    color: var(--admin-primary);
+    display: inline-flex;
+    font-size: 0.78rem;
+    font-weight: 700;
+    gap: 0.3rem;
+    margin-top: 0.5rem;
+    padding: 0.32rem 0.8rem;
+    text-decoration: none;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.admin-stat-card__hint a:hover {
+    background: #dbe4ff;
+    box-shadow: 0 0.25rem 0.6rem rgba(54, 89, 217, 0.18);
+    transform: translateX(2px);
+}
+
 .admin-stat-card--warning .admin-stat-card__value {
     color: #b45309;
 }

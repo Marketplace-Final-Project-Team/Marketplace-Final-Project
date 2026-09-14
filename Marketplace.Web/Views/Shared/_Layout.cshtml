@@ -63,12 +63,20 @@
                 <div class="site-header__actions">
                     <form asp-controller="Culture" asp-action="SetCulture" method="post" class="site-header__lang">
                         <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                        <svg class="site-header__lang-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9" />
+                            <path d="M3 12h18" />
+                            <path d="M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18Z" />
+                        </svg>
                         <select name="culture" class="site-header__lang-select" onchange="this.form.submit()" aria-label="@SharedLocalizer["Мова сайту"]">
                             @foreach (var lang in LayoutCultures.Supported)
                             {
                                 <option value="@lang.Code" selected="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == lang.Code)">@lang.NativeName</option>
                             }
                         </select>
+                        <svg class="site-header__lang-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12" aria-hidden="true">
+                            <path d="m6 9 6 6 6-6" />
+                        </svg>
                     </form>
 
                     @if (isAuthenticated)
