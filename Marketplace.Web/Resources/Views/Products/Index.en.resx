@@ -181,4 +181,43 @@
   <data name="Цю дію не можна скасувати." xml:space="preserve">
     <value>This action cannot be undone.</value>
   </data>
+  <data name="Імпорт" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="Експорт" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="Артикул:" xml:space="preserve">
+    <value>SKU:</value>
+  </data>
+  <data name="Розмірів:" xml:space="preserve">
+    <value>Sizes:</value>
+  </data>
+  <data name="Закінчуються" xml:space="preserve">
+    <value>Running low</value>
+  </data>
+  <data name="Немає в наявності" xml:space="preserve">
+    <value>Out of stock</value>
+  </data>
+  <data name="Приховані" xml:space="preserve">
+    <value>Hidden</value>
+  </data>
+  <data name="Усі" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="Фільтр товарів" xml:space="preserve">
+    <value>Product filter</value>
+  </data>
+  <data name="Пошук за назвою або артикулом" xml:space="preserve">
+    <value>Search by name or SKU</value>
+  </data>
+  <data name="Шукати" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="Нічого не знайдено" xml:space="preserve">
+    <value>Nothing found</value>
+  </data>
+  <data name="Спробуйте змінити пошуковий запит або оберіть інший фільтр." xml:space="preserve">
+    <value>Try changing your search query or choosing a different filter.</value>
+  </data>
 </root>

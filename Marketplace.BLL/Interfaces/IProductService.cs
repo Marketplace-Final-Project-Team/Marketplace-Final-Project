@@ -14,5 +14,7 @@ namespace Marketplace.BLL.Interfaces
         Task<Product?> UpdateAsync(ProductEditDto dto);
         Task<bool> DeleteAsync(Guid id);
         Task<IReadOnlyList<CatalogProductDto>> GetSearchSuggestionsAsync(string? term, int limit = 8, bool allowAdultContent = false);
+        Task<byte[]> ExportToExcelAsync(Guid businessId);
+        Task<ProductImportResultDto> ImportFromExcelAsync(Guid businessId, Stream fileStream);
     }
 }

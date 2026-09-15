@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ClosedXML.Excel;
 using Microsoft.EntityFrameworkCore;
 using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
@@ -377,6 +378,165 @@ public class ProductService : IProductService
         _context.Products.Remove(product);
         await _context.SaveChangesAsync();
         return true;
+    }
+
+    private static readonly string[] ExcelHeaders =
+    {
+        "Артикул (SKU)", "Назва", "Опис", "Категорія", "Ціна", "Кількість", "Статус"
+    };
+
+    public async Task<byte[]> ExportToExcelAsync(Guid businessId)
+    {
+        var products = await _context.Products
+            .AsNoTracking()
+            .Include(p => p.Category)
+            .Where(p => p.BusinessId == businessId)
+            .OrderBy(p => p.Name)
+            .ToListAsync();
+
+        using var workbook = new XLWorkbook();
+        var sheet = workbook.Worksheets.Add("Товари");
+
+        for (var col = 0; col < ExcelHeaders.Length; col++)
+        {
+            sheet.Cell(1, col + 1).Value = ExcelHeaders[col];
+            sheet.Cell(1, col + 1).Style.Font.Bold = true;
+        }
+
+        var row = 2;
+        foreach (var product in products)
+        {
+            sheet.Cell(row, 1).Value = product.Sku ?? string.Empty;
+            sheet.Cell(row, 2).Value = product.Name;
+            sheet.Cell(row, 3).Value = product.Description;
+            sheet.Cell(row, 4).Value = product.Category?.Name ?? string.Empty;
+            sheet.Cell(row, 5).Value = product.Price;
+            sheet.Cell(row, 6).Value = product.Quantity;
+            sheet.Cell(row, 7).Value = product.Status.ToString();
+            row++;
+        }
+
+        sheet.Columns().AdjustToContents();
+
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        return stream.ToArray();
+    }
+
+    public async Task<ProductImportResultDto> ImportFromExcelAsync(Guid businessId, Stream fileStream)
+    {
+        var result = new ProductImportResultDto();
+
+        var categories = await _context.Categories.AsNoTracking().ToListAsync();
+        var existingProducts = await _context.Products
+            .Where(p => p.BusinessId == businessId)
+            .ToListAsync();
+        var touchedProductIds = new List<Guid>();
+
+        using var workbook = new XLWorkbook(fileStream);
+        var sheet = workbook.Worksheet(1);
+        var lastRow = sheet.LastRowUsed()?.RowNumber() ?? 1;
+
+        for (var rowNumber = 2; rowNumber <= lastRow; rowNumber++)
+        {
+            var row = sheet.Row(rowNumber);
+            var sku = row.Cell(1).GetString().Trim();
+            var name = row.Cell(2).GetString().Trim();
+
+            if (string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(sku))
+            {
+                continue;
+            }
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                result.RowErrors.Add(new ProductImportRowError { RowNumber = rowNumber, ProductName = sku, Error = "Не вказано назву товару." });
+                continue;
+            }
+
+            var description = row.Cell(3).GetString().Trim();
+            var categoryName = row.Cell(4).GetString().Trim();
+            var category = categories.FirstOrDefault(c => string.Equals(c.Name, categoryName, StringComparison.OrdinalIgnoreCase));
+
+            if (category is null)
+            {
+                result.RowErrors.Add(new ProductImportRowError { RowNumber = rowNumber, ProductName = name, Error = $"Категорію «{categoryName}» не знайдено." });
+                continue;
+            }
+
+            if (!row.Cell(5).TryGetValue(out decimal price) || price <= 0)
+            {
+                result.RowErrors.Add(new ProductImportRowError { RowNumber = rowNumber, ProductName = name, Error = "Некоректна ціна." });
+                continue;
+            }
+
+            if (!row.Cell(6).TryGetValue(out int quantity) || quantity < 0)
+            {
+                result.RowErrors.Add(new ProductImportRowError { RowNumber = rowNumber, ProductName = name, Error = "Некоректна кількість." });
+                continue;
+            }
+
+            var existing = string.IsNullOrWhiteSpace(sku)
+                ? null
+                : existingProducts.FirstOrDefault(p => string.Equals(p.Sku, sku, StringComparison.OrdinalIgnoreCase));
+
+            if (existing is not null)
+            {
+                if (existing.Variants.Count > 0)
+                {
+                    result.RowErrors.Add(new ProductImportRowError
+                    {
+                        RowNumber = rowNumber,
+                        ProductName = name,
+                        Error = "Товар має розміри - оновлення через імпорт недоступне. Редагуйте його вручну."
+                    });
+                    continue;
+                }
+
+                existing.Name = name;
+                existing.Description = description;
+                existing.CategoryId = category.Id;
+                existing.Price = price;
+                existing.Quantity = quantity;
+                existing.Status = ProductStatus.Pending;
+                existing.ModerationReason = null;
+
+                touchedProductIds.Add(existing.Id);
+                result.UpdatedCount++;
+            }
+            else
+            {
+                var created = new Product
+                {
+                    Id = Guid.NewGuid(),
+                    BusinessId = businessId,
+                    CategoryId = category.Id,
+                    Name = name,
+                    Description = description,
+                    Price = price,
+                    Quantity = quantity,
+                    Sku = string.IsNullOrWhiteSpace(sku) ? null : sku,
+                    Status = ProductStatus.Pending,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                await _productRepository.AddAsync(created);
+                existingProducts.Add(created);
+
+                touchedProductIds.Add(created.Id);
+                result.CreatedCount++;
+            }
+        }
+
+        await _context.SaveChangesAsync();
+
+        foreach (var productId in touchedProductIds)
+        {
+            await ScheduleModerationJobAsync(productId);
+            await ScheduleTranslationJobAsync(productId);
+        }
+
+        return result;
     }
 
     private static List<ProductVariant> BuildVariants(IEnumerable<ProductVariantDto>? variants)
