@@ -360,6 +360,7 @@ namespace Marketplace.Web.Controllers
                     ProductId = item.ProductId,
                     ProductName = item.ProductName,
                     ImageUrl = item.ImageUrl,
+                    VariantSize = item.VariantSize,
                     UnitPrice = item.UnitPrice,
                     Quantity = item.Quantity,
                     BelongsToBusiness = item.BelongsToBusiness

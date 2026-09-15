@@ -483,6 +483,18 @@ img.order-line__media {
     margin-top: 0.2rem;
 }
 
+.cart-item__variant,
+.order-line__variant {
+    color: var(--shop-muted);
+    font-size: 0.8rem;
+    margin-top: 0.15rem;
+}
+
+.cart-item__variant strong,
+.order-line__variant strong {
+    color: var(--shop-ink);
+}
+
 .quantity-control {
     align-items: center;
     display: flex;

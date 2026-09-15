@@ -304,6 +304,8 @@ public class ProductService : IProductService
             }
         }
 
+        var variants = BuildVariants(dto.Variants);
+
         var product = new Product
         {
             Id = Guid.NewGuid(),
@@ -312,12 +314,19 @@ public class ProductService : IProductService
             Name = dto.Name,
             Description = dto.Description,
             Price = dto.Price,
-            Quantity = dto.Quantity,
+            Quantity = variants.Count > 0 ? variants.Sum(v => v.Quantity) : dto.Quantity,
+            Sku = string.IsNullOrWhiteSpace(dto.Sku) ? null : dto.Sku.Trim(),
             IsAdultOnly = dto.IsAdultOnly,
             Status = ProductStatus.Pending,
             ModerationReason = null,
             CreatedAt = DateTime.UtcNow
         };
+
+        foreach (var variant in variants)
+        {
+            variant.ProductId = product.Id;
+            product.Variants.Add(variant);
+        }
 
         await _productRepository.AddAsync(product);
         await _context.SaveChangesAsync();
@@ -341,10 +350,13 @@ public class ProductService : IProductService
         product.Name = dto.Name;
         product.Description = dto.Description;
         product.Price = dto.Price;
-        product.Quantity = dto.Quantity;
+        product.Sku = string.IsNullOrWhiteSpace(dto.Sku) ? null : dto.Sku.Trim();
         product.IsAdultOnly = dto.IsAdultOnly;
         product.Status = ProductStatus.Pending;
         product.ModerationReason = null;
+
+        SyncVariants(product, dto.Variants);
+        product.Quantity = product.Variants.Count > 0 ? product.Variants.Sum(v => v.Quantity) : dto.Quantity;
 
         await _context.SaveChangesAsync();
 
@@ -365,5 +377,55 @@ public class ProductService : IProductService
         _context.Products.Remove(product);
         await _context.SaveChangesAsync();
         return true;
+    }
+
+    private static List<ProductVariant> BuildVariants(IEnumerable<ProductVariantDto>? variants)
+    {
+        if (variants == null)
+        {
+            return new List<ProductVariant>();
+        }
+
+        return variants
+            .Where(v => !string.IsNullOrWhiteSpace(v.Size))
+            .GroupBy(v => v.Size.Trim(), StringComparer.OrdinalIgnoreCase)
+            .Select(g => g.Last())
+            .Select(v => new ProductVariant
+            {
+                Size = v.Size.Trim(),
+                Sku = v.Sku?.Trim() ?? string.Empty,
+                Quantity = Math.Max(0, v.Quantity)
+            })
+            .ToList();
+    }
+
+    private static void SyncVariants(Product product, IEnumerable<ProductVariantDto>? variants)
+    {
+        var incoming = BuildVariants(variants);
+        var existing = product.Variants.ToList();
+
+        foreach (var variantDto in incoming)
+        {
+            var match = existing.FirstOrDefault(v => v.Size.Equals(variantDto.Size, StringComparison.OrdinalIgnoreCase));
+            if (match != null)
+            {
+                match.Sku = variantDto.Sku;
+                match.Quantity = variantDto.Quantity;
+                existing.Remove(match);
+            }
+            else
+            {
+                variantDto.ProductId = product.Id;
+                product.Variants.Add(variantDto);
+            }
+        }
+
+        // Any size left in `existing` is no longer submitted by the seller — soft-delete it
+        // rather than hard-remove, since it may already be referenced by past order history
+        // (OrderItem -> ProductVariant is a Restrict FK, so a hard delete could fail there).
+        foreach (var stale in existing)
+        {
+            stale.IsDeleted = true;
+        }
     }
 }

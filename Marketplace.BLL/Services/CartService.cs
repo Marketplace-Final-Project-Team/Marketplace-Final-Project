@@ -1,4 +1,4 @@
-﻿using Marketplace.BLL.Common;
+using Marketplace.BLL.Common;
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
@@ -103,18 +103,33 @@ namespace Marketplace.BLL.Services
                     ImageUrl = ci.Product.MainImageUrl,
                     Price = finalPrice,
                     Quantity = ci.Quantity,
-                    StockQuantity = ci.Product.Quantity
+                    StockQuantity = ci.ProductVariant?.Quantity ?? ci.Product.Quantity,
+                    ProductVariantId = ci.ProductVariantId,
+                    VariantSize = ci.ProductVariant?.Size
                 };
             }).ToList();
         }
 
-        public async Task<ServiceResult> AddToCart(string userId, Guid productId)
+        public async Task<ServiceResult> AddToCart(string userId, Guid productId, Guid? variantId = null)
         {
             var product = await _productRepository.FirstOrDefaultAsync(p => p.Id == productId);
 
-            if (product == null || product.Status != ProductStatus.Active || product.Quantity <= 0)
+            if (product == null || product.Status != ProductStatus.Active)
             {
                 return new ServiceResult { Succeeded = false, Message = "Товар не знайдено." };
+            }
+
+            var variantResult = ResolveVariant(product, variantId);
+            if (!variantResult.Succeeded)
+            {
+                return variantResult.Error!;
+            }
+            var variant = variantResult.Variant;
+            var availableStock = variant?.Quantity ?? product.Quantity;
+
+            if (availableStock <= 0)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Товару немає в наявності." };
             }
 
             var cart = await _cartRepository.FirstOrDefaultAsync(c => c.UserId == userId);
@@ -126,17 +141,17 @@ namespace Marketplace.BLL.Services
                 await _context.SaveChangesAsync();
             }
 
-            var item = await _cartItemRepository.FirstOrDefaultAsync(ci => ci.Cart.UserId == userId && ci.ProductId == productId);
+            var item = await _cartItemRepository.FirstOrDefaultAsync(ci => ci.Cart.UserId == userId && ci.ProductId == productId && ci.ProductVariantId == variantId);
 
             if (item == null)
             {
-                item = new CartItem { CartId = cart.Id, ProductId = productId, Quantity = 1 };
+                item = new CartItem { CartId = cart.Id, ProductId = productId, ProductVariantId = variantId, Quantity = 1 };
                 await _cartItemRepository.AddAsync(item);
                 await _context.SaveChangesAsync();
             }
             else
             {
-                if (item.Quantity >= product.Quantity)
+                if (item.Quantity >= availableStock)
                 {
                     return new ServiceResult
                     {
@@ -153,7 +168,7 @@ namespace Marketplace.BLL.Services
             return new ServiceResult { Succeeded = true, Message = string.Empty };
         }
 
-        public async Task<ServiceResult> RemoveFromCart(string userId, Guid productId)
+        public async Task<ServiceResult> RemoveFromCart(string userId, Guid productId, Guid? variantId = null)
         {
             var product = await _productRepository.FirstOrDefaultAsync(p => p.Id == productId);
 
@@ -162,7 +177,7 @@ namespace Marketplace.BLL.Services
                 return new ServiceResult { Succeeded = false, Message = "Товар не знайдено." };
             }
 
-            var item = await _cartItemRepository.FirstOrDefaultAsync(ci => ci.Cart.UserId == userId && ci.ProductId == productId);
+            var item = await _cartItemRepository.FirstOrDefaultAsync(ci => ci.Cart.UserId == userId && ci.ProductId == productId && ci.ProductVariantId == variantId);
 
             if (item == null)
             {
@@ -174,23 +189,30 @@ namespace Marketplace.BLL.Services
             return new ServiceResult { Succeeded = true, Message = string.Empty };
         }
 
-        public async Task<ServiceResult> IncreaseQuantity(string userId, Guid productId)
+        public async Task<ServiceResult> IncreaseQuantity(string userId, Guid productId, Guid? variantId = null)
         {
             var product = await _productRepository.FirstOrDefaultAsync(p => p.Id == productId);
 
-            if (product == null || product.Status != ProductStatus.Active || product.Quantity <= 0)
+            if (product == null || product.Status != ProductStatus.Active)
             {
                 return new ServiceResult { Succeeded = false, Message = "Товар не знайдено." };
             }
 
-            var item = await _cartItemRepository.FirstOrDefaultAsync(ci => ci.Cart.UserId == userId && ci.ProductId == productId);
+            var variantResult = ResolveVariant(product, variantId);
+            if (!variantResult.Succeeded)
+            {
+                return variantResult.Error!;
+            }
+            var availableStock = variantResult.Variant?.Quantity ?? product.Quantity;
+
+            var item = await _cartItemRepository.FirstOrDefaultAsync(ci => ci.Cart.UserId == userId && ci.ProductId == productId && ci.ProductVariantId == variantId);
 
             if (item == null)
             {
                 return new ServiceResult { Succeeded = false, Message = "Товар не знайдено у кошику." };
             }
 
-            if (item.Quantity >= product.Quantity)
+            if (item.Quantity >= availableStock)
             {
                 return new ServiceResult
                 {
@@ -204,7 +226,7 @@ namespace Marketplace.BLL.Services
             return new ServiceResult { Succeeded = true, Message = string.Empty };
         }
 
-        public async Task<ServiceResult> DecreaseQuantity(string userId, Guid productId)
+        public async Task<ServiceResult> DecreaseQuantity(string userId, Guid productId, Guid? variantId = null)
         {
             var product = await _productRepository.FirstOrDefaultAsync(p => p.Id == productId);
 
@@ -213,7 +235,7 @@ namespace Marketplace.BLL.Services
                 return new ServiceResult { Succeeded = false, Message = "Товар не знайдено." };
             }
 
-            var item = await _cartItemRepository.FirstOrDefaultAsync(ci => ci.Cart.UserId == userId && ci.ProductId == productId);
+            var item = await _cartItemRepository.FirstOrDefaultAsync(ci => ci.Cart.UserId == userId && ci.ProductId == productId && ci.ProductVariantId == variantId);
 
             if (item == null)
             {
@@ -230,6 +252,27 @@ namespace Marketplace.BLL.Services
             }
 
             return new ServiceResult { Succeeded = true, Message = string.Empty };
+        }
+
+        private static (bool Succeeded, ProductVariant? Variant, ServiceResult? Error) ResolveVariant(Product product, Guid? variantId)
+        {
+            if (product.Variants.Count == 0)
+            {
+                return (true, null, null);
+            }
+
+            if (variantId is null)
+            {
+                return (false, null, new ServiceResult { Succeeded = false, Message = "Оберіть розмір товару." });
+            }
+
+            var variant = product.Variants.FirstOrDefault(v => v.Id == variantId);
+            if (variant is null)
+            {
+                return (false, null, new ServiceResult { Succeeded = false, Message = "Обраний варіант товару не знайдено." });
+            }
+
+            return (true, variant, null);
         }
 
         private async Task ChangeQuantity(CartItem item, int temp)

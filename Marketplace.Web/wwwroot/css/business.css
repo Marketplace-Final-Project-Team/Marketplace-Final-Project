@@ -823,6 +823,16 @@
     font-size: 0.8rem;
 }
 
+.seller-order-line__variant {
+    color: var(--seller-muted);
+    font-size: 0.8rem;
+    margin: 0.1rem 0;
+}
+
+.seller-order-line__variant strong {
+    color: inherit;
+}
+
 .seller-order-line__total {
     font-weight: 750;
     white-space: nowrap;

@@ -82,16 +82,22 @@
 
                                 <div>
                                     <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.ProductId" class="cart-item__name">@item.ProductName</a>
+                                    @if (!string.IsNullOrWhiteSpace(item.VariantSize))
+                                    {
+                                        <div class="cart-item__variant">@Localizer["Розмір:"] <strong>@item.VariantSize</strong></div>
+                                    }
                                     <div class="cart-item__unit">@item.Price.ToString("N2") ₴ @Localizer["за одиницю · доступно"] @item.StockQuantity</div>
 
                                     <div class="quantity-control" aria-label="@Localizer["Кількість товару"]">
                                         <form asp-action="DecreaseQuantity" method="post">
                                             <input type="hidden" name="productId" value="@item.ProductId" />
+                                            <input type="hidden" name="variantId" value="@item.ProductVariantId" />
                                             <button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="@Localizer["Зменшити кількість"]">−</button>
                                         </form>
                                         <span class="quantity-control__value">@item.Quantity</span>
                                         <form asp-action="IncreaseQuantity" method="post">
                                             <input type="hidden" name="productId" value="@item.ProductId" />
+                                            <input type="hidden" name="variantId" value="@item.ProductVariantId" />
                                             <button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="@Localizer["Збільшити кількість"]">+</button>
                                         </form>
                                     </div>
@@ -101,6 +107,7 @@
                                     <strong>@item.LineTotal.ToString("N2") ₴</strong>
                                     <form asp-action="Remove" method="post">
                                         <input type="hidden" name="productId" value="@item.ProductId" />
+                                        <input type="hidden" name="variantId" value="@item.ProductVariantId" />
                                         <button type="submit" class="cart-remove">@Localizer["Видалити"]</button>
                                     </form>
                                 </div>

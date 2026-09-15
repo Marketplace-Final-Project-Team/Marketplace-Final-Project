@@ -120,6 +120,14 @@
                                     <div>
                                         <a asp-action="Details" asp-route-id="@item.Id" class="product-name">@item.Name</a>
                                         <div class="product-category">@(string.IsNullOrWhiteSpace(item.CategoryName) ? Localizer["Без категорії"].Value : SharedLocalizer[item.CategoryName].Value)</div>
+                                        @if (!string.IsNullOrWhiteSpace(item.Sku))
+                                        {
+                                            <div class="product-sku">@Localizer["Артикул:"] @item.Sku</div>
+                                        }
+                                        @if (item.VariantCount > 0)
+                                        {
+                                            <div class="product-sku">@Localizer["Розмірів:"] @item.VariantCount</div>
+                                        }
                                     </div>
                                 </div>
                             </td>

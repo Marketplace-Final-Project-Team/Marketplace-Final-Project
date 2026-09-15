@@ -81,6 +81,10 @@
                     }
                     <div>
                         <div>@item.ProductName @if (!item.BelongsToBusiness) { <span class="seller-order-line__badge">@Localizer["інший продавець"]</span> }</div>
+                        @if (!string.IsNullOrWhiteSpace(item.VariantSize))
+                        {
+                            <div class="seller-order-line__variant">@Localizer["Розмір:"] <strong>@item.VariantSize</strong></div>
+                        }
                         <div class="seller-order-line__meta">@item.Quantity @Localizer["шт."] × @item.UnitPrice.ToString("N2") ₴</div>
                     </div>
                     <div class="seller-order-line__total">@((item.UnitPrice * item.Quantity).ToString("N2")) ₴</div>

@@ -314,6 +314,11 @@ public class CatalogueController : Controller
             Description = product.Description,
             Price = hasDiscount ? product.GetDiscountedPrice(userId) : product.Price,
             Quantity = product.Quantity,
+            Sku = product.Sku,
+            Variants = product.Variants
+                .OrderBy(v => v.Size)
+                .Select(v => new CatalogProductVariantViewModel { Id = v.Id, Size = v.Size, Quantity = v.Quantity })
+                .ToList(),
             CreatedAt = product.CreatedAt,
             MainImageUrl = product.MainImageUrl,
             CategoryName = product.Category?.Name ?? "Без категорії",

@@ -31,9 +31,9 @@ public class CartController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Add(Guid productId, string? returnUrl = null)
+    public async Task<IActionResult> Add(Guid productId, Guid? variantId, string? returnUrl = null)
     {
-        var result = await _cartService.AddToCart(GetUserId(), productId);
+        var result = await _cartService.AddToCart(GetUserId(), productId, variantId);
         SetResultMessage(result.Succeeded, result.Message, "Товар додано до кошика.");
 
         return !string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl)
@@ -43,9 +43,9 @@ public class CartController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> BuyNow(Guid productId)
+    public async Task<IActionResult> BuyNow(Guid productId, Guid? variantId)
     {
-        var result = await _cartService.AddToCart(GetUserId(), productId);
+        var result = await _cartService.AddToCart(GetUserId(), productId, variantId);
         if (!result.Succeeded)
         {
             TempData["Error"] = result.Message;
@@ -57,27 +57,27 @@ public class CartController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Remove(Guid productId)
+    public async Task<IActionResult> Remove(Guid productId, Guid? variantId)
     {
-        var result = await _cartService.RemoveFromCart(GetUserId(), productId);
+        var result = await _cartService.RemoveFromCart(GetUserId(), productId, variantId);
         SetResultMessage(result.Succeeded, result.Message, "Товар видалено з кошика.");
         return RedirectToAction(nameof(Index));
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> IncreaseQuantity(Guid productId)
+    public async Task<IActionResult> IncreaseQuantity(Guid productId, Guid? variantId)
     {
-        var result = await _cartService.IncreaseQuantity(GetUserId(), productId);
+        var result = await _cartService.IncreaseQuantity(GetUserId(), productId, variantId);
         SetResultMessage(result.Succeeded, result.Message);
         return RedirectToAction(nameof(Index));
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DecreaseQuantity(Guid productId)
+    public async Task<IActionResult> DecreaseQuantity(Guid productId, Guid? variantId)
     {
-        var result = await _cartService.DecreaseQuantity(GetUserId(), productId);
+        var result = await _cartService.DecreaseQuantity(GetUserId(), productId, variantId);
         SetResultMessage(result.Succeeded, result.Message);
         return RedirectToAction(nameof(Index));
     }

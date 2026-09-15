@@ -96,7 +96,7 @@
         <section class="product-summary" aria-labelledby="product-title">
             <div class="product-summary__topline">
                 <a asp-action="Index" asp-route-search="@Model.CategoryName" class="product-category">@SharedLocalizer[Model.CategoryName]</a>
-                <span class="product-code">@Localizer["Код:"] @productCode</span>
+                <span class="product-code">@Localizer["Код:"] @(string.IsNullOrWhiteSpace(Model.Sku) ? productCode : Model.Sku)</span>
             </div>
 
             <h1 id="product-title">@localizedName</h1>
@@ -116,19 +116,42 @@
                 </p>
             </div>
 
+            @if (Model.Variants.Count > 0)
+            {
+                <div class="product-variant-selector" data-variant-selector>
+                    <span class="product-variant-selector__label">@Localizer["Розмір"]</span>
+                    <div class="product-variant-selector__options">
+                        @foreach (var variant in Model.Variants)
+                        {
+                            <button type="button"
+                                    class="product-variant-option"
+                                    data-variant-option
+                                    data-variant-id="@variant.Id"
+                                    data-variant-stock="@variant.Quantity"
+                                    disabled="@(variant.Quantity <= 0)">
+                                @variant.Size
+                            </button>
+                        }
+                    </div>
+                    <p class="product-variant-selector__hint" data-variant-hint>@Localizer["Оберіть розмір"]</p>
+                </div>
+            }
+
             <div class="product-buybox">
                 @if (User.Identity?.IsAuthenticated == true)
                 {
                     <form asp-controller="Cart" asp-action="BuyNow" method="post">
                         <input type="hidden" name="productId" value="@Model.Id" />
-                        <button type="submit" class="product-button product-button--accent">
+                        <input type="hidden" name="variantId" value="" data-variant-input />
+                        <button type="submit" class="product-button product-button--accent" data-requires-variant="@(Model.Variants.Count > 0 ? "true" : "false")">
                             <span aria-hidden="true">⚡</span> @Localizer["Купити в 1 клік"]
                         </button>
                     </form>
                     <form asp-controller="Cart" asp-action="Add" method="post">
                         <input type="hidden" name="productId" value="@Model.Id" />
+                        <input type="hidden" name="variantId" value="" data-variant-input />
                         <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                        <button type="submit" class="product-button product-button--primary">
+                        <button type="submit" class="product-button product-button--primary" data-requires-variant="@(Model.Variants.Count > 0 ? "true" : "false")">
                             <span aria-hidden="true">＋</span> @Localizer["Додати до кошика"]
                         </button>
                     </form>
@@ -369,4 +392,5 @@
 @section Scripts {
     <script src="~/js/product-details.js" asp-append-version="true"></script>
     <script src="~/js/product-extras.js" asp-append-version="true"></script>
+    <script src="~/js/product-variant-selector.js" asp-append-version="true"></script>
 }

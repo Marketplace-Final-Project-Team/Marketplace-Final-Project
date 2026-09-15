@@ -243,6 +243,10 @@
                                             }
                                             <div>
                                                 <div class="order-line__name">@item.ProductName</div>
+                                                @if (!string.IsNullOrWhiteSpace(item.VariantSize))
+                                                {
+                                                    <div class="order-line__variant">@Localizer["Розмір:"] <strong>@item.VariantSize</strong></div>
+                                                }
                                                 <div class="order-line__meta">@item.Quantity @Localizer["шт."] × @item.Price.ToString("N2") ₴</div>
                                             </div>
                                             <div class="order-line__total">@item.LineTotal.ToString("N2") ₴</div>
