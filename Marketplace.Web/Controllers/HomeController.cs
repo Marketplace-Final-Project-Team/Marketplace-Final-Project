@@ -77,6 +77,7 @@ namespace Marketplace.Web.Controllers
                     Name = c.Name,
                     ColorClass = colors[index % colors.Length],
                     Icon = CategoryIcon(c.Name),
+                    ImageUrl = c.ImageUrl,
                     ProductCount = c.ActiveProductCount
                 })
                 .ToList();

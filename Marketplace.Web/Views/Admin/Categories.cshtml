@@ -32,7 +32,8 @@
 
             <div class="admin-panel" style="padding: 1.1rem 1.25rem; margin-bottom: 1.25rem;">
                 <form asp-action="CreateCategory" method="post" class="admin-inline-form">
-                    <input type="text" name="name" placeholder="@Localizer["Назва нової категорії"]" maxlength="100" required style="flex: 1 1 20rem; padding: 0.5rem 0.75rem; border: 1px solid var(--admin-line); border-radius: 0.6rem;" />
+                    <input type="text" name="name" placeholder="@Localizer["Назва нової категорії"]" maxlength="100" required style="flex: 1 1 16rem; padding: 0.5rem 0.75rem; border: 1px solid var(--admin-line); border-radius: 0.6rem;" />
+                    <input type="url" name="imageUrl" placeholder="@Localizer["URL картинки (необов'язково)"]" maxlength="500" style="flex: 1 1 18rem; padding: 0.5rem 0.75rem; border: 1px solid var(--admin-line); border-radius: 0.6rem;" />
                     <button type="submit" class="btn btn-primary btn-sm">+ @Localizer["Додати категорію"]</button>
                 </form>
             </div>
@@ -59,6 +60,7 @@
                     <table class="table admin-table" id="categories-table">
                         <thead>
                             <tr>
+                                <th></th>
                                 <th>@Localizer["Назва"]</th>
                                 <th>18+</th>
                                 <th class="text-end">@Localizer["Дії"]</th>
@@ -69,9 +71,20 @@
                             {
                                 <tr data-search="@category.Name">
                                     <td>
+                                        @if (!string.IsNullOrWhiteSpace(category.ImageUrl))
+                                        {
+                                            <img src="@category.ImageUrl" alt="@category.Name" class="admin-category-thumb" />
+                                        }
+                                        else
+                                        {
+                                            <span class="admin-category-thumb admin-category-thumb--empty" aria-hidden="true">@category.Name[..1].ToUpperInvariant()</span>
+                                        }
+                                    </td>
+                                    <td>
                                         <form asp-action="UpdateCategory" method="post" class="admin-inline-form">
                                             <input type="hidden" name="categoryId" value="@category.Id" />
-                                            <input type="text" name="name" value="@category.Name" maxlength="100" required class="admin-inline-form__input" style="width: 16rem;" />
+                                            <input type="text" name="name" value="@category.Name" maxlength="100" required class="admin-inline-form__input" style="width: 12rem;" />
+                                            <input type="url" name="imageUrl" value="@category.ImageUrl" placeholder="@Localizer["URL картинки"]" maxlength="500" class="admin-inline-form__input" style="width: 14rem;" />
                                             <button type="submit" class="btn btn-sm btn-outline-secondary">@Localizer["Зберегти"]</button>
                                         </form>
                                     </td>

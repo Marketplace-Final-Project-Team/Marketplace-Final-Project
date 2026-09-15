@@ -750,6 +750,23 @@
     gap: 0.4rem;
 }
 
+.admin-category-thumb {
+    border-radius: 0.6rem;
+    display: block;
+    height: 2.75rem;
+    object-fit: cover;
+    width: 2.75rem;
+}
+
+.admin-category-thumb--empty {
+    align-items: center;
+    background: var(--admin-soft);
+    color: var(--admin-muted);
+    display: flex;
+    font-weight: 800;
+    justify-content: center;
+}
+
 .admin-inline-form__input {
     background: var(--admin-surface);
     border: 1px solid var(--admin-line);

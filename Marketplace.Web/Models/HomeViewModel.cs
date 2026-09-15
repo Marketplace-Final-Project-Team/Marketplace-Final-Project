@@ -6,6 +6,7 @@ namespace Marketplace.Web.Models
         public string Name { get; set; } = string.Empty;
         public string ColorClass { get; set; } = string.Empty;
         public string Icon { get; set; } = string.Empty;
+        public string? ImageUrl { get; set; }
         public int ProductCount { get; set; }
     }
 

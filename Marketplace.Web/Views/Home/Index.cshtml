@@ -142,8 +142,14 @@
             <div class="category-grid">
                 @foreach (var category in Model.Categories)
                 {
-                    <a asp-controller="Catalogue" asp-action="Index" asp-route-categoryId="@category.Id" class="category-card category-card--@category.ColorClass">
-                        <span class="category-card__icon">@category.Icon</span>
+                    var hasImage = !string.IsNullOrWhiteSpace(category.ImageUrl);
+                    <a asp-controller="Catalogue" asp-action="Index" asp-route-categoryId="@category.Id"
+                       class="category-card @(hasImage ? "category-card--photo" : $"category-card--{category.ColorClass}")"
+                       style="@(hasImage ? $"background-image:url('{category.ImageUrl}')" : null)">
+                        @if (!hasImage)
+                        {
+                            <span class="category-card__icon">@category.Icon</span>
+                        }
                         <strong>@SharedLocalizer[category.Name]</strong>
                         <small>@category.ProductCount @(category.ProductCount == 1 ? Localizer["товар"].Value : category.ProductCount is >= 2 and <= 4 ? Localizer["товари"].Value : Localizer["товарів"].Value)</small>
                     </a>

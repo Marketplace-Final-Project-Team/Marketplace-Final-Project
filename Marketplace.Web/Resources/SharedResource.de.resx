@@ -193,4 +193,25 @@
   <data name="Книги" xml:space="preserve">
     <value>Bücher</value>
   </data>
+  <data name="Краса та догляд" xml:space="preserve">
+    <value>Schönheit &amp; Pflege</value>
+  </data>
+  <data name="Здоров&apos;я та wellness" xml:space="preserve">
+    <value>Gesundheit &amp; Wellness</value>
+  </data>
+  <data name="Дитячі товари" xml:space="preserve">
+    <value>Kinderprodukte</value>
+  </data>
+  <data name="Прикраси та годинники" xml:space="preserve">
+    <value>Schmuck &amp; Uhren</value>
+  </data>
+  <data name="Автотовари" xml:space="preserve">
+    <value>Autoteile &amp; Zubehör</value>
+  </data>
+  <data name="Інструменти та ремонт" xml:space="preserve">
+    <value>Werkzeuge &amp; Heimwerken</value>
+  </data>
+  <data name="Сад і двір" xml:space="preserve">
+    <value>Garten &amp; Außenbereich</value>
+  </data>
 </root>
