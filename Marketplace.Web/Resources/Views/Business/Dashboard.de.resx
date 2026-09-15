@@ -211,4 +211,40 @@
   <data name="Дій поки немає." xml:space="preserve">
     <value>Noch keine Aktivitäten.</value>
   </data>
+  <data name="Стан акаунту" xml:space="preserve">
+    <value>Kontostatus</value>
+  </data>
+  <data name="На розгляді" xml:space="preserve">
+    <value>Wird geprüft</value>
+  </data>
+  <data name="Призупинено" xml:space="preserve">
+    <value>Gesperrt</value>
+  </data>
+  <data name="Відхилено" xml:space="preserve">
+    <value>Abgelehnt</value>
+  </data>
+  <data name="відгуків" xml:space="preserve">
+    <value>Bewertungen</value>
+  </data>
+  <data name="На маркетплейсі з" xml:space="preserve">
+    <value>Auf dem Marktplatz seit</value>
+  </data>
+  <data name="Сповіщення" xml:space="preserve">
+    <value>Benachrichtigungen</value>
+  </data>
+  <data name="Усе добре, дій не потрібно." xml:space="preserve">
+    <value>Alles in Ordnung, keine Maßnahme erforderlich.</value>
+  </data>
+  <data name="Замовлень очікує обробки: {0}" xml:space="preserve">
+    <value>Zu bearbeitende Bestellungen: {0}</value>
+  </data>
+  <data name="Товарів на низькому залишку: {0}" xml:space="preserve">
+    <value>Artikel mit niedrigem Bestand: {0}</value>
+  </data>
+  <data name="Немає в наявності: {0}" xml:space="preserve">
+    <value>Nicht auf Lager: {0}</value>
+  </data>
+  <data name="Товарів заблоковано модерацією: {0}" xml:space="preserve">
+    <value>Durch Moderation blockierte Artikel: {0}</value>
+  </data>
 </root>

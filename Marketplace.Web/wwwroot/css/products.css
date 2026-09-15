@@ -111,6 +111,60 @@
     margin-top: 0.25rem;
 }
 
+.stock-planning-row--urgent td {
+    background: #fdecea;
+}
+
+.stock-planning-days--urgent {
+    color: #b42318;
+    font-weight: 750;
+}
+
+.stock-planning-hint {
+    color: #b42318;
+    font-size: 0.72rem;
+    font-weight: 650;
+}
+
+.warehouse-stock-form {
+    display: flex;
+    gap: 0.4rem;
+    justify-content: flex-end;
+}
+
+.warehouse-stock-form .form-control {
+    width: 5.5rem;
+}
+
+.products-subnav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.25rem;
+}
+
+.products-subnav a {
+    background: var(--products-surface);
+    border: 1px solid var(--products-line);
+    border-radius: 0.75rem;
+    color: var(--products-muted);
+    font-size: 0.85rem;
+    font-weight: 650;
+    padding: 0.55rem 0.95rem;
+    text-decoration: none;
+}
+
+.products-subnav a:hover {
+    border-color: var(--products-primary);
+    color: var(--products-primary);
+}
+
+.products-subnav a.is-active {
+    background: var(--products-primary);
+    border-color: var(--products-primary);
+    color: #fff;
+}
+
 .products-heading__actions {
     align-items: center;
     display: flex;

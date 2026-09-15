@@ -148,6 +148,11 @@ namespace Marketplace.Web.Controllers
             var lowStockThreshold = await _settingsService.GetIntAsync("BusinessRules", "LowStockThreshold", 5);
             var traffic = await _productAnalyticsService.GetBusinessTrafficStatsAsync(businessId, start, end);
             var recentActivity = await _activityLog.GetRecentBusinessActionsAsync(businessId, take: 15);
+            var ratingStats = await _context.Reviews
+                .Where(r => r.Product.BusinessId == businessId)
+                .GroupBy(r => 1)
+                .Select(g => new { Average = g.Average(r => r.Rating), Count = g.Count() })
+                .FirstOrDefaultAsync();
 
             var periodRevenue = statsResult.Succeeded ? statsResult.Data.TotalRevenue : 0;
             var periodOrders = statsResult.Succeeded ? statsResult.Data.Stats.Sum(s => s.OrderCount) : 0;
@@ -200,6 +205,12 @@ namespace Marketplace.Web.Controllers
                 PendingProductCount = products.Count(p => p.Status == ProductStatus.Pending),
                 OutOfStockProductCount = products.Count(p => p.Quantity <= 0),
                 LowStockProductCount = products.Count(p => p.Quantity > 0 && p.Quantity <= lowStockThreshold),
+                BannedProductCount = products.Count(p => p.Status == ProductStatus.Banned),
+
+                AccountStatus = business.Status.ToString(),
+                MemberSince = business.CreatedAt,
+                AverageRating = ratingStats?.Average ?? 0,
+                ReviewCount = ratingStats?.Count ?? 0,
 
                 TotalViews = traffic.TotalViews,
                 TotalCartAdds = traffic.TotalCartAdds,

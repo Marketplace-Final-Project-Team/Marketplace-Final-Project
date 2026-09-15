@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ClosedXML.Excel;
 using Microsoft.EntityFrameworkCore;
+using Marketplace.BLL.Common;
 using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
@@ -378,6 +379,84 @@ public class ProductService : IProductService
         _context.Products.Remove(product);
         await _context.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<ServiceResult> UpdateQuantityAsync(Guid productId, int quantity)
+    {
+        if (quantity < 0)
+        {
+            return new ServiceResult { Succeeded = false, Message = "Кількість не може бути від'ємною." };
+        }
+
+        var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == productId);
+        if (product is null)
+        {
+            return new ServiceResult { Succeeded = false, Message = "Товар не знайдено." };
+        }
+
+        if (product.Variants.Count > 0)
+        {
+            return new ServiceResult { Succeeded = false, Message = "Товар має розміри - кількість редагується через сторінку товару." };
+        }
+
+        product.Quantity = quantity;
+        await _context.SaveChangesAsync();
+
+        return new ServiceResult { Succeeded = true, Message = string.Empty };
+    }
+
+    public async Task<IReadOnlyList<ReservedProductDto>> GetReservedProductsAsync(Guid businessId)
+    {
+        return await _context.OrderItems
+            .Where(oi => oi.Product.BusinessId == businessId
+                && !oi.IsReturned
+                && (oi.Order.Status == OrderStatus.Pending || oi.Order.Status == OrderStatus.Confirmed))
+            .GroupBy(oi => new { oi.ProductId, oi.Product.Name, oi.Product.Sku, oi.Product.MainImageUrl, oi.Product.Quantity })
+            .Select(g => new ReservedProductDto
+            {
+                ProductId = g.Key.ProductId,
+                ProductName = g.Key.Name,
+                Sku = g.Key.Sku,
+                MainImageUrl = g.Key.MainImageUrl,
+                ReservedQuantity = g.Sum(x => x.Quantity),
+                OrderCount = g.Select(x => x.OrderId).Distinct().Count(),
+                TotalQuantity = g.Key.Quantity
+            })
+            .OrderByDescending(r => r.ReservedQuantity)
+            .ToListAsync();
+    }
+
+    public async Task<IReadOnlyList<StockForecastDto>> GetStockForecastAsync(Guid businessId, int lookbackDays = 30)
+    {
+        var cutoff = DateTime.UtcNow.AddDays(-lookbackDays);
+
+        var salesByProduct = await _context.OrderItems
+            .Where(oi => oi.Product.BusinessId == businessId
+                && oi.Order.CreatedAt >= cutoff
+                && oi.Order.Status != OrderStatus.Canceled
+                && !oi.IsReturned)
+            .GroupBy(oi => oi.ProductId)
+            .Select(g => new { ProductId = g.Key, Sold = g.Sum(x => x.Quantity) })
+            .ToDictionaryAsync(x => x.ProductId, x => x.Sold);
+
+        var products = await _context.Products
+            .AsNoTracking()
+            .Where(p => p.BusinessId == businessId && p.Status == ProductStatus.Active)
+            .ToListAsync();
+
+        return products
+            .Select(p => new StockForecastDto
+            {
+                ProductId = p.Id,
+                ProductName = p.Name,
+                Sku = p.Sku,
+                MainImageUrl = p.MainImageUrl,
+                CurrentQuantity = p.Quantity,
+                UnitsSoldLast30Days = salesByProduct.TryGetValue(p.Id, out var sold) ? sold : 0
+            })
+            .Where(f => f.UnitsSoldLast30Days > 0)
+            .OrderBy(f => f.EstimatedDaysRemaining ?? int.MaxValue)
+            .ToList();
     }
 
     private static readonly string[] ExcelHeaders =

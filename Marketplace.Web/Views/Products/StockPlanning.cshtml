@@ -1,0 +1,99 @@
+@model IEnumerable<Marketplace.BLL.DTOs.Products.StockForecastDto>
+
+@{
+    ViewData["Title"] = Localizer["Планування запасів"];
+    var items = Model.ToList();
+    var businessId = ViewBag.SelectedBusinessId as Guid?;
+    const int reorderThresholdDays = 14;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/products.css" asp-append-version="true" />
+}
+
+<div class="products-page">
+    <a asp-action="Index" asp-route-businessId="@businessId" class="products-back">← @Localizer["Назад до товарів"]</a>
+    <header class="products-heading">
+        <div>
+            <div class="products-eyebrow">@Localizer["Панель продавця"]</div>
+            <h1 class="products-title">@Localizer["Планування запасів"]</h1>
+            <p class="products-subtitle">@Localizer["На основі продажів за останні 30 днів - коли товар закінчиться і скільки часу лишилось на дозамовлення."]</p>
+        </div>
+    </header>
+
+    @if (businessId.HasValue)
+    {
+        <partial name="_ProductsNav" model="businessId.Value" />
+    }
+
+    @if (items.Count == 0)
+    {
+        <section class="product-empty">
+            <div class="product-empty__icon" aria-hidden="true">□</div>
+            <h2>@Localizer["Недостатньо даних для прогнозу"]</h2>
+            <p>@Localizer["Прогноз з'явиться, щойно активні товари матимуть продажі за останні 30 днів."]</p>
+        </section>
+    }
+    else
+    {
+        <div class="products-panel table-responsive">
+            <table class="table products-table">
+                <thead>
+                    <tr>
+                        <th>@Localizer["Товар"]</th>
+                        <th>@Localizer["Поточний залишок"]</th>
+                        <th>@Localizer["Продано за 30 днів"]</th>
+                        <th>@Localizer["У середньому/день"]</th>
+                        <th>@Localizer["Залишилось днів"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in items)
+                    {
+                        var isUrgent = item.EstimatedDaysRemaining.HasValue && item.EstimatedDaysRemaining.Value <= reorderThresholdDays;
+                        <tr class="@(isUrgent ? "stock-planning-row--urgent" : "")">
+                            <td>
+                                <div class="product-cell">
+                                    @if (!string.IsNullOrWhiteSpace(item.MainImageUrl))
+                                    {
+                                        <img class="product-thumb" src="@item.MainImageUrl" alt="@item.ProductName" />
+                                    }
+                                    else
+                                    {
+                                        <div class="product-image-placeholder" aria-hidden="true">@item.ProductName[..1].ToUpperInvariant()</div>
+                                    }
+                                    <div>
+                                        <a asp-action="Details" asp-route-id="@item.ProductId" class="product-name">@item.ProductName</a>
+                                        @if (!string.IsNullOrWhiteSpace(item.Sku))
+                                        {
+                                            <div class="product-sku">@Localizer["Артикул:"] @item.Sku</div>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@item.CurrentQuantity @Localizer["шт."]</td>
+                            <td>@item.UnitsSoldLast30Days @Localizer["шт."]</td>
+                            <td>@item.AverageDailySales.ToString("0.0")</td>
+                            <td>
+                                @if (item.EstimatedDaysRemaining.HasValue)
+                                {
+                                    <span class="stock-planning-days @(isUrgent ? "stock-planning-days--urgent" : "")">
+                                        @item.EstimatedDaysRemaining @Localizer["дн."]
+                                    </span>
+                                    @if (isUrgent)
+                                    {
+                                        <div class="stock-planning-hint">@Localizer["Час дозамовити"]</div>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-secondary">—</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

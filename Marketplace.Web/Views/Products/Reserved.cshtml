@@ -1,0 +1,80 @@
+@model IEnumerable<Marketplace.BLL.DTOs.Products.ReservedProductDto>
+
+@{
+    ViewData["Title"] = Localizer["Зарезервовані товари"];
+    var items = Model.ToList();
+    var businessId = ViewBag.SelectedBusinessId as Guid?;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/products.css" asp-append-version="true" />
+}
+
+<div class="products-page">
+    <a asp-action="Index" asp-route-businessId="@businessId" class="products-back">← @Localizer["Назад до товарів"]</a>
+    <header class="products-heading">
+        <div>
+            <div class="products-eyebrow">@Localizer["Панель продавця"]</div>
+            <h1 class="products-title">@Localizer["Зарезервовані товари"]</h1>
+            <p class="products-subtitle">@Localizer["Кількість товару, яка вже тримається під неоплаченими або непідтвердженими замовленнями."]</p>
+        </div>
+    </header>
+
+    @if (businessId.HasValue)
+    {
+        <partial name="_ProductsNav" model="businessId.Value" />
+    }
+
+    @if (items.Count == 0)
+    {
+        <section class="product-empty">
+            <div class="product-empty__icon" aria-hidden="true">□</div>
+            <h2>@Localizer["Немає зарезервованих товарів"]</h2>
+            <p>@Localizer["Тут з'являться товари, щойно з'явиться необроблене замовлення."]</p>
+        </section>
+    }
+    else
+    {
+        <div class="products-panel table-responsive">
+            <table class="table products-table">
+                <thead>
+                    <tr>
+                        <th>@Localizer["Товар"]</th>
+                        <th>@Localizer["Зарезервовано"]</th>
+                        <th>@Localizer["У замовленнях"]</th>
+                        <th>@Localizer["Доступно"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>
+                                <div class="product-cell">
+                                    @if (!string.IsNullOrWhiteSpace(item.MainImageUrl))
+                                    {
+                                        <img class="product-thumb" src="@item.MainImageUrl" alt="@item.ProductName" />
+                                    }
+                                    else
+                                    {
+                                        <div class="product-image-placeholder" aria-hidden="true">@item.ProductName[..1].ToUpperInvariant()</div>
+                                    }
+                                    <div>
+                                        <a asp-action="Details" asp-route-id="@item.ProductId" class="product-name">@item.ProductName</a>
+                                        @if (!string.IsNullOrWhiteSpace(item.Sku))
+                                        {
+                                            <div class="product-sku">@Localizer["Артикул:"] @item.Sku</div>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="fw-semibold">@item.ReservedQuantity</span> <span class="text-secondary small">@Localizer["шт."]</span></td>
+                            <td>@item.OrderCount</td>
+                            <td>@item.AvailableQuantity @Localizer["шт."]</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

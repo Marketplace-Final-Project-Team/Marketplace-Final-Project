@@ -1022,6 +1022,108 @@
     margin-bottom: 1.25rem;
 }
 
+.business-status-row {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.business-status-row .business-panel {
+    margin-bottom: 0;
+}
+
+.business-status-badge {
+    border-radius: 999px;
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.3rem 0.75rem;
+}
+
+.business-status-badge--active {
+    background: #e7f8f0;
+    color: #16845b;
+}
+
+.business-status-badge--pending {
+    background: #fff2d8;
+    color: #b45309;
+}
+
+.business-status-badge--suspended,
+.business-status-badge--rejected {
+    background: #fdecea;
+    color: #b42318;
+}
+
+.business-status-card__rating {
+    align-items: center;
+    display: flex;
+    gap: 0.35rem;
+    margin-top: 0.85rem;
+}
+
+.business-status-card__rating span[aria-hidden] {
+    color: #f5b400;
+}
+
+.business-status-card__rating strong {
+    color: var(--seller-ink);
+    font-size: 1.05rem;
+}
+
+.business-status-card__rating span:last-child {
+    color: var(--seller-muted);
+    font-size: 0.82rem;
+}
+
+.business-status-card__since {
+    color: var(--seller-muted);
+    font-size: 0.8rem;
+    margin: 0.6rem 0 0;
+}
+
+.business-notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.business-notifications-list__item {
+    border-radius: 0.7rem;
+    padding: 0.6rem 0.85rem;
+}
+
+.business-notifications-list__item a {
+    color: inherit;
+    font-size: 0.85rem;
+    font-weight: 650;
+    text-decoration: none;
+}
+
+.business-notifications-list__item a:hover {
+    text-decoration: underline;
+}
+
+.business-notifications-list__item--warning {
+    background: #fff2d8;
+    color: #b45309;
+}
+
+.business-notifications-list__item--danger {
+    background: #fdecea;
+    color: #b42318;
+}
+
+@media (max-width: 767.98px) {
+    .business-status-row {
+        grid-template-columns: 1fr;
+    }
+}
+
 .business-kpi {
     background: var(--seller-soft);
     border-radius: 0.85rem;

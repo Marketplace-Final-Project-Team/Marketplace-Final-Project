@@ -38,6 +38,11 @@
         }
     </header>
 
+    @if (selectedBusinessId.HasValue)
+    {
+        <partial name="_ProductsNav" model="selectedBusinessId.Value" />
+    }
+
     @if (TempData["Error"] is string error)
     {
         <div class="alert alert-warning" role="alert">@error</div>

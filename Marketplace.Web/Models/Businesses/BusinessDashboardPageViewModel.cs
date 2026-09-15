@@ -70,6 +70,12 @@ namespace Marketplace.Web.Models.Businesses
         public int PendingProductCount { get; set; }
         public int OutOfStockProductCount { get; set; }
         public int LowStockProductCount { get; set; }
+        public int BannedProductCount { get; set; }
+
+        public string AccountStatus { get; set; } = string.Empty;
+        public DateTime MemberSince { get; set; }
+        public double AverageRating { get; set; }
+        public int ReviewCount { get; set; }
 
         public int TotalViews { get; set; }
         public int TotalCartAdds { get; set; }

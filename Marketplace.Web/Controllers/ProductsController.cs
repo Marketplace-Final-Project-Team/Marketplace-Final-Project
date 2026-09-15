@@ -180,6 +180,91 @@ public class ProductsController : Controller
         return RedirectToAction(nameof(Index), new { businessId });
     }
 
+    [HttpGet]
+    public async Task<IActionResult> Warehouse(Guid businessId)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Challenge();
+
+        if (!await _businessAccessService.HasAccessAsync(businessId, userId, BusinessPermissions.ProductCrud))
+        {
+            return Forbid();
+        }
+
+        var products = await _productService.GetByBusinessAsync(businessId);
+        ViewBag.SelectedBusinessId = businessId;
+
+        return View(products
+            .OrderBy(p => p.Quantity)
+            .Select(p => new WarehouseProductViewModel
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Sku = p.Sku,
+                MainImageUrl = p.MainImageUrl,
+                Quantity = p.Quantity,
+                VariantCount = p.Variants.Count,
+                Status = p.Status.ToString()
+            }).ToList());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateStock(Guid productId, Guid businessId, int quantity)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Challenge();
+
+        if (!await _businessAccessService.HasAccessAsync(businessId, userId, BusinessPermissions.ProductCrud))
+        {
+            return Forbid();
+        }
+
+        var result = await _productService.UpdateQuantityAsync(productId, quantity);
+        if (result.Succeeded)
+        {
+            TempData["Success"] = "Залишок оновлено.";
+        }
+        else
+        {
+            TempData["Error"] = result.Message;
+        }
+
+        return RedirectToAction(nameof(Warehouse), new { businessId });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Reserved(Guid businessId)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Challenge();
+
+        if (!await _businessAccessService.HasAccessAsync(businessId, userId, BusinessPermissions.ProductCrud))
+        {
+            return Forbid();
+        }
+
+        ViewBag.SelectedBusinessId = businessId;
+        var reserved = await _productService.GetReservedProductsAsync(businessId);
+        return View(reserved);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> StockPlanning(Guid businessId)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Challenge();
+
+        if (!await _businessAccessService.HasAccessAsync(businessId, userId, BusinessPermissions.ProductCrud))
+        {
+            return Forbid();
+        }
+
+        ViewBag.SelectedBusinessId = businessId;
+        var forecast = await _productService.GetStockForecastAsync(businessId);
+        return View(forecast);
+    }
+
     public async Task<IActionResult> Details(Guid id)
     {
         var accessible = await GetAccessibleProductAsync(id);
