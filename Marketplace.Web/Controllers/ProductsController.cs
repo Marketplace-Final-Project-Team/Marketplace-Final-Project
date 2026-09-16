@@ -4,6 +4,7 @@ using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Interfaces;
+using ProductStatus = Marketplace.Domain.Enums.ProductStatus;
 using Marketplace.Web.Models.Products;
 using Microsoft.AspNetCore.Authorization;
 using Marketplace.Web.Models;
@@ -39,7 +40,7 @@ public class ProductsController : Controller
         _sharedLocalizer = sharedLocalizer;
     }
 
-    public async Task<IActionResult> Index(Guid? businessId)
+    public async Task<IActionResult> Index(Guid? businessId, string? search, string filter = "all")
     {
         var userId = GetCurrentUserId();
         if (userId is null) return Challenge();
@@ -49,7 +50,7 @@ public class ProductsController : Controller
         {
             TempData["Error"] = "У вас поки немає бізнесу з доступом до керування товарами.";
             ViewBag.Businesses = Array.Empty<SelectListItem>();
-            return View(new List<ProductListItemViewModel>());
+            return View(new ProductsIndexViewModel());
         }
 
         var selectedBusinessId = businessId ?? businesses[0].Id;
@@ -58,7 +59,9 @@ public class ProductsController : Controller
             return Forbid();
         }
 
+        var lowStockThreshold = await _settingsService.GetIntAsync("BusinessRules", "LowStockThreshold", 5);
         var products = await _productService.GetByBusinessAsync(selectedBusinessId);
+
         ViewBag.Businesses = businesses.Select(b => new SelectListItem
         {
             Value = b.Id.ToString(),
@@ -67,7 +70,40 @@ public class ProductsController : Controller
         }).ToList();
         ViewBag.SelectedBusinessId = selectedBusinessId;
 
-        return View(products.Select(p =>
+        bool IsLowStock(Product p) => p.Status == ProductStatus.Active && p.Quantity > 0 && p.Quantity <= lowStockThreshold;
+        bool IsOutOfStock(Product p) => p.Quantity <= 0;
+        bool IsHidden(Product p) => p.Status != ProductStatus.Active;
+
+        var model = new ProductsIndexViewModel
+        {
+            Search = search,
+            Filter = string.IsNullOrWhiteSpace(filter) ? "all" : filter,
+            AllCount = products.Count,
+            ActiveCount = products.Count(p => p.Status == ProductStatus.Active),
+            PendingCount = products.Count(p => p.Status == ProductStatus.Pending),
+            LowStockCount = products.Count(IsLowStock),
+            OutOfStockCount = products.Count(IsOutOfStock),
+            HiddenCount = products.Count(IsHidden)
+        };
+
+        IEnumerable<Product> filtered = model.Filter switch
+        {
+            "active" => products.Where(p => p.Status == ProductStatus.Active),
+            "low-stock" => products.Where(IsLowStock),
+            "out-of-stock" => products.Where(IsOutOfStock),
+            "hidden" => products.Where(IsHidden),
+            _ => products
+        };
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var term = search.Trim();
+            filtered = filtered.Where(p =>
+                p.Name.Contains(term, StringComparison.OrdinalIgnoreCase) ||
+                (p.Sku is not null && p.Sku.Contains(term, StringComparison.OrdinalIgnoreCase)));
+        }
+
+        model.Items = filtered.Select(p =>
         {
             var activeDiscount = p.GetActiveProductDiscount();
 
@@ -77,6 +113,8 @@ public class ProductsController : Controller
                 Name = p.Name,
                 Price = p.Price,
                 Quantity = p.Quantity,
+                Sku = p.Sku,
+                VariantCount = p.Variants.Count,
                 MainImageUrl = p.MainImageUrl,
                 Status = p.Status.ToString(),
                 CategoryName = p.Category?.Name ?? string.Empty,
@@ -84,7 +122,147 @@ public class ProductsController : Controller
                 HasDiscount = activeDiscount != null,
                 DiscountPercent = activeDiscount != null ? (int)activeDiscount.Percent : 0
             };
-        }).ToList());
+        }).ToList();
+
+        return View(model);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> ExportExcel(Guid businessId)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Challenge();
+
+        if (!await _businessAccessService.HasAccessAsync(businessId, userId, BusinessPermissions.ProductCrud))
+        {
+            return Forbid();
+        }
+
+        var fileBytes = await _productService.ExportToExcelAsync(businessId);
+        var fileName = $"products-{DateTime.UtcNow:yyyyMMdd-HHmm}.xlsx";
+        return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ImportExcel(Guid businessId, IFormFile? file)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Challenge();
+
+        if (!await _businessAccessService.HasAccessAsync(businessId, userId, BusinessPermissions.ProductCrud))
+        {
+            return Forbid();
+        }
+
+        if (file is null || file.Length == 0)
+        {
+            TempData["Error"] = "Оберіть файл .xlsx для імпорту.";
+            return RedirectToAction(nameof(Index), new { businessId });
+        }
+
+        await using var stream = file.OpenReadStream();
+        var result = await _productService.ImportFromExcelAsync(businessId, stream);
+
+        await _activityLog.LogBusinessActionAsync(businessId, "ProductsImported",
+            $"Імпорт товарів: створено {result.CreatedCount}, оновлено {result.UpdatedCount}, помилок {result.RowErrors.Count}.", actorUserId: userId);
+
+        if (result.RowErrors.Count == 0)
+        {
+            TempData["Success"] = $"Імпорт завершено: створено {result.CreatedCount}, оновлено {result.UpdatedCount}.";
+        }
+        else
+        {
+            var errorsPreview = string.Join(" ", result.RowErrors.Take(5).Select(e => $"Рядок {e.RowNumber}: {e.Error}"));
+            TempData["Error"] = $"Створено {result.CreatedCount}, оновлено {result.UpdatedCount}. Помилки в {result.RowErrors.Count} рядках. {errorsPreview}";
+        }
+
+        return RedirectToAction(nameof(Index), new { businessId });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Warehouse(Guid businessId)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Challenge();
+
+        if (!await _businessAccessService.HasAccessAsync(businessId, userId, BusinessPermissions.ProductCrud))
+        {
+            return Forbid();
+        }
+
+        var products = await _productService.GetByBusinessAsync(businessId);
+        ViewBag.SelectedBusinessId = businessId;
+
+        return View(products
+            .OrderBy(p => p.Quantity)
+            .Select(p => new WarehouseProductViewModel
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Sku = p.Sku,
+                MainImageUrl = p.MainImageUrl,
+                Quantity = p.Quantity,
+                VariantCount = p.Variants.Count,
+                Status = p.Status.ToString()
+            }).ToList());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateStock(Guid productId, Guid businessId, int quantity)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Challenge();
+
+        if (!await _businessAccessService.HasAccessAsync(businessId, userId, BusinessPermissions.ProductCrud))
+        {
+            return Forbid();
+        }
+
+        var result = await _productService.UpdateQuantityAsync(productId, quantity);
+        if (result.Succeeded)
+        {
+            TempData["Success"] = "Залишок оновлено.";
+        }
+        else
+        {
+            TempData["Error"] = result.Message;
+        }
+
+        return RedirectToAction(nameof(Warehouse), new { businessId });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Reserved(Guid businessId)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Challenge();
+
+        if (!await _businessAccessService.HasAccessAsync(businessId, userId, BusinessPermissions.ProductCrud))
+        {
+            return Forbid();
+        }
+
+        ViewBag.SelectedBusinessId = businessId;
+        var reserved = await _productService.GetReservedProductsAsync(businessId);
+        return View(reserved);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> StockPlanning(Guid businessId)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Challenge();
+
+        if (!await _businessAccessService.HasAccessAsync(businessId, userId, BusinessPermissions.ProductCrud))
+        {
+            return Forbid();
+        }
+
+        ViewBag.SelectedBusinessId = businessId;
+        var forecast = await _productService.GetStockForecastAsync(businessId);
+        return View(forecast);
     }
 
     public async Task<IActionResult> Details(Guid id)
@@ -100,6 +278,11 @@ public class ProductsController : Controller
             Description = product.Description,
             Price = product.Price,
             Quantity = product.Quantity,
+            Sku = product.Sku,
+            Variants = product.Variants
+                .OrderBy(v => v.Size)
+                .Select(v => new ProductVariantInputModel { Size = v.Size, Sku = v.Sku, Quantity = v.Quantity })
+                .ToList(),
             MainImageUrl = product.MainImageUrl,
             Status = product.Status.ToString(),
             CategoryName = product.Category?.Name ?? "Без категорії",
@@ -159,6 +342,11 @@ public class ProductsController : Controller
                 Description = model.Description,
                 Price = model.Price,
                 Quantity = model.Quantity,
+                Sku = model.Sku,
+                Variants = model.Variants
+                    .Where(v => !string.IsNullOrWhiteSpace(v.Size))
+                    .Select(v => new ProductVariantDto { Size = v.Size, Sku = v.Sku, Quantity = v.Quantity })
+                    .ToList(),
                 IsAdultOnly = model.IsAdultOnly,
                 MainImage = model.MainImage,
                 AdditionalImages = model.AdditionalImages
@@ -205,6 +393,11 @@ public class ProductsController : Controller
             Description = product.Description,
             Price = product.Price,
             Quantity = product.Quantity,
+            Sku = product.Sku,
+            Variants = product.Variants
+                .OrderBy(v => v.Size)
+                .Select(v => new ProductVariantInputModel { Size = v.Size, Sku = v.Sku, Quantity = v.Quantity })
+                .ToList(),
             IsAdultOnly = product.IsAdultOnly,
             CategoryId = product.CategoryId,
             ExistingMainImageUrl = product.MainImageUrl,
@@ -249,6 +442,11 @@ public class ProductsController : Controller
                 Description = model.Description,
                 Price = model.Price,
                 Quantity = model.Quantity,
+                Sku = model.Sku,
+                Variants = model.Variants
+                    .Where(v => !string.IsNullOrWhiteSpace(v.Size))
+                    .Select(v => new ProductVariantDto { Size = v.Size, Sku = v.Sku, Quantity = v.Quantity })
+                    .ToList(),
                 IsAdultOnly = model.IsAdultOnly,
                 MainImage = model.MainImage,
                 AdditionalImages = model.AdditionalImages

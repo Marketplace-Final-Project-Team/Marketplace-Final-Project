@@ -87,7 +87,8 @@ namespace Marketplace.BLL.Services
                         };
                     }
 
-                    if (cartItem.Product.Quantity < cartItem.Quantity)
+                    var availableStock = cartItem.ProductVariant?.Quantity ?? cartItem.Product.Quantity;
+                    if (availableStock < cartItem.Quantity)
                     {
                         return new OrderResultDto { Succeeded = false, Message = $"Недостатньо товару «{cartItem.Product.Name}» на складі." };
                     }
@@ -176,11 +177,18 @@ namespace Marketplace.BLL.Services
                     {
                         ProductId = cartItem.ProductId,
                         ProductName = cartItem.Product.Name,
+                        ProductVariantId = cartItem.ProductVariantId,
+                        VariantSize = cartItem.ProductVariant?.Size,
+                        VariantSku = cartItem.ProductVariant?.Sku ?? cartItem.Product.Sku,
                         UnitPrice = unitPrice,
                         Quantity = cartItem.Quantity,
                         IsReturned = false
                     };
 
+                    if (cartItem.ProductVariant != null)
+                    {
+                        cartItem.ProductVariant.Quantity -= cartItem.Quantity;
+                    }
                     cartItem.Product.Quantity -= cartItem.Quantity;
                     _productRepository.Update(cartItem.Product);
 
@@ -288,6 +296,10 @@ namespace Marketplace.BLL.Services
                         {
                             item.Product.Quantity += item.Quantity;
                         }
+                        if (item.ProductVariant != null)
+                        {
+                            item.ProductVariant.Quantity += item.Quantity;
+                        }
                     }
 
 
@@ -352,6 +364,11 @@ namespace Marketplace.BLL.Services
                 if (item.Product != null)
                 {
                     item.Product.Quantity += item.Quantity;
+
+                    if (item.ProductVariant != null)
+                    {
+                        item.ProductVariant.Quantity += item.Quantity;
+                    }
 
                     if (item.Product.Business != null)
                     {
@@ -528,6 +545,7 @@ namespace Marketplace.BLL.Services
                     ProductId = item.ProductId,
                     ProductName = item.ProductName,
                     ImageUrl = item.Product?.MainImageUrl ?? string.Empty,
+                    VariantSize = item.VariantSize,
                     UnitPrice = item.UnitPrice,
                     Quantity = item.Quantity,
                     BelongsToBusiness = item.Product != null && item.Product.BusinessId == businessId

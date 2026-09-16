@@ -130,6 +130,71 @@
         <div class="business-kpi"><span>@Localizer["Товарів усього"]</span><strong>@Model.TotalProductCount</strong></div>
     </div>
 
+    @{
+        var accountStatusLabel = Model.AccountStatus switch
+        {
+            "Active" => Localizer["Активний"].Value,
+            "Pending" => Localizer["На розгляді"].Value,
+            "Suspended" => Localizer["Призупинено"].Value,
+            "Rejected" => Localizer["Відхилено"].Value,
+            _ => Model.AccountStatus
+        };
+
+        // IViewLocalizer's formatted indexer only substitutes {0} args when the
+        // LocalizedHtmlString is written directly to the Razor output (WriteTo);
+        // calling .Value on it returns the raw, unformatted template. So format
+        // explicitly against the plain (argument-less) lookup instead.
+        var notifications = new List<(string Text, string? Url, string Tone)>();
+        if (Model.AwaitingOrders > 0)
+        {
+            notifications.Add((string.Format(Localizer["Замовлень очікує обробки: {0}"].Value, Model.AwaitingOrders), Url.Action("Orders", "Business", new { businessId = Model.BusinessId }), "warning"));
+        }
+        if (Model.LowStockProductCount > 0)
+        {
+            notifications.Add((string.Format(Localizer["Товарів на низькому залишку: {0}"].Value, Model.LowStockProductCount), Url.Action("Index", "Products", new { businessId = Model.BusinessId, filter = "low-stock" }), "warning"));
+        }
+        if (Model.OutOfStockProductCount > 0)
+        {
+            notifications.Add((string.Format(Localizer["Немає в наявності: {0}"].Value, Model.OutOfStockProductCount), Url.Action("Index", "Products", new { businessId = Model.BusinessId, filter = "out-of-stock" }), "danger"));
+        }
+        if (Model.BannedProductCount > 0)
+        {
+            notifications.Add((string.Format(Localizer["Товарів заблоковано модерацією: {0}"].Value, Model.BannedProductCount), Url.Action("Index", "Products", new { businessId = Model.BusinessId, filter = "hidden" }), "danger"));
+        }
+    }
+
+    <div class="business-status-row">
+        <section class="business-panel business-status-card">
+            <h2>✓ @Localizer["Стан акаунту"]</h2>
+            <span class="business-status-badge business-status-badge--@Model.AccountStatus.ToLowerInvariant()">@accountStatusLabel</span>
+            <div class="business-status-card__rating">
+                <span aria-hidden="true">★</span>
+                <strong>@(Model.ReviewCount > 0 ? Model.AverageRating.ToString("0.0") : "—")</strong>
+                <span>(@Model.ReviewCount @Localizer["відгуків"])</span>
+            </div>
+            <p class="business-status-card__since">@Localizer["На маркетплейсі з"] @Model.MemberSince.ToString("dd.MM.yyyy")</p>
+        </section>
+
+        <section class="business-panel business-notifications-card">
+            <h2>🔔 @Localizer["Сповіщення"]</h2>
+            @if (notifications.Count == 0)
+            {
+                <p class="business-empty">@Localizer["Усе добре, дій не потрібно."]</p>
+            }
+            else
+            {
+                <ul class="business-notifications-list">
+                    @foreach (var notification in notifications)
+                    {
+                        <li class="business-notifications-list__item business-notifications-list__item--@notification.Tone">
+                            <a href="@notification.Url">@notification.Text</a>
+                        </li>
+                    }
+                </ul>
+            }
+        </section>
+    </div>
+
     <div class="business-two-col">
         <section class="business-panel business-chart-card" data-collapsible>
             <h2>@Localizer["Виручка та замовлення за період"]</h2>

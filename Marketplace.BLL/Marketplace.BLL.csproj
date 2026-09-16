@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.S3" Version="4.0.102.5" />
+    <PackageReference Include="ClosedXML" Version="0.105.1" />
     <PackageReference Include="CloudinaryDotNet" Version="1.29.3" />
     <PackageReference Include="Google.Cloud.Vision.V1" Version="3.8.0" />
     <PackageReference Include="MailKit" Version="4.17.0" />

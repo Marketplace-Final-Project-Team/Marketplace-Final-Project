@@ -591,6 +591,34 @@
 .category-card--green { background: #e9f7ef; }
 .category-card--violet { background: #f0ebff; }
 .category-card--yellow { background: #fff7d9; }
+.category-card--teal { background: #e3f6f5; }
+
+.category-card--photo {
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    position: relative;
+}
+
+.category-card--photo::before {
+    background: linear-gradient(180deg, rgba(12, 18, 34, 0) 35%, rgba(12, 18, 34, 0.75) 100%);
+    border-radius: inherit;
+    content: "";
+    inset: 0;
+    position: absolute;
+}
+
+.category-card--photo strong,
+.category-card--photo small {
+    position: relative;
+    z-index: 1;
+}
+
+.category-card--photo strong { color: #fff; }
+.category-card--photo small { color: rgba(255, 255, 255, 0.85); }
 
 .category-card__icon {
     align-items: center;

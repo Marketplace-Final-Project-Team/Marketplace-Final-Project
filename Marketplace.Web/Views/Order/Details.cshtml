@@ -70,6 +70,10 @@
                         }
                         <div>
                             <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.ProductId" class="order-line__name">@item.ProductName</a>
+                            @if (!string.IsNullOrWhiteSpace(item.VariantSize))
+                            {
+                                <div class="order-line__variant">@Localizer["Розмір:"] <strong>@item.VariantSize</strong></div>
+                            }
                             <div class="order-line__meta">@item.Quantity @Localizer["шт."] × @item.UnitPrice.ToString("N2") ₴</div>
                         </div>
                         <div class="order-line__total">@item.LineTotal.ToString("N2") ₴</div>

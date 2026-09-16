@@ -565,7 +565,7 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCategory(string name)
+        public async Task<IActionResult> CreateCategory(string name, string? imageUrl)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -573,7 +573,7 @@ namespace Marketplace.Web.Controllers
                 return RedirectToAction("Categories");
             }
 
-            var result = await _categoryService.CreateCategory(name.Trim());
+            var result = await _categoryService.CreateCategory(name.Trim(), imageUrl);
             if (result.Succeeded)
             {
                 TempData["Success"] = $"Категорію «{name}» створено.";
@@ -587,7 +587,7 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateCategory(Guid categoryId, string name)
+        public async Task<IActionResult> UpdateCategory(Guid categoryId, string name, string? imageUrl)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -595,7 +595,7 @@ namespace Marketplace.Web.Controllers
                 return RedirectToAction("Categories");
             }
 
-            var result = await _categoryService.UpdateCategory(name.Trim(), categoryId);
+            var result = await _categoryService.UpdateCategory(name.Trim(), categoryId, imageUrl);
             TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded ? "Категорію оновлено." : result.Message;
 
             return RedirectToAction("Categories");

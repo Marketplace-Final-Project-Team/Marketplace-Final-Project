@@ -1,0 +1,115 @@
+@model IEnumerable<Marketplace.Web.Models.Products.WarehouseProductViewModel>
+
+@{
+    ViewData["Title"] = Localizer["Склад"];
+    var items = Model.ToList();
+    var businessId = ViewBag.SelectedBusinessId as Guid?;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/products.css" asp-append-version="true" />
+}
+
+<div class="products-page">
+    <a asp-action="Index" asp-route-businessId="@businessId" class="products-back">← @Localizer["Назад до товарів"]</a>
+    <header class="products-heading">
+        <div>
+            <div class="products-eyebrow">@Localizer["Панель продавця"]</div>
+            <h1 class="products-title">@Localizer["Склад"]</h1>
+            <p class="products-subtitle">@Localizer["Швидко перегляньте та оновіть залишки по всіх товарах в одному місці."]</p>
+        </div>
+    </header>
+
+    @if (businessId.HasValue)
+    {
+        <partial name="_ProductsNav" model="businessId.Value" />
+    }
+
+    @if (TempData["Error"] is string error)
+    {
+        <div class="alert alert-warning" role="alert">@error</div>
+    }
+
+    @if (TempData["Success"] is string success)
+    {
+        <div class="alert alert-success" role="alert">@success</div>
+    }
+
+    @if (items.Count == 0)
+    {
+        <section class="product-empty">
+            <div class="product-empty__icon" aria-hidden="true">□</div>
+            <h2>@Localizer["Товарів поки немає"]</h2>
+        </section>
+    }
+    else
+    {
+        <div class="products-panel table-responsive">
+            <table class="table products-table">
+                <thead>
+                    <tr>
+                        <th>@Localizer["Товар"]</th>
+                        <th>@Localizer["Статус"]</th>
+                        <th>@Localizer["Залишок"]</th>
+                        <th class="text-end">@Localizer["Оновити"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in items)
+                    {
+                        var statusClass = item.Status.ToLowerInvariant();
+                        var statusLabel = item.Status switch
+                        {
+                            "Active" => Localizer["Активний"].Value,
+                            "Pending" => Localizer["На модерації"].Value,
+                            "Banned" => Localizer["Заблокований"].Value,
+                            _ => item.Status
+                        };
+
+                        <tr>
+                            <td>
+                                <div class="product-cell">
+                                    @if (!string.IsNullOrWhiteSpace(item.MainImageUrl))
+                                    {
+                                        <img class="product-thumb" src="@item.MainImageUrl" alt="@item.Name" />
+                                    }
+                                    else
+                                    {
+                                        <div class="product-image-placeholder" aria-hidden="true">@item.Name[..1].ToUpperInvariant()</div>
+                                    }
+                                    <div>
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="product-name">@item.Name</a>
+                                        @if (!string.IsNullOrWhiteSpace(item.Sku))
+                                        {
+                                            <div class="product-sku">@Localizer["Артикул:"] @item.Sku</div>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="product-status product-status--@statusClass">@statusLabel</span></td>
+                            <td>
+                                <span class="fw-semibold">@item.Quantity</span>
+                                <span class="text-secondary small">@Localizer["шт."]</span>
+                            </td>
+                            <td class="text-end">
+                                @if (item.VariantCount > 0)
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">@Localizer["Керується через розміри"]</a>
+                                }
+                                else
+                                {
+                                    <form asp-action="UpdateStock" method="post" class="warehouse-stock-form">
+                                        <input type="hidden" name="businessId" value="@businessId" />
+                                        <input type="hidden" name="productId" value="@item.Id" />
+                                        <input type="number" min="0" name="quantity" value="@item.Quantity" class="form-control form-control-sm" />
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">@Localizer["Зберегти"]</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

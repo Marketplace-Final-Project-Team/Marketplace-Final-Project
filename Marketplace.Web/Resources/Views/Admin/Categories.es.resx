@@ -103,4 +103,10 @@
   <data name="Видалити" xml:space="preserve">
     <value>Eliminar</value>
   </data>
+  <data name="URL РєР°СЂС‚РёРЅРєРё" xml:space="preserve">
+    <value>URL de la imagen</value>
+  </data>
+  <data name="URL РєР°СЂС‚РёРЅРєРё (РЅРµРѕР±РѕРІ&apos;СЏР·РєРѕРІРѕ)" xml:space="preserve">
+    <value>URL de la imagen (opcional)</value>
+  </data>
 </root>

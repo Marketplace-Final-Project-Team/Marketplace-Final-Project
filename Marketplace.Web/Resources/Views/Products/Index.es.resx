@@ -181,4 +181,43 @@
   <data name="Цю дію не можна скасувати." xml:space="preserve">
     <value>Esta acción no se puede deshacer.</value>
   </data>
+  <data name="Імпорт" xml:space="preserve">
+    <value>Importar</value>
+  </data>
+  <data name="Експорт" xml:space="preserve">
+    <value>Exportar</value>
+  </data>
+  <data name="Артикул:" xml:space="preserve">
+    <value>SKU:</value>
+  </data>
+  <data name="Розмірів:" xml:space="preserve">
+    <value>Tallas:</value>
+  </data>
+  <data name="Закінчуються" xml:space="preserve">
+    <value>Agotándose</value>
+  </data>
+  <data name="Немає в наявності" xml:space="preserve">
+    <value>Sin stock</value>
+  </data>
+  <data name="Приховані" xml:space="preserve">
+    <value>Ocultos</value>
+  </data>
+  <data name="Усі" xml:space="preserve">
+    <value>Todos</value>
+  </data>
+  <data name="Фільтр товарів" xml:space="preserve">
+    <value>Filtro de productos</value>
+  </data>
+  <data name="Пошук за назвою або артикулом" xml:space="preserve">
+    <value>Buscar por nombre o SKU</value>
+  </data>
+  <data name="Шукати" xml:space="preserve">
+    <value>Buscar</value>
+  </data>
+  <data name="Нічого не знайдено" xml:space="preserve">
+    <value>No se encontró nada</value>
+  </data>
+  <data name="Спробуйте змінити пошуковий запит або оберіть інший фільтр." xml:space="preserve">
+    <value>Intente cambiar su búsqueda o elegir otro filtro.</value>
+  </data>
 </root>

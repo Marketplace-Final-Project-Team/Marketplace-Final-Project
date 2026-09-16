@@ -142,8 +142,14 @@
             <div class="category-grid">
                 @foreach (var category in Model.Categories)
                 {
-                    <a asp-controller="Catalogue" asp-action="Index" asp-route-categoryId="@category.Id" class="category-card category-card--@category.ColorClass">
-                        <span class="category-card__icon">@category.Icon</span>
+                    var hasImage = !string.IsNullOrWhiteSpace(category.ImageUrl);
+                    <a asp-controller="Catalogue" asp-action="Index" asp-route-categoryId="@category.Id"
+                       class="category-card @(hasImage ? "category-card--photo" : $"category-card--{category.ColorClass}")"
+                       style="@(hasImage ? $"background-image:url('{category.ImageUrl}')" : null)">
+                        @if (!hasImage)
+                        {
+                            <span class="category-card__icon">@category.Icon</span>
+                        }
                         <strong>@SharedLocalizer[category.Name]</strong>
                         <small>@category.ProductCount @(category.ProductCount == 1 ? Localizer["товар"].Value : category.ProductCount is >= 2 and <= 4 ? Localizer["товари"].Value : Localizer["товарів"].Value)</small>
                     </a>
@@ -152,234 +158,81 @@
         }
     </section>
 
-    @if (Model.FeaturedProducts.Count > 0)
+    @foreach (var categorySection in Model.CategorySections)
     {
         <section class="home-section home-featured">
             <div class="home-section__heading">
                 <div>
-                    <span class="home-section__kicker">@Localizer["Варто переглянути"]</span>
-                    <h2>@Localizer["Популярне зараз"]</h2>
+                    <span class="home-section__kicker">@Localizer["Обирайте швидше"]</span>
+                    <h2>@SharedLocalizer[categorySection.CategoryName]</h2>
                 </div>
-                <a asp-controller="Catalogue" asp-action="Index" asp-route-Sort="Popularity">@Localizer["Дивитися більше →"]</a>
+                <a asp-controller="Catalogue" asp-action="Index" asp-route-categoryId="@categorySection.CategoryId">@Localizer["Дивитися більше →"]</a>
             </div>
 
-            <div class="home-view-toggle" role="group" aria-label="@Localizer["Режим перегляду товарів"]">
-                <button type="button" class="home-view-toggle__btn" data-view-toggle="grid" aria-label="@Localizer["Плитка"]">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
-                        <rect x="3" y="3" width="7" height="7" rx="1.2" />
-                        <rect x="14" y="3" width="7" height="7" rx="1.2" />
-                        <rect x="14" y="14" width="7" height="7" rx="1.2" />
-                        <rect x="3" y="14" width="7" height="7" rx="1.2" />
-                    </svg>
-                    <span>@Localizer["Плитка"]</span>
-                </button>
-                <button type="button" class="home-view-toggle__btn" data-view-toggle="list" aria-label="@Localizer["Список"]">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
-                        <path d="M8 6h13" />
-                        <path d="M8 12h13" />
-                        <path d="M8 18h13" />
-                        <path d="M3 6h.01" />
-                        <path d="M3 12h.01" />
-                        <path d="M3 18h.01" />
-                    </svg>
-                    <span>@Localizer["Список"]</span>
-                </button>
-                <button type="button" class="home-view-toggle__btn" data-view-toggle="slider" aria-label="@Localizer["Слайдер"]">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
-                        <rect x="7" y="4" width="10" height="16" rx="1.5" />
-                        <path d="M2 8v8" />
-                        <path d="M22 8v8" />
-                    </svg>
-                    <span>@Localizer["Слайдер"]</span>
-                </button>
-            </div>
+            <div class="home-products">
+                @for (var index = 0; index < categorySection.Products.Count; index++)
+                {
+                    var product = categorySection.Products[index];
+                    var productName = (await ProductTranslator.GetLocalizedAsync(product.Id, product.Name, product.Description, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)).Name;
+                    var colorClass = index % 3 == 0 ? "blue" : index % 3 == 1 ? "violet" : "orange";
+                    <article class="home-product position-relative">
 
-            <div data-products-view="grid">
-                <div class="home-products">
-                    @for (var index = 0; index < Model.FeaturedProducts.Count; index++)
-                    {
-                        var product = Model.FeaturedProducts[index];
-                        var productName = (await ProductTranslator.GetLocalizedAsync(product.Id, product.Name, product.Description, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)).Name;
-                        var colorClass = index % 3 == 0 ? "blue" : index % 3 == 1 ? "violet" : "orange";
-                        <article class="home-product position-relative">
-
-                            <!-- ПЛАШКА 18+ ДЛЯ СПИСКУ -->
-                            @if (product.IsAgeRestricted)
-                            {
-                                <span class="position-absolute top-0 end-0 bg-danger text-white text-xs fw-bold px-2 py-1 rounded-pill z-1 m-2 shadow">
-                                    18+
-                                </span>
-                            }
-
-                            <button type="button" class="home-product__media home-product__media--@colorClass border-0 w-100 text-start"
-                                    onclick="checkAgeAndAction('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
-                                @if (!string.IsNullOrWhiteSpace(product.MainImageUrl))
-                                {
-                                    <img src="@product.MainImageUrl" alt="@productName" />
-                                }
-                                else
-                                {
-                                    <span>@productName[..1].ToUpperInvariant()</span>
-                                }
-                                <small>@(product.Quantity > 0 ? Localizer["В наявності"].Value : Localizer["Немає в наявності"].Value)</small>
-                            </button>
-
-                            <div class="home-product__body">
-                                <div class="home-product__category">@SharedLocalizer[product.CategoryName]</div>
-                                <button type="button" class="home-product__name border-0 bg-transparent p-0 text-start"
-                                        onclick="checkAgeAndAction('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
-                                    @productName
-                                </button>
-                                @if (product.ReviewCount > 0)
-                                {
-                                    <div class="home-product__rating">★ @product.AverageRating.ToString("0.0") (@product.ReviewCount)</div>
-                                }
-                                <div class="home-product__bottom">
-                                    <div class="home-product__price d-flex align-items-center gap-1">
-                                        @if (product.OriginalPrice.HasValue && product.OriginalPrice.Value > product.Price)
-                                        {
-                                            <strong class="text-danger">@product.Price.ToString("N2") ₴</strong>
-                                            <span class="text-muted text-decoration-line-through small">@product.OriginalPrice.Value.ToString("N2") ₴</span>
-                                            @if (product.DiscountPercent.HasValue)
-                                            {
-                                                <span class="badge bg-danger small">-@product.DiscountPercent%</span>
-                                            }
-                                        }
-                                        else
-                                        {
-                                            <strong>@product.Price.ToString("N2") ₴</strong>
-                                        }
-                                    </div>
-                                    <form asp-controller="Cart" asp-action="Add" method="post">
-                                        <input type="hidden" name="productId" value="@product.Id" />
-                                        <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                                        <button type="submit" aria-label="@Localizer["Додати"] @productName @Localizer["до кошика"]">+</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </article>
-                    }
-                </div>
-            </div>
-
-            <div data-products-view="list" hidden>
-                <div class="home-product-list">
-                    @for (var index = 0; index < Model.FeaturedProducts.Count; index++)
-                    {
-                        var product = Model.FeaturedProducts[index];
-                        var productName = (await ProductTranslator.GetLocalizedAsync(product.Id, product.Name, product.Description, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)).Name;
-                        <div class="home-product-list__row">
-                            <button type="button" class="home-product-list__media border-0"
-                                    onclick="checkAgeAndAction('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
-                                @if (!string.IsNullOrWhiteSpace(product.MainImageUrl))
-                                {
-                                    <img src="@product.MainImageUrl" alt="@productName" />
-                                }
-                                else
-                                {
-                                    <span>@productName[..1].ToUpperInvariant()</span>
-                                }
-                                @if (product.IsAgeRestricted)
-                                {
-                                    <span class="home-product-list__age-badge">18+</span>
-                                }
-                            </button>
-                            <div class="home-product-list__info">
-                                <div class="home-product__category">@SharedLocalizer[product.CategoryName]</div>
-                                <button type="button" class="home-product-list__name border-0 bg-transparent p-0 text-start"
-                                        onclick="checkAgeAndAction('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
-                                    @productName
-                                </button>
-                                @if (product.ReviewCount > 0)
-                                {
-                                    <div class="home-product__rating">★ @product.AverageRating.ToString("0.0") (@product.ReviewCount)</div>
-                                }
-                            </div>
-                            <div class="home-product-list__price">
-                                @if (product.OriginalPrice.HasValue && product.OriginalPrice.Value > product.Price)
-                                {
-                                    <strong class="text-danger">@product.Price.ToString("N2") ₴</strong>
-                                    <span class="text-muted text-decoration-line-through small">@product.OriginalPrice.Value.ToString("N2") ₴</span>
-                                }
-                                else
-                                {
-                                    <strong>@product.Price.ToString("N2") ₴</strong>
-                                }
-                            </div>
-                            <form asp-controller="Cart" asp-action="Add" method="post">
-                                <input type="hidden" name="productId" value="@product.Id" />
-                                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                                <button type="submit" class="home-product-list__add" aria-label="@Localizer["Додати"] @productName @Localizer["до кошика"]">+</button>
-                            </form>
-                        </div>
-                    }
-                </div>
-            </div>
-
-            <div data-products-view="slider" hidden>
-                <div id="homeFeaturedCarousel" class="carousel slide home-product-carousel" data-bs-ride="false" data-bs-interval="false">
-                    <div class="carousel-inner">
-                        @for (var index = 0; index < Model.FeaturedProducts.Count; index++)
+                        <!-- ПЛАШКА 18+ -->
+                        @if (product.IsAgeRestricted)
                         {
-                            var product = Model.FeaturedProducts[index];
-                            var productName = (await ProductTranslator.GetLocalizedAsync(product.Id, product.Name, product.Description, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)).Name;
-                            <div class="carousel-item @(index == 0 ? "active" : "")">
-                                <div class="home-product-slide">
-                                    <button type="button" class="home-product-slide__media border-0"
-                                            onclick="checkAgeAndAction('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
-                                        @if (!string.IsNullOrWhiteSpace(product.MainImageUrl))
-                                        {
-                                            <img src="@product.MainImageUrl" alt="@productName" />
-                                        }
-                                        else
-                                        {
-                                            <span>@productName[..1].ToUpperInvariant()</span>
-                                        }
-                                        @if (product.IsAgeRestricted)
-                                        {
-                                            <span class="home-product-list__age-badge">18+</span>
-                                        }
-                                    </button>
-                                    <div class="home-product-slide__body">
-                                        <div class="home-product__category">@SharedLocalizer[product.CategoryName]</div>
-                                        <button type="button" class="home-product-slide__name border-0 bg-transparent p-0 text-start"
-                                                onclick="checkAgeAndAction('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
-                                            @productName
-                                        </button>
-                                        @if (product.ReviewCount > 0)
-                                        {
-                                            <div class="home-product__rating">★ @product.AverageRating.ToString("0.0") (@product.ReviewCount)</div>
-                                        }
-                                        <div class="home-product__bottom">
-                                            @if (product.OriginalPrice.HasValue && product.OriginalPrice.Value > product.Price)
-                                            {
-                                                <strong class="text-danger">@product.Price.ToString("N2") ₴</strong>
-                                                <span class="text-muted text-decoration-line-through small">@product.OriginalPrice.Value.ToString("N2") ₴</span>
-                                            }
-                                            else
-                                            {
-                                                <strong>@product.Price.ToString("N2") ₴</strong>
-                                            }
-                                            <form asp-controller="Cart" asp-action="Add" method="post">
-                                                <input type="hidden" name="productId" value="@product.Id" />
-                                                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                                                <button type="submit" aria-label="@Localizer["Додати"] @productName @Localizer["до кошика"]">+</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <span class="position-absolute top-0 end-0 bg-danger text-white text-xs fw-bold px-2 py-1 rounded-pill z-1 m-2 shadow">
+                                18+
+                            </span>
                         }
-                    </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#homeFeaturedCarousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">@Localizer["Попередній"]</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#homeFeaturedCarousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">@Localizer["Наступний"]</span>
-                    </button>
-                </div>
+
+                        <button type="button" class="home-product__media home-product__media--@colorClass border-0 w-100 text-start"
+                                onclick="checkAgeAndAction('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
+                            @if (!string.IsNullOrWhiteSpace(product.MainImageUrl))
+                            {
+                                <img src="@product.MainImageUrl" alt="@productName" />
+                            }
+                            else
+                            {
+                                <span>@productName[..1].ToUpperInvariant()</span>
+                            }
+                            <small>@(product.Quantity > 0 ? Localizer["В наявності"].Value : Localizer["Немає в наявності"].Value)</small>
+                        </button>
+
+                        <div class="home-product__body">
+                            <div class="home-product__category">@SharedLocalizer[product.CategoryName]</div>
+                            <button type="button" class="home-product__name border-0 bg-transparent p-0 text-start"
+                                    onclick="checkAgeAndAction('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
+                                @productName
+                            </button>
+                            @if (product.ReviewCount > 0)
+                            {
+                                <div class="home-product__rating">★ @product.AverageRating.ToString("0.0") (@product.ReviewCount)</div>
+                            }
+                            <div class="home-product__bottom">
+                                <div class="home-product__price d-flex align-items-center gap-1">
+                                    @if (product.OriginalPrice.HasValue && product.OriginalPrice.Value > product.Price)
+                                    {
+                                        <strong class="text-danger">@product.Price.ToString("N2") ₴</strong>
+                                        <span class="text-muted text-decoration-line-through small">@product.OriginalPrice.Value.ToString("N2") ₴</span>
+                                        @if (product.DiscountPercent.HasValue)
+                                        {
+                                            <span class="badge bg-danger small">-@product.DiscountPercent%</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <strong>@product.Price.ToString("N2") ₴</strong>
+                                    }
+                                </div>
+                                <form asp-controller="Cart" asp-action="Add" method="post">
+                                    <input type="hidden" name="productId" value="@product.Id" />
+                                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                    <button type="submit" aria-label="@Localizer["Додати"] @productName @Localizer["до кошика"]">+</button>
+                                </form>
+                            </div>
+                        </div>
+                    </article>
+                }
             </div>
         </section>
     }
@@ -558,5 +411,4 @@
             homeSteps.forEach((step) => step.classList.add('is-visible'));
         }
     </script>
-    <script src="~/js/home-products-view.js" asp-append-version="true"></script>
 }

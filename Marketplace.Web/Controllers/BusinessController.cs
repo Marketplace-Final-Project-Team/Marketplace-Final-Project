@@ -148,6 +148,11 @@ namespace Marketplace.Web.Controllers
             var lowStockThreshold = await _settingsService.GetIntAsync("BusinessRules", "LowStockThreshold", 5);
             var traffic = await _productAnalyticsService.GetBusinessTrafficStatsAsync(businessId, start, end);
             var recentActivity = await _activityLog.GetRecentBusinessActionsAsync(businessId, take: 15);
+            var ratingStats = await _context.Reviews
+                .Where(r => r.Product.BusinessId == businessId)
+                .GroupBy(r => 1)
+                .Select(g => new { Average = g.Average(r => r.Rating), Count = g.Count() })
+                .FirstOrDefaultAsync();
 
             var periodRevenue = statsResult.Succeeded ? statsResult.Data.TotalRevenue : 0;
             var periodOrders = statsResult.Succeeded ? statsResult.Data.Stats.Sum(s => s.OrderCount) : 0;
@@ -200,6 +205,12 @@ namespace Marketplace.Web.Controllers
                 PendingProductCount = products.Count(p => p.Status == ProductStatus.Pending),
                 OutOfStockProductCount = products.Count(p => p.Quantity <= 0),
                 LowStockProductCount = products.Count(p => p.Quantity > 0 && p.Quantity <= lowStockThreshold),
+                BannedProductCount = products.Count(p => p.Status == ProductStatus.Banned),
+
+                AccountStatus = business.Status.ToString(),
+                MemberSince = business.CreatedAt,
+                AverageRating = ratingStats?.Average ?? 0,
+                ReviewCount = ratingStats?.Count ?? 0,
 
                 TotalViews = traffic.TotalViews,
                 TotalCartAdds = traffic.TotalCartAdds,
@@ -360,6 +371,7 @@ namespace Marketplace.Web.Controllers
                     ProductId = item.ProductId,
                     ProductName = item.ProductName,
                     ImageUrl = item.ImageUrl,
+                    VariantSize = item.VariantSize,
                     UnitPrice = item.UnitPrice,
                     Quantity = item.Quantity,
                     BelongsToBusiness = item.BelongsToBusiness
@@ -381,7 +393,7 @@ namespace Marketplace.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResolvePostSaleRequest(Guid businessId, Guid orderId, Guid requestId, PostSaleRequestStatus decision, string? sellerResponse)
+        public async Task<IActionResult> ResolvePostSaleRequest(Guid businessId, Guid orderId, Guid requestId, PostSaleRequestStatus decision, string? sellerResponse, string? returnUrl = null)
         {
             var business = await GetAccessibleBusinessOrNullAsync(businessId);
             if (business is null)
@@ -401,7 +413,62 @@ namespace Marketplace.Web.Controllers
                 ? "Рішення щодо заявки збережено."
                 : result.Message;
 
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return LocalRedirect(returnUrl);
+            }
+
             return RedirectToAction(nameof(OrderDetails), new { businessId, orderId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Returns(Guid businessId, string filter = "all")
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var requests = await _postSaleService.GetRequestsForBusinessAsync(businessId);
+
+            var model = new BusinessReturnsPageViewModel
+            {
+                BusinessId = businessId,
+                StoreName = business.StoreName,
+                Filter = string.IsNullOrWhiteSpace(filter) ? "all" : filter,
+                AllCount = requests.Count,
+                PendingCount = requests.Count(r => r.Status == PostSaleRequestStatus.Pending),
+                RefundedCount = requests.Count(r => r.Status == PostSaleRequestStatus.Refunded),
+                RejectedCount = requests.Count(r => r.Status == PostSaleRequestStatus.Rejected)
+            };
+
+            IEnumerable<PostSaleRequestDto> filtered = model.Filter switch
+            {
+                "pending" => requests.Where(r => r.Status == PostSaleRequestStatus.Pending),
+                "refunded" => requests.Where(r => r.Status == PostSaleRequestStatus.Refunded),
+                "rejected" => requests.Where(r => r.Status == PostSaleRequestStatus.Rejected),
+                _ => requests
+            };
+
+            model.Items = filtered.Select(r => new BusinessReturnRequestViewModel
+            {
+                Id = r.Id,
+                OrderId = r.OrderId,
+                ProductName = r.ProductName,
+                ImageUrl = r.ImageUrl,
+                BuyerName = r.BuyerName,
+                UnitPrice = r.UnitPrice,
+                Quantity = r.Quantity,
+                Reason = r.Reason,
+                Comment = r.Comment,
+                PhotoUrls = r.PhotoUrls,
+                Status = r.Status,
+                SellerResponse = r.SellerResponse,
+                CreatedAt = r.CreatedAt
+            }).ToList();
+
+            return View(model);
         }
 
         [HttpPost]

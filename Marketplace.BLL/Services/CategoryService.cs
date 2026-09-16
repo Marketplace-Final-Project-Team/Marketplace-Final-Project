@@ -20,14 +20,18 @@ namespace Marketplace.BLL.Services
             _context = context;
         }
 
-        public async Task<ServiceResult> CreateCategory(string categoryName)
+        public async Task<ServiceResult> CreateCategory(string categoryName, string? imageUrl = null)
         {
             if (await _categoryRepository.ExistsAsync(c => c.Name.ToLower() == categoryName.ToLower()))
             {
                 return new ServiceResult { Succeeded = false, Message = "Така категорія вже існує" };
             }
 
-            await _categoryRepository.AddAsync(new Category { Name = categoryName });
+            await _categoryRepository.AddAsync(new Category
+            {
+                Name = categoryName,
+                ImageUrl = string.IsNullOrWhiteSpace(imageUrl) ? null : imageUrl.Trim()
+            });
             await _context.SaveChangesAsync();
 
             return new ServiceResult { Succeeded = true, Message = string.Empty };
@@ -40,6 +44,7 @@ namespace Marketplace.BLL.Services
                 {
                     Id = c.Id,
                     Name = c.Name,
+                    ImageUrl = c.ImageUrl,
                     ActiveProductCount = c.Products.Count(p => !p.IsDeleted && p.Status == ProductStatus.Active),
                     IsAdultOnly = c.IsAdultOnly
                 })
@@ -62,7 +67,7 @@ namespace Marketplace.BLL.Services
             return new ServiceResult { Succeeded = true, Message = string.Empty };
         }
 
-        public async Task<ServiceResult> UpdateCategory(string newCategoryName, Guid categoryId)
+        public async Task<ServiceResult> UpdateCategory(string newCategoryName, Guid categoryId, string? imageUrl = null)
         {
             var category = await _categoryRepository.GetByIdAsync(categoryId);
 
@@ -77,6 +82,7 @@ namespace Marketplace.BLL.Services
             }
 
             category.Name = newCategoryName;
+            category.ImageUrl = string.IsNullOrWhiteSpace(imageUrl) ? null : imageUrl.Trim();
             _categoryRepository.Update(category);
             await _context.SaveChangesAsync();
 

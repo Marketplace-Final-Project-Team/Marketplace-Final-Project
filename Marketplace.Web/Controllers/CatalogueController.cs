@@ -74,6 +74,10 @@ public class CatalogueController : Controller
             return RedirectToAction(nameof(Index), filter);
         }
 
+        var selectedCategory = filter.CategoryId.HasValue
+            ? categories.FirstOrDefault(category => category.Id == filter.CategoryId.Value)
+            : null;
+
         var model = new CatalogPageViewModel
         {
             Filter = filter,
@@ -84,7 +88,9 @@ public class CatalogueController : Controller
             TotalCount = result.TotalCount,
             Page = result.Page,
             PageSize = result.PageSize,
-            TotalPages = result.TotalPages
+            TotalPages = result.TotalPages,
+            SelectedCategoryName = selectedCategory?.Name,
+            SelectedCategoryImageUrl = selectedCategory?.ImageUrl
         };
 
         return View("~/Views/Catalog/Index.cshtml", model);
@@ -314,6 +320,11 @@ public class CatalogueController : Controller
             Description = product.Description,
             Price = hasDiscount ? product.GetDiscountedPrice(userId) : product.Price,
             Quantity = product.Quantity,
+            Sku = product.Sku,
+            Variants = product.Variants
+                .OrderBy(v => v.Size)
+                .Select(v => new CatalogProductVariantViewModel { Id = v.Id, Size = v.Size, Quantity = v.Quantity })
+                .ToList(),
             CreatedAt = product.CreatedAt,
             MainImageUrl = product.MainImageUrl,
             CategoryName = product.Category?.Name ?? "Без категорії",

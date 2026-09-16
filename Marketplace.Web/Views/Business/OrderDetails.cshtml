@@ -21,7 +21,11 @@
 
     private string PostSaleStatusLabel(Marketplace.Domain.Enums.PostSaleRequestStatus status) => status switch
     {
+        // A resolved-and-approved return is persisted as Refunded, not Approved - the
+        // service only ever stores Pending/Refunded/Rejected. The Approved case here is
+        // effectively unreachable but kept for completeness.
         Marketplace.Domain.Enums.PostSaleRequestStatus.Approved => Localizer["Підтверджено"].Value,
+        Marketplace.Domain.Enums.PostSaleRequestStatus.Refunded => Localizer["Кошти повернуто"].Value,
         Marketplace.Domain.Enums.PostSaleRequestStatus.Rejected => Localizer["Відхилено"].Value,
         _ => Localizer["Очікує розгляду"].Value
     };
@@ -81,6 +85,10 @@
                     }
                     <div>
                         <div>@item.ProductName @if (!item.BelongsToBusiness) { <span class="seller-order-line__badge">@Localizer["інший продавець"]</span> }</div>
+                        @if (!string.IsNullOrWhiteSpace(item.VariantSize))
+                        {
+                            <div class="seller-order-line__variant">@Localizer["Розмір:"] <strong>@item.VariantSize</strong></div>
+                        }
                         <div class="seller-order-line__meta">@item.Quantity @Localizer["шт."] × @item.UnitPrice.ToString("N2") ₴</div>
                     </div>
                     <div class="seller-order-line__total">@((item.UnitPrice * item.Quantity).ToString("N2")) ₴</div>
