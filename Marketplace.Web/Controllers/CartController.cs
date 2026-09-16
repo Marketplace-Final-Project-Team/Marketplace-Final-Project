@@ -31,9 +31,9 @@ public class CartController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Add(Guid productId, Guid? variantId, string? returnUrl = null)
+    public async Task<IActionResult> Add(Guid productId, Guid? variantId, int quantity = 1, string? returnUrl = null)
     {
-        var result = await _cartService.AddToCart(GetUserId(), productId, variantId);
+        var result = await _cartService.AddToCart(GetUserId(), productId, variantId, quantity);
         SetResultMessage(result.Succeeded, result.Message, "Товар додано до кошика.");
 
         return !string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl)
@@ -43,9 +43,9 @@ public class CartController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> BuyNow(Guid productId, Guid? variantId)
+    public async Task<IActionResult> BuyNow(Guid productId, Guid? variantId, int quantity = 1)
     {
-        var result = await _cartService.AddToCart(GetUserId(), productId, variantId);
+        var result = await _cartService.AddToCart(GetUserId(), productId, variantId, quantity);
         if (!result.Succeeded)
         {
             TempData["Error"] = result.Message;

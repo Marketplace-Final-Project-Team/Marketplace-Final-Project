@@ -110,8 +110,13 @@ namespace Marketplace.BLL.Services
             }).ToList();
         }
 
-        public async Task<ServiceResult> AddToCart(string userId, Guid productId, Guid? variantId = null)
+        public async Task<ServiceResult> AddToCart(string userId, Guid productId, Guid? variantId = null, int quantity = 1)
         {
+            if (quantity < 1)
+            {
+                quantity = 1;
+            }
+
             var product = await _productRepository.FirstOrDefaultAsync(p => p.Id == productId);
 
             if (product == null || product.Status != ProductStatus.Active)
@@ -145,7 +150,7 @@ namespace Marketplace.BLL.Services
 
             if (item == null)
             {
-                item = new CartItem { CartId = cart.Id, ProductId = productId, ProductVariantId = variantId, Quantity = 1 };
+                item = new CartItem { CartId = cart.Id, ProductId = productId, ProductVariantId = variantId, Quantity = Math.Min(quantity, availableStock) };
                 await _cartItemRepository.AddAsync(item);
                 await _context.SaveChangesAsync();
             }
@@ -160,7 +165,7 @@ namespace Marketplace.BLL.Services
                     };
                 }
 
-                await ChangeQuantity(item, 1);
+                await ChangeQuantity(item, Math.Min(quantity, availableStock - item.Quantity));
             }
 
             await _productAnalyticsService.RecordEventAsync(productId, product.BusinessId, ProductEventType.AddToCart, userId);

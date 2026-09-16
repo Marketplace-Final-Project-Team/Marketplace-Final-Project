@@ -296,6 +296,32 @@
     color: var(--product-muted);
 }
 
+.product-quantity-selector {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding-bottom: 1.1rem;
+}
+.product-quantity-selector__label {
+    font-weight: 700;
+    font-size: .85rem;
+    color: var(--product-ink);
+}
+.product-quantity-selector__select {
+    min-width: 4.5rem;
+    padding: .5rem .75rem;
+    border: 1.5px solid var(--product-line);
+    border-radius: .6rem;
+    background: #fff;
+    font-weight: 700;
+    font-size: .9rem;
+    color: var(--product-ink);
+}
+.product-quantity-selector__select:focus {
+    outline: none;
+    border-color: var(--product-blue);
+}
+
 .product-buybox { display: grid; grid-template-columns: 1fr auto; gap: .7rem; }
 .product-buybox form { margin: 0; }
 .product-buybox > p {

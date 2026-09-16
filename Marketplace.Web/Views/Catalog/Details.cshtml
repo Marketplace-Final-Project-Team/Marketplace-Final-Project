@@ -11,6 +11,7 @@
     var productCode = Model.Id.ToString()[..8].ToUpperInvariant();
     var isLowStock = Model.Quantity <= Model.LowStockThreshold;
     var isNew = Model.CreatedAt >= DateTime.UtcNow.AddDays(-14);
+    var maxSelectableQuantity = Math.Max(1, Math.Min(Model.Quantity, 10));
 }
 
 @section Styles {
@@ -137,12 +138,26 @@
                 </div>
             }
 
+            @if (Model.Quantity > 0)
+            {
+                <div class="product-quantity-selector">
+                    <label for="productQuantity" class="product-quantity-selector__label">@Localizer["Кількість"]</label>
+                    <select id="productQuantity" class="product-quantity-selector__select" data-quantity-select>
+                        @for (var qty = 1; qty <= maxSelectableQuantity; qty++)
+                        {
+                            <option value="@qty">@qty</option>
+                        }
+                    </select>
+                </div>
+            }
+
             <div class="product-buybox">
                 @if (User.Identity?.IsAuthenticated == true)
                 {
                     <form asp-controller="Cart" asp-action="BuyNow" method="post">
                         <input type="hidden" name="productId" value="@Model.Id" />
                         <input type="hidden" name="variantId" value="" data-variant-input />
+                        <input type="hidden" name="quantity" value="1" data-quantity-input />
                         <button type="submit" class="product-button product-button--accent" data-requires-variant="@(Model.Variants.Count > 0 ? "true" : "false")">
                             <span aria-hidden="true">⚡</span> @Localizer["Купити в 1 клік"]
                         </button>
@@ -150,6 +165,7 @@
                     <form asp-controller="Cart" asp-action="Add" method="post">
                         <input type="hidden" name="productId" value="@Model.Id" />
                         <input type="hidden" name="variantId" value="" data-variant-input />
+                        <input type="hidden" name="quantity" value="1" data-quantity-input />
                         <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
                         <button type="submit" class="product-button product-button--primary" data-requires-variant="@(Model.Variants.Count > 0 ? "true" : "false")">
                             <span aria-hidden="true">＋</span> @Localizer["Додати до кошика"]
@@ -393,4 +409,5 @@
     <script src="~/js/product-details.js" asp-append-version="true"></script>
     <script src="~/js/product-extras.js" asp-append-version="true"></script>
     <script src="~/js/product-variant-selector.js" asp-append-version="true"></script>
+    <script src="~/js/product-quantity-selector.js" asp-append-version="true"></script>
 }

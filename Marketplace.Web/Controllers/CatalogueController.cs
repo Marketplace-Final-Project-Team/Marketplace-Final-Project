@@ -74,6 +74,10 @@ public class CatalogueController : Controller
             return RedirectToAction(nameof(Index), filter);
         }
 
+        var selectedCategory = filter.CategoryId.HasValue
+            ? categories.FirstOrDefault(category => category.Id == filter.CategoryId.Value)
+            : null;
+
         var model = new CatalogPageViewModel
         {
             Filter = filter,
@@ -84,7 +88,9 @@ public class CatalogueController : Controller
             TotalCount = result.TotalCount,
             Page = result.Page,
             PageSize = result.PageSize,
-            TotalPages = result.TotalPages
+            TotalPages = result.TotalPages,
+            SelectedCategoryName = selectedCategory?.Name,
+            SelectedCategoryImageUrl = selectedCategory?.ImageUrl
         };
 
         return View("~/Views/Catalog/Index.cshtml", model);
