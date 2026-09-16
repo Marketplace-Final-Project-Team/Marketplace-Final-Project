@@ -148,4 +148,7 @@
   <data name="Ваша відповідь:" xml:space="preserve">
     <value>Ihre Antwort:</value>
   </data>
+  <data name="Кошти повернуто" xml:space="preserve">
+    <value>Rückerstattet</value>
+  </data>
 </root>

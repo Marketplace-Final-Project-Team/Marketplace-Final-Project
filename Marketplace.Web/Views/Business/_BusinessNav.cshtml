@@ -30,6 +30,7 @@
         }
 
         <a class="@ActiveClass("Orders")" asp-action="Orders" asp-route-businessId="@Model">@SharedLocalizer["Замовлення"]</a>
+        <a class="@ActiveClass("Returns")" asp-action="Returns" asp-route-businessId="@Model">@Localizer["Повернення"]</a>
 
         @if (BusinessPermissions.Statistics.Contains(role))
         {

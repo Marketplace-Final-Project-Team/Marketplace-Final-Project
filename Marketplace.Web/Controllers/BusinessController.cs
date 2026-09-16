@@ -393,7 +393,7 @@ namespace Marketplace.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResolvePostSaleRequest(Guid businessId, Guid orderId, Guid requestId, PostSaleRequestStatus decision, string? sellerResponse)
+        public async Task<IActionResult> ResolvePostSaleRequest(Guid businessId, Guid orderId, Guid requestId, PostSaleRequestStatus decision, string? sellerResponse, string? returnUrl = null)
         {
             var business = await GetAccessibleBusinessOrNullAsync(businessId);
             if (business is null)
@@ -413,7 +413,62 @@ namespace Marketplace.Web.Controllers
                 ? "Рішення щодо заявки збережено."
                 : result.Message;
 
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return LocalRedirect(returnUrl);
+            }
+
             return RedirectToAction(nameof(OrderDetails), new { businessId, orderId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Returns(Guid businessId, string filter = "all")
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var requests = await _postSaleService.GetRequestsForBusinessAsync(businessId);
+
+            var model = new BusinessReturnsPageViewModel
+            {
+                BusinessId = businessId,
+                StoreName = business.StoreName,
+                Filter = string.IsNullOrWhiteSpace(filter) ? "all" : filter,
+                AllCount = requests.Count,
+                PendingCount = requests.Count(r => r.Status == PostSaleRequestStatus.Pending),
+                RefundedCount = requests.Count(r => r.Status == PostSaleRequestStatus.Refunded),
+                RejectedCount = requests.Count(r => r.Status == PostSaleRequestStatus.Rejected)
+            };
+
+            IEnumerable<PostSaleRequestDto> filtered = model.Filter switch
+            {
+                "pending" => requests.Where(r => r.Status == PostSaleRequestStatus.Pending),
+                "refunded" => requests.Where(r => r.Status == PostSaleRequestStatus.Refunded),
+                "rejected" => requests.Where(r => r.Status == PostSaleRequestStatus.Rejected),
+                _ => requests
+            };
+
+            model.Items = filtered.Select(r => new BusinessReturnRequestViewModel
+            {
+                Id = r.Id,
+                OrderId = r.OrderId,
+                ProductName = r.ProductName,
+                ImageUrl = r.ImageUrl,
+                BuyerName = r.BuyerName,
+                UnitPrice = r.UnitPrice,
+                Quantity = r.Quantity,
+                Reason = r.Reason,
+                Comment = r.Comment,
+                PhotoUrls = r.PhotoUrls,
+                Status = r.Status,
+                SellerResponse = r.SellerResponse,
+                CreatedAt = r.CreatedAt
+            }).ToList();
+
+            return View(model);
         }
 
         [HttpPost]

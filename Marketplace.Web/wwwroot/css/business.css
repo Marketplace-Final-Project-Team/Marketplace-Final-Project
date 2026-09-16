@@ -744,7 +744,8 @@
     margin-bottom: 0;
 }
 
-.seller-postsale-item--approved {
+.seller-postsale-item--approved,
+.seller-postsale-item--refunded {
     background: #e8f7ee;
 }
 
@@ -789,6 +790,41 @@
 .seller-postsale-item__buttons {
     display: flex;
     gap: 0.6rem;
+}
+
+.seller-returns-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.25rem;
+}
+
+.seller-returns-tab {
+    background: #fff;
+    border: 1px solid var(--seller-line);
+    border-radius: 999px;
+    color: var(--seller-muted);
+    font-size: 0.82rem;
+    font-weight: 650;
+    padding: 0.45rem 0.9rem;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.seller-returns-tab span {
+    margin-left: 0.3rem;
+    opacity: 0.75;
+}
+
+.seller-returns-tab:hover {
+    border-color: var(--seller-primary);
+    color: var(--seller-primary);
+}
+
+.seller-returns-tab.is-active {
+    background: var(--seller-primary);
+    border-color: var(--seller-primary);
+    color: #fff;
 }
 
 .seller-order-line {

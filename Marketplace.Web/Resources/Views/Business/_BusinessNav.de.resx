@@ -82,4 +82,7 @@
   <data name="Налаштування" xml:space="preserve">
     <value>Einstellungen</value>
   </data>
+  <data name="Повернення" xml:space="preserve">
+    <value>Retouren</value>
+  </data>
 </root>

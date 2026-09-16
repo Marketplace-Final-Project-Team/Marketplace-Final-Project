@@ -84,4 +84,33 @@ namespace Marketplace.Web.Models.Businesses
         public string? SellerResponse { get; set; }
         public DateTime CreatedAt { get; set; }
     }
+
+    public class BusinessReturnRequestViewModel
+    {
+        public Guid Id { get; set; }
+        public Guid OrderId { get; set; }
+        public string ProductName { get; set; } = string.Empty;
+        public string ImageUrl { get; set; } = string.Empty;
+        public string BuyerName { get; set; } = string.Empty;
+        public decimal UnitPrice { get; set; }
+        public int Quantity { get; set; }
+        public string Reason { get; set; } = string.Empty;
+        public string? Comment { get; set; }
+        public List<string> PhotoUrls { get; set; } = new();
+        public PostSaleRequestStatus Status { get; set; }
+        public string? SellerResponse { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+
+    public class BusinessReturnsPageViewModel
+    {
+        public Guid BusinessId { get; set; }
+        public string StoreName { get; set; } = string.Empty;
+        public string Filter { get; set; } = "all";
+        public List<BusinessReturnRequestViewModel> Items { get; set; } = new();
+        public int AllCount { get; set; }
+        public int PendingCount { get; set; }
+        public int RefundedCount { get; set; }
+        public int RejectedCount { get; set; }
+    }
 }

@@ -1,0 +1,127 @@
+@model Marketplace.Web.Models.Businesses.BusinessReturnsPageViewModel
+@using System.Security.Claims
+@using Marketplace.BLL.Interfaces
+@using Marketplace.Web.Models.Businesses
+@using Marketplace.Domain.Enums
+@inject IBusinessAccessService BusinessAccessService
+
+@{
+    ViewData["Title"] = $"{Localizer["Повернення"].Value} - {Model.StoreName}";
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var currentRole = !string.IsNullOrEmpty(userId)
+        ? await BusinessAccessService.GetUserRoleAsync(Model.BusinessId, userId)
+        : null;
+
+    string TabUrl(string tabFilter) => Url.Action(nameof(Marketplace.Web.Controllers.BusinessController.Returns), new
+    {
+        businessId = Model.BusinessId,
+        filter = tabFilter
+    }) ?? "#";
+}
+
+@functions {
+    private string PostSaleStatusLabel(PostSaleRequestStatus status) => status switch
+    {
+        PostSaleRequestStatus.Refunded => Localizer["Кошти повернуто"].Value,
+        PostSaleRequestStatus.Rejected => Localizer["Відхилено"].Value,
+        _ => Localizer["Очікує розгляду"].Value
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/business.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/postsale.css" asp-append-version="true" />
+}
+
+<div class="seller-dashboard">
+    <a asp-action="Index" class="seller-order-back">← @SharedLocalizer["Панель продавця"]</a>
+
+    <header class="seller-orders-header">
+        <div>
+            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> @BusinessRoleContext.PanelLabel(currentRole)</div>
+            <h1>@Localizer["Повернення"] - @Model.StoreName</h1>
+            <p>@Localizer["Усі заявки на повернення по товарах цього магазину, в одному місці."]</p>
+        </div>
+    </header>
+
+    <partial name="_BusinessNav" model="Model.BusinessId" />
+
+    @if (TempData["Success"] is string success)
+    {
+        <div class="seller-alert" role="status">
+            <span aria-hidden="true">✓</span>
+            <p><strong>@Localizer["Успішно"]</strong>@success</p>
+        </div>
+    }
+    @if (TempData["Error"] is string error)
+    {
+        <div class="alert alert-warning" role="alert">@error</div>
+    }
+
+    <nav class="seller-returns-tabs" aria-label="@Localizer["Фільтр заявок"]">
+        <a class="seller-returns-tab @(Model.Filter == "all" ? "is-active" : "")" href="@TabUrl("all")">@Localizer["Усі"] <span>@Model.AllCount</span></a>
+        <a class="seller-returns-tab @(Model.Filter == "pending" ? "is-active" : "")" href="@TabUrl("pending")">@Localizer["Очікують розгляду"] <span>@Model.PendingCount</span></a>
+        <a class="seller-returns-tab @(Model.Filter == "refunded" ? "is-active" : "")" href="@TabUrl("refunded")">@Localizer["Кошти повернуто"] <span>@Model.RefundedCount</span></a>
+        <a class="seller-returns-tab @(Model.Filter == "rejected" ? "is-active" : "")" href="@TabUrl("rejected")">@Localizer["Відхилено"] <span>@Model.RejectedCount</span></a>
+    </nav>
+
+    @if (Model.Items.Count == 0)
+    {
+        <div class="seller-orders-panel">
+            <p class="seller-orders-empty">@Localizer["Заявок на повернення з цим фільтром не знайдено."]</p>
+        </div>
+    }
+    else
+    {
+        <section class="seller-order-card seller-postsale">
+            @foreach (var request in Model.Items)
+            {
+                <div class="seller-postsale-item seller-postsale-item--@request.Status.ToString().ToLowerInvariant()">
+                    <div class="seller-postsale-item__header">
+                        <strong>@request.ProductName</strong>
+                        <span class="seller-postsale-item__status">@PostSaleStatusLabel(request.Status)</span>
+                    </div>
+                    <p class="seller-postsale-item__meta">
+                        @request.CreatedAt.ToLocalTime().ToString("dd MMMM yyyy, HH:mm") · @request.Reason ·
+                        @request.Quantity @Localizer["шт."] × @request.UnitPrice.ToString("N2") ₴ ·
+                        @Localizer["Покупець:"] @request.BuyerName ·
+                        <a asp-action="OrderDetails" asp-route-businessId="@Model.BusinessId" asp-route-orderId="@request.OrderId">@Localizer["Замовлення"] #@request.OrderId.ToString()[..8].ToUpperInvariant()</a>
+                    </p>
+                    @if (!string.IsNullOrWhiteSpace(request.Comment))
+                    {
+                        <p class="seller-postsale-item__comment">«@request.Comment»</p>
+                    }
+                    @if (request.PhotoUrls.Any())
+                    {
+                        <div class="postsale-photos">
+                            @foreach (var url in request.PhotoUrls)
+                            {
+                                <a href="@url" target="_blank" rel="noopener"><img src="@url" alt="@Localizer["Фото до заявки"]" /></a>
+                            }
+                        </div>
+                    }
+
+                    @if (request.Status == PostSaleRequestStatus.Pending)
+                    {
+                        <form asp-action="ResolvePostSaleRequest" method="post" class="seller-postsale-item__actions">
+                            <input type="hidden" name="businessId" value="@Model.BusinessId" />
+                            <input type="hidden" name="orderId" value="@request.OrderId" />
+                            <input type="hidden" name="requestId" value="@request.Id" />
+                            <input type="hidden" name="returnUrl" value="@Url.Action(nameof(Marketplace.Web.Controllers.BusinessController.Returns), new { businessId = Model.BusinessId, filter = Model.Filter })" />
+                            <input type="text" name="sellerResponse" class="form-control" placeholder="@Localizer["Коментар покупцю (необов'язково)"]" />
+                            <div class="seller-postsale-item__buttons">
+                                <button type="submit" name="decision" value="Approved" class="seller-button seller-button--primary">@Localizer["Підтвердити й повернути кошти"]</button>
+                                <button type="submit" name="decision" value="Rejected" class="seller-button">@Localizer["Відхилити"]</button>
+                            </div>
+                        </form>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(request.SellerResponse))
+                    {
+                        <p class="seller-postsale-item__comment">@Localizer["Ваша відповідь:"] «@request.SellerResponse»</p>
+                    }
+                </div>
+            }
+        </section>
+    }
+</div>
