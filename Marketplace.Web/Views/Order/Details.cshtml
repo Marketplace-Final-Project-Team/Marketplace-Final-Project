@@ -85,6 +85,9 @@
                         {
                             <div class="postsale-status postsale-status--@item.ReturnRequest.Status.ToString().ToLowerInvariant() my-2 p-3 border rounded">
                                 <strong>@PostSaleStatusLabel(item.ReturnRequest.Status)</strong>
+                                <a asp-controller="Support" asp-action="RefundChatByOrderItem" asp-route-orderItemId="@item.Id" class="btn btn-sm btn-outline-primary mt-2">
+                                    Повернутися в чат
+                                </a>
                                 <div class="text-muted small">@item.ReturnRequest.SubmittedAtUtc.ToLocalTime().ToString("dd MMMM yyyy, HH:mm") · Причина: @item.ReturnRequest.Reason</div>
 
                                 @if (!string.IsNullOrWhiteSpace(item.ReturnRequest.Comment))

@@ -4,6 +4,8 @@ using Marketplace.BLL.Interfaces;
 using Marketplace.Web.Infrastructure;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using Marketplace.Domain.Entities;
 
 namespace Marketplace.Web.Controllers
 {
@@ -11,12 +13,20 @@ namespace Marketplace.Web.Controllers
     {
         private readonly IProductService _productService;
         private readonly ICategoryService _categoryService;
+        private readonly ISupportTicketService _supportTicketService;
+        private readonly UserManager<User> _userManager;
 
-        public HomeController(IProductService productService, ICategoryService categoryService)
-        {
-            _productService = productService;
-            _categoryService = categoryService;
-        }
+        public HomeController(
+          IProductService productService,
+          ICategoryService categoryService,
+          ISupportTicketService supportTicketService,
+          UserManager<User> userManager)
+            {
+                _productService = productService;
+                _categoryService = categoryService;
+                _supportTicketService = supportTicketService;
+                _userManager = userManager;
+            }
 
         public async Task<IActionResult> Index([FromQuery] CatalogFilterViewModel filter, string? userId)
         {
@@ -144,10 +154,21 @@ namespace Marketplace.Web.Controllers
             return View();
         }
 
-        public IActionResult Support()
+        public async Task<IActionResult> Support()
         {
-            return View();
+            var userId = _userManager.GetUserId(User);
+
+            var activeTicket = !string.IsNullOrEmpty(userId)
+                ? await _supportTicketService.GetActiveTicketForUserAsync(userId)
+                : null;
+
+            return View(new SupportPageViewModel
+            {
+                IsAuthenticated = !string.IsNullOrEmpty(userId),
+                ActiveTicket = activeTicket
+            });
         }
+
 
         public IActionResult CookiePolicy()
         {

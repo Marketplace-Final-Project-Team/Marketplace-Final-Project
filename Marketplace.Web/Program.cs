@@ -111,7 +111,9 @@ builder.Services.AddScoped<IMarketplaceBalanceService, MarketplaceBalanceService
 builder.Services.AddScoped<IContentModerationService, ContentModerationService>();
 
 builder.Services.AddScoped<IUserDiscountService, UserDiscountService>();
-
+builder.Services.AddScoped<IRefundChatService, RefundChatService>();
+builder.Services.AddScoped<ISupportTicketService, SupportTicketService>();
+builder.Services.AddSignalR();
 // LiqPay configuration
 builder.Services.Configure<LiqPayOptions>(builder.Configuration.GetSection("LiqPay"));
 builder.Services.AddScoped<IPaymentService, LiqPayPaymentService>();
@@ -159,6 +161,8 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 app.MapControllers();
+app.MapHub<Marketplace.Web.Hubs.RefundChatHub>("/refundChatHub");
+app.MapHub<Marketplace.Web.Hubs.SupportTicketChatHub>("/supportTicketChatHub");
 app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}")

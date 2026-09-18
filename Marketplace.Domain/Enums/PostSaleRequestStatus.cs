@@ -5,7 +5,8 @@ namespace Marketplace.Domain.Enums
         Pending,
         Approved,
         Rejected,
-        Refunded
-
+        Refunded,
+        AwaitingSellerConfirmation,
+        SellerDisputed
     }
 }

@@ -34,6 +34,7 @@ namespace Marketplace.Web.Controllers
         private readonly IProductAnalyticsService _productAnalyticsService;
         private readonly ISystemSettingsService _settingsService;
         private readonly ICategoryService _categoryService;
+        private readonly IRefundChatService _refundChatService;
 
         public BusinessController(
             IBusinessService businessService,
@@ -50,7 +51,8 @@ namespace Marketplace.Web.Controllers
             IActivityLogService activityLog,
             IProductAnalyticsService productAnalyticsService,
             ISystemSettingsService settingsService,
-            ICategoryService categoryService)
+            ICategoryService categoryService,
+            IRefundChatService refundChatService)
         {
             _businessService = businessService;
             _businessAccessService = businessAccessService;
@@ -67,6 +69,7 @@ namespace Marketplace.Web.Controllers
             _productAnalyticsService = productAnalyticsService;
             _settingsService = settingsService;
             _categoryService = categoryService;
+            _refundChatService = refundChatService;
         }
 
         [HttpGet]
@@ -282,24 +285,36 @@ namespace Marketplace.Web.Controllers
 
             var orders = await _orderService.GetBusinessOrders(businessId, status);
 
+            var pendingReturns = (await _postSaleService.GetRequestsForBusinessAsync(businessId))
+                .Where(r => r.Status == PostSaleRequestStatus.AwaitingSellerConfirmation)
+                .ToList();
+
             return View(new BusinessOrdersPageViewModel
             {
                 BusinessId = businessId,
                 StoreName = business.StoreName,
                 StatusFilter = status,
-                Orders = orders.Select(order => new BusinessOrderListItemViewModel
+                Orders = orders.Select(order =>
                 {
-                    OrderId = order.OrderId,
-                    CreatedAt = order.CreatedAt,
-                    Status = order.Status,
-                    BuyerName = order.BuyerName,
-                    BuyerEmail = order.BuyerEmail,
-                    ShippingAddress = $"{order.ShippingCity}, {order.ShippingStreet}",
-                    ItemsCount = order.ItemsCount,
-                    LineTotal = order.LineTotal
+                    var urgentReturn = pendingReturns.FirstOrDefault(r => r.OrderId == order.OrderId);
+
+                    return new BusinessOrderListItemViewModel
+                    {
+                        OrderId = order.OrderId,
+                        CreatedAt = order.CreatedAt,
+                        Status = order.Status,
+                        BuyerName = order.BuyerName,
+                        BuyerEmail = order.BuyerEmail,
+                        ShippingAddress = $"{order.ShippingCity}, {order.ShippingStreet}",
+                        ItemsCount = order.ItemsCount,
+                        LineTotal = order.LineTotal,
+                        HasUrgentReturn = urgentReturn != null,
+                        ReturnDeadline = urgentReturn?.SellerConfirmDeadline
+                    };
                 }).ToList()
             });
         }
+
 
         [HttpGet]
         public async Task<IActionResult> OrderDetails(Guid businessId, Guid orderId)
@@ -317,6 +332,29 @@ namespace Marketplace.Web.Controllers
             }
 
             var postSaleRequests = await _postSaleService.GetRequestsForOrderAsync(orderId);
+
+            var postSaleRequestViewModels = new List<BusinessPostSaleRequestViewModel>();
+            foreach (var r in postSaleRequests)
+            {
+                var unreadFromAdmin = r.Status == Marketplace.Domain.Enums.PostSaleRequestStatus.SellerDisputed
+                    ? await _refundChatService.GetUnreadCountAsync(r.Id, isSellerChannel: true, byAdmin: false)
+                    : 0;
+
+                postSaleRequestViewModels.Add(new BusinessPostSaleRequestViewModel
+                {
+                    Id = r.Id,
+                    ProductName = r.ProductName,
+                    ImageUrl = r.ImageUrl,
+                    Reason = r.Reason,
+                    Comment = r.Comment,
+                    PhotoUrls = r.PhotoUrls,
+                    Status = r.Status,
+                    SellerResponse = r.SellerResponse,
+                    CreatedAt = r.CreatedAt,
+                    SellerConfirmDeadline = r.SellerConfirmDeadline,
+                    UnreadFromAdmin = unreadFromAdmin
+                });
+            }
 
             return View(new BusinessOrderDetailsViewModel
             {
@@ -341,18 +379,7 @@ namespace Marketplace.Web.Controllers
                     Quantity = item.Quantity,
                     BelongsToBusiness = item.BelongsToBusiness
                 }).ToList(),
-                PostSaleRequests = postSaleRequests.Select(r => new BusinessPostSaleRequestViewModel
-                {
-                    Id = r.Id,
-                    ProductName = r.ProductName,
-                    ImageUrl = r.ImageUrl,
-                    Reason = r.Reason,
-                    Comment = r.Comment,
-                    PhotoUrls = r.PhotoUrls,
-                    Status = r.Status,
-                    SellerResponse = r.SellerResponse,
-                    CreatedAt = r.CreatedAt
-                }).ToList()
+                PostSaleRequests = postSaleRequestViewModels
             });
         }
 
@@ -380,6 +407,52 @@ namespace Marketplace.Web.Controllers
 
             return RedirectToAction(nameof(OrderDetails), new { businessId, orderId });
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmReturn(Guid businessId, Guid orderId, Guid requestId)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var result = await _postSaleService.SellerConfirmReturnAsync(requestId, businessId);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "ReturnConfirmedBySeller",
+                    "Продавець підтвердив повернення, кошти повернуто покупцю.",
+                    actorUserId: _userManager.GetUserId(User), relatedEntityId: requestId);
+            }
+
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            return RedirectToAction(nameof(OrderDetails), new { businessId, orderId });
+        }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DisputeReturn(Guid businessId, Guid orderId, Guid requestId, string reason)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return Json(new { success = false, message = "Немає доступу до цього магазину." });
+            }
+
+            var result = await _postSaleService.SellerDisputeAsync(requestId, businessId, reason);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "ReturnDisputedBySeller",
+                    $"Продавець відхилив повернення з обґрунтуванням: {reason}",
+                    actorUserId: _userManager.GetUserId(User), relatedEntityId: requestId);
+            }
+
+            return Json(new { success = result.Succeeded, message = result.Message, requestId });
+        }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

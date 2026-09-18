@@ -97,10 +97,16 @@
                 <tbody>
                     @foreach (var order in Model.Orders)
                     {
-                        <tr>
+                        <tr class="@(order.HasUrgentReturn ? "table-danger" : "")">
                             <td>
                                 <div class="fw-semibold">#@order.OrderId.ToString()[..8].ToUpperInvariant()</div>
                                 <div class="text-secondary small">@order.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+                                @if (order.HasUrgentReturn)
+                                {
+                                    <span class="badge bg-danger mt-1">
+                                        Потрібне підтвердження повернення · до @order.ReturnDeadline?.ToLocalTime().ToString("dd.MM HH:mm")
+                                    </span>
+                                }
                             </td>
                             <td class="seller-order-buyer">
                                 <strong>@order.BuyerName</strong>

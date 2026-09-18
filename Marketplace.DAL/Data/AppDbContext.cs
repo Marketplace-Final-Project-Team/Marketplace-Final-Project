@@ -20,7 +20,7 @@ namespace Marketplace.DAL.Data
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Review> Reviews { get; set; }
-
+        public DbSet<SupportTicket> SupportTickets { get; set; }
         public DbSet<Wishlist> Wishlists { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
 
@@ -33,7 +33,7 @@ namespace Marketplace.DAL.Data
         public DbSet<PostSaleRequestImage> PostSaleRequestImages { get; set; }
 
         public DbSet<PromoCode> PromoCodes { get; set; }
-
+        public DbSet<SupportTicketMessage> SupportTicketMessages { get; set; }
         public DbSet<SystemSetting> SystemSettings { get; set; }
         public DbSet<UserActionLog> UserActionLogs { get; set; }
         public DbSet<BusinessActionLog> BusinessActionLogs { get; set; }
@@ -41,6 +41,7 @@ namespace Marketplace.DAL.Data
         public DbSet<ProductEvent> ProductEvents { get; set; }
 
         public DbSet<UserDiscount> UserDiscounts { get; set; }
+        public DbSet<RefundChatMessage> RefundChatMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -67,6 +68,7 @@ namespace Marketplace.DAL.Data
             builder.Entity<PromoCode>().HasQueryFilter(pc => !pc.IsDeleted);
             builder.Entity<SystemSetting>().HasQueryFilter(s => !s.IsDeleted);
             builder.Entity<MarketplaceBalance>().HasQueryFilter(mb => !mb.IsDeleted);
+            builder.Entity<RefundChatMessage>().HasQueryFilter(m => !m.IsDeleted);
             // UserActionLog / BusinessActionLog are append-only audit trails — no soft-delete filter.
 
 
@@ -269,6 +271,12 @@ namespace Marketplace.DAL.Data
                 .WithMany(b => b.UserDiscounts)
                 .HasForeignKey(ud => ud.BusinessId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<RefundChatMessage>()
+                .HasOne(m => m.PostSaleRequest)
+                .WithMany() 
+                .HasForeignKey(m => m.PostSaleRequestId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Product>().Navigation(p => p.Category).AutoInclude();
             builder.Entity<Product>().Navigation(p => p.Images).AutoInclude();

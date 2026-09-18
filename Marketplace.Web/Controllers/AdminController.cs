@@ -25,6 +25,10 @@ namespace Marketplace.Web.Controllers
         private readonly ISchedulerFactory _schedulerFactory;
         private readonly IDiscountService _discountService;
         private readonly IOrderService _orderService;
+        private readonly IPostSaleService _postSaleService;
+        private readonly IRefundChatService _refundChatService;
+        private readonly ISupportTicketService _supportTicketService;
+
 
         public AdminController(
             IAdminService adminService,
@@ -36,7 +40,10 @@ namespace Marketplace.Web.Controllers
             ISchedulerFactory schedulerFactory,
             IBusinessService businessService,
             IDiscountService discountService,
-            IOrderService orderService)
+            IOrderService orderService,
+            IPostSaleService postSaleService,
+            IRefundChatService refundChatService,
+            ISupportTicketService supportTicketService)
         {
             _adminService = adminService;
             _settingsService = settingsService;
@@ -48,6 +55,9 @@ namespace Marketplace.Web.Controllers
             _businessService = businessService;
             _discountService = discountService;
             _orderService = orderService;
+            _postSaleService = postSaleService;
+            _refundChatService = refundChatService;
+            _supportTicketService = supportTicketService;
         }
 
         private string? CurrentAdminId => User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -334,10 +344,7 @@ namespace Marketplace.Web.Controllers
             });
         }
 
-        // BusinessLimits is backed by the real SystemSettings table (see
-        // ISystemSettingsService) — saved values persist for real and drive live
-        // behaviour (the BusinessRules caps enforced in DiscountService/PromoCodeService/
-        // ProductsController plus the PendingOrderExpiryJob and the catalog low-stock badge).
+
 
         [HttpGet]
         public async Task<IActionResult> Jobs()
@@ -412,11 +419,22 @@ namespace Marketplace.Web.Controllers
                 })
                 .ToList();
 
+            var openReturnRequests = await _postSaleService.GetAllOpenRequestsAsync();
+            foreach (var request in openReturnRequests)
+            {
+                request.UnreadFromBuyer = await _refundChatService.GetUnreadCountAsync(request.Id, isSellerChannel: false, byAdmin: true);
+                request.UnreadFromSeller = await _refundChatService.GetUnreadCountAsync(request.Id, isSellerChannel: true, byAdmin: true);
+            }
+
+            var openTickets = await _supportTicketService.GetOpenTicketsForAdminAsync();
+
             return View(new JobsPageViewModel
             {
                 IsSchedulerRunning = scheduler.IsStarted && !scheduler.InStandbyMode && !scheduler.IsShutdown,
                 ScheduledJobs = scheduledJobs.OrderBy(j => j.NextRunAtUtc).ToList(),
-                RecentDecisions = recentDecisions
+                RecentDecisions = recentDecisions,
+                OpenReturnRequests = openReturnRequests,
+                OpenTickets = openTickets
             });
         }
 
@@ -670,5 +688,47 @@ namespace Marketplace.Web.Controllers
             TempData["Success"] = "Задачу запущено негайно.";
             return RedirectToAction("Jobs");
         }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveReturnRequest(Guid requestId)
+        {
+            var result = await _postSaleService.AdminApproveAsync(requestId);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogUserActionAsync(CurrentAdminId!, "ReturnApprovedByAdmin",
+                    "Адміністратор підтвердив заявку на повернення, очікуємо продавця.",
+                    actorUserId: CurrentAdminId);
+            }
+
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            return RedirectToAction("Jobs");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectReturnRequest(Guid requestId, string reason)
+        {
+            var result = await _postSaleService.AdminRejectAsync(requestId, reason);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogUserActionAsync(CurrentAdminId!, "ReturnRejectedByAdmin",
+                    $"Адміністратор відхилив заявку на повернення: {reason}",
+                    actorUserId: CurrentAdminId);
+            }
+
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            return RedirectToAction("Jobs");
+        }
+        [HttpGet]
+        public async Task<IActionResult> JobsCounts()
+        {
+            var returnCount = (await _postSaleService.GetAllOpenRequestsAsync()).Count;
+            var ticketCount = (await _supportTicketService.GetOpenTicketsForAdminAsync()).Count;
+
+            return Json(new { returnCount, ticketCount });
+        }
+
     }
 }
