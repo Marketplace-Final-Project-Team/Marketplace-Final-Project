@@ -12,6 +12,8 @@ namespace Marketplace.Web.Models.Businesses
         public string ShippingAddress { get; set; } = string.Empty;
         public int ItemsCount { get; set; }
         public decimal LineTotal { get; set; }
+        public bool HasUrgentReturn { get; set; }
+        public DateTime? ReturnDeadline { get; set; }
     }
 
     public class BusinessOrdersPageViewModel
@@ -83,6 +85,8 @@ namespace Marketplace.Web.Models.Businesses
         public PostSaleRequestStatus Status { get; set; }
         public string? SellerResponse { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime? SellerConfirmDeadline { get; set; }
+        public int UnreadFromAdmin { get; set; }
     }
 
     public class BusinessReturnRequestViewModel

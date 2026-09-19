@@ -6,6 +6,7 @@ using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Quartz;
 
 namespace Marketplace.BLL.Services
 {
@@ -20,19 +21,23 @@ namespace Marketplace.BLL.Services
         private readonly IPaymentService _paymentService;
         private readonly IMarketplaceBalanceService _marketplaceBalanceService;
         private readonly IOrderService _orderService;
+        private readonly ISchedulerFactory _schedulerFactory;
 
         public PostSaleService(
              AppDbContext context,
              IImageStorageService imageStorageService,
              IPaymentService paymentService,
              IMarketplaceBalanceService marketplaceBalanceService,
-             IOrderService orderService)
+             IOrderService orderService,
+             ISchedulerFactory schedulerFactory)
         {
             _context = context;
             _imageStorageService = imageStorageService;
             _paymentService = paymentService;
             _marketplaceBalanceService = marketplaceBalanceService;
             _orderService = orderService;
+            _schedulerFactory = schedulerFactory;
+
         }
 
         public async Task<ServiceResult> CreateRequestAsync(string buyerId, Guid orderItemId, string reason, string comment, List<IFormFile> photos)
@@ -222,6 +227,211 @@ namespace Marketplace.BLL.Services
             }
         }
 
+
+        public async Task<ServiceResult> AdminApproveAsync(Guid requestId)
+        {
+            var request = await _context.PostSaleRequests.FirstOrDefaultAsync(r => r.Id == requestId);
+
+            if (request is null)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Заявку не знайдено" };
+            }
+
+            if (request.Status != PostSaleRequestStatus.Pending && request.Status != PostSaleRequestStatus.SellerDisputed)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Заявку вже опрацьовано" };
+            }
+
+            var isFirstApproval = request.SellerConfirmDeadline is null;
+
+            request.Status = PostSaleRequestStatus.AwaitingSellerConfirmation;
+            request.SellerConfirmDeadline ??= DateTime.UtcNow.AddDays(7);
+            request.SellerDisputeReason = null;
+            request.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            // Плануємо автоматичну обробку рівно на момент дедлайну — ТІЛЬКИ при першому
+            // підтвердженні. При повторному (після спору продавця) — задача вже запланована раніше.
+            if (isFirstApproval)
+            {
+                var scheduler = await _schedulerFactory.GetScheduler();
+                var jobKey = new JobKey($"postsale-deadline-job-{request.Id}", "postsale");
+
+                var job = JobBuilder.Create<PostSaleAutoResolveJob>()
+                    .WithIdentity(jobKey)
+                    .UsingJobData("RequestId", request.Id.ToString())
+                    .Build();
+
+                var trigger = TriggerBuilder.Create()
+                    .WithIdentity($"postsale-deadline-trigger-{request.Id}", "postsale")
+                    .StartAt(new DateTimeOffset(request.SellerConfirmDeadline!.Value, TimeSpan.Zero))
+                    .Build();
+
+                await scheduler.ScheduleJob(job, trigger);
+            }
+
+            return new ServiceResult { Succeeded = true, Message = "Заявку підтверджено. Очікуємо підтвердження продавця.", EntityId = request.Id };
+        }
+
+        public async Task<ServiceResult> AdminRejectAsync(Guid requestId, string reason)
+        {
+            if (string.IsNullOrWhiteSpace(reason))
+            {
+                return new ServiceResult { Succeeded = false, Message = "Вкажіть причину відхилення" };
+            }
+
+            var request = await _context.PostSaleRequests.FirstOrDefaultAsync(r => r.Id == requestId);
+
+            if (request is null)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Заявку не знайдено" };
+            }
+
+            if (request.Status != PostSaleRequestStatus.Pending && request.Status != PostSaleRequestStatus.SellerDisputed)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Заявку вже опрацьовано" };
+            }
+
+            request.Status = PostSaleRequestStatus.Rejected;
+            request.SellerResponse = reason.Trim();
+            request.ResolvedAt = DateTime.UtcNow;
+            request.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            var scheduler2 = await _schedulerFactory.GetScheduler();
+            await scheduler2.DeleteJob(new JobKey($"postsale-deadline-job-{request.Id}", "postsale"));
+
+            return new ServiceResult { Succeeded = true, Message = "Заявку відхилено.", EntityId = request.Id };
+        }
+
+        public async Task<ServiceResult> SellerDisputeAsync(Guid requestId, Guid businessId, string reason)
+        {
+            if (string.IsNullOrWhiteSpace(reason))
+            {
+                return new ServiceResult { Succeeded = false, Message = "Вкажіть причину відмови" };
+            }
+
+            var request = await _context.PostSaleRequests
+                .Include(r => r.OrderItem)
+                    .ThenInclude(oi => oi.Product)
+                .FirstOrDefaultAsync(r => r.Id == requestId);
+
+            if (request is null)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Заявку не знайдено" };
+            }
+
+            if (request.OrderItem.Product is null || request.OrderItem.Product.BusinessId != businessId)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Цей товар не належить вашому магазину" };
+            }
+
+            if (request.Status != PostSaleRequestStatus.AwaitingSellerConfirmation)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Ця заявка не очікує підтвердження" };
+            }
+
+            request.Status = PostSaleRequestStatus.SellerDisputed;
+            request.SellerDisputeReason = reason.Trim();
+            request.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return new ServiceResult { Succeeded = true, Message = "Вашу відмову передано адміністратору на розгляд.", EntityId = request.Id };
+        }
+        public async Task<ServiceResult> SellerConfirmReturnAsync(Guid requestId, Guid businessId)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var request = await _context.PostSaleRequests
+                    .Include(r => r.OrderItem)
+                        .ThenInclude(oi => oi.Product)
+                            .ThenInclude(p => p.Business)
+                    .FirstOrDefaultAsync(r => r.Id == requestId);
+
+                if (request is null)
+                {
+                    return new ServiceResult { Succeeded = false, Message = "Заявку не знайдено" };
+                }
+
+                if (request.OrderItem.Product is null || request.OrderItem.Product.BusinessId != businessId)
+                {
+                    return new ServiceResult { Succeeded = false, Message = "Цей товар не належить вашому магазину" };
+                }
+
+                if (request.Status != PostSaleRequestStatus.AwaitingSellerConfirmation)
+                {
+                    return new ServiceResult { Succeeded = false, Message = "Ця заявка не очікує підтвердження" };
+                }
+
+                var business = request.OrderItem.Product.Business!;
+                var amount = Math.Round(request.OrderItem.UnitPrice * request.OrderItem.Quantity, 2, MidpointRounding.AwayFromZero);
+                var netAmount = amount - request.OrderItem.CommissionAmount;
+
+                if (business.Balance < netAmount)
+                {
+                    await transaction.RollbackAsync();
+                    return new ServiceResult
+                    {
+                        Succeeded = false,
+                        Message = $"Недостатньо коштів на балансі магазину (потрібно {netAmount:N2} ₴). Поповніть баланс і спробуйте ще раз до {request.SellerConfirmDeadline:dd.MM.yyyy HH:mm}."
+                    };
+                }
+
+                var paymentRefunded = await _paymentService.RefundPaymentAsync(request.OrderId.ToString(), amount);
+                if (!paymentRefunded)
+                {
+                    await transaction.RollbackAsync();
+                    return new ServiceResult { Succeeded = false, Message = "Не вдалося провести повернення коштів через платіжну систему" };
+                }
+
+                var stockResult = await _orderService.RefundOrderItemAsync(request.OrderItemId);
+                if (!stockResult.Succeeded)
+                {
+                    await transaction.RollbackAsync();
+                    return new ServiceResult
+                    {
+                        Succeeded = false,
+                        Message = $"Кошти повернуто через платіжну систему, але виникла помилка синхронізації складу/балансу: {stockResult.Message}"
+                    };
+                }
+
+                request.Status = PostSaleRequestStatus.Refunded;
+                request.ResolvedAt = DateTime.UtcNow;
+                request.UpdatedAt = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                var scheduler = await _schedulerFactory.GetScheduler();
+                await scheduler.DeleteJob(new JobKey($"postsale-deadline-job-{request.Id}", "postsale"));
+
+                return new ServiceResult { Succeeded = true, Message = "Повернення підтверджено, кошти повернуто покупцю.", EntityId = request.Id };
+
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
+        public async Task<List<PostSaleRequestDto>> GetAllOpenRequestsAsync()
+        {
+            var requests = await _context.PostSaleRequests
+                .Include(r => r.Buyer)
+                .Include(r => r.Images)
+                .Include(r => r.OrderItem)
+                    .ThenInclude(oi => oi.Product)
+                .Where(r => r.Status == PostSaleRequestStatus.Pending || r.Status == PostSaleRequestStatus.SellerDisputed)
+                .OrderBy(r => r.CreatedAt)
+                .ToListAsync();
+
+            return requests.Select(ToDto).ToList();
+        }
         private static PostSaleRequestDto ToDto(PostSaleRequest r) => new()
         {
             Id = r.Id,
@@ -241,7 +451,9 @@ namespace Marketplace.BLL.Services
             Status = r.Status,
             SellerResponse = r.SellerResponse,
             CreatedAt = r.CreatedAt,
-            ResolvedAt = r.ResolvedAt
+            ResolvedAt = r.ResolvedAt,
+            SellerConfirmDeadline = r.SellerConfirmDeadline,
+            SellerDisputeReason = r.SellerDisputeReason
         };
     }
 }

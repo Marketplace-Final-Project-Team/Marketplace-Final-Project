@@ -491,6 +491,12 @@ namespace Marketplace.DAL.Migrations
                     b.Property<DateTime?>("ResolvedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("SellerConfirmDeadline")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SellerDisputeReason")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SellerResponse")
                         .HasColumnType("nvarchar(max)");
 
@@ -782,6 +788,51 @@ namespace Marketplace.DAL.Migrations
                     b.ToTable("PromoCodes");
                 });
 
+            modelBuilder.Entity("Marketplace.Domain.Entities.RefundChatMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsFromAdmin")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSellerChannel")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("PostSaleRequestId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostSaleRequestId");
+
+                    b.ToTable("RefundChatMessages");
+                });
+
             modelBuilder.Entity("Marketplace.Domain.Entities.Review", b =>
                 {
                     b.Property<Guid>("Id")
@@ -818,6 +869,88 @@ namespace Marketplace.DAL.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Reviews");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.SupportTicket", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ClosedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SupportTickets");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.SupportTicketMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsFromAdmin")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("SupportTicketId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SupportTicketId");
+
+                    b.ToTable("SupportTicketMessages");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.SystemSetting", b =>
@@ -1535,6 +1668,17 @@ namespace Marketplace.DAL.Migrations
                     b.Navigation("Business");
                 });
 
+            modelBuilder.Entity("Marketplace.Domain.Entities.RefundChatMessage", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.PostSaleRequest", "PostSaleRequest")
+                        .WithMany()
+                        .HasForeignKey("PostSaleRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PostSaleRequest");
+                });
+
             modelBuilder.Entity("Marketplace.Domain.Entities.Review", b =>
                 {
                     b.HasOne("Marketplace.Domain.Entities.Product", "Product")
@@ -1552,6 +1696,28 @@ namespace Marketplace.DAL.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.SupportTicket", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.SupportTicketMessage", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.SupportTicket", "SupportTicket")
+                        .WithMany()
+                        .HasForeignKey("SupportTicketId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SupportTicket");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.UserDiscount", b =>

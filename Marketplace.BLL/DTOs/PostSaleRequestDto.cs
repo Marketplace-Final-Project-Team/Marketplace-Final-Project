@@ -22,5 +22,9 @@ namespace Marketplace.BLL.DTOs
         public string? SellerResponse { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? ResolvedAt { get; set; }
+        public DateTime? SellerConfirmDeadline { get; set; }
+        public string? SellerDisputeReason { get; set; }
+        public int UnreadFromBuyer { get; set; }
+        public int UnreadFromSeller { get; set; }
     }
 }

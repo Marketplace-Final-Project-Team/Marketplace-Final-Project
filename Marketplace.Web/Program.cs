@@ -128,7 +128,10 @@ builder.Services.AddScoped<IContentModerationService, ContentModerationService>(
 builder.Services.AddScoped<IProductTranslationService, ProductTranslationService>();
 
 builder.Services.AddScoped<IUserDiscountService, UserDiscountService>();
+builder.Services.AddScoped<IRefundChatService, RefundChatService>();
+builder.Services.AddScoped<ISupportTicketService, SupportTicketService>();
 builder.Services.AddScoped<IWithdrawalService, WithdrawalService>();
+builder.Services.AddSignalR();
 
 // LiqPay configuration
 builder.Services.Configure<LiqPayOptions>(builder.Configuration.GetSection("LiqPay"));
@@ -192,6 +195,8 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 app.MapControllers();
+app.MapHub<Marketplace.Web.Hubs.RefundChatHub>("/refundChatHub");
+app.MapHub<Marketplace.Web.Hubs.SupportTicketChatHub>("/supportTicketChatHub");
 app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}")

@@ -22,7 +22,7 @@ namespace Marketplace.DAL.Data
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Review> Reviews { get; set; }
-
+        public DbSet<SupportTicket> SupportTickets { get; set; }
         public DbSet<Wishlist> Wishlists { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
 
@@ -35,7 +35,7 @@ namespace Marketplace.DAL.Data
         public DbSet<PostSaleRequestImage> PostSaleRequestImages { get; set; }
 
         public DbSet<PromoCode> PromoCodes { get; set; }
-
+        public DbSet<SupportTicketMessage> SupportTicketMessages { get; set; }
         public DbSet<SystemSetting> SystemSettings { get; set; }
         public DbSet<UserActionLog> UserActionLogs { get; set; }
         public DbSet<BusinessActionLog> BusinessActionLogs { get; set; }
@@ -43,6 +43,7 @@ namespace Marketplace.DAL.Data
         public DbSet<ProductEvent> ProductEvents { get; set; }
 
         public DbSet<UserDiscount> UserDiscounts { get; set; }
+        public DbSet<RefundChatMessage> RefundChatMessages { get; set; }
 
         public DbSet<WithdrawalRequest> WithdrawalRequests { get; set; }
 
@@ -72,10 +73,8 @@ namespace Marketplace.DAL.Data
             builder.Entity<PromoCode>().HasQueryFilter(pc => !pc.IsDeleted);
             builder.Entity<SystemSetting>().HasQueryFilter(s => !s.IsDeleted);
             builder.Entity<MarketplaceBalance>().HasQueryFilter(mb => !mb.IsDeleted);
-
-            
-            // UserActionLog / BusinessActionLog are append-only audit trails — no soft-delete filter.
-
+            builder.Entity<RefundChatMessage>().HasQueryFilter(m => !m.IsDeleted);
+          
 
             builder.Entity<Business>()
                 .HasOne(b => b.Owner)
@@ -196,11 +195,11 @@ namespace Marketplace.DAL.Data
                 .HasForeignKey(wi => wi.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-                    builder.Entity<Review>()
-            .HasOne(r => r.User)
-            .WithMany(u => u.Reviews) 
-            .HasForeignKey(r => r.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Review>()
+    .HasOne(r => r.User)
+    .WithMany(u => u.Reviews)
+    .HasForeignKey(r => r.UserId)
+    .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Review>()
                 .HasOne(r => r.Product)
@@ -244,8 +243,6 @@ namespace Marketplace.DAL.Data
                 .HasForeignKey(psr => psr.BuyerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Restrict (not Cascade) — PostSaleRequest already cascades via Order, and SQL
-            // Server rejects a second cascade path to the same table through OrderItem.
             builder.Entity<PostSaleRequest>()
                 .HasOne(psr => psr.OrderItem)
                 .WithMany()
@@ -291,7 +288,7 @@ namespace Marketplace.DAL.Data
                 .HasForeignKey(bal => bal.BusinessId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-  
+
 
             builder.Entity<ProductEvent>()
                 .HasOne<Product>()
@@ -313,12 +310,17 @@ namespace Marketplace.DAL.Data
                 .HasForeignKey(ud => ud.BusinessId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<RefundChatMessage>()
+                .HasOne(m => m.PostSaleRequest)
+                .WithMany()
+                .HasForeignKey(m => m.PostSaleRequestId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.Entity<WithdrawalRequest>()
                 .HasOne(wr => wr.Business)
                 .WithMany()
                 .HasForeignKey(wr => wr.BusinessId)
                 .OnDelete(DeleteBehavior.Restrict);
-
 
             builder.Entity<Product>().Navigation(p => p.Category).AutoInclude();
             builder.Entity<Product>().Navigation(p => p.Images).AutoInclude();
@@ -329,7 +331,7 @@ namespace Marketplace.DAL.Data
             builder.Entity<Wishlist>().Navigation(w => w.WishlistItems).AutoInclude();
             builder.Entity<Review>().Navigation(r => r.User).AutoInclude();
 
-      
+
             builder.Entity<Product>().Navigation(p => p.Discounts).AutoInclude();
         }
 
