@@ -1,7 +1,7 @@
 @model Marketplace.BLL.DTOs.WishlistCollectionDetailDto
 
 @{
-    ViewData["Title"] = "Перейменувати колекцію";
+    ViewData["Title"] = Localizer["Перейменувати колекцію"];
 }
 
 @section Styles {
@@ -10,10 +10,10 @@
 }
 
 <div class="profile-page">
-    <a asp-action="Index" class="profile-back">← До колекцій</a>
+    <a asp-action="Index" class="profile-back">← @Localizer["До колекцій"]</a>
 
     <div class="profile-summary">
-        <h1>Перейменувати колекцію</h1>
+        <h1>@Localizer["Перейменувати колекцію"]</h1>
     </div>
 
     @if (TempData["Error"] is string error)
@@ -22,11 +22,11 @@
     }
 
     <form asp-action="Edit" asp-route-id="@Model.Id" method="post" class="wishlist-collection-form">
-        <label for="name">Назва колекції</label>
+        <label for="name">@Localizer["Назва колекції"]</label>
         <input type="text" id="name" name="name" value="@Model.Name" maxlength="40" required autofocus />
         <div class="wishlist-collection-form__actions">
-            <a asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
-            <button type="submit" class="btn btn-primary">Зберегти</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">@Localizer["Скасувати"]</a>
+            <button type="submit" class="btn btn-primary">@Localizer["Зберегти"]</button>
         </div>
     </form>
 </div>

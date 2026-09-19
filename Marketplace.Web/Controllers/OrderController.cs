@@ -361,6 +361,7 @@ public class OrderController : Controller
                 ProductId = item.ProductId,
                 ProductName = item.ProductName,
                 ImageUrl = item.Product?.MainImageUrl ?? string.Empty,
+                VariantSize = item.VariantSize,
                 UnitPrice = item.UnitPrice,
                 Quantity = item.Quantity,
                 ReturnRequest = ToViewModel(postSaleRequests.FirstOrDefault(r => r.OrderItemId == item.Id))

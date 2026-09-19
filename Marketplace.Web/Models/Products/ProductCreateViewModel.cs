@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Marketplace.Web.Models.Products
@@ -31,9 +32,14 @@ namespace Marketplace.Web.Models.Products
         [Range(0.01, double.MaxValue, ErrorMessage = "Ціна має бути більшою за 0")]
         public decimal Price { get; set; }
 
-        [Required]
         [Range(0, int.MaxValue, ErrorMessage = "Кількість не може бути від'ємною")]
         public int Quantity { get; set; }
+
+        [Display(Name = "Артикул (SKU)")]
+        [StringLength(100)]
+        public string? Sku { get; set; }
+
+        public List<ProductVariantInputModel> Variants { get; set; } = new();
 
         [Required(ErrorMessage = "Оберіть категорію")]
         public Guid CategoryId { get; set; }
@@ -41,7 +47,7 @@ namespace Marketplace.Web.Models.Products
         [Display(Name = "Товар тільки для дорослих (18+)")]
         public bool IsAdultOnly { get; set; }
 
- 
+
 
         public IFormFile? MainImage { get; set; }
         public List<IFormFile>? AdditionalImages { get; set; }
@@ -50,6 +56,21 @@ namespace Marketplace.Web.Models.Products
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            var activeVariants = Variants.Where(v => !string.IsNullOrWhiteSpace(v.Size)).ToList();
+
+            if (activeVariants.Count == 0 && Quantity <= 0)
+            {
+                yield return new ValidationResult("Вкажіть кількість товару або додайте хоча б один розмір.", new[] { nameof(Quantity) });
+            }
+
+            var duplicateSize = activeVariants
+                .GroupBy(v => v.Size.Trim(), StringComparer.OrdinalIgnoreCase)
+                .FirstOrDefault(g => g.Count() > 1);
+            if (duplicateSize is not null)
+            {
+                yield return new ValidationResult($"Розмір «{duplicateSize.Key}» вказано декілька разів.", new[] { nameof(Variants) });
+            }
+
             if (MainImage is not null)
             {
                 var mainImageError = ValidateImage(MainImage);

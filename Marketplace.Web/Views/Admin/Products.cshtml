@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.AdminProductsPageViewModel
 
 @{
-    ViewData["Title"] = "Товари - Адмін-панель";
+    ViewData["Title"] = $"{Localizer["Товари"].Value} - {SharedLocalizer["Адмін-панель"].Value}";
     var products = Model.Result.Items;
 }
 
@@ -10,22 +10,22 @@
 }
 
 @functions {
-    private static string StatusLabel(Marketplace.Domain.Enums.ProductStatus status) => status switch
+    private string StatusLabel(Marketplace.Domain.Enums.ProductStatus status) => status switch
     {
-        Marketplace.Domain.Enums.ProductStatus.Active => "Активний",
-        Marketplace.Domain.Enums.ProductStatus.Pending => "На модерації",
-        Marketplace.Domain.Enums.ProductStatus.Banned => "Заблокований",
+        Marketplace.Domain.Enums.ProductStatus.Active => Localizer["Активний"].Value,
+        Marketplace.Domain.Enums.ProductStatus.Pending => Localizer["На модерації"].Value,
+        Marketplace.Domain.Enums.ProductStatus.Banned => Localizer["Заблокований"].Value,
         _ => status.ToString()
     };
 
-    private static string SortLabel(Marketplace.Domain.Enums.ProductSortOption option) => option switch
+    private string SortLabel(Marketplace.Domain.Enums.ProductSortOption option) => option switch
     {
-        Marketplace.Domain.Enums.ProductSortOption.PriceAsc => "Ціна: зростання",
-        Marketplace.Domain.Enums.ProductSortOption.PriceDesc => "Ціна: спадання",
-        Marketplace.Domain.Enums.ProductSortOption.CreatedAtAsc => "Спочатку старі",
-        Marketplace.Domain.Enums.ProductSortOption.CreatedAtDesc => "Спочатку нові",
-        Marketplace.Domain.Enums.ProductSortOption.PopularityAsc => "Популярність: за зростанням",
-        Marketplace.Domain.Enums.ProductSortOption.PopularityDesc => "Популярність: за спаданням",
+        Marketplace.Domain.Enums.ProductSortOption.PriceAsc => Localizer["Ціна: зростання"].Value,
+        Marketplace.Domain.Enums.ProductSortOption.PriceDesc => Localizer["Ціна: спадання"].Value,
+        Marketplace.Domain.Enums.ProductSortOption.CreatedAtAsc => Localizer["Спочатку старі"].Value,
+        Marketplace.Domain.Enums.ProductSortOption.CreatedAtDesc => Localizer["Спочатку нові"].Value,
+        Marketplace.Domain.Enums.ProductSortOption.PopularityAsc => Localizer["Популярність: за зростанням"].Value,
+        Marketplace.Domain.Enums.ProductSortOption.PopularityDesc => Localizer["Популярність: за спаданням"].Value,
         _ => option.ToString()
     };
 }
@@ -38,8 +38,8 @@
             <header class="admin-header">
                 <div>
                     <div class="admin-kicker">Admin</div>
-                    <h1 class="admin-title">Товари</h1>
-                    <p class="admin-subtitle">Знайдено <strong>@Model.Result.TotalItems</strong> товарів.</p>
+                    <h1 class="admin-title">@Localizer["Товари"]</h1>
+                    <p class="admin-subtitle">@Localizer["Знайдено"] <strong>@Model.Result.TotalItems</strong> @Localizer["товарів."]</p>
                 </div>
             </header>
 
@@ -49,57 +49,57 @@
                         <circle cx="11" cy="11" r="8" />
                         <path d="m21 21-4.3-4.3" />
                     </svg>
-                    <input type="search" class="form-control admin-search" name="Search" value="@Model.Filter.Search" placeholder="Пошук за назвою" aria-label="Пошук товарів" />
+                    <input type="search" class="form-control admin-search" name="Search" value="@Model.Filter.Search" placeholder="@Localizer["Пошук за назвою"]" aria-label="@Localizer["Пошук товарів"]" />
                 </div>
                 <div class="admin-search-wrap">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
                         <circle cx="11" cy="11" r="8" />
                         <path d="m21 21-4.3-4.3" />
                     </svg>
-                    <input type="search" class="form-control admin-search" name="SearchBusiness" value="@Model.Filter.SearchBusiness" placeholder="Пошук за магазином" aria-label="Пошук за магазином" />
+                    <input type="search" class="form-control admin-search" name="SearchBusiness" value="@Model.Filter.SearchBusiness" placeholder="@Localizer["Пошук за магазином"]" aria-label="@Localizer["Пошук за магазином"]" />
                 </div>
-                <select class="form-select" name="CategoryId" aria-label="Фільтр за категорією" onchange="this.form.submit()">
-                    <option value="">Усі категорії</option>
+                <select class="form-select" name="CategoryId" aria-label="@Localizer["Фільтр за категорією"]" onchange="this.form.submit()">
+                    <option value="">@SharedLocalizer["Усі категорії"]</option>
                     @foreach (var category in Model.Categories)
                     {
-                        <option value="@category.Id" selected="@(Model.Filter.CategoryId == category.Id)">@category.Name</option>
+                        <option value="@category.Id" selected="@(Model.Filter.CategoryId == category.Id)">@SharedLocalizer[category.Name]</option>
                     }
                 </select>
-                <select class="form-select" name="Status" aria-label="Фільтр за статусом" onchange="this.form.submit()">
-                    <option value="">Усі статуси</option>
+                <select class="form-select" name="Status" aria-label="@Localizer["Фільтр за статусом"]" onchange="this.form.submit()">
+                    <option value="">@Localizer["Усі статуси"]</option>
                     @foreach (Marketplace.Domain.Enums.ProductStatus status in Enum.GetValues(typeof(Marketplace.Domain.Enums.ProductStatus)))
                     {
                         <option value="@status" selected="@(Model.Filter.Status == status)">@StatusLabel(status)</option>
                     }
                 </select>
                 <div class="admin-price-range">
-                    <input type="number" class="form-control" name="MinPrice" min="0" step="1" placeholder="Ціна від" aria-label="Ціна від" value="@Model.Filter.MinPrice" />
+                    <input type="number" class="form-control" name="MinPrice" min="0" step="1" placeholder="@Localizer["Ціна від"]" aria-label="@Localizer["Ціна від"]" value="@Model.Filter.MinPrice" />
                     <span aria-hidden="true">-</span>
-                    <input type="number" class="form-control" name="MaxPrice" min="0" step="1" placeholder="Ціна до" aria-label="Ціна до" value="@Model.Filter.MaxPrice" />
+                    <input type="number" class="form-control" name="MaxPrice" min="0" step="1" placeholder="@Localizer["Ціна до"]" aria-label="@Localizer["Ціна до"]" value="@Model.Filter.MaxPrice" />
                 </div>
                 <label class="admin-checkbox-filter">
                     <input type="checkbox" name="InStockOnly" value="true" checked="@(Model.Filter.InStockOnly == true)" onchange="this.form.submit()" />
-                    Тільки в наявності
+                    @Localizer["Тільки в наявності"]
                 </label>
-                <select class="form-select" name="SortOption" aria-label="Сортування" onchange="this.form.submit()">
+                <select class="form-select" name="SortOption" aria-label="@Localizer["Сортування"]" onchange="this.form.submit()">
                     @foreach (Marketplace.Domain.Enums.ProductSortOption option in Enum.GetValues(typeof(Marketplace.Domain.Enums.ProductSortOption)))
                     {
                         <option value="@option" selected="@(Model.Filter.SortOption == option)">@SortLabel(option)</option>
                     }
                 </select>
-                <button type="submit" class="btn btn-outline-secondary">Застосувати</button>
+                <button type="submit" class="btn btn-outline-secondary">@Localizer["Застосувати"]</button>
             </form>
 
             @if (products.Count == 0)
             {
                 <div class="admin-panel">
-                    <p class="admin-empty">Нічого не знайдено за цим запитом.</p>
+                    <p class="admin-empty">@Localizer["Нічого не знайдено за цим запитом."]</p>
                 </div>
             }
             else
             {
-                <div class="admin-view-toggle" role="group" aria-label="Режим перегляду товарів">
-                    <button type="button" class="admin-view-toggle__btn" data-view-toggle="list" aria-label="Список">
+                <div class="admin-view-toggle" role="group" aria-label="@Localizer["Режим перегляду товарів"]">
+                    <button type="button" class="admin-view-toggle__btn" data-view-toggle="list" aria-label="@Localizer["Список"]">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="17" height="17">
                             <path d="M8 6h13" />
                             <path d="M8 12h13" />
@@ -108,24 +108,24 @@
                             <path d="M3 12h.01" />
                             <path d="M3 18h.01" />
                         </svg>
-                        <span>Список</span>
+                        <span>@Localizer["Список"]</span>
                     </button>
-                    <button type="button" class="admin-view-toggle__btn" data-view-toggle="grid" aria-label="Плитка">
+                    <button type="button" class="admin-view-toggle__btn" data-view-toggle="grid" aria-label="@Localizer["Плитка"]">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="17" height="17">
                             <rect x="3" y="3" width="7" height="7" rx="1.2" />
                             <rect x="14" y="3" width="7" height="7" rx="1.2" />
                             <rect x="14" y="14" width="7" height="7" rx="1.2" />
                             <rect x="3" y="14" width="7" height="7" rx="1.2" />
                         </svg>
-                        <span>Плитка</span>
+                        <span>@Localizer["Плитка"]</span>
                     </button>
-                    <button type="button" class="admin-view-toggle__btn" data-view-toggle="carousel" aria-label="Карусель">
+                    <button type="button" class="admin-view-toggle__btn" data-view-toggle="carousel" aria-label="@Localizer["Карусель"]">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="17" height="17">
                             <rect x="7" y="4" width="10" height="16" rx="1.5" />
                             <path d="M2 8v8" />
                             <path d="M22 8v8" />
                         </svg>
-                        <span>Карусель</span>
+                        <span>@Localizer["Карусель"]</span>
                     </button>
                 </div>
 
@@ -134,10 +134,10 @@
                         <table class="table admin-table" id="products-table">
                             <thead>
                                 <tr>
-                                    <th>Товар</th>
-                                    <th>Ціна</th>
-                                    <th>Статус</th>
-                                    <th class="text-end">Дії</th>
+                                    <th>@Localizer["Товар"]</th>
+                                    <th>@Localizer["Ціна"]</th>
+                                    <th>@Localizer["Статус"]</th>
+                                    <th class="text-end">@Localizer["Дії"]</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -245,11 +245,11 @@
                         </div>
                         <button class="carousel-control-prev" type="button" data-bs-target="#productsCarousel" data-bs-slide="prev">
                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Попередній</span>
+                            <span class="visually-hidden">@Localizer["Попередній"]</span>
                         </button>
                         <button class="carousel-control-next" type="button" data-bs-target="#productsCarousel" data-bs-slide="next">
                             <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Наступний</span>
+                            <span class="visually-hidden">@Localizer["Наступний"]</span>
                         </button>
                     </div>
                     <div class="admin-panel">
@@ -262,7 +262,7 @@
 
     <div class="admin-modal" data-admin-modal hidden>
         <div class="admin-modal__card admin-modal__card--wide">
-            <button type="button" class="admin-modal__close" aria-label="Закрити" data-admin-modal-close>×</button>
+            <button type="button" class="admin-modal__close" aria-label="@Localizer["Закрити"]" data-admin-modal-close>×</button>
             <div data-admin-modal-body></div>
         </div>
     </div>

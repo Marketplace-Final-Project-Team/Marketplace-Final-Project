@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Реєстрація" xml:space="preserve">
+    <value>Registrierung</value>
+  </data>
+  <data name="Новий акаунт" xml:space="preserve">
+    <value>Neues Konto</value>
+  </data>
+  <data name="Приєднуйтесь до Marketplace" xml:space="preserve">
+    <value>Treten Sie Marketplace bei</value>
+  </data>
+  <data name="Створіть один акаунт для покупок і майбутнього кабінету продавця." xml:space="preserve">
+    <value>Erstellen Sie ein einziges Konto zum Einkaufen und für Ihr zukünftiges Verkäufer-Dashboard.</value>
+  </data>
+  <data name="Ім’я користувача" xml:space="preserve">
+    <value>Benutzername</value>
+  </data>
+  <data name="Наприклад, oleksii" xml:space="preserve">
+    <value>z. B. oleksii</value>
+  </data>
+  <data name="Електронна пошта" xml:space="preserve">
+    <value>E-Mail-Adresse</value>
+  </data>
+  <data name="Пароль" xml:space="preserve">
+    <value>Passwort</value>
+  </data>
+  <data name="8+ символів" xml:space="preserve">
+    <value>8+ Zeichen</value>
+  </data>
+  <data name="Створіть надійний пароль" xml:space="preserve">
+    <value>Erstellen Sie ein sicheres Passwort</value>
+  </data>
+  <data name="Показати пароль" xml:space="preserve">
+    <value>Passwort anzeigen</value>
+  </data>
+  <data name="Показати" xml:space="preserve">
+    <value>Anzeigen</value>
+  </data>
+  <data name="Велика й мала літера, цифра та спеціальний символ." xml:space="preserve">
+    <value>Groß- und Kleinbuchstabe, Zahl und Sonderzeichen.</value>
+  </data>
+  <data name="Надійність пароля" xml:space="preserve">
+    <value>Passwortstärke</value>
+  </data>
+  <data name="Не вказано" xml:space="preserve">
+    <value>Nicht angegeben</value>
+  </data>
+  <data name="Повторіть пароль" xml:space="preserve">
+    <value>Passwort wiederholen</value>
+  </data>
+  <data name="Введіть пароль ще раз" xml:space="preserve">
+    <value>Passwort erneut eingeben</value>
+  </data>
+  <data name="Я приймаю правила користування та" xml:space="preserve">
+    <value>Ich akzeptiere die Nutzungsbedingungen und die</value>
+  </data>
+  <data name="політику конфіденційності" xml:space="preserve">
+    <value>Datenschutzrichtlinie</value>
+  </data>
+  <data name="вже зареєстровані?" xml:space="preserve">
+    <value>bereits registriert?</value>
+  </data>
+  <data name="Увійти до наявного акаунта" xml:space="preserve">
+    <value>Bei bestehendem Konto anmelden</value>
+  </data>
+</root>

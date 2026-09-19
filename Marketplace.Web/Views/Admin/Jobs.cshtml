@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.JobsPageViewModel
 
 @{
-    ViewData["Title"] = "Задачі - Адмін-панель";
+    ViewData["Title"] = $"{Localizer["Задачі"].Value} - {SharedLocalizer["Адмін-панель"].Value}";
 }
 
 @functions {
@@ -24,8 +24,8 @@
             <header class="admin-header">
                 <div>
                     <div class="admin-kicker">Admin</div>
-                    <h1 class="admin-title">Фонові задачі</h1>
-                    <p class="admin-subtitle">Автоматична модерація товарів через Quartz.NET - планувальник, черга та журнал рішень.</p>
+                    <h1 class="admin-title">@Localizer["Фонові задачі"]</h1>
+                    <p class="admin-subtitle">@Localizer["Автоматична модерація товарів через Quartz.NET - планувальник, черга та журнал рішень."]</p>
                 </div>
             </header>
 
@@ -38,7 +38,7 @@
                 <div class="admin-alert admin-alert--error"><span>!</span><p>@error</p></div>
             }
 
-            <div class="admin-stats" aria-label="Стан планувальника">
+            <div class="admin-stats" aria-label="@Localizer["Стан планувальника"]">
                 <div class="admin-stat-card">
                     <span class="admin-stat-card__icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
@@ -47,19 +47,19 @@
                         </svg>
                     </span>
                     <div class="admin-stat-card__body">
-                        <span class="admin-stat-card__label">Планувальник Quartz</span>
-                        <strong class="admin-stat-card__value">@(Model.IsSchedulerRunning ? "Працює" : "Зупинено")</strong>
-                        <span class="admin-stat-card__hint">ProductModerationJob - модерація товарів через Gemini</span>
+                        <span class="admin-stat-card__label">@Localizer["Планувальник Quartz"]</span>
+                        <strong class="admin-stat-card__value">@(Model.IsSchedulerRunning ? Localizer["Працює"] : Localizer["Зупинено"])</strong>
+                        <span class="admin-stat-card__hint">@Localizer["ProductModerationJob - модерація товарів через Gemini"]</span>
                         @if (Model.IsSchedulerRunning)
                         {
                             <form asp-action="PauseScheduler" method="post" class="mt-2">
-                                <button type="submit" class="btn btn-sm btn-outline-secondary">Призупинити планувальник</button>
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">@Localizer["Призупинити планувальник"]</button>
                             </form>
                         }
                         else
                         {
                             <form asp-action="ResumeScheduler" method="post" class="mt-2">
-                                <button type="submit" class="btn btn-sm btn-outline-success">Відновити планувальник</button>
+                                <button type="submit" class="btn btn-sm btn-outline-success">@Localizer["Відновити планувальник"]</button>
                             </form>
                         }
                     </div>
@@ -74,49 +74,49 @@
                         </svg>
                     </span>
                     <div class="admin-stat-card__body">
-                        <span class="admin-stat-card__label">У черзі зараз</span>
+                        <span class="admin-stat-card__label">@Localizer["У черзі зараз"]</span>
                         <strong class="admin-stat-card__value">@Model.ScheduledJobs.Count</strong>
-                        <span class="admin-stat-card__hint">Товарів очікують на автоматичну перевірку</span>
+                        <span class="admin-stat-card__hint">@Localizer["Товарів очікують на автоматичну перевірку"]</span>
                     </div>
                 </div>
             </div>
 
             <div class="admin-note">
-                <strong>Як це працює</strong>
-                Після створення або редагування товару система через 5 секунд запускає перевірку тексту й зображень через Gemini AI. Залежно від результату товар отримує статус «Активний» або «Заблокований»; у разі помилки перевірки - лишається «На модерації» для ручного розгляду.
+                <strong>@Localizer["Як це працює"]</strong>
+                @Localizer["Після створення або редагування товару система через 5 секунд запускає перевірку тексту й зображень через Gemini AI. Залежно від результату товар отримує статус «Активний» або «Заблокований»; у разі помилки перевірки - лишається «На модерації» для ручного розгляду."]
             </div>
 
             <section class="admin-panel table-responsive">
                 <div class="admin-header" style="padding: 1rem 1.25rem 0;">
-                    <h2 class="admin-title" style="font-size: 1.1rem;">У черзі на модерацію</h2>
+                    <h2 class="admin-title" style="font-size: 1.1rem;">@Localizer["У черзі на модерацію"]</h2>
                 </div>
                 @if (Model.ScheduledJobs.Count == 0)
                 {
-                    <p class="admin-empty">Зараз немає товарів, що очікують на автоматичну перевірку.</p>
+                    <p class="admin-empty">@Localizer["Зараз немає товарів, що очікують на автоматичну перевірку."]</p>
                 }
                 else
                 {
                     <table class="table admin-table">
                         <thead>
                             <tr>
-                                <th>Тип</th>
-                                <th>Назва</th>
-                                <th>Запуск перевірки</th>
-                                <th class="text-end">Дії</th>
+                                <th>@Localizer["Тип"]</th>
+                                <th>@Localizer["Назва"]</th>
+                                <th>@Localizer["Запуск перевірки"]</th>
+                                <th class="text-end">@Localizer["Дії"]</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var job in Model.ScheduledJobs)
                             {
                                 <tr>
-                                    <td>@(job.EntityType == "Business" ? "Бізнес" : "Товар")</td>
+                                    <td>@(job.EntityType == "Business" ? Localizer["Бізнес"] : Localizer["Товар"])</td>
                                     <td class="admin-entity-name">@job.ProductName</td>
                                     <td>@(job.NextRunAtUtc?.ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss") ?? "-")</td>
                                     <td class="text-end">
                                         <form asp-action="RunModerationJobNow" method="post" class="d-inline">
                                             <input type="hidden" name="entityId" value="@job.EntityId" />
                                             <input type="hidden" name="entityType" value="@job.EntityType" />
-                                            <button type="submit" class="btn btn-sm btn-outline-primary">Запустити зараз</button>
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">@Localizer["Запустити зараз"]</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -224,22 +224,78 @@
                 }
             </section>
 
-            <section class="admin-panel table-responsive mt-3">
+            <section class="admin-panel table-responsive">
                 <div class="admin-header" style="padding: 1rem 1.25rem 0;">
-                    <h2 class="admin-title" style="font-size: 1.1rem;">Останні рішення модерації</h2>
+                    <h2 class="admin-title" style="font-size: 1.1rem;">@Localizer["Регулярні задачі"]</h2>
                 </div>
-                @if (Model.RecentDecisions.Count == 0)
+                @if (Model.RecurringJobs.Count == 0)
                 {
-                    <p class="admin-empty">Поки що немає жодного запису.</p>
+                    <p class="admin-empty">@Localizer["Регулярних задач не знайдено."]</p>
                 }
                 else
                 {
                     <table class="table admin-table">
                         <thead>
                             <tr>
-                                <th>Час</th>
-                                <th>Бізнес</th>
-                                <th>Опис</th>
+                                <th>@Localizer["Назва"]</th>
+                                <th>@Localizer["Опис"]</th>
+                                <th>@Localizer["Останній запуск"]</th>
+                                <th>@Localizer["Наступний запуск"]</th>
+                                <th class="text-end">@Localizer["Дії"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var job in Model.RecurringJobs)
+                            {
+                                <tr>
+                                    <td class="admin-entity-name">@job.DisplayName</td>
+                                    <td>@job.Description</td>
+                                    <td>@(job.PreviousRunAtUtc?.ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss") ?? Localizer["ще не запускалась"].Value)</td>
+                                    <td>@(job.NextRunAtUtc?.ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss") ?? "-")</td>
+                                    <td class="text-end">
+                                        <form asp-action="RunRecurringJobNow" method="post" class="d-inline">
+                                            <input type="hidden" name="groupName" value="@job.GroupName" />
+                                            <input type="hidden" name="jobName" value="@job.JobName" />
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">@Localizer["Запустити зараз"]</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </section>
+
+            <section class="admin-panel" style="padding: 1.25rem 1.5rem;">
+                <h2 class="admin-title" style="font-size: 1.1rem;">@Localizer["Налаштування Gemini API"]</h2>
+                <p class="admin-subtitle">@Localizer["Ключ і модель, які використовує автоматична модерація товарів."] @(Model.HasCustomApiKey ? Localizer["Зараз використовується ключ, збережений тут."] : Localizer["Зараз використовується ключ із конфігурації сервера."])</p>
+                <form asp-action="UpdateModerationApiKey" method="post" class="admin-toolbar">
+                    <div class="admin-search-wrap">
+                        <input type="password" class="form-control" name="apiKey" placeholder="@(Model.HasCustomApiKey ? Localizer["Введіть, щоб замінити збережений ключ"] : "Gemini API key")" autocomplete="off" />
+                    </div>
+                    <div class="admin-search-wrap">
+                        <input type="text" class="form-control" name="model" placeholder="gemini-2.5-flash" value="@Model.ModerationModel" />
+                    </div>
+                    <button type="submit" class="btn btn-outline-secondary">@Localizer["Зберегти"]</button>
+                </form>
+            </section>
+
+            <section class="admin-panel table-responsive mt-3">
+                <div class="admin-header" style="padding: 1rem 1.25rem 0;">
+                    <h2 class="admin-title" style="font-size: 1.1rem;">@Localizer["Останні рішення модерації"]</h2>
+                </div>
+                @if (Model.RecentDecisions.Count == 0)
+                {
+                    <p class="admin-empty">@Localizer["Поки що немає жодного запису."]</p>
+                }
+                else
+                {
+                    <table class="table admin-table">
+                        <thead>
+                            <tr>
+                                <th>@Localizer["Час"]</th>
+                                <th>@Localizer["Бізнес"]</th>
+                                <th>@Localizer["Опис"]</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -387,28 +443,27 @@
         (() => {
             let lastReturnCount = @Model.OpenReturnRequests.Count;
             let lastTicketCount = @Model.OpenTickets.Count;
- 
+
             setInterval(async () => {
-       
                 if (document.querySelector('.modal.show')) {
                     return;
                 }
- 
+
                 try {
                     const response = await fetch('/Admin/JobsCounts');
                     if (!response.ok) {
                         return;
                     }
- 
+
                     const data = await response.json();
- 
+
                     if (data.returnCount !== lastReturnCount || data.ticketCount !== lastTicketCount) {
                         window.location.reload();
                     }
                 } catch (error) {
                     console.error('Помилка опитування нових заявок:', error);
                 }
-            }, 10000); 
+            }, 10000);
         })();
     </script>
 }

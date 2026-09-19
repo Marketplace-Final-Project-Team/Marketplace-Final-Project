@@ -23,6 +23,7 @@ namespace Marketplace.Web.Controllers
         private readonly AppDbContext _context;
         private readonly UserManager<User> _userManager;
         private readonly IEmailSender _emailSender;
+        private readonly IUserDiscountService _userDiscountService;
 
         public ProfileController(
             IProfileService profileService,
@@ -32,7 +33,8 @@ namespace Marketplace.Web.Controllers
             IGenericRepository<Address> addressRepository,
             AppDbContext context,
             UserManager<User> userManager,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IUserDiscountService userDiscountService)
         {
             _profileService = profileService;
             _orderService = orderService;
@@ -42,6 +44,7 @@ namespace Marketplace.Web.Controllers
             _context = context;
             _userManager = userManager;
             _emailSender = emailSender;
+            _userDiscountService = userDiscountService;
         }
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -58,6 +61,7 @@ namespace Marketplace.Web.Controllers
             var orders = await _orderService.GetUserOrders(userId!);
             var addresses = await _addressRepository.FindAsync(a => a.UserId == userId);
             var wishlist = await _wishlistService.GetWishlistAsync(userId!);
+            var discounts = await _userDiscountService.GetActiveDiscountsForUserAsync(userId!);
 
             
             var now = DateTime.UtcNow;
@@ -80,10 +84,19 @@ namespace Marketplace.Web.Controllers
                 OrdersCount = orders.Count,
                 AddressesCount = addresses.Count,
                 WishlistCount = wishlist.TotalItems,
+                DiscountsCount = discounts.Count,
                 PersonalDiscounts = personalDiscounts
             });
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> Discounts()
+        {
+            var userId = _userManager.GetUserId(User);
+            var discounts = await _userDiscountService.GetActiveDiscountsForUserAsync(userId!);
+            return View(discounts);
+        }
 
         [HttpGet]
         public async Task<IActionResult> Activity()

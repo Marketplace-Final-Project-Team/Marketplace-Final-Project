@@ -18,9 +18,14 @@ namespace Marketplace.Web.Models.Products
         [Range(0.01, double.MaxValue, ErrorMessage = "Ціна має бути більшою за 0")]
         public decimal Price { get; set; }
 
-        [Required]
         [Range(0, int.MaxValue, ErrorMessage = "Кількість не може бути від'ємною")]
         public int Quantity { get; set; }
+
+        [Display(Name = "Артикул (SKU)")]
+        [StringLength(100)]
+        public string? Sku { get; set; }
+
+        public List<ProductVariantInputModel> Variants { get; set; } = new();
 
         [Required(ErrorMessage = "Оберіть категорію")]
         public Guid CategoryId { get; set; }

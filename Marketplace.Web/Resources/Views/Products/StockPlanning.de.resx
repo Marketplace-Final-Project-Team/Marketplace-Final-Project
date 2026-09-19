@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="шт." xml:space="preserve">
+    <value>Stk.</value>
+  </data>
+  <data name="дн." xml:space="preserve">
+    <value>Tg.</value>
+  </data>
+  <data name="Назад до товарів" xml:space="preserve">
+    <value>Zurück zu den Artikeln</value>
+  </data>
+  <data name="Залишилось днів" xml:space="preserve">
+    <value>Verbleibende Tage</value>
+  </data>
+  <data name="Товар" xml:space="preserve">
+    <value>Artikel</value>
+  </data>
+  <data name="Поточний залишок" xml:space="preserve">
+    <value>Aktueller Bestand</value>
+  </data>
+  <data name="Прогноз з&apos;явиться, щойно активні товари матимуть продажі за останні 30 днів." xml:space="preserve">
+    <value>Die Prognose erscheint, sobald aktive Artikel in den letzten 30 Tagen Verkäufe hatten.</value>
+  </data>
+  <data name="У середньому/день" xml:space="preserve">
+    <value>Durchschnitt/Tag</value>
+  </data>
+  <data name="Панель продавця" xml:space="preserve">
+    <value>Verkäuferbereich</value>
+  </data>
+  <data name="Продано за 30 днів" xml:space="preserve">
+    <value>In 30 Tagen verkauft</value>
+  </data>
+  <data name="На основі продажів за останні 30 днів - коли товар закінчиться і скільки часу лишилось на дозамовлення." xml:space="preserve">
+    <value>Basierend auf den Verkäufen der letzten 30 Tage - wann ein Artikel ausgeht und wie viel Zeit für eine Nachbestellung bleibt.</value>
+  </data>
+  <data name="Недостатньо даних для прогнозу" xml:space="preserve">
+    <value>Nicht genügend Daten für eine Prognose</value>
+  </data>
+  <data name="Планування запасів" xml:space="preserve">
+    <value>Bestandsplanung</value>
+  </data>
+  <data name="Час дозамовити" xml:space="preserve">
+    <value>Zeit zum Nachbestellen</value>
+  </data>
+  <data name="Артикул:" xml:space="preserve">
+    <value>Artikelnummer:</value>
+  </data>
+</root>

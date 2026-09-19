@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.CartPageViewModel
 
 @{
-    ViewData["Title"] = "Кошик";
+    ViewData["Title"] = SharedLocalizer["Кошик"].Value;
 }
 
 @section Styles {
@@ -12,11 +12,11 @@
 <div class="shop-page">
     <header class="shop-header">
         <div>
-            <div class="shop-kicker">Покупки</div>
-            <h1 class="shop-title">Кошик</h1>
-            <p class="shop-subtitle">Перевірте товари та кількість перед оформленням замовлення.</p>
+            <div class="shop-kicker">@Localizer["Покупки"]</div>
+            <h1 class="shop-title">@SharedLocalizer["Кошик"]</h1>
+            <p class="shop-subtitle">@Localizer["Перевірте товари та кількість перед оформленням замовлення."]</p>
         </div>
-        <a asp-controller="Catalog" asp-action="Index" class="btn btn-outline-primary">Продовжити покупки</a>
+        <a asp-controller="Catalog" asp-action="Index" class="btn btn-outline-primary">@Localizer["Продовжити покупки"]</a>
     </header>
 
     @if (TempData["Success"] is string success)
@@ -32,9 +32,9 @@
     {
         <section class="shop-empty">
             <div class="shop-empty__icon" aria-hidden="true">□</div>
-            <h2>Кошик порожній</h2>
-            <p>Додайте кілька товарів із каталогу, щоб оформити замовлення.</p>
-            <a asp-controller="Catalog" asp-action="Index" class="btn btn-primary">Перейти до каталогу</a>
+            <h2>@Localizer["Кошик порожній"]</h2>
+            <p>@Localizer["Додайте кілька товарів із каталогу, щоб оформити замовлення."]</p>
+            <a asp-controller="Catalog" asp-action="Index" class="btn btn-primary">@Localizer["Перейти до каталогу"]</a>
         </section>
     }
     else
@@ -45,7 +45,7 @@
                 {
                     <p class="cart-sellers-note">
                         <span aria-hidden="true">ⓘ</span>
-                        Товари згруповано за @Model.SellerGroups.Count продавцями - оформлюються одним замовленням.
+                        @Localizer["Товари згруповано за"] @Model.SellerGroups.Count @Localizer["продавцями - оформлюються одним замовленням."]
                     </p>
                 }
 
@@ -62,10 +62,10 @@
                                 <span class="cart-seller-group__logo cart-seller-group__logo--fallback" aria-hidden="true">@group.StoreName[..1].ToUpperInvariant()</span>
                             }
                             <div>
-                                <span class="cart-seller-group__label">Продавець</span>
+                                <span class="cart-seller-group__label">@Localizer["Продавець"]</span>
                                 <strong>@group.StoreName</strong>
                             </div>
-                            <span class="cart-seller-group__subtotal">@group.Subtotal.ToString("N2") ₴ · @group.ItemCount шт.</span>
+                            <span class="cart-seller-group__subtotal">@group.Subtotal.ToString("N2") ₴ · @group.ItemCount @Localizer["шт."]</span>
                         </div>
 
                         @foreach (var item in group.Items)
@@ -82,17 +82,23 @@
 
                                 <div>
                                     <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.ProductId" class="cart-item__name">@item.ProductName</a>
-                                    <div class="cart-item__unit">@item.Price.ToString("N2") ₴ за одиницю · доступно @item.StockQuantity</div>
+                                    @if (!string.IsNullOrWhiteSpace(item.VariantSize))
+                                    {
+                                        <div class="cart-item__variant">@Localizer["Розмір:"] <strong>@item.VariantSize</strong></div>
+                                    }
+                                    <div class="cart-item__unit">@item.Price.ToString("N2") ₴ @Localizer["за одиницю · доступно"] @item.StockQuantity</div>
 
-                                    <div class="quantity-control" aria-label="Кількість товару">
+                                    <div class="quantity-control" aria-label="@Localizer["Кількість товару"]">
                                         <form asp-action="DecreaseQuantity" method="post">
                                             <input type="hidden" name="productId" value="@item.ProductId" />
-                                            <button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="Зменшити кількість">−</button>
+                                            <input type="hidden" name="variantId" value="@item.ProductVariantId" />
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="@Localizer["Зменшити кількість"]">−</button>
                                         </form>
                                         <span class="quantity-control__value">@item.Quantity</span>
                                         <form asp-action="IncreaseQuantity" method="post">
                                             <input type="hidden" name="productId" value="@item.ProductId" />
-                                            <button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="Збільшити кількість">+</button>
+                                            <input type="hidden" name="variantId" value="@item.ProductVariantId" />
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="@Localizer["Збільшити кількість"]">+</button>
                                         </form>
                                     </div>
                                 </div>
@@ -101,7 +107,8 @@
                                     <strong>@item.LineTotal.ToString("N2") ₴</strong>
                                     <form asp-action="Remove" method="post">
                                         <input type="hidden" name="productId" value="@item.ProductId" />
-                                        <button type="submit" class="cart-remove">Видалити</button>
+                                        <input type="hidden" name="variantId" value="@item.ProductVariantId" />
+                                        <button type="submit" class="cart-remove">@Localizer["Видалити"]</button>
                                     </form>
                                 </div>
                             </article>
@@ -111,15 +118,15 @@
             </div>
 
             <aside class="shop-panel summary-card">
-                <h2>Разом</h2>
-                <div class="summary-row"><span>Товарів</span><strong>@Model.TotalUnits шт.</strong></div>
+                <h2>@Localizer["Разом"]</h2>
+                <div class="summary-row"><span>@Localizer["Товарів"]</span><strong>@Model.TotalUnits @Localizer["шт."]</strong></div>
                 @if (Model.HasMultipleSellers)
                 {
-                    <div class="summary-row"><span>Продавців</span><strong>@Model.SellerGroups.Count</strong></div>
+                    <div class="summary-row"><span>@Localizer["Продавців"]</span><strong>@Model.SellerGroups.Count</strong></div>
                 }
-                <div class="summary-row"><span>Доставка</span><strong>Безкоштовно</strong></div>
-                <div class="summary-total"><span>До сплати</span><span>@Model.Total.ToString("N2") ₴</span></div>
-                <a asp-controller="Order" asp-action="Create" class="btn btn-primary">Оформити замовлення</a>
+                <div class="summary-row"><span>@Localizer["Доставка"]</span><strong>@Localizer["Безкоштовно"]</strong></div>
+                <div class="summary-total"><span>@Localizer["До сплати"]</span><span>@Model.Total.ToString("N2") ₴</span></div>
+                <a asp-controller="Order" asp-action="Create" class="btn btn-primary">@Localizer["Оформити замовлення"]</a>
             </aside>
         </div>
     }

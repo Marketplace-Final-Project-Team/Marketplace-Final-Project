@@ -6,6 +6,8 @@ namespace Marketplace.Web.Models
         public CatalogFilterViewModel Filter { get; set; } = new();
         public List<SelectListItem> Categories { get; set; } = new();
         public List<CatalogProductViewModel> Products { get; set; } = new();
+        public string? SelectedCategoryName { get; set; }
+        public string? SelectedCategoryImageUrl { get; set; }
 
         public int TotalCount { get; set; }
         public int Page { get; set; } = 1;

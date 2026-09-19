@@ -6,6 +6,12 @@ namespace Marketplace.Domain.Entities
         public Guid ProductId { get; set; }
         public Product Product { get; set; } = null!;
         public string ProductName { get; set; } = string.Empty;
+
+        public Guid? ProductVariantId { get; set; }
+        public ProductVariant? ProductVariant { get; set; }
+        public string? VariantSize { get; set; }
+        public string? VariantSku { get; set; }
+
         public decimal UnitPrice { get; set; }
         public int Quantity { get; set; }
         public decimal CommissionAmount { get; set; }

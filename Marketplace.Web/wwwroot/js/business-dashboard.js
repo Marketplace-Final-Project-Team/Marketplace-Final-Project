@@ -51,6 +51,20 @@
         }
     }
 
+    const topCustomersCanvas = document.getElementById("topCustomersChart");
+    if (topCustomersCanvas) {
+        const items = MpCharts.readData(topCustomersCanvas) || [];
+        if (items.length > 0) {
+            MpCharts.bar("topCustomersChart", {
+                labels: items.map((c) => c.name),
+                data: items.map((c) => c.revenue),
+                label: "Виручка, ₴",
+                color: "#42a98b",
+                horizontal: true
+            });
+        }
+    }
+
     const trafficCanvas = document.getElementById("trafficChart");
     if (trafficCanvas) {
         const d = MpCharts.readData(trafficCanvas);
@@ -60,6 +74,18 @@
                 data: [d.views, d.cartAdds, d.wishlistAdds, d.orders],
                 label: "Дії",
                 color: "#42a98b"
+            });
+        }
+    }
+
+    const categoryCanvas = document.getElementById("categoryChart");
+    if (categoryCanvas) {
+        const items = MpCharts.readData(categoryCanvas) || [];
+        if (items.length > 0) {
+            MpCharts.doughnut("categoryChart", {
+                labels: items.map((c) => c.name),
+                data: items.map((c) => c.revenue),
+                colors: items.map((c) => c.color)
             });
         }
     }

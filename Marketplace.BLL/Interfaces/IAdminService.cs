@@ -24,7 +24,6 @@ namespace Marketplace.BLL.Interfaces
 
         Task<DataResult<AdminCommissionStatsDto>> GetCommissionStatsByPeriodAsync(DateTime? startDate, DateTime? endDate);
         Task<decimal> GetTotalCommissionAsync();
-
-        Task<AdminStatisticsOverviewDto> GetStatisticsAsync(DateTime? startDate, DateTime? endDate);
+        Task<AdminStatisticsOverviewDto> GetStatisticsAsync(DateTime? startDate, DateTime? endDate, Guid? businessId = null);
     }
 }

@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Навігаційний шлях" xml:space="preserve">
+    <value>Ruta de navegación</value>
+  </data>
+  <data name="Каталог" xml:space="preserve">
+    <value>Catálogo</value>
+  </data>
+  <data name="Товар у кошику" xml:space="preserve">
+    <value>Artículo en el carrito</value>
+  </data>
+  <data name="Відкрити кошик →" xml:space="preserve">
+    <value>Abrir carrito →</value>
+  </data>
+  <data name="Не вдалося виконати дію" xml:space="preserve">
+    <value>No se pudo completar la acción</value>
+  </data>
+  <data name="Галерея товару {0}" xml:space="preserve">
+    <value>Galería del producto {0}</value>
+  </data>
+  <data name="Новинка" xml:space="preserve">
+    <value>Novedad</value>
+  </data>
+  <data name="{0} - основне зображення" xml:space="preserve">
+    <value>{0} - imagen principal</value>
+  </data>
+  <data name="Зображення товару {0} відсутнє" xml:space="preserve">
+    <value>No hay imagen disponible para {0}</value>
+  </data>
+  <data name="Зображення готується" xml:space="preserve">
+    <value>Imagen en preparación</value>
+  </data>
+  <data name="Оберіть зображення" xml:space="preserve">
+    <value>Elige una imagen</value>
+  </data>
+  <data name="{0} - зображення {1}" xml:space="preserve">
+    <value>{0} - imagen {1}</value>
+  </data>
+  <data name="Показати зображення {0}" xml:space="preserve">
+    <value>Mostrar imagen {0}</value>
+  </data>
+  <data name="Фото товару" xml:space="preserve">
+    <value>Foto del producto</value>
+  </data>
+  <data name="Доступно {0} зображення" xml:space="preserve">
+    <value>{0} imágenes disponibles</value>
+  </data>
+  <data name="Перегляньте товар перед покупкою" xml:space="preserve">
+    <value>Échale un vistazo antes de comprar</value>
+  </data>
+  <data name="Код:" xml:space="preserve">
+    <value>Código:</value>
+  </data>
+  <data name="Ціна" xml:space="preserve">
+    <value>Precio</value>
+  </data>
+  <data name="Ціна вказана з урахуванням усіх податків" xml:space="preserve">
+    <value>El precio incluye todos los impuestos</value>
+  </data>
+  <data name="Залишилося лише {0} шт." xml:space="preserve">
+    <value>Solo quedan {0} unidades</value>
+  </data>
+  <data name="Є в наявності" xml:space="preserve">
+    <value>En stock</value>
+  </data>
+  <data name="Рекомендуємо не відкладати замовлення" xml:space="preserve">
+    <value>Te recomendamos pedirlo pronto</value>
+  </data>
+  <data name="Доступно до замовлення: {0} шт." xml:space="preserve">
+    <value>Disponible para pedir: {0} uds.</value>
+  </data>
+  <data name="Купити в 1 клік" xml:space="preserve">
+    <value>Comprar en 1 clic</value>
+  </data>
+  <data name="Додати до кошика" xml:space="preserve">
+    <value>Añadir al carrito</value>
+  </data>
+  <data name="Відкрити кошик" xml:space="preserve">
+    <value>Abrir carrito</value>
+  </data>
+  <data name="У списку бажань" xml:space="preserve">
+    <value>En la lista de deseos</value>
+  </data>
+  <data name="У список бажань" xml:space="preserve">
+    <value>Añadir a la lista de deseos</value>
+  </data>
+  <data name="Увійти та додати до кошика" xml:space="preserve">
+    <value>Iniciar sesión y añadir al carrito</value>
+  </data>
+  <data name="Безпечне оформлення замовлення" xml:space="preserve">
+    <value>Pago seguro</value>
+  </data>
+  <data name="Орієнтовна доставка" xml:space="preserve">
+    <value>Entrega estimada</value>
+  </data>
+  <data name="2–4 робочі дні" xml:space="preserve">
+    <value>2-4 días laborables</value>
+  </data>
+  <data name="Просте повернення" xml:space="preserve">
+    <value>Devoluciones fáciles</value>
+  </data>
+  <data name="Повернення протягом 14 днів після отримання" xml:space="preserve">
+    <value>Devolución dentro de los 14 días posteriores a la recepción</value>
+  </data>
+  <data name="Захищена покупка" xml:space="preserve">
+    <value>Compra protegida</value>
+  </data>
+  <data name="Статус замовлення та доставки завжди під рукою" xml:space="preserve">
+    <value>Estado del pedido y la entrega siempre a mano</value>
+  </data>
+  <data name="Логотип продавця {0}" xml:space="preserve">
+    <value>Logotipo del vendedor {0}</value>
+  </data>
+  <data name="Продавець" xml:space="preserve">
+    <value>Vendedor</value>
+  </data>
+  <data name="Перевірений продавець Marketplace" xml:space="preserve">
+    <value>Vendedor verificado de Marketplace</value>
+  </data>
+  <data name="Перевірений продавець" xml:space="preserve">
+    <value>Vendedor verificado</value>
+  </data>
+  <data name="Про товар" xml:space="preserve">
+    <value>Sobre el producto</value>
+  </data>
+  <data name="Опис" xml:space="preserve">
+    <value>Descripción</value>
+  </data>
+  <data name="Перевірена наявність" xml:space="preserve">
+    <value>Disponibilidad verificada</value>
+  </data>
+  <data name="Актуальний залишок синхронізований із каталогом." xml:space="preserve">
+    <value>El stock actual está sincronizado con el catálogo.</value>
+  </data>
+  <data name="Зручне повернення" xml:space="preserve">
+    <value>Devolución cómoda</value>
+  </data>
+  <data name="Зрозумілий процес повернення після покупки." xml:space="preserve">
+    <value>Un proceso de devolución claro después de la compra.</value>
+  </data>
+  <data name="Контроль доставки" xml:space="preserve">
+    <value>Seguimiento de la entrega</value>
+  </data>
+  <data name="Відстежуйте шлях замовлення в особистому кабінеті." xml:space="preserve">
+    <value>Sigue el trayecto de tu pedido en tu cuenta personal.</value>
+  </data>
+  <data name="Деталі" xml:space="preserve">
+    <value>Detalles</value>
+  </data>
+  <data name="Характеристики" xml:space="preserve">
+    <value>Características</value>
+  </data>
+  <data name="Категорія" xml:space="preserve">
+    <value>Categoría</value>
+  </data>
+  <data name="Наявність" xml:space="preserve">
+    <value>Disponibilidad</value>
+  </data>
+  <data name="шт." xml:space="preserve">
+    <value>uds.</value>
+  </data>
+  <data name="Код товару" xml:space="preserve">
+    <value>Código de producto</value>
+  </data>
+  <data name="Стан" xml:space="preserve">
+    <value>Estado</value>
+  </data>
+  <data name="Новий товар" xml:space="preserve">
+    <value>Artículo nuevo</value>
+  </data>
+  <data name="Відгуки покупців" xml:space="preserve">
+    <value>Opiniones de clientes</value>
+  </data>
+  <data name="Відгуки ({0})" xml:space="preserve">
+    <value>Opiniones ({0})</value>
+  </data>
+  <data name="на основі {0} відгуків" xml:space="preserve">
+    <value>basado en {0} opiniones</value>
+  </data>
+  <data name="поки без відгуків" xml:space="preserve">
+    <value>aún sin opiniones</value>
+  </data>
+  <data name="Редагувати мій відгук" xml:space="preserve">
+    <value>Editar mi opinión</value>
+  </data>
+  <data name="Написати відгук" xml:space="preserve">
+    <value>Escribir una opinión</value>
+  </data>
+  <data name="Увійти, щоб залишити відгук" xml:space="preserve">
+    <value>Inicia sesión para dejar una opinión</value>
+  </data>
+  <data name="Ще немає відгуків про цей товар. Будьте першим!" xml:space="preserve">
+    <value>Aún no hay opiniones sobre este producto. ¡Sé el primero!</value>
+  </data>
+  <data name="Оцінка {0} з 5" xml:space="preserve">
+    <value>Valoración {0} de 5</value>
+  </data>
+  <data name="Редагувати" xml:space="preserve">
+    <value>Editar</value>
+  </data>
+  <data name="Видалити цей відгук?" xml:space="preserve">
+    <value>¿Eliminar esta opinión?</value>
+  </data>
+  <data name="Видалити" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
+  <data name="Запитання та відповіді" xml:space="preserve">
+    <value>Preguntas y respuestas</value>
+  </data>
+  <data name="Запитайте продавця" xml:space="preserve">
+    <value>Pregunta al vendedor</value>
+  </data>
+  <data name="Наприклад: чи підходить цей товар для..." xml:space="preserve">
+    <value>Por ejemplo: ¿es adecuado este producto para...</value>
+  </data>
+  <data name="Надіслати запитання" xml:space="preserve">
+    <value>Enviar pregunta</value>
+  </data>
+  <data name="Продавець «{0}» відповідає на запитання протягом 1–2 робочих днів." xml:space="preserve">
+    <value>El vendedor "{0}" responde a las preguntas en 1-2 días laborables.</value>
+  </data>
+  <data name="Увійти, щоб поставити запитання" xml:space="preserve">
+    <value>Inicia sesión para hacer una pregunta</value>
+  </data>
+  <data name="Ще немає запитань про цей товар. Будьте першим!" xml:space="preserve">
+    <value>Aún no hay preguntas sobre este producto. ¡Sé el primero!</value>
+  </data>
+  <data name="Може сподобатися" xml:space="preserve">
+    <value>También te podría gustar</value>
+  </data>
+  <data name="Схожі товари" xml:space="preserve">
+    <value>Productos relacionados</value>
+  </data>
+  <data name="Переглянути каталог" xml:space="preserve">
+    <value>Ver catálogo</value>
+  </data>
+  <data name="Переглянути {0}" xml:space="preserve">
+    <value>Ver {0}</value>
+  </data>
+  <data name="В наявності" xml:space="preserve">
+    <value>En stock</value>
+  </data>
+  <data name="Немає в наявності" xml:space="preserve">
+    <value>Agotado</value>
+  </data>
+</root>

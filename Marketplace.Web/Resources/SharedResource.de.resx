@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Меню" xml:space="preserve">
+    <value>Menü</value>
+  </data>
+  <data name="Категорія пошуку" xml:space="preserve">
+    <value>Suchkategorie</value>
+  </data>
+  <data name="Усі категорії" xml:space="preserve">
+    <value>Alle Kategorien</value>
+  </data>
+  <data name="Пошук товарів на MarketPlace" xml:space="preserve">
+    <value>Produkte auf MarketPlace suchen</value>
+  </data>
+  <data name="Пошук товарів" xml:space="preserve">
+    <value>Produkte suchen</value>
+  </data>
+  <data name="Шукати" xml:space="preserve">
+    <value>Suchen</value>
+  </data>
+  <data name="Мова сайту" xml:space="preserve">
+    <value>Sprache der Website</value>
+  </data>
+  <data name="Вітаємо," xml:space="preserve">
+    <value>Willkommen,</value>
+  </data>
+  <data name="Мій профіль" xml:space="preserve">
+    <value>Mein Profil</value>
+  </data>
+  <data name="Мої замовлення" xml:space="preserve">
+    <value>Meine Bestellungen</value>
+  </data>
+  <data name="Список бажань" xml:space="preserve">
+    <value>Wunschliste</value>
+  </data>
+  <data name="Адреси доставки" xml:space="preserve">
+    <value>Lieferadressen</value>
+  </data>
+  <data name="Панель продавця" xml:space="preserve">
+    <value>Verkäufer-Dashboard</value>
+  </data>
+  <data name="Мої товари" xml:space="preserve">
+    <value>Meine Produkte</value>
+  </data>
+  <data name="Адмін-панель" xml:space="preserve">
+    <value>Admin-Bereich</value>
+  </data>
+  <data name="Вийти" xml:space="preserve">
+    <value>Abmelden</value>
+  </data>
+  <data name="Увійти" xml:space="preserve">
+    <value>Anmelden</value>
+  </data>
+  <data name="Створити акаунт" xml:space="preserve">
+    <value>Konto erstellen</value>
+  </data>
+  <data name="Повернення та" xml:space="preserve">
+    <value>Rückgabe &amp;</value>
+  </data>
+  <data name="Замовлення" xml:space="preserve">
+    <value>Bestellungen</value>
+  </data>
+  <data name="Категорії" xml:space="preserve">
+    <value>Kategorien</value>
+  </data>
+  <data name="Усі товари" xml:space="preserve">
+    <value>Alle Produkte</value>
+  </data>
+  <data name="Головна" xml:space="preserve">
+    <value>Startseite</value>
+  </data>
+  <data name="Реєстрація" xml:space="preserve">
+    <value>Registrierung</value>
+  </data>
+  <data name="Маркетплейс, де покупці знаходять потрібне, а продавці розвивають свій бізнес." xml:space="preserve">
+    <value>Ein Marktplatz, auf dem Käufer finden, was sie brauchen, und Verkäufer ihr Geschäft ausbauen.</value>
+  </data>
+  <data name="Покупцям" xml:space="preserve">
+    <value>Für Käufer</value>
+  </data>
+  <data name="Каталог товарів" xml:space="preserve">
+    <value>Produktkatalog</value>
+  </data>
+  <data name="Кошик" xml:space="preserve">
+    <value>Warenkorb</value>
+  </data>
+  <data name="Допомога" xml:space="preserve">
+    <value>Hilfe</value>
+  </data>
+  <data name="Доставка та оплата" xml:space="preserve">
+    <value>Versand &amp; Zahlung</value>
+  </data>
+  <data name="Повернення та обмін" xml:space="preserve">
+    <value>Rückgabe &amp; Umtausch</value>
+  </data>
+  <data name="Підтримка та FAQ" xml:space="preserve">
+    <value>Support &amp; FAQ</value>
+  </data>
+  <data name="Продавцям" xml:space="preserve">
+    <value>Für Verkäufer</value>
+  </data>
+  <data name="Створити магазин" xml:space="preserve">
+    <value>Shop erstellen</value>
+  </data>
+  <data name="Правила для продавців" xml:space="preserve">
+    <value>Verkäuferregeln</value>
+  </data>
+  <data name="Правова інформація" xml:space="preserve">
+    <value>Rechtliche Informationen</value>
+  </data>
+  <data name="Умови використання" xml:space="preserve">
+    <value>Nutzungsbedingungen</value>
+  </data>
+  <data name="Конфіденційність" xml:space="preserve">
+    <value>Datenschutz</value>
+  </data>
+  <data name="Політика кукі" xml:space="preserve">
+    <value>Cookie-Richtlinie</value>
+  </data>
+  <data name="Оплата карткою через LiqPay:" xml:space="preserve">
+    <value>Kartenzahlung über LiqPay:</value>
+  </data>
+  <data name="Електроніка" xml:space="preserve">
+    <value>Elektronik</value>
+  </data>
+  <data name="Спорт і відпочинок" xml:space="preserve">
+    <value>Sport &amp; Freizeit</value>
+  </data>
+  <data name="Дом і кухня" xml:space="preserve">
+    <value>Haus &amp; Küche</value>
+  </data>
+  <data name="Одяг" xml:space="preserve">
+    <value>Kleidung</value>
+  </data>
+  <data name="Книги" xml:space="preserve">
+    <value>Bücher</value>
+  </data>
+  <data name="Краса та догляд" xml:space="preserve">
+    <value>Schönheit &amp; Pflege</value>
+  </data>
+  <data name="Здоров&apos;я та wellness" xml:space="preserve">
+    <value>Gesundheit &amp; Wellness</value>
+  </data>
+  <data name="Дитячі товари" xml:space="preserve">
+    <value>Kinderprodukte</value>
+  </data>
+  <data name="Прикраси та годинники" xml:space="preserve">
+    <value>Schmuck &amp; Uhren</value>
+  </data>
+  <data name="Автотовари" xml:space="preserve">
+    <value>Autoteile &amp; Zubehör</value>
+  </data>
+  <data name="Інструменти та ремонт" xml:space="preserve">
+    <value>Werkzeuge &amp; Heimwerken</value>
+  </data>
+  <data name="Сад і двір" xml:space="preserve">
+    <value>Garten &amp; Außenbereich</value>
+  </data>
+</root>

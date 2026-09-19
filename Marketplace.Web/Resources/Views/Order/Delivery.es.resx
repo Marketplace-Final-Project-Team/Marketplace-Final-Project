@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Доставка замовлення" xml:space="preserve">
+    <value>Entrega del pedido</value>
+  </data>
+  <data name="До замовлення" xml:space="preserve">
+    <value>Volver al pedido</value>
+  </data>
+  <data name="Замовлення #" xml:space="preserve">
+    <value>Pedido #</value>
+  </data>
+  <data name="Доставка товару" xml:space="preserve">
+    <value>Entrega del pedido</value>
+  </data>
+  <data name="Статус і маршрут доставки вашого замовлення." xml:space="preserve">
+    <value>Estado y ruta de entrega de tu pedido.</value>
+  </data>
+  <data name="Замовлення скасовано. Доставка не виконується." xml:space="preserve">
+    <value>El pedido ha sido cancelado. La entrega no se realizará.</value>
+  </data>
+  <data name="Адреса доставки" xml:space="preserve">
+    <value>Dirección de envío</value>
+  </data>
+  <data name="Замовлення створено" xml:space="preserve">
+    <value>Pedido realizado</value>
+  </data>
+  <data name="Ми отримали ваше замовлення." xml:space="preserve">
+    <value>Hemos recibido tu pedido.</value>
+  </data>
+  <data name="Замовлення підтверджено" xml:space="preserve">
+    <value>Pedido confirmado</value>
+  </data>
+  <data name="Продавець готує товари до відправлення." xml:space="preserve">
+    <value>El vendedor está preparando los artículos para el envío.</value>
+  </data>
+  <data name="Передано в доставку" xml:space="preserve">
+    <value>Entregado al transportista</value>
+  </data>
+  <data name="Посилка вже прямує до вас." xml:space="preserve">
+    <value>Tu paquete ya va en camino.</value>
+  </data>
+  <data name="Доставлено" xml:space="preserve">
+    <value>Entregado</value>
+  </data>
+  <data name="Замовлення успішно отримано." xml:space="preserve">
+    <value>El pedido se ha recibido correctamente.</value>
+  </data>
+</root>

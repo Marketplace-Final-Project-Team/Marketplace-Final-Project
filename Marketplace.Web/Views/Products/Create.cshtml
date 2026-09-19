@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.Products.ProductCreateViewModel
 
 @{
-    ViewData["Title"] = "Новий товар";
+    ViewData["Title"] = Localizer["Новий товар"];
 }
 
 @section Styles {
@@ -9,12 +9,12 @@
 }
 
 <div class="products-page">
-    <a asp-action="Index" class="products-back">← Назад до товарів</a>
+    <a asp-action="Index" class="products-back">← @Localizer["Назад до товарів"]</a>
     <header class="products-heading">
         <div>
-            <div class="products-eyebrow">Новий запис</div>
-            <h1 class="products-title">Додати товар</h1>
-            <p class="products-subtitle">Заповніть основні поля. Після створення товар отримає статус «На модерації».</p>
+            <div class="products-eyebrow">@Localizer["Новий запис"]</div>
+            <h1 class="products-title">@Localizer["Додати товар"]</h1>
+            <p class="products-subtitle">@Localizer["Заповніть основні поля. Після створення товар отримає статус «На модерації»."]</p>
         </div>
     </header>
 
@@ -24,53 +24,80 @@
         <div class="product-form-shell">
             <div class="products-panel">
                 <section class="product-form-section">
-                    <h2>Основна інформація</h2>
+                    <h2>@Localizer["Основна інформація"]</h2>
                     <div class="mb-3">
-                        <label asp-for="Name" class="form-label">Назва товару</label>
-                        <input asp-for="Name" class="form-control" placeholder="Наприклад, Бездротові навушники" autofocus />
+                        <label asp-for="Name" class="form-label">@Localizer["Назва товару"]</label>
+                        <input asp-for="Name" class="form-control" placeholder="@Localizer["Наприклад, Бездротові навушники"]" autofocus />
                         <span asp-validation-for="Name" class="text-danger small"></span>
                     </div>
                     <div>
-                        <label asp-for="Description" class="form-label">Опис</label>
-                        <textarea asp-for="Description" class="form-control" rows="5" placeholder="Коротко опишіть товар та його переваги"></textarea>
+                        <label asp-for="Description" class="form-label">@Localizer["Опис"]</label>
+                        <textarea asp-for="Description" class="form-control" rows="5" placeholder="@Localizer["Коротко опишіть товар та його переваги"]"></textarea>
                         <span asp-validation-for="Description" class="text-danger small"></span>
                     </div>
                 </section>
 
                 <section class="product-form-section">
-                    <h2>Продаж і класифікація</h2>
+                    <h2>@Localizer["Продаж і класифікація"]</h2>
                     <div class="product-field-grid">
                         <div>
-                            <label asp-for="BusinessId" class="form-label">Бізнес</label>
+                            <label asp-for="BusinessId" class="form-label">@Localizer["Бізнес"]</label>
                             <select asp-for="BusinessId" asp-items="Model.Businesses" class="form-select">
-                                <option value="">Оберіть бізнес</option>
+                                <option value="">@Localizer["Оберіть бізнес"]</option>
                             </select>
                             <span asp-validation-for="BusinessId" class="text-danger small"></span>
                         </div>
                         <div>
-                            <label asp-for="CategoryId" class="form-label">Категорія</label>
+                            <label asp-for="CategoryId" class="form-label">@Localizer["Категорія"]</label>
                             <select asp-for="CategoryId" asp-items="Model.Categories" class="form-select">
-                                <option value="">Оберіть категорію</option>
+                                <option value="">@Localizer["Оберіть категорію"]</option>
                             </select>
                             <span asp-validation-for="CategoryId" class="text-danger small"></span>
                         </div>
                         <div>
-                            <label asp-for="Price" class="form-label">Ціна, ₴</label>
+                            <label asp-for="Price" class="form-label">@Localizer["Ціна, ₴"]</label>
                             <input asp-for="Price" class="form-control" inputmode="decimal" />
                             <span asp-validation-for="Price" class="text-danger small"></span>
                         </div>
-                        <div>
-                            <label asp-for="Quantity" class="form-label">Кількість, шт.</label>
+                        <div data-quantity-field>
+                            <label asp-for="Quantity" class="form-label">@Localizer["Кількість, шт."]</label>
                             <input asp-for="Quantity" class="form-control" inputmode="numeric" />
                             <span asp-validation-for="Quantity" class="text-danger small"></span>
                         </div>
+                        <div>
+                            <label asp-for="Sku" class="form-label">@Localizer["Артикул (SKU)"]</label>
+                            <input asp-for="Sku" class="form-control" placeholder="@Localizer["Наприклад, TS-BLK-001"]" />
+                            <span asp-validation-for="Sku" class="text-danger small"></span>
+                        </div>
                     </div>
-                    
-                  
+
+                    <div class="product-variants" data-variants-section>
+                        <div class="product-section-heading">
+                            <div>
+                                <p class="product-section-kicker">@Localizer["Розміри"]</p>
+                                <h3>@Localizer["Варіанти товару (необов'язково)"]</h3>
+                            </div>
+                        </div>
+                        <p class="product-help">@Localizer["Якщо товар продається різними розмірами (S, M, L...), додайте кожен окремим рядком - загальна кількість порахується автоматично."]</p>
+                        <div data-variant-rows>
+                            @for (var i = 0; i < Model.Variants.Count; i++)
+                            {
+                                <div class="product-variant-row" data-variant-row>
+                                    <input name="Variants[@i].Size" value="@Model.Variants[i].Size" class="form-control" placeholder="@Localizer["Розмір (S, M, L...)"]" />
+                                    <input name="Variants[@i].Sku" value="@Model.Variants[i].Sku" class="form-control" placeholder="@Localizer["Артикул розміру"]" />
+                                    <input name="Variants[@i].Quantity" value="@Model.Variants[i].Quantity" type="number" min="0" class="form-control" placeholder="@Localizer["К-сть"]" />
+                                    <button type="button" class="product-variant-row__remove" data-remove-variant aria-label="@Localizer["Видалити розмір"]">✕</button>
+                                </div>
+                            }
+                        </div>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-add-variant>+ @Localizer["Додати розмір"]</button>
+                        <span asp-validation-for="Variants" class="text-danger small d-block mt-2"></span>
+                    </div>
+
                     <div class="form-check mt-4">
                         <input asp-for="IsAdultOnly" class="form-check-input" type="checkbox" />
                         <label asp-for="IsAdultOnly" class="form-check-label">
-                            Товар тільки для дорослих (18+)
+                            @Localizer["Товар тільки для дорослих (18+)"]
                         </label>
                         <span asp-validation-for="IsAdultOnly" class="text-danger small d-block mt-1"></span>
                     </div>
@@ -79,16 +106,16 @@
                 <section class="product-form-section product-media-section" data-product-uploader>
                     <div class="product-section-heading">
                         <div>
-                            <p class="product-section-kicker">Медіа товару</p>
-                            <h2>Зображення</h2>
+                            <p class="product-section-kicker">@Localizer["Медіа товару"]</p>
+                            <h2>@Localizer["Зображення"]</h2>
                         </div>
-                        <span class="product-upload-rules">JPG, PNG або WEBP · до 5 МБ</span>
+                        <span class="product-upload-rules">@Localizer["JPG, PNG або WEBP · до 5 МБ"]</span>
                     </div>
 
                     <div class="product-upload-group" data-upload-group="main">
                         <div class="product-upload-label-row">
-                            <label asp-for="MainImage" class="form-label">Головне фото</label>
-                            <span>1 файл</span>
+                            <label asp-for="MainImage" class="form-label">@Localizer["Головне фото"]</label>
+                            <span>@Localizer["1 файл"]</span>
                         </div>
                         <div class="product-dropzone" data-dropzone>
                             <input asp-for="MainImage"
@@ -98,12 +125,12 @@
                                    data-file-input />
                             <div class="product-dropzone__icon" aria-hidden="true">↑</div>
                             <div class="product-dropzone__copy">
-                                <strong>Перетягніть головне фото сюди</strong>
-                                <span>або <span class="product-dropzone__action">оберіть на комп’ютері</span></span>
+                                <strong>@Localizer["Перетягніть головне фото сюди"]</strong>
+                                <span>@Localizer["або"] <span class="product-dropzone__action">@Localizer["оберіть на комп’ютері"]</span></span>
                             </div>
-                            <span class="product-dropzone__meta">Рекомендовано квадратне фото від 1000×1000 px</span>
+                            <span class="product-dropzone__meta">@Localizer["Рекомендовано квадратне фото від 1000×1000 px"]</span>
                         </div>
-                        <p id="main-image-help" class="product-help">Воно буде першим у каталозі та на сторінці товару.</p>
+                        <p id="main-image-help" class="product-help">@Localizer["Воно буде першим у каталозі та на сторінці товару."]</p>
                         <div id="main-image-error" class="product-upload-error" data-upload-error role="alert" aria-live="polite"></div>
                         <div class="product-file-list product-file-list--main" data-file-list aria-live="polite"></div>
                         <span asp-validation-for="MainImage" class="text-danger small"></span>
@@ -111,8 +138,8 @@
 
                     <div class="product-upload-group" data-upload-group="additional">
                         <div class="product-upload-label-row">
-                            <label asp-for="AdditionalImages" class="form-label">Додаткові фото</label>
-                            <span data-file-counter>0 / 8 файлів</span>
+                            <label asp-for="AdditionalImages" class="form-label">@Localizer["Додаткові фото"]</label>
+                            <span data-file-counter>@Localizer["0 / 8 файлів"]</span>
                         </div>
                         <div class="product-dropzone product-dropzone--compact" data-dropzone>
                             <input asp-for="AdditionalImages"
@@ -123,11 +150,11 @@
                                    data-file-input />
                             <div class="product-dropzone__icon" aria-hidden="true">＋</div>
                             <div class="product-dropzone__copy">
-                                <strong>Додайте галерею товару</strong>
-                                <span>Перетягніть кілька фото або натисніть для вибору</span>
+                                <strong>@Localizer["Додайте галерею товару"]</strong>
+                                <span>@Localizer["Перетягніть кілька фото або натисніть для вибору"]</span>
                             </div>
                         </div>
-                        <p id="additional-images-help" class="product-help">До 8 фото. Покажіть товар з різних ракурсів і важливі деталі.</p>
+                        <p id="additional-images-help" class="product-help">@Localizer["До 8 фото. Покажіть товар з різних ракурсів і важливі деталі."]</p>
                         <div id="additional-images-error" class="product-upload-error" data-upload-error role="alert" aria-live="polite"></div>
                         <div class="product-file-list" data-file-list aria-live="polite"></div>
                         <span asp-validation-for="AdditionalImages" class="text-danger small"></span>
@@ -135,22 +162,22 @@
                 </section>
 
                 <div class="product-form-actions">
-                    <a asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
-                    <button type="submit" class="btn btn-primary">Створити товар</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">@Localizer["Скасувати"]</a>
+                    <button type="submit" class="btn btn-primary">@Localizer["Створити товар"]</button>
                 </div>
             </div>
 
             <aside>
                 <div class="product-note product-note--checklist">
-                    <span class="product-note__eyebrow">Перед публікацією</span>
-                    <strong>Підготуйте картку товару</strong>
+                    <span class="product-note__eyebrow">@Localizer["Перед публікацією"]</span>
+                    <strong>@Localizer["Підготуйте картку товару"]</strong>
                     <ul>
-                        <li><span aria-hidden="true">✓</span> Зрозуміла назва без зайвих символів</li>
-                        <li><span aria-hidden="true">✓</span> Детальний опис і актуальна ціна</li>
-                        <li><span aria-hidden="true">✓</span> Якісне головне зображення</li>
-                        <li><span aria-hidden="true">✓</span> Фото з кількох ракурсів</li>
+                        <li><span aria-hidden="true">✓</span> @Localizer["Зрозуміла назва без зайвих символів"]</li>
+                        <li><span aria-hidden="true">✓</span> @Localizer["Детальний опис і актуальна ціна"]</li>
+                        <li><span aria-hidden="true">✓</span> @Localizer["Якісне головне зображення"]</li>
+                        <li><span aria-hidden="true">✓</span> @Localizer["Фото з кількох ракурсів"]</li>
                     </ul>
-                    <p>Після створення товар автоматично потрапить на модерацію.</p>
+                    <p>@Localizer["Після створення товар автоматично потрапить на модерацію."]</p>
                 </div>
             </aside>
         </div>
@@ -160,4 +187,5 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/product-upload.js" asp-append-version="true"></script>
+    <script src="~/js/product-variants.js" asp-append-version="true"></script>
 }

@@ -12,7 +12,7 @@
         return Url.Action(ViewContext.RouteData.Values["action"]!.ToString(), values)!;
     }
 
-    <nav class="admin-pagination" aria-label="Сторінки">
+    <nav class="admin-pagination" aria-label="@Localizer["Сторінки"]">
         <a class="admin-pagination__link" href="@PageUrl(Math.Max(1, Model.Page - 1))" aria-disabled="@(Model.Page <= 1)">‹</a>
         @for (var p = 1; p <= Model.TotalPages; p++)
         {

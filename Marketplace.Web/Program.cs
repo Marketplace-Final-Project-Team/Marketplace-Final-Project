@@ -1,4 +1,4 @@
-using System.Globalization;
+using Amazon.S3;
 using CloudinaryDotNet;
 using Marketplace.BLL.Common;
 using Marketplace.BLL.Configs;
@@ -13,10 +13,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+builder.Services.AddControllersWithViews()
+    .AddViewLocalization(Microsoft.AspNetCore.Mvc.Razor.LanguageViewLocationExpanderFormat.Suffix)
+    .AddDataAnnotationsLocalization();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -29,6 +33,19 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+//S3
+builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
+builder.Services.AddAWSService<IAmazonS3>();
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddScoped<IImageStorageService, CloudinaryImageStorageService>();
+}
+else
+{
+    builder.Services.AddScoped<IImageStorageService, S3ImageStorageService>();
+}
 
 // Quartz
 builder.Services.AddQuartz(q =>
@@ -84,7 +101,6 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
 builder.Services.AddScoped<IBusinessRepository, BusinessRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IImageStorageService, ImageStorageService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IBusinessService, BusinessService>();
@@ -109,11 +125,14 @@ builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
 builder.Services.AddScoped<IMarketplaceBalanceService, MarketplaceBalanceService>();
 
 builder.Services.AddScoped<IContentModerationService, ContentModerationService>();
+builder.Services.AddScoped<IProductTranslationService, ProductTranslationService>();
 
 builder.Services.AddScoped<IUserDiscountService, UserDiscountService>();
 builder.Services.AddScoped<IRefundChatService, RefundChatService>();
 builder.Services.AddScoped<ISupportTicketService, SupportTicketService>();
+builder.Services.AddScoped<IWithdrawalService, WithdrawalService>();
 builder.Services.AddSignalR();
+
 // LiqPay configuration
 builder.Services.Configure<LiqPayOptions>(builder.Configuration.GetSection("LiqPay"));
 builder.Services.AddScoped<IPaymentService, LiqPayPaymentService>();
@@ -138,12 +157,27 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-var defaultCulture = new CultureInfo("uk-UA");
+var defaultCulture = new CultureInfo("uk");
+var supportedCultures = new List<CultureInfo>
+{
+    defaultCulture,
+    new CultureInfo("en"),
+    new CultureInfo("de"),
+    new CultureInfo("fr"),
+    new CultureInfo("es")
+};
 var localizationOptions = new RequestLocalizationOptions
 {
     DefaultRequestCulture = new RequestCulture(defaultCulture),
-    SupportedCultures = new List<CultureInfo> { defaultCulture },
-    SupportedUICultures = new List<CultureInfo> { defaultCulture }
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+};
+// Cookie (the language switcher) takes priority over the browser's own Accept-Language
+// header, so a visitor's explicit choice always wins over auto-detection.
+localizationOptions.RequestCultureProviders = new List<IRequestCultureProvider>
+{
+    new CookieRequestCultureProvider { CookieName = CookieRequestCultureProvider.DefaultCookieName },
+    new AcceptLanguageHeaderRequestCultureProvider()
 };
 
 app.UseRequestLocalization(localizationOptions);

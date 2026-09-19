@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Деталі замовлення" xml:space="preserve">
+    <value>Détails de la commande</value>
+  </data>
+  <data name="Очікує підтвердження" xml:space="preserve">
+    <value>En attente de confirmation</value>
+  </data>
+  <data name="Підтверджено" xml:space="preserve">
+    <value>Confirmée</value>
+  </data>
+  <data name="Відправлено" xml:space="preserve">
+    <value>Expédiée</value>
+  </data>
+  <data name="Доставлено" xml:space="preserve">
+    <value>Livrée</value>
+  </data>
+  <data name="Скасовано" xml:space="preserve">
+    <value>Annulée</value>
+  </data>
+  <data name="Повернення підтверджено - кошти повернуто" xml:space="preserve">
+    <value>Retour confirmé - montant remboursé</value>
+  </data>
+  <data name="У поверненні відмовлено" xml:space="preserve">
+    <value>Retour refusé</value>
+  </data>
+  <data name="Заявку на повернення подано · очікує розгляду" xml:space="preserve">
+    <value>Demande de retour envoyée · en attente d'examen</value>
+  </data>
+  <data name="До всіх замовлень" xml:space="preserve">
+    <value>Retour à toutes les commandes</value>
+  </data>
+  <data name="Замовлення #" xml:space="preserve">
+    <value>Commande #</value>
+  </data>
+  <data name="Створено" xml:space="preserve">
+    <value>Créée le</value>
+  </data>
+  <data name="Відстежити доставку" xml:space="preserve">
+    <value>Suivre la livraison</value>
+  </data>
+  <data name="Склад замовлення" xml:space="preserve">
+    <value>Contenu de la commande</value>
+  </data>
+  <data name="шт." xml:space="preserve">
+    <value>pcs</value>
+  </data>
+  <data name="Оформити повернення" xml:space="preserve">
+    <value>Demander un retour</value>
+  </data>
+  <data name="Причина:" xml:space="preserve">
+    <value>Motif :</value>
+  </data>
+  <data name="Фото до заявки" xml:space="preserve">
+    <value>Photo de la demande de retour</value>
+  </data>
+  <data name="Відповідь продавця:" xml:space="preserve">
+    <value>Réponse du vendeur :</value>
+  </data>
+  <data name="Інформація" xml:space="preserve">
+    <value>Informations</value>
+  </data>
+  <data name="Статус" xml:space="preserve">
+    <value>Statut</value>
+  </data>
+  <data name="Адреса" xml:space="preserve">
+    <value>Adresse</value>
+  </data>
+  <data name="Доставка" xml:space="preserve">
+    <value>Livraison</value>
+  </data>
+  <data name="Кур'єром на вказану адресу" xml:space="preserve">
+    <value>Par coursier à l'adresse indiquée</value>
+  </data>
+  <data name="Оплата" xml:space="preserve">
+    <value>Paiement</value>
+  </data>
+  <data name="LiqPay (онлайн)" xml:space="preserve">
+    <value>LiqPay (en ligne)</value>
+  </data>
+  <data name="Разом" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="Післяпродажний сервіс та безпека" xml:space="preserve">
+    <value>Service après-vente et sécurité</value>
+  </data>
+  <data name="Захист покупця" xml:space="preserve">
+    <value>Protection de l'acheteur</value>
+  </data>
+  <data name="Кошти продавцю переказуються лише після підтвердження отримання товару. Повернення можливе протягом 14 днів з дати доставки — окремо на кожен товар." xml:space="preserve">
+    <value>Les fonds ne sont transférés au vendeur qu'après confirmation de la réception de l'article. Le retour est possible dans les 14 jours suivant la livraison — séparément pour chaque article.</value>
+  </data>
+  <data name="Закрити" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="Оформлення повернення" xml:space="preserve">
+    <value>Demande de retour</value>
+  </data>
+  <data name="Причина повернення" xml:space="preserve">
+    <value>Motif du retour</value>
+  </data>
+  <data name="Оберіть причину" xml:space="preserve">
+    <value>Sélectionnez un motif</value>
+  </data>
+  <data name="Товар пошкоджений або несправний" xml:space="preserve">
+    <value>L'article est endommagé ou défectueux</value>
+  </data>
+  <data name="Товар не відповідає опису" xml:space="preserve">
+    <value>L'article ne correspond pas à la description</value>
+  </data>
+  <data name="Отримано не той товар" xml:space="preserve">
+    <value>Mauvais article reçu</value>
+  </data>
+  <data name="Не підійшов розмір або колір" xml:space="preserve">
+    <value>La taille ou la couleur ne convient pas</value>
+  </data>
+  <data name="Передумав(-ла)" xml:space="preserve">
+    <value>J'ai changé d'avis</value>
+  </data>
+  <data name="Інше" xml:space="preserve">
+    <value>Autre</value>
+  </data>
+  <data name="Опишіть ситуацію" xml:space="preserve">
+    <value>Décrivez la situation</value>
+  </data>
+  <data name="Розкажіть детальніше, що не так із товаром (мінімум 10 символів)..." xml:space="preserve">
+    <value>Décrivez plus en détail ce qui ne va pas avec l'article (10 caractères minimum)...</value>
+  </data>
+  <data name="Фото товару" xml:space="preserve">
+    <value>Photos de l'article</value>
+  </data>
+  <data name="Додайте від 1 до 5 фото — це підтвердження стану товару для продавця." xml:space="preserve">
+    <value>Ajoutez de 1 à 5 photos — elles confirment l'état de l'article pour le vendeur.</value>
+  </data>
+  <data name="Надіслати заявку" xml:space="preserve">
+    <value>Envoyer la demande</value>
+  </data>
+</root>

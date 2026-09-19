@@ -1,3 +1,5 @@
+using Marketplace.BLL.DTOs;
+
 namespace Marketplace.Web.Models
 {
     public class AdminDashboardViewModel
@@ -10,6 +12,8 @@ namespace Marketplace.Web.Models
         public int TotalBusinesses { get; set; }
         public int PendingBusinesses { get; set; }
         public int PendingAdultRequests { get; set; }
+        public int PendingWithdrawals { get; set; }
         public decimal MarketplaceBalance { get; set; }
+        public List<BusinessAdminDto> AdultRequestsQueue { get; set; } = new();
     }
 }

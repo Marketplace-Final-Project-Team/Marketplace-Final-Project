@@ -1,12 +1,17 @@
-@model IEnumerable<Marketplace.Web.Models.Products.ProductListItemViewModel>
+@model Marketplace.Web.Models.Products.ProductsIndexViewModel
 
 @{
-    ViewData["Title"] = "Мої товари";
-    var products = Model.ToList();
+    ViewData["Title"] = SharedLocalizer["Мої товари"];
     var businessOptions = ViewBag.Businesses as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>
         ?? Array.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
-    var activeCount = products.Count(product => product.Status == "Active");
-    var pendingCount = products.Count(product => product.Status == "Pending");
+    var selectedBusinessId = ViewBag.SelectedBusinessId as Guid?;
+
+    string TabUrl(string tabFilter) => Url.Action(nameof(Marketplace.Web.Controllers.ProductsController.Index), new
+    {
+        businessId = selectedBusinessId,
+        search = Model.Search,
+        filter = tabFilter
+    }) ?? "#";
 }
 
 @section Styles {
@@ -15,15 +20,28 @@
 <div class="products-page">
     <header class="products-heading">
         <div>
-            <div class="products-eyebrow">Панель продавця</div>
-            <h1 class="products-title">Мої товари</h1>
-            <p class="products-subtitle">Керуйте асортиментом: додавайте нові товари, редагуйте наявні та стежте за їхнім статусом.</p>
+            <div class="products-eyebrow">@Localizer["Панель продавця"]</div>
+            <h1 class="products-title">@SharedLocalizer["Мої товари"]</h1>
+            <p class="products-subtitle">@Localizer["Керуйте асортиментом: додавайте нові товари, редагуйте наявні та стежте за їхнім статусом."]</p>
         </div>
         @if (businessOptions.Any())
         {
-            <a asp-action="Create" class="btn btn-primary">+ Додати товар</a>
+            <div class="products-heading__actions">
+                <a asp-action="ExportExcel" asp-route-businessId="@selectedBusinessId" class="btn btn-outline-secondary">@Localizer["Експорт"]</a>
+                <form asp-action="ImportExcel" method="post" enctype="multipart/form-data" class="products-import-form">
+                    <input type="hidden" name="businessId" value="@selectedBusinessId" />
+                    <label class="btn btn-outline-secondary" for="importFile">@Localizer["Імпорт"]</label>
+                    <input type="file" id="importFile" name="file" accept=".xlsx" class="visually-hidden" data-auto-submit />
+                </form>
+                <a asp-action="Create" class="btn btn-primary">+ @Localizer["Додати товар"]</a>
+            </div>
         }
     </header>
+
+    @if (selectedBusinessId.HasValue)
+    {
+        <partial name="_ProductsNav" model="selectedBusinessId.Value" />
+    }
 
     @if (TempData["Error"] is string error)
     {
@@ -40,44 +58,68 @@
         <div class="products-toolbar">
             <form asp-action="Index" method="get" class="products-business-form">
                 <div>
-                    <label for="businessId" class="form-label">Поточний бізнес</label>
+                    <label for="businessId" class="form-label">@Localizer["Поточний бізнес"]</label>
                     <select id="businessId" name="businessId" asp-items="businessOptions" class="form-select"></select>
                 </div>
-                <button type="submit" class="btn btn-outline-secondary">Показати</button>
+                <input type="hidden" name="filter" value="@Model.Filter" />
+                <button type="submit" class="btn btn-outline-secondary">@Localizer["Показати"]</button>
             </form>
-            <span class="text-secondary small">Зміни зберігаються одразу</span>
+            <span class="text-secondary small">@Localizer["Зміни зберігаються одразу"]</span>
         </div>
 
-        <div class="products-stats" aria-label="Статистика товарів">
+        <div class="products-stats" aria-label="@Localizer["Статистика товарів"]">
             <div class="products-stat">
-                <span class="products-stat__value">@products.Count</span>
-                <span class="products-stat__label">Усього товарів</span>
+                <span class="products-stat__value">@Model.AllCount</span>
+                <span class="products-stat__label">@Localizer["Усього товарів"]</span>
             </div>
             <div class="products-stat">
-                <span class="products-stat__value">@activeCount</span>
-                <span class="products-stat__label">Активні</span>
+                <span class="products-stat__value">@Model.ActiveCount</span>
+                <span class="products-stat__label">@Localizer["Активні"]</span>
             </div>
             <div class="products-stat">
-                <span class="products-stat__value">@pendingCount</span>
-                <span class="products-stat__label">Очікують модерації</span>
+                <span class="products-stat__value">@Model.PendingCount</span>
+                <span class="products-stat__label">@Localizer["Очікують модерації"]</span>
             </div>
         </div>
+
+        <form asp-action="Index" method="get" class="products-search-form">
+            <input type="hidden" name="businessId" value="@selectedBusinessId" />
+            <input type="hidden" name="filter" value="@Model.Filter" />
+            <input type="search" name="search" value="@Model.Search" class="form-control" placeholder="@Localizer["Пошук за назвою або артикулом"]" />
+            <button type="submit" class="btn btn-outline-secondary">@Localizer["Шукати"]</button>
+        </form>
+
+        <nav class="products-tabs" aria-label="@Localizer["Фільтр товарів"]">
+            <a class="products-tab @(Model.Filter == "all" ? "is-active" : "")" href="@TabUrl("all")">@Localizer["Усі"] <span>@Model.AllCount</span></a>
+            <a class="products-tab @(Model.Filter == "active" ? "is-active" : "")" href="@TabUrl("active")">@Localizer["Активні"] <span>@Model.ActiveCount</span></a>
+            <a class="products-tab @(Model.Filter == "low-stock" ? "is-active" : "")" href="@TabUrl("low-stock")">@Localizer["Закінчуються"] <span>@Model.LowStockCount</span></a>
+            <a class="products-tab @(Model.Filter == "out-of-stock" ? "is-active" : "")" href="@TabUrl("out-of-stock")">@Localizer["Немає в наявності"] <span>@Model.OutOfStockCount</span></a>
+            <a class="products-tab @(Model.Filter == "hidden" ? "is-active" : "")" href="@TabUrl("hidden")">@Localizer["Приховані"] <span>@Model.HiddenCount</span></a>
+        </nav>
     }
 
-    @if (products.Count == 0)
+    @if (Model.Items.Count == 0)
     {
         <section class="product-empty">
             <div class="product-empty__icon" aria-hidden="true">□</div>
-            <h2>Товарів поки немає</h2>
-            @if (businessOptions.Any())
+            @if (Model.AllCount > 0)
             {
-                <p>Додайте свій перший товар, щоб він з'явився в каталозі.</p>
-                <a asp-action="Create" class="btn btn-primary">Створити перший товар</a>
+                <h2>@Localizer["Нічого не знайдено"]</h2>
+                <p>@Localizer["Спробуйте змінити пошуковий запит або оберіть інший фільтр."]</p>
             }
             else
             {
-                <p>Спочатку створіть бізнес або отримайте доступ до керування товарами.</p>
-                <a asp-controller="Business" asp-action="Create" class="btn btn-primary">Створити бізнес</a>
+                <h2>@Localizer["Товарів поки немає"]</h2>
+                @if (businessOptions.Any())
+                {
+                    <p>@Localizer["Додайте свій перший товар, щоб він з'явився в каталозі."]</p>
+                    <a asp-action="Create" class="btn btn-primary">@Localizer["Створити перший товар"]</a>
+                }
+                else
+                {
+                    <p>@Localizer["Спочатку створіть бізнес або отримайте доступ до керування товарами."]</p>
+                    <a asp-controller="Business" asp-action="Create" class="btn btn-primary">@Localizer["Створити бізнес"]</a>
+                }
             }
         </section>
     }
@@ -87,22 +129,22 @@
             <table class="table products-table">
                 <thead>
                     <tr>
-                        <th>Товар</th>
-                        <th>Ціна</th>
-                        <th>Залишок</th>
-                        <th>Статус</th>
-                        <th class="text-end">Дії</th>
+                        <th>@Localizer["Товар"]</th>
+                        <th>@Localizer["Ціна"]</th>
+                        <th>@Localizer["Залишок"]</th>
+                        <th>@Localizer["Статус"]</th>
+                        <th class="text-end">@Localizer["Дії"]</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in products)
+                    @foreach (var item in Model.Items)
                     {
                         var statusClass = item.Status.ToLowerInvariant();
                         var statusLabel = item.Status switch
                         {
-                            "Active" => "Активний",
-                            "Pending" => "На модерації",
-                            "Banned" => "Заблокований",
+                            "Active" => Localizer["Активний"].Value,
+                            "Pending" => Localizer["На модерації"].Value,
+                            "Banned" => Localizer["Заблокований"].Value,
                             _ => item.Status
                         };
 
@@ -119,7 +161,15 @@
                                     }
                                     <div>
                                         <a asp-action="Details" asp-route-id="@item.Id" class="product-name">@item.Name</a>
-                                        <div class="product-category">@(string.IsNullOrWhiteSpace(item.CategoryName) ? "Без категорії" : item.CategoryName)</div>
+                                        <div class="product-category">@(string.IsNullOrWhiteSpace(item.CategoryName) ? Localizer["Без категорії"].Value : SharedLocalizer[item.CategoryName].Value)</div>
+                                        @if (!string.IsNullOrWhiteSpace(item.Sku))
+                                        {
+                                            <div class="product-sku">@Localizer["Артикул:"] @item.Sku</div>
+                                        }
+                                        @if (item.VariantCount > 0)
+                                        {
+                                            <div class="product-sku">@Localizer["Розмірів:"] @item.VariantCount</div>
+                                        }
                                     </div>
                                 </div>
                             </td>
@@ -147,7 +197,7 @@
 
                                             <button type="button" class="btn btn-link btn-sm text-danger p-0 text-decoration-none fw-bold"
                                                     style="font-size: 14px; line-height: 1;"
-                                                    title="Видалити знижку"
+                                                    title="@Localizer["Видалити знижку"]"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#deleteDiscountModal"
                                                     data-product-id="@item.Id"
@@ -160,7 +210,7 @@
                             </td>
                             <td>
                                 <span class="fw-semibold">@item.Quantity</span>
-                                <span class="text-secondary small">шт.</span>
+                                <span class="text-secondary small">@Localizer["шт."]</span>
                             </td>
                             <td>
                                 <span class="product-status product-status--@statusClass">@statusLabel</span>
@@ -171,18 +221,18 @@
                             </td>
                             <td>
                                 <div class="product-actions justify-content-end align-items-center gap-2">
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Переглянути</a>
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Редагувати</a>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">@Localizer["Переглянути"]</a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">@Localizer["Редагувати"]</a>
 
                                     <button type="button" class="btn btn-sm btn-outline-warning text-dark"
                                             data-bs-toggle="modal"
                                             data-bs-target="#discountModal"
                                             data-product-id="@item.Id"
-                                            title="Встановити знижку">
-                                        Знижка
+                                            title="@Localizer["Встановити знижку"]">
+                                        @Localizer["Знижка"]
                                     </button>
 
-                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Видалити</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">@Localizer["Видалити"]</a>
                                 </div>
                             </td>
                         </tr>
@@ -199,30 +249,30 @@
         <div class="modal-content">
             <form asp-controller="Discounts" asp-action="Set" method="post">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="discountModalLabel">Керування знижкою</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрити"></button>
+                    <h5 class="modal-title" id="discountModalLabel">@Localizer["Керування знижкою"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["Закрити"]"></button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="modalProductId" name="productId" />
 
                     <div class="mb-3">
-                        <label for="modalPercent" class="form-label">Відсоток знижки (%)</label>
+                        <label for="modalPercent" class="form-label">@Localizer["Відсоток знижки (%)"]</label>
                         <input type="number" id="modalPercent" name="percent" min="1" max="99" class="form-control" required />
                     </div>
 
                     <div class="mb-3">
-                        <label for="modalStartDate" class="form-label">Дата початку</label>
+                        <label for="modalStartDate" class="form-label">@Localizer["Дата початку"]</label>
                         <input type="date" id="modalStartDate" name="startDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
                     </div>
 
                     <div class="mb-3">
-                        <label for="modalEndDate" class="form-label">Дата закінчення</label>
+                        <label for="modalEndDate" class="form-label">@Localizer["Дата закінчення"]</label>
                         <input type="date" id="modalEndDate" name="endDate" class="form-control" value="@DateTime.Today.AddDays(7).ToString("yyyy-MM-dd")" required />
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
-                    <button type="submit" class="btn btn-primary">Зберегти знижку</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Скасувати"]</button>
+                    <button type="submit" class="btn btn-primary">@Localizer["Зберегти знижку"]</button>
                 </div>
             </form>
         </div>
@@ -235,20 +285,20 @@
         <div class="modal-content">
             <form asp-controller="Discounts" asp-action="Remove" method="post">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteDiscountModalLabel">Видалення знижки</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрити"></button>
+                    <h5 class="modal-title" id="deleteDiscountModalLabel">@Localizer["Видалення знижки"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["Закрити"]"></button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="deleteModalProductId" name="productId" />
                     <p class="mb-0">
-                        Ви точно хочете видалити знижку на товар
+                        @Localizer["Ви точно хочете видалити знижку на товар"]
                         «<strong id="deleteModalProductName"></strong>»?
                     </p>
-                    <p class="text-secondary small mb-0 mt-2">Цю дію не можна скасувати.</p>
+                    <p class="text-secondary small mb-0 mt-2">@Localizer["Цю дію не можна скасувати."]</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
-                    <button type="submit" class="btn btn-danger">Видалити знижку</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Скасувати"]</button>
+                    <button type="submit" class="btn btn-danger">@Localizer["Видалити знижку"]</button>
                 </div>
             </form>
         </div>
@@ -287,5 +337,13 @@
                 }
             });
         }
+
+        document.querySelectorAll('[data-auto-submit]').forEach((input) => {
+            input.addEventListener('change', () => {
+                if (input.files.length > 0) {
+                    input.form.submit();
+                }
+            });
+        });
     </script>
 }

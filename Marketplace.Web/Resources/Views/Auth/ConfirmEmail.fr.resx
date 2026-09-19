@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Не вдалося підтвердити електронну пошту." xml:space="preserve">
+    <value>Impossible de confirmer votre adresse e-mail.</value>
+  </data>
+  <data name="Email підтверджено" xml:space="preserve">
+    <value>E-mail confirmé</value>
+  </data>
+  <data name="Помилка підтвердження" xml:space="preserve">
+    <value>Erreur de confirmation</value>
+  </data>
+  <data name="Підтверджено" xml:space="preserve">
+    <value>Confirmé</value>
+  </data>
+  <data name="Посилання не спрацювало" xml:space="preserve">
+    <value>Le lien n&apos;a pas fonctionné</value>
+  </data>
+  <data name="Електронну пошту підтверджено" xml:space="preserve">
+    <value>Votre adresse e-mail a été confirmée</value>
+  </data>
+  <data name="Не вдалося підтвердити email" xml:space="preserve">
+    <value>Impossible de confirmer l&apos;e-mail</value>
+  </data>
+  <data name="Акаунт готовий до роботи" xml:space="preserve">
+    <value>Votre compte est prêt</value>
+  </data>
+  <data name="Тепер ви можете входити, купувати товари та створювати власний магазин." xml:space="preserve">
+    <value>Vous pouvez maintenant vous connecter, acheter des produits et créer votre propre boutique.</value>
+  </data>
+  <data name="Увійти до акаунта" xml:space="preserve">
+    <value>Se connecter à votre compte</value>
+  </data>
+  <data name="На головну" xml:space="preserve">
+    <value>Retour à l&apos;accueil</value>
+  </data>
+  <data name="Що могло статися?" xml:space="preserve">
+    <value>Que s&apos;est-il passé ?</value>
+  </data>
+  <data name="Посилання пошкоджене, уже використане або термін його дії завершився." xml:space="preserve">
+    <value>Le lien est corrompu, déjà utilisé ou a expiré.</value>
+  </data>
+  <data name="Створити акаунт ще раз" xml:space="preserve">
+    <value>Créer à nouveau un compte</value>
+  </data>
+  <data name="Повернутися до входу" xml:space="preserve">
+    <value>Retour à la connexion</value>
+  </data>
+</root>

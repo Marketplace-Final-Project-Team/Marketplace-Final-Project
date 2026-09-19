@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Політика повернення та обміну" xml:space="preserve">
+    <value>Rückgabe- und Umtauschrichtlinie</value>
+  </data>
+  <data name="Як повернути товар або відкрити спір" xml:space="preserve">
+    <value>Wie Sie einen Artikel zurückgeben oder einen Streitfall eröffnen</value>
+  </data>
+  <data name="Пояснюємо, коли можна повернути товар, як оформити заявку прямо в кабінеті замовлення та скільки часу займає розгляд." xml:space="preserve">
+    <value>Wir erklären, wann Sie einen Artikel zurückgeben können, wie Sie einen Antrag direkt über Ihre Bestellseite stellen und wie lange die Bearbeitung dauert.</value>
+  </data>
+  <data name="1. Строк повернення" xml:space="preserve">
+    <value>1. Rückgabefrist</value>
+  </data>
+  <data name="Ви можете оформити повернення товару належної якості протягом &lt;strong&gt;14 календарних днів&lt;/strong&gt; з дати доставки замовлення - це період дії «Захисту покупця». Товар неналежної якості (пошкоджений, невідповідний опису) можна повернути в будь-який момент після виявлення проблеми через розділ «Відкрити спір»." xml:space="preserve">
+    <value>Sie können einen mangelfreien Artikel innerhalb von &lt;strong&gt;14 Kalendertagen&lt;/strong&gt; ab dem Lieferdatum der Bestellung zurückgeben - dies ist der Zeitraum des "Käuferschutzes". Ein mangelhafter Artikel (beschädigt, nicht der Beschreibung entsprechend) kann jederzeit nach Feststellung des Problems über den Bereich "Streitfall eröffnen" zurückgegeben werden.</value>
+  </data>
+  <data name="2. Як оформити повернення" xml:space="preserve">
+    <value>2. So beantragen Sie eine Rückgabe</value>
+  </data>
+  <data name="Заявка подається прямо на сторінці деталей замовлення, без дзвінків чи листів:" xml:space="preserve">
+    <value>Der Antrag wird direkt auf der Bestelldetailseite gestellt, ohne Anrufe oder E-Mails:</value>
+  </data>
+  <data name="Відкрийте розділ" xml:space="preserve">
+    <value>Öffnen Sie den Bereich</value>
+  </data>
+  <data name="«Мої замовлення»" xml:space="preserve">
+    <value>„Meine Bestellungen"</value>
+  </data>
+  <data name="та оберіть потрібне замовлення зі статусом «Доставлено»;" xml:space="preserve">
+    <value>und wählen Sie die betreffende Bestellung mit dem Status "Geliefert";</value>
+  </data>
+  <data name="Натисніть кнопку «Оформити повернення» в блоці «Післяпродажний сервіс та безпека»;" xml:space="preserve">
+    <value>Klicken Sie im Bereich "After-Sales-Service und Sicherheit" auf die Schaltfläche "Rückgabe beantragen";</value>
+  </data>
+  <data name="Оберіть причину повернення зі списку та за бажанням додайте коментар з деталями;" xml:space="preserve">
+    <value>Wählen Sie einen Rückgabegrund aus der Liste und fügen Sie optional einen Kommentar mit Details hinzu;</value>
+  </data>
+  <data name="Надішліть заявку - вона одразу зберігається і відображається у вас на сторінці замовлення;" xml:space="preserve">
+    <value>Senden Sie den Antrag ab - er wird sofort gespeichert und auf Ihrer Bestellseite angezeigt;</value>
+  </data>
+  <data name="Очікуйте на зворотний зв'язок протягом 1–2 робочих днів." xml:space="preserve">
+    <value>Eine Rückmeldung erfolgt innerhalb von 1-2 Werktagen.</value>
+  </data>
+  <data name="3. Умови повернення товару належної якості" xml:space="preserve">
+    <value>3. Bedingungen für die Rückgabe eines mangelfreien Artikels</value>
+  </data>
+  <data name="Товар не був у використанні, зберіг товарний вигляд, споживчі властивості, пломби та ярлики;" xml:space="preserve">
+    <value>Der Artikel wurde nicht benutzt und hat sein Erscheinungsbild, seine Gebrauchseigenschaften, Siegel und Etiketten behalten;</value>
+  </data>
+  <data name="Наявний документ, що підтверджує факт і умови купівлі (номер замовлення);" xml:space="preserve">
+    <value>Es liegt ein Dokument vor, das den Kauf und seine Bedingungen bestätigt (Bestellnummer);</value>
+  </data>
+  <data name="Товар не входить до переліку, що не підлягає поверненню чи обміну (див. пункт 5)." xml:space="preserve">
+    <value>Der Artikel steht nicht auf der Liste der von Rückgabe oder Umtausch ausgeschlossenen Waren (siehe Punkt 5).</value>
+  </data>
+  <data name="4. Повернення товару неналежної якості" xml:space="preserve">
+    <value>4. Rückgabe eines mangelhaften Artikels</value>
+  </data>
+  <data name="Якщо товар пошкоджений, некомплектний або не відповідає опису в картці товару - скористайтесь кнопкою «Відкрити спір» на сторінці замовлення. Оберіть тип проблеми та опишіть ситуацію максимально детально. Команда підтримки маркетплейсу підключається до вирішення спору та зв'язується з вами протягом 24 годин. У такому разі повернення коштів або заміна товару відбувається за рахунок продавця, без додаткових витрат для покупця." xml:space="preserve">
+    <value>Wenn ein Artikel beschädigt, unvollständig ist oder nicht der Beschreibung auf der Produktseite entspricht, verwenden Sie die Schaltfläche "Streitfall eröffnen" auf der Bestellseite. Wählen Sie die Art des Problems und beschreiben Sie die Situation so detailliert wie möglich. Das Support-Team des Marktplatzes wird in die Klärung des Streitfalls einbezogen und meldet sich innerhalb von 24 Stunden bei Ihnen. In diesem Fall erfolgt die Rückerstattung oder der Umtausch des Artikels auf Kosten des Verkäufers, ohne zusätzliche Kosten für den Käufer.</value>
+  </data>
+  <data name="5. Товари, що не підлягають поверненню" xml:space="preserve">
+    <value>5. Von der Rückgabe ausgeschlossene Waren</value>
+  </data>
+  <data name="товари особистої гігієни та нижня білизна;" xml:space="preserve">
+    <value>Hygieneartikel und Unterwäsche;</value>
+  </data>
+  <data name="товари з порушеною заводською упаковкою, якщо цілісність упаковки впливає на можливість подальшого продажу;" xml:space="preserve">
+    <value>Artikel mit beschädigter Originalverpackung, sofern die Unversehrtheit der Verpackung den Weiterverkauf beeinflusst;</value>
+  </data>
+  <data name="товари, виготовлені на замовлення покупця за індивідуальними характеристиками;" xml:space="preserve">
+    <value>nach Kundenwunsch mit individuellen Eigenschaften angefertigte Artikel;</value>
+  </data>
+  <data name="харчові продукти та товари з обмеженим строком придатності." xml:space="preserve">
+    <value>Lebensmittel und Artikel mit begrenzter Haltbarkeit.</value>
+  </data>
+  <data name="6. Повернення коштів" xml:space="preserve">
+    <value>6. Rückerstattung</value>
+  </data>
+  <data name="Кошти повертаються тим самим способом, яким було здійснено оплату. Для оплати карткою онлайн повернення відбувається протягом 3–10 банківських днів після підтвердження повернення. Для замовлень з оплатою при отриманні кошти повертаються на вказані вами реквізити після узгодження з підтримкою." xml:space="preserve">
+    <value>Das Geld wird auf demselben Weg erstattet, auf dem die Zahlung erfolgt ist. Bei Online-Kartenzahlungen erfolgt die Erstattung innerhalb von 3-10 Bankarbeitstagen nach Bestätigung der Rückgabe. Bei Nachnahmebestellungen wird das Geld nach Absprache mit dem Support auf die von Ihnen angegebenen Daten überwiesen.</value>
+  </data>
+  <data name="7. Захист покупця" xml:space="preserve">
+    <value>7. Käuferschutz</value>
+  </data>
+  <data name="Кошти за будь-яке замовлення з онлайн-оплатою резервуються платформою і переказуються продавцю лише після того, як ви підтвердите отримання товару, або автоматично - після завершення 14-денного періоду без претензій. Це гарантує, що ви завжди маєте час перевірити товар і оформити повернення до того, як гроші дійдуть до продавця." xml:space="preserve">
+    <value>Das Geld für jede online bezahlte Bestellung wird von der Plattform einbehalten und erst an den Verkäufer überwiesen, nachdem Sie den Erhalt des Artikels bestätigt haben, oder automatisch nach Ablauf der 14-tägigen beanstandungsfreien Frist. So haben Sie immer genug Zeit, den Artikel zu prüfen und eine Rückgabe zu beantragen, bevor das Geld beim Verkäufer eingeht.</value>
+  </data>
+</root>

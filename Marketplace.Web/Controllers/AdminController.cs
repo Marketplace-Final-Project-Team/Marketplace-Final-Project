@@ -28,7 +28,7 @@ namespace Marketplace.Web.Controllers
         private readonly IPostSaleService _postSaleService;
         private readonly IRefundChatService _refundChatService;
         private readonly ISupportTicketService _supportTicketService;
-
+        private readonly IWithdrawalService _withdrawalService;
 
         public AdminController(
             IAdminService adminService,
@@ -43,7 +43,8 @@ namespace Marketplace.Web.Controllers
             IOrderService orderService,
             IPostSaleService postSaleService,
             IRefundChatService refundChatService,
-            ISupportTicketService supportTicketService)
+            ISupportTicketService supportTicketService,
+            IWithdrawalService withdrawalService)
         {
             _adminService = adminService;
             _settingsService = settingsService;
@@ -58,6 +59,7 @@ namespace Marketplace.Web.Controllers
             _postSaleService = postSaleService;
             _refundChatService = refundChatService;
             _supportTicketService = supportTicketService;
+            _withdrawalService = withdrawalService;
         }
 
         private string? CurrentAdminId => User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -67,6 +69,8 @@ namespace Marketplace.Web.Controllers
             var users = _adminService.GetUsers();
             var products = await _adminService.GetProductsAsync();
             var businesses = await _adminService.GetBusinessesAsync();
+            var adultRequests = await _adminService.GetPendingAdultRequestsAsync();
+            var pendingWithdrawals = await _withdrawalService.GetAllWithdrawalsAsync(WithdrawalStatus.Pending);
 
             var model = new AdminDashboardViewModel
             {
@@ -77,6 +81,9 @@ namespace Marketplace.Web.Controllers
                 BannedProducts = products.Count(p => p.Status == ProductStatus.Banned),
                 TotalBusinesses = businesses.Count,
                 PendingBusinesses = businesses.Count(b => b.Status == BusinessStatus.Pending),
+                PendingAdultRequests = adultRequests.Count,
+                AdultRequestsQueue = adultRequests.ToList(),
+                PendingWithdrawals = pendingWithdrawals.Count,
                 MarketplaceBalance = await _marketplaceBalanceService.GetBalanceAsync(),
             };
 
@@ -406,6 +413,37 @@ namespace Marketplace.Web.Controllers
                 });
             }
 
+            var recurringJobs = new List<RecurringJobViewModel>();
+            var cleanupJobKey = new JobKey("pending-order-expiry-job", "cleanup");
+            if (await scheduler.CheckExists(cleanupJobKey))
+            {
+                var cleanupTriggers = await scheduler.GetTriggersOfJob(cleanupJobKey);
+                var nextRun = cleanupTriggers
+                    .Select(t => t.GetNextFireTimeUtc())
+                    .Where(t => t.HasValue)
+                    .Select(t => t!.Value.UtcDateTime)
+                    .OrderBy(t => t)
+                    .Cast<DateTime?>()
+                    .FirstOrDefault();
+                var previousRun = cleanupTriggers
+                    .Select(t => t.GetPreviousFireTimeUtc())
+                    .Where(t => t.HasValue)
+                    .Select(t => t!.Value.UtcDateTime)
+                    .OrderByDescending(t => t)
+                    .Cast<DateTime?>()
+                    .FirstOrDefault();
+
+                recurringJobs.Add(new RecurringJobViewModel
+                {
+                    GroupName = cleanupJobKey.Group,
+                    JobName = cleanupJobKey.Name,
+                    DisplayName = "Автоскасування прострочених замовлень",
+                    Description = "Щогодини скасовує замовлення зі статусом «Очікує підтвердження», якщо оплата не надійшла протягом налаштованого часу (за замовчуванням 48 год.).",
+                    NextRunAtUtc = nextRun,
+                    PreviousRunAtUtc = previousRun
+                });
+            }
+
             var recentDecisions = (await _activityLog.GetRecentBusinessActionsAsync())
                 .Where(l => l.Action == ProductModerationJob.ActivityLogAction)
                 .Take(30)
@@ -432,10 +470,29 @@ namespace Marketplace.Web.Controllers
             {
                 IsSchedulerRunning = scheduler.IsStarted && !scheduler.InStandbyMode && !scheduler.IsShutdown,
                 ScheduledJobs = scheduledJobs.OrderBy(j => j.NextRunAtUtc).ToList(),
+                RecurringJobs = recurringJobs,
                 RecentDecisions = recentDecisions,
+                HasCustomApiKey = !string.IsNullOrEmpty(await _settingsService.GetAsync("GoogleAI", "ApiKey")),
+                ModerationModel = await _settingsService.GetAsync("GoogleAI", "Model"),
                 OpenReturnRequests = openReturnRequests,
                 OpenTickets = openTickets
             });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateModerationApiKey(string? apiKey, string? model)
+        {
+            if (!string.IsNullOrWhiteSpace(apiKey))
+            {
+                await _settingsService.SetAsync("GoogleAI", "ApiKey", apiKey, isSecret: true, actorUserId: CurrentAdminId);
+            }
+            if (!string.IsNullOrWhiteSpace(model))
+            {
+                await _settingsService.SetAsync("GoogleAI", "Model", model, isSecret: false, actorUserId: CurrentAdminId);
+            }
+
+            TempData["Success"] = "Налаштування Gemini API оновлено.";
+            return RedirectToAction("Jobs");
         }
 
         [HttpGet]
@@ -485,12 +542,14 @@ namespace Marketplace.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Statistics([FromQuery] AdminStatisticsFilterViewModel filter)
         {
-            var overview = await _adminService.GetStatisticsAsync(filter.StartDate, filter.EndDate);
+            var overview = await _adminService.GetStatisticsAsync(filter.StartDate, filter.EndDate, filter.BusinessId);
+            var businesses = await _adminService.GetBusinessesAsync();
 
             return View(new AdminStatisticsPageViewModel
             {
                 Filter = filter,
-                Overview = overview
+                Overview = overview,
+                Businesses = businesses.OrderBy(b => b.Name).ToList()
             });
         }
 
@@ -523,7 +582,7 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCategory(string name)
+        public async Task<IActionResult> CreateCategory(string name, string? imageUrl)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -531,7 +590,7 @@ namespace Marketplace.Web.Controllers
                 return RedirectToAction("Categories");
             }
 
-            var result = await _categoryService.CreateCategory(name.Trim());
+            var result = await _categoryService.CreateCategory(name.Trim(), imageUrl);
             if (result.Succeeded)
             {
                 TempData["Success"] = $"Категорію «{name}» створено.";
@@ -545,7 +604,7 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateCategory(Guid categoryId, string name)
+        public async Task<IActionResult> UpdateCategory(Guid categoryId, string name, string? imageUrl)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -553,8 +612,19 @@ namespace Marketplace.Web.Controllers
                 return RedirectToAction("Categories");
             }
 
-            var result = await _categoryService.UpdateCategory(name.Trim(), categoryId);
+            var result = await _categoryService.UpdateCategory(name.Trim(), categoryId, imageUrl);
             TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded ? "Категорію оновлено." : result.Message;
+
+            return RedirectToAction("Categories");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SetCategoryAdultStatus(Guid categoryId, bool isAdultOnly)
+        {
+            var result = await _categoryService.SetCategoryAdultStatus(categoryId, isAdultOnly);
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded
+                ? (isAdultOnly ? "Категорію позначено як 18+." : "Позначку 18+ знято з категорії.")
+                : result.Message;
 
             return RedirectToAction("Categories");
         }
@@ -689,7 +759,6 @@ namespace Marketplace.Web.Controllers
             return RedirectToAction("Jobs");
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ApproveReturnRequest(Guid requestId)
@@ -721,6 +790,7 @@ namespace Marketplace.Web.Controllers
             TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
             return RedirectToAction("Jobs");
         }
+
         [HttpGet]
         public async Task<IActionResult> JobsCounts()
         {
@@ -730,5 +800,26 @@ namespace Marketplace.Web.Controllers
             return Json(new { returnCount, ticketCount });
         }
 
+        [HttpPost]
+        public async Task<IActionResult> RunRecurringJobNow(string groupName, string jobName)
+        {
+            var scheduler = await _schedulerFactory.GetScheduler();
+            var jobKey = new JobKey(jobName, groupName);
+
+            if (!await scheduler.CheckExists(jobKey))
+            {
+                TempData["Error"] = "Задачу не знайдено.";
+                return RedirectToAction("Jobs");
+            }
+
+            await scheduler.TriggerJob(jobKey);
+
+            await _activityLog.LogUserActionAsync(CurrentAdminId!, "RecurringJobTriggeredManually",
+                $"Задачу «{jobName}» запущено вручну адміністратором (позачергово, регулярний розклад не порушено).",
+                actorUserId: CurrentAdminId);
+
+            TempData["Success"] = "Задачу запущено негайно.";
+            return RedirectToAction("Jobs");
+        }
     }
 }

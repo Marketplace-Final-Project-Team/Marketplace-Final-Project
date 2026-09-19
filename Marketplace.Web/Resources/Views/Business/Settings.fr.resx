@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Налаштування" xml:space="preserve">
+    <value>Paramètres</value>
+  </data>
+  <data name="Інформація про компанію, платежі та доступи." xml:space="preserve">
+    <value>Informations sur l'entreprise, paiements et accès.</value>
+  </data>
+  <data name="Успішно: " xml:space="preserve">
+    <value>Succès : </value>
+  </data>
+  <data name="Помилка: " xml:space="preserve">
+    <value>Erreur : </value>
+  </data>
+  <data name="Інформація про компанію" xml:space="preserve">
+    <value>Informations sur l'entreprise</value>
+  </data>
+  <data name="Ці дані бачать покупці на сторінці магазину." xml:space="preserve">
+    <value>Ces informations sont visibles par les clients sur la page de la boutique.</value>
+  </data>
+  <data name="Назва магазину" xml:space="preserve">
+    <value>Nom de la boutique</value>
+  </data>
+  <data name="Опис" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Зберегти" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="Статус 18+ контенту" xml:space="preserve">
+    <value>Statut du contenu 18+</value>
+  </data>
+  <data name="Дозвіл на розміщення товарів із віковими обмеженнями у каталозі." xml:space="preserve">
+    <value>Autorisation de publier des produits à contenu réservé aux adultes dans le catalogue.</value>
+  </data>
+  <data name="Поточний статус магазину:" xml:space="preserve">
+    <value>Statut actuel de la boutique :</value>
+  </data>
+  <data name="Подати заявку на розміщення 18+ контенту" xml:space="preserve">
+    <value>Soumettre une demande pour publier du contenu 18+</value>
+  </data>
+  <data name="Ваша заявка на розгляд статусу 18+ наразі опрацьовується адміністратором." xml:space="preserve">
+    <value>Votre demande de statut 18+ est actuellement examinée par un administrateur.</value>
+  </data>
+  <data name="Магазин успішно верифіковано! Ви можете створювати товари категорії 18+." xml:space="preserve">
+    <value>La boutique a été vérifiée avec succès ! Vous pouvez désormais créer des produits de catégorie 18+.</value>
+  </data>
+  <data name="Юридичні та платіжні дані" xml:space="preserve">
+    <value>Informations juridiques et de paiement</value>
+  </data>
+  <data name="Зберігається локально" xml:space="preserve">
+    <value>Enregistré localement</value>
+  </data>
+  <data name="Ці поля ще не підключені до бази даних платформи - значення зберігаються лише в цьому браузері, щоб продемонструвати майбутній інтерфейс налаштувань." xml:space="preserve">
+    <value>Ces champs ne sont pas encore connectés à la base de données de la plateforme - les valeurs sont enregistrées uniquement dans ce navigateur pour illustrer la future interface de paramètres.</value>
+  </data>
+  <data name="Юридична адреса" xml:space="preserve">
+    <value>Adresse légale</value>
+  </data>
+  <data name="Місто, вулиця, будинок" xml:space="preserve">
+    <value>Ville, rue, numéro</value>
+  </data>
+  <data name="Податковий номер (ІПН/ЄДРПОУ)" xml:space="preserve">
+    <value>Numéro fiscal (SIREN/SIRET)</value>
+  </data>
+  <data name="Банківські реквізити (IBAN)" xml:space="preserve">
+    <value>Coordonnées bancaires (IBAN)</value>
+  </data>
+  <data name="Налаштування доставки за замовчуванням" xml:space="preserve">
+    <value>Paramètres de livraison par défaut</value>
+  </data>
+  <data name="Наприклад: відправлення протягом 1 дня" xml:space="preserve">
+    <value>Par exemple : expédition sous 1 jour</value>
+  </data>
+  <data name="Надсилати email-сповіщення про нові замовлення" xml:space="preserve">
+    <value>Envoyer des notifications par e-mail pour les nouvelles commandes</value>
+  </data>
+  <data name="Двофакторна автентифікація для власника магазину" xml:space="preserve">
+    <value>Authentification à deux facteurs pour le propriétaire de la boutique</value>
+  </data>
+  <data name="Зберегти локально" xml:space="preserve">
+    <value>Enregistrer localement</value>
+  </data>
+  <data name="Збережено" xml:space="preserve">
+    <value>Enregistré</value>
+  </data>
+  <data name="Користувачі та права доступу" xml:space="preserve">
+    <value>Utilisateurs et droits d'accès</value>
+  </data>
+  <data name="Керування учасниками та ролями винесено в окремий розділ." xml:space="preserve">
+    <value>La gestion des membres et des rôles a été déplacée vers une section distincte.</value>
+  </data>
+  <data name="Відкрити «Команда»" xml:space="preserve">
+    <value>Ouvrir « Équipe »</value>
+  </data>
+</root>

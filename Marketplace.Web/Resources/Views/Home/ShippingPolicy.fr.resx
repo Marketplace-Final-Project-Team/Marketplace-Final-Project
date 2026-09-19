@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Політика доставки" xml:space="preserve">
+    <value>Politique de livraison</value>
+  </data>
+  <data name="Доставка" xml:space="preserve">
+    <value>Livraison</value>
+  </data>
+  <data name="Способи, строки та вартість доставки" xml:space="preserve">
+    <value>Modes, délais et coûts de livraison</value>
+  </data>
+  <data name="Все, що потрібно знати про доставку замовлень: перевізники, орієнтовні строки та відстеження посилки." xml:space="preserve">
+    <value>Tout ce qu'il faut savoir sur la livraison des commandes : transporteurs, délais estimés et suivi des colis.</value>
+  </data>
+  <data name="1. Доступні способи доставки" xml:space="preserve">
+    <value>1. Modes de livraison disponibles</value>
+  </data>
+  <data name="Перевізник" xml:space="preserve">
+    <value>Transporteur</value>
+  </data>
+  <data name="Тип доставки" xml:space="preserve">
+    <value>Type de livraison</value>
+  </data>
+  <data name="Орієнтовний строк" xml:space="preserve">
+    <value>Délai estimé</value>
+  </data>
+  <data name="Нова пошта" xml:space="preserve">
+    <value>Nova Poshta</value>
+  </data>
+  <data name="Відділення або поштомат" xml:space="preserve">
+    <value>Point relais ou consigne automatique</value>
+  </data>
+  <data name="1–3 робочі дні" xml:space="preserve">
+    <value>1 à 3 jours ouvrés</value>
+  </data>
+  <data name="Укрпошта" xml:space="preserve">
+    <value>Ukrposhta</value>
+  </data>
+  <data name="Кур'єрська доставка на вказану адресу" xml:space="preserve">
+    <value>Livraison par coursier à l'adresse indiquée</value>
+  </data>
+  <data name="3–5 робочих днів" xml:space="preserve">
+    <value>3 à 5 jours ouvrés</value>
+  </data>
+  <data name="2–4 робочі дні" xml:space="preserve">
+    <value>2 à 4 jours ouvrés</value>
+  </data>
+  <data name="Спосіб доставки обирається на кроці «Доставка» під час оформлення замовлення. Точні строки залежать від місцезнаходження продавця, обраного відділення та завантаженості перевізника у конкретний період." xml:space="preserve">
+    <value>Le mode de livraison est choisi à l'étape « Livraison » lors de la commande. Les délais exacts dépendent de la localisation du vendeur, du point relais choisi et de la charge du transporteur à un moment donné.</value>
+  </data>
+  <data name="2. Вартість доставки" xml:space="preserve">
+    <value>2. Coût de la livraison</value>
+  </data>
+  <data name="Вартість доставки розраховується перевізником на основі ваги, габаритів посилки та відстані. Вона відображається на кроці «Огляд» перед підтвердженням замовлення. У межах промоакцій MarketPlace може пропонувати безкоштовну доставку - умови такої акції завжди вказуються окремо в каталозі та кошику." xml:space="preserve">
+    <value>Le coût de la livraison est calculé par le transporteur en fonction du poids, des dimensions du colis et de la distance. Il s'affiche à l'étape « Récapitulatif » avant la confirmation de la commande. Dans le cadre de promotions, MarketPlace peut proposer la livraison gratuite - les conditions de ces offres sont toujours précisées séparément dans le catalogue et le panier.</value>
+  </data>
+  <data name="3. Обробка та відправлення замовлення" xml:space="preserve">
+    <value>3. Traitement et expédition de la commande</value>
+  </data>
+  <data name="Після оформлення замовлення продавець отримує сповіщення й підтверджує наявність товару;" xml:space="preserve">
+    <value>Une fois la commande passée, le vendeur reçoit une notification et confirme la disponibilité de l'article ;</value>
+  </data>
+  <data name="Товар передається обраній службі доставки протягом 1–2 робочих днів з моменту підтвердження замовлення;" xml:space="preserve">
+    <value>L'article est remis au service de livraison choisi sous 1 à 2 jours ouvrés à compter de la confirmation de la commande ;</value>
+  </data>
+  <data name="Після відправлення статус замовлення змінюється на «Відправлено», і стає доступним номер для відстеження;" xml:space="preserve">
+    <value>Une fois expédiée, la commande passe au statut « Expédiée » et un numéro de suivi devient disponible ;</value>
+  </data>
+  <data name="Замовлення з кількома товарами від різних продавців можуть прибувати окремими посилками в різний час." xml:space="preserve">
+    <value>Les commandes comportant plusieurs articles de différents vendeurs peuvent arriver sous forme de colis distincts à des moments différents.</value>
+  </data>
+  <data name="4. Відстеження замовлення" xml:space="preserve">
+    <value>4. Suivi de la commande</value>
+  </data>
+  <data name="Актуальний статус доставки завжди доступний на сторінці замовлення в розділі «Відстежити доставку». Там відображається обраний перевізник, поточний статус («Очікує підтвердження», «Підтверджено», «Відправлено», «Доставлено») та адреса чи відділення отримання." xml:space="preserve">
+    <value>Le statut actuel de la livraison est toujours disponible sur la page de la commande, dans la section « Suivre la livraison ». On y voit le transporteur choisi, le statut actuel (« En attente de confirmation », « Confirmée », « Expédiée », « Livrée ») ainsi que l'adresse ou le point de retrait.</value>
+  </data>
+  <data name="5. Якщо посилка затримується або загублена" xml:space="preserve">
+    <value>5. En cas de retard ou de perte du colis</value>
+  </data>
+  <data name="Якщо строк доставки суттєво перевищено, а статус замовлення не оновлюється - скористайтесь кнопкою «Відкрити спір» на сторінці замовлення й оберіть причину «Товар не прийшов». Підтримка маркетплейсу зв'яжеться з перевізником і продавцем для з'ясування ситуації, а у разі підтвердженої втрати посилки покупцю повертаються повні кошти за замовлення." xml:space="preserve">
+    <value>Si le délai de livraison est nettement dépassé et que le statut de la commande ne se met pas à jour, utilisez le bouton « Ouvrir un litige » sur la page de commande et choisissez le motif « Article non reçu ». Le support de la marketplace contactera le transporteur et le vendeur pour clarifier la situation, et en cas de perte confirmée du colis, l'acheteur est intégralement remboursé de sa commande.</value>
+  </data>
+  <data name="6. Міжнародна доставка" xml:space="preserve">
+    <value>6. Livraison internationale</value>
+  </data>
+  <data name="На поточному етапі MarketPlace обслуговує доставку виключно в межах України. Розширення на міжнародні напрямки планується в майбутніх оновленнях платформи." xml:space="preserve">
+    <value>À l'heure actuelle, MarketPlace n'assure la livraison qu'à l'intérieur de l'Ukraine. Une extension vers des destinations internationales est prévue dans de futures mises à jour de la plateforme.</value>
+  </data>
+</root>

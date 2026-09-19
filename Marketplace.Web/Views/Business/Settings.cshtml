@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.Businesses.BusinessSettingsViewModel
 
 @{
-    ViewData["Title"] = $"Налаштування - {Model.StoreName}";
+    ViewData["Title"] = $"{Localizer["Налаштування"].Value} - {Model.StoreName}";
 }
 
 @section Styles {
@@ -9,13 +9,13 @@
 }
 
 <div class="seller-dashboard">
-    <a asp-action="Index" class="seller-order-back">← До панелі продавця</a>
+    <a asp-action="Index" class="seller-order-back">← @SharedLocalizer["Панель продавця"]</a>
 
     <header class="seller-orders-header">
         <div>
-            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> Панель продавця</div>
-            <h1>Налаштування - @Model.StoreName</h1>
-            <p>Інформація про компанію, платежі та доступи.</p>
+            <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> @SharedLocalizer["Панель продавця"]</div>
+            <h1>@Localizer["Налаштування"] - @Model.StoreName</h1>
+            <p>@Localizer["Інформація про компанію, платежі та доступи."]</p>
         </div>
     </header>
 
@@ -25,7 +25,7 @@
     {
         <div class="seller-alert" role="status" style="background-color: #d1e7dd; color: #0f5132; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
             <span aria-hidden="true">✓</span>
-            <p style="margin: 0;"><strong>Успішно: </strong>@success</p>
+            <p style="margin: 0;"><strong>@Localizer["Успішно: "]</strong>@success</p>
         </div>
     }
 
@@ -33,43 +33,43 @@
     {
         <div class="seller-alert" role="status" style="background-color: #f8d7da; color: #842029; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
             <span aria-hidden="true">✕</span>
-            <p style="margin: 0;"><strong>Помилка: </strong>@error</p>
+            <p style="margin: 0;"><strong>@Localizer["Помилка: "]</strong>@error</p>
         </div>
     }
 
     <section class="business-panel">
-        <h2>Інформація про компанію</h2>
-        <p class="business-panel__lead">Ці дані бачать покупці на сторінці магазину.</p>
+        <h2>@Localizer["Інформація про компанію"]</h2>
+        <p class="business-panel__lead">@Localizer["Ці дані бачать покупці на сторінці магазину."]</p>
 
         <form asp-action="Settings" method="post" class="business-settings-form">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
             <input type="hidden" asp-for="BusinessId" />
 
             <div>
-                <label asp-for="StoreName">Назва магазину</label>
+                <label asp-for="StoreName">@Localizer["Назва магазину"]</label>
                 <input asp-for="StoreName" class="form-control" />
                 <span asp-validation-for="StoreName" class="text-danger small"></span>
             </div>
             <div>
-                <label asp-for="Description">Опис</label>
+                <label asp-for="Description">@Localizer["Опис"]</label>
                 <textarea asp-for="Description" class="form-control" rows="3"></textarea>
                 <span asp-validation-for="Description" class="text-danger small"></span>
             </div>
 
             <div>
-                <button type="submit" class="seller-button seller-button--primary">Зберегти</button>
+                <button type="submit" class="seller-button seller-button--primary">@Localizer["Зберегти"]</button>
             </div>
         </form>
     </section>
 
     <!-- СЕКЦІЯ: Управління статусом 18+ контенту -->
     <section class="business-panel">
-        <h2>Статус 18+ контенту</h2>
-        <p class="business-panel__lead">Дозвіл на розміщення товарів із віковими обмеженнями у каталозі.</p>
+        <h2>@Localizer["Статус 18+ контенту"]</h2>
+        <p class="business-panel__lead">@Localizer["Дозвіл на розміщення товарів із віковими обмеженнями у каталозі."]</p>
 
         <div class="business-settings-form">
             <div class="mb-3">
-                <p>Поточний статус магазину: <strong>@Model.AdultStatus</strong></p>
+                <p>@Localizer["Поточний статус магазину:"] <strong>@Model.AdultStatus</strong></p>
             </div>
 
           @if (Model.AdultStatus.ToString() == "None" || Model.AdultStatus.ToString() == "Rejected")
@@ -78,69 +78,68 @@
         @Html.AntiForgeryToken()
         <input type="hidden" name="businessId" value="@Model.BusinessId" />
         <button type="submit" class="seller-button seller-button--secondary">
-            Подати заявку на розміщення 18+ контенту
+            @Localizer["Подати заявку на розміщення 18+ контенту"]
         </button>
     </form>
 }
 else if (Model.AdultStatus.ToString() == "Pending")
 {
     <div class="alert alert-info" role="alert" style="padding: 10px; background-color: #cff4fc; color: #055160; border-radius: 5px;">
-        Ваша заявка на розгляд статусу 18+ наразі опрацьовується адміністратором.
+        @Localizer["Ваша заявка на розгляд статусу 18+ наразі опрацьовується адміністратором."]
     </div>
 }
 else if (Model.AdultStatus.ToString() == "Approved")
 {
     <div class="alert alert-success" role="alert" style="padding: 10px; background-color: #d1e7dd; color: #0f5132; border-radius: 5px;">
-        Магазин успішно верифіковано! Ви можете створювати товари категорії 18+.
+        @Localizer["Магазин успішно верифіковано! Ви можете створювати товари категорії 18+."]
     </div>
 }
         </div>
     </section>
 
     <section class="business-panel" data-local-settings data-business-id="@Model.BusinessId">
-        <h2>Юридичні та платіжні дані <span class="business-local-badge">Зберігається локально</span></h2>
+        <h2>@Localizer["Юридичні та платіжні дані"] <span class="business-local-badge">@Localizer["Зберігається локально"]</span></h2>
         <p class="business-panel__lead">
-            Ці поля ще не підключені до бази даних платформи - значення зберігаються лише в цьому браузері,
-            щоб продемонструвати майбутній інтерфейс налаштувань.
+            @Localizer["Ці поля ще не підключені до бази даних платформи - значення зберігаються лише в цьому браузері, щоб продемонструвати майбутній інтерфейс налаштувань."]
         </p>
 
         <div class="business-settings-form">
             <div>
-                <label for="ls-legal-address">Юридична адреса</label>
-                <input type="text" id="ls-legal-address" data-local-field="legalAddress" class="form-control" placeholder="Місто, вулиця, будинок" />
+                <label for="ls-legal-address">@Localizer["Юридична адреса"]</label>
+                <input type="text" id="ls-legal-address" data-local-field="legalAddress" class="form-control" placeholder="@Localizer["Місто, вулиця, будинок"]" />
             </div>
             <div>
-                <label for="ls-tax-id">Податковий номер (ІПН/ЄДРПОУ)</label>
+                <label for="ls-tax-id">@Localizer["Податковий номер (ІПН/ЄДРПОУ)"]</label>
                 <input type="text" id="ls-tax-id" data-local-field="taxId" class="form-control" placeholder="0000000000" />
             </div>
             <div>
-                <label for="ls-iban">Банківські реквізити (IBAN)</label>
+                <label for="ls-iban">@Localizer["Банківські реквізити (IBAN)"]</label>
                 <input type="text" id="ls-iban" data-local-field="iban" class="form-control" placeholder="UA00 0000 0000 0000 0000 0000 0" />
             </div>
             <div>
-                <label for="ls-shipping-note">Налаштування доставки за замовчуванням</label>
-                <input type="text" id="ls-shipping-note" data-local-field="shippingNote" class="form-control" placeholder="Наприклад: відправлення протягом 1 дня" />
+                <label for="ls-shipping-note">@Localizer["Налаштування доставки за замовчуванням"]</label>
+                <input type="text" id="ls-shipping-note" data-local-field="shippingNote" class="form-control" placeholder="@Localizer["Наприклад: відправлення протягом 1 дня"]" />
             </div>
             <label class="d-flex align-items-center gap-2">
                 <input type="checkbox" data-local-field="notifyOrders" />
-                Надсилати email-сповіщення про нові замовлення
+                @Localizer["Надсилати email-сповіщення про нові замовлення"]
             </label>
             <label class="d-flex align-items-center gap-2">
                 <input type="checkbox" data-local-field="twoFactor" />
-                Двофакторна автентифікація для власника магазину
+                @Localizer["Двофакторна автентифікація для власника магазину"]
             </label>
 
             <div>
-                <button type="button" class="seller-button seller-button--secondary" data-save-local-settings>Зберегти локально</button>
-                <span class="business-empty" data-local-saved-hint hidden>Збережено ✓</span>
+                <button type="button" class="seller-button seller-button--secondary" data-save-local-settings>@Localizer["Зберегти локально"]</button>
+                <span class="business-empty" data-local-saved-hint hidden>@Localizer["Збережено"] ✓</span>
             </div>
         </div>
     </section>
 
     <section class="business-panel">
-        <h2>Користувачі та права доступу</h2>
-        <p class="business-panel__lead">Керування учасниками та ролями винесено в окремий розділ.</p>
-        <a asp-action="Team" asp-route-businessId="@Model.BusinessId" class="seller-button seller-button--secondary">Відкрити «Команда» →</a>
+        <h2>@Localizer["Користувачі та права доступу"]</h2>
+        <p class="business-panel__lead">@Localizer["Керування учасниками та ролями винесено в окремий розділ."]</p>
+        <a asp-action="Team" asp-route-businessId="@Model.BusinessId" class="seller-button seller-button--secondary">@Localizer["Відкрити «Команда»"] →</a>
     </section>
 </div>
 

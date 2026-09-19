@@ -14,6 +14,8 @@ namespace Marketplace.DAL.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<ProductVariant> ProductVariants { get; set; }
+        public DbSet<ProductTranslation> ProductTranslations { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Order> Orders { get; set; }
@@ -43,6 +45,8 @@ namespace Marketplace.DAL.Data
         public DbSet<UserDiscount> UserDiscounts { get; set; }
         public DbSet<RefundChatMessage> RefundChatMessages { get; set; }
 
+        public DbSet<WithdrawalRequest> WithdrawalRequests { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -53,6 +57,7 @@ namespace Marketplace.DAL.Data
             builder.Entity<Category>().HasQueryFilter(c => !c.IsDeleted);
             builder.Entity<Product>().HasQueryFilter(p => !p.IsDeleted);
             builder.Entity<ProductImage>().HasQueryFilter(pi => !pi.IsDeleted);
+            builder.Entity<ProductVariant>().HasQueryFilter(pv => !pv.IsDeleted);
             builder.Entity<Cart>().HasQueryFilter(cart => !cart.IsDeleted);
             builder.Entity<CartItem>().HasQueryFilter(ci => !ci.IsDeleted);
             builder.Entity<Order>().HasQueryFilter(o => !o.IsDeleted);
@@ -69,8 +74,7 @@ namespace Marketplace.DAL.Data
             builder.Entity<SystemSetting>().HasQueryFilter(s => !s.IsDeleted);
             builder.Entity<MarketplaceBalance>().HasQueryFilter(mb => !mb.IsDeleted);
             builder.Entity<RefundChatMessage>().HasQueryFilter(m => !m.IsDeleted);
-            // UserActionLog / BusinessActionLog are append-only audit trails — no soft-delete filter.
-
+          
 
             builder.Entity<Business>()
                 .HasOne(b => b.Owner)
@@ -108,6 +112,17 @@ namespace Marketplace.DAL.Data
                 .HasForeignKey(pi => pi.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Entity<ProductVariant>()
+                .HasOne(pv => pv.Product)
+                .WithMany(p => p.Variants)
+                .HasForeignKey(pv => pv.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<ProductVariant>()
+                .HasIndex(pv => new { pv.ProductId, pv.Size })
+                .IsUnique()
+                .HasFilter("[IsDeleted] = 0");
+
             builder.Entity<Cart>()
                 .HasOne(c => c.User)
                 .WithMany()
@@ -126,6 +141,12 @@ namespace Marketplace.DAL.Data
                 .HasForeignKey(ci => ci.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<CartItem>()
+                .HasOne(ci => ci.ProductVariant)
+                .WithMany()
+                .HasForeignKey(ci => ci.ProductVariantId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<Order>()
                 .HasOne(o => o.User)
                 .WithMany()
@@ -142,6 +163,12 @@ namespace Marketplace.DAL.Data
                 .HasOne(oi => oi.Product)
                 .WithMany(p => p.OrderItems)
                 .HasForeignKey(oi => oi.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<OrderItem>()
+                .HasOne(oi => oi.ProductVariant)
+                .WithMany()
+                .HasForeignKey(oi => oi.ProductVariantId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Address>()
@@ -168,11 +195,11 @@ namespace Marketplace.DAL.Data
                 .HasForeignKey(wi => wi.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-                    builder.Entity<Review>()
-            .HasOne(r => r.User)
-            .WithMany(u => u.Reviews) 
-            .HasForeignKey(r => r.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Review>()
+    .HasOne(r => r.User)
+    .WithMany(u => u.Reviews)
+    .HasForeignKey(r => r.UserId)
+    .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Review>()
                 .HasOne(r => r.Product)
@@ -216,8 +243,6 @@ namespace Marketplace.DAL.Data
                 .HasForeignKey(psr => psr.BuyerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Restrict (not Cascade) — PostSaleRequest already cascades via Order, and SQL
-            // Server rejects a second cascade path to the same table through OrderItem.
             builder.Entity<PostSaleRequest>()
                 .HasOne(psr => psr.OrderItem)
                 .WithMany()
@@ -244,13 +269,26 @@ namespace Marketplace.DAL.Data
                 .HasIndex(s => new { s.Category, s.Key })
                 .IsUnique();
 
+            builder.Entity<ProductTranslation>()
+                .HasQueryFilter(pt => !pt.IsDeleted);
+
+            builder.Entity<ProductTranslation>()
+                .HasOne(pt => pt.Product)
+                .WithMany()
+                .HasForeignKey(pt => pt.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<ProductTranslation>()
+                .HasIndex(pt => new { pt.ProductId, pt.Culture })
+                .IsUnique();
+
             builder.Entity<BusinessActionLog>()
                 .HasOne<Business>()
                 .WithMany()
                 .HasForeignKey(bal => bal.BusinessId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-  
+
 
             builder.Entity<ProductEvent>()
                 .HasOne<Product>()
@@ -274,17 +312,26 @@ namespace Marketplace.DAL.Data
 
             builder.Entity<RefundChatMessage>()
                 .HasOne(m => m.PostSaleRequest)
-                .WithMany() 
+                .WithMany()
                 .HasForeignKey(m => m.PostSaleRequestId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<WithdrawalRequest>()
+                .HasOne(wr => wr.Business)
+                .WithMany()
+                .HasForeignKey(wr => wr.BusinessId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Product>().Navigation(p => p.Category).AutoInclude();
             builder.Entity<Product>().Navigation(p => p.Images).AutoInclude();
             builder.Entity<Product>().Navigation(p => p.Business).AutoInclude();
+            builder.Entity<Product>().Navigation(p => p.Variants).AutoInclude();
+            builder.Entity<CartItem>().Navigation(ci => ci.ProductVariant).AutoInclude();
+            builder.Entity<OrderItem>().Navigation(oi => oi.ProductVariant).AutoInclude();
             builder.Entity<Wishlist>().Navigation(w => w.WishlistItems).AutoInclude();
             builder.Entity<Review>().Navigation(r => r.User).AutoInclude();
 
-      
+
             builder.Entity<Product>().Navigation(p => p.Discounts).AutoInclude();
         }
 
