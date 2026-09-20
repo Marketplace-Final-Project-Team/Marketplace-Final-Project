@@ -42,11 +42,10 @@
         const search = params.get("Search");
         if (search) parts.push(`«${search}»`);
 
-        const categorySelect = document.getElementById("filter-category");
         const categoryId = params.get("CategoryId");
-        if (categoryId && categorySelect) {
-            const option = Array.from(categorySelect.options).find((o) => o.value === categoryId);
-            if (option) parts.push(option.textContent.trim());
+        if (categoryId) {
+            const link = document.querySelector(`[data-category-link][data-category-id="${categoryId}"]`);
+            if (link) parts.push(link.textContent.trim());
         }
 
         const minPrice = params.get("MinPrice");

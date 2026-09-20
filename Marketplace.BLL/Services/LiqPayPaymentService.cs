@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -73,6 +74,7 @@ namespace Marketplace.BLL.Services
                 Url = "https://www.liqpay.ua/api/3/checkout"
             };
         }
+
         public async Task<bool> RefundPaymentAsync(string orderId, decimal amount)
         {
             var publicKey = await GetSettingAsync("PublicKey", _options.Value.PublicKey);
@@ -119,9 +121,6 @@ namespace Marketplace.BLL.Services
                 {
                     string? status = statusProp.GetString();
 
-                    // Якщо платіжна система підтвердила успіх
-                    // "reversed" — офіційний статус LiqPay для успішно виконаного повернення коштів
-                    // (гроші можуть зараховуватись на картку не миттєво, це нормально)
                     if (status == "success" || status == "wait_accept" || status == "reversed")
                     {
                         return true;
@@ -145,6 +144,79 @@ namespace Marketplace.BLL.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Exception occurred while processing LiqPay refund for order {OrderId}", orderId);
+                return false;
+            }
+        }
+
+        public async Task<bool> CreatePayoutAsync(
+            Guid requestId,
+            decimal amount,
+            string cardNumber,
+            string recipientName,
+            string description
+            )
+        {
+            var publicKey = await GetSettingAsync("PublicKey", _options.Value.PublicKey);
+            var privateKey = await GetPrivateKeyAsync();
+            var serverUrl = await GetSettingAsync("ServerUrl", _options.Value.ServerUrl);
+
+            var request = new
+            {
+                version = "3",
+                public_key = publicKey,
+                action = "payout",
+                card = cardNumber,
+                receiver_name = recipientName,
+                amount = amount,
+                currency = "UAH",
+                description = description,
+                order_id = requestId.ToString(),
+                server_url = serverUrl
+            };
+
+            var json = JsonSerializer.Serialize(request);
+            string base64Data = Convert.ToBase64String(Encoding.UTF8.GetBytes(json));
+
+            string signature = privateKey + base64Data + privateKey;
+            string base64signature = Convert.ToBase64String(SHA1.HashData(Encoding.UTF8.GetBytes(signature)));
+
+            var formContent = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("data", base64Data),
+                new KeyValuePair<string, string>("signature", base64signature)
+            });
+
+            try
+            {
+                var httpResponse = await _httpClient.PostAsync("https://www.liqpay.ua/api/request", formContent);
+                if (!httpResponse.IsSuccessStatusCode)
+                {
+                    _logger.LogError("LiqPay Payout HTTP Error: {StatusCode}", httpResponse.StatusCode);
+                    return false;
+                }
+
+                string jsonResponse = await httpResponse.Content.ReadAsStringAsync();
+                _logger.LogInformation("LiqPay Payout Response: {Response}", jsonResponse);
+
+                using var doc = JsonDocument.Parse(jsonResponse);
+                var root = doc.RootElement;
+
+                if (root.TryGetProperty("status", out var statusProp))
+                {
+                    string? status = statusProp.GetString();
+
+                    if (status == "success" || status == "wait_accept")
+                    {
+                        return true;
+                    }
+                }
+
+                _logger.LogError("LiqPay payout rejected for request {RequestId}. Response: {Response}", requestId, jsonResponse);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred while processing LiqPay payout for request {RequestId}", requestId);
                 return false;
             }
         }

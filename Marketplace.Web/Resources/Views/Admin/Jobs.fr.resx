@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Задачі" xml:space="preserve">
+    <value>Tâches</value>
+  </data>
+  <data name="Фонові задачі" xml:space="preserve">
+    <value>Tâches en arrière-plan</value>
+  </data>
+  <data name="Автоматична модерація товарів через Quartz.NET - планувальник, черга та журнал рішень." xml:space="preserve">
+    <value>Modération automatique des produits via Quartz.NET - planificateur, file d'attente et journal des décisions.</value>
+  </data>
+  <data name="Стан планувальника" xml:space="preserve">
+    <value>État du planificateur</value>
+  </data>
+  <data name="Планувальник Quartz" xml:space="preserve">
+    <value>Planificateur Quartz</value>
+  </data>
+  <data name="Працює" xml:space="preserve">
+    <value>En cours</value>
+  </data>
+  <data name="Зупинено" xml:space="preserve">
+    <value>Arrêté</value>
+  </data>
+  <data name="ProductModerationJob - модерація товарів через Gemini" xml:space="preserve">
+    <value>ProductModerationJob - modération des produits via Gemini</value>
+  </data>
+  <data name="Призупинити планувальник" xml:space="preserve">
+    <value>Mettre le planificateur en pause</value>
+  </data>
+  <data name="Відновити планувальник" xml:space="preserve">
+    <value>Reprendre le planificateur</value>
+  </data>
+  <data name="У черзі зараз" xml:space="preserve">
+    <value>Actuellement en file d'attente</value>
+  </data>
+  <data name="Товарів очікують на автоматичну перевірку" xml:space="preserve">
+    <value>Produits en attente de vérification automatique</value>
+  </data>
+  <data name="Як це працює" xml:space="preserve">
+    <value>Comment ça marche</value>
+  </data>
+  <data name="Після створення або редагування товару система через 5 секунд запускає перевірку тексту й зображень через Gemini AI. Залежно від результату товар отримує статус «Активний» або «Заблокований»; у разі помилки перевірки - лишається «На модерації» для ручного розгляду." xml:space="preserve">
+    <value>Après la création ou la modification d'un produit, le système lance une vérification du texte et des images via Gemini AI au bout de 5 secondes. Selon le résultat, le produit obtient le statut « Actif » ou « Bloqué » ; en cas d'erreur de vérification, il reste « En modération » pour un examen manuel.</value>
+  </data>
+  <data name="У черзі на модерацію" xml:space="preserve">
+    <value>En file d'attente de modération</value>
+  </data>
+  <data name="Зараз немає товарів, що очікують на автоматичну перевірку." xml:space="preserve">
+    <value>Aucun produit n'est actuellement en attente de vérification automatique.</value>
+  </data>
+  <data name="Тип" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="Назва" xml:space="preserve">
+    <value>Nom</value>
+  </data>
+  <data name="Запуск перевірки" xml:space="preserve">
+    <value>Lancement de la vérification</value>
+  </data>
+  <data name="Дії" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="Бізнес" xml:space="preserve">
+    <value>Entreprise</value>
+  </data>
+  <data name="Товар" xml:space="preserve">
+    <value>Produit</value>
+  </data>
+  <data name="Запустити зараз" xml:space="preserve">
+    <value>Exécuter maintenant</value>
+  </data>
+  <data name="Налаштування Gemini API" xml:space="preserve">
+    <value>Paramètres de l'API Gemini</value>
+  </data>
+  <data name="Ключ і модель, які використовує автоматична модерація товарів." xml:space="preserve">
+    <value>La clé et le modèle utilisés par la modération automatique des produits.</value>
+  </data>
+  <data name="Зараз використовується ключ, збережений тут." xml:space="preserve">
+    <value>La clé enregistrée ici est actuellement utilisée.</value>
+  </data>
+  <data name="Зараз використовується ключ із конфігурації сервера." xml:space="preserve">
+    <value>La clé de la configuration du serveur est actuellement utilisée.</value>
+  </data>
+  <data name="Введіть, щоб замінити збережений ключ" xml:space="preserve">
+    <value>Saisir pour remplacer la clé enregistrée</value>
+  </data>
+  <data name="Зберегти" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="Останні рішення модерації" xml:space="preserve">
+    <value>Décisions de modération récentes</value>
+  </data>
+  <data name="Поки що немає жодного запису." xml:space="preserve">
+    <value>Aucune entrée pour le moment.</value>
+  </data>
+  <data name="Час" xml:space="preserve">
+    <value>Heure</value>
+  </data>
+  <data name="Опис" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Регулярні задачі" xml:space="preserve">
+    <value>Tâches récurrentes</value>
+  </data>
+  <data name="Регулярних задач не знайдено." xml:space="preserve">
+    <value>Aucune tâche récurrente trouvée.</value>
+  </data>
+  <data name="Останній запуск" xml:space="preserve">
+    <value>Dernière exécution</value>
+  </data>
+  <data name="Наступний запуск" xml:space="preserve">
+    <value>Prochaine exécution</value>
+  </data>
+  <data name="ще не запускалась" xml:space="preserve">
+    <value>jamais exécutée</value>
+  </data>
+</root>

@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.Products.ProductEditViewModel
 
 @{
-    ViewData["Title"] = "Редагування товару";
+    ViewData["Title"] = Localizer["Редагування товару"];
 }
 
 @section Styles {
@@ -9,12 +9,12 @@
 }
 
 <div class="products-page">
-    <a asp-action="Details" asp-route-id="@Model.Id" class="products-back">← Назад до товару</a>
+    <a asp-action="Details" asp-route-id="@Model.Id" class="products-back">← @Localizer["Назад до товару"]</a>
     <header class="products-heading">
         <div>
-            <div class="products-eyebrow">Редагування</div>
+            <div class="products-eyebrow">@Localizer["Редагування"]</div>
             <h1 class="products-title">@Model.Name</h1>
-            <p class="products-subtitle">Оновіть дані товару. Після збереження він знову перейде на модерацію.</p>
+            <p class="products-subtitle">@Localizer["Оновіть дані товару. Після збереження він знову перейде на модерацію."]</p>
         </div>
     </header>
 
@@ -33,62 +33,90 @@
             <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
             <section class="product-form-section">
-                <h2>Основна інформація</h2>
+                <h2>@Localizer["Основна інформація"]</h2>
                 <div class="mb-3">
-                    <label asp-for="Name" class="form-label">Назва товару</label>
+                    <label asp-for="Name" class="form-label">@Localizer["Назва товару"]</label>
                     <input asp-for="Name" class="form-control" autofocus />
                     <span asp-validation-for="Name" class="text-danger small"></span>
                 </div>
                 <div>
-                    <label asp-for="Description" class="form-label">Опис</label>
+                    <label asp-for="Description" class="form-label">@Localizer["Опис"]</label>
                     <textarea asp-for="Description" class="form-control" rows="5"></textarea>
                     <span asp-validation-for="Description" class="text-danger small"></span>
                 </div>
             </section>
 
             <section class="product-form-section">
-                <h2>Продаж і класифікація</h2>
+                <h2>@Localizer["Продаж і класифікація"]</h2>
                 <div class="product-field-grid">
                     <div>
-                        <label asp-for="CategoryId" class="form-label">Категорія</label>
+                        <label asp-for="CategoryId" class="form-label">@Localizer["Категорія"]</label>
                         <select asp-for="CategoryId" asp-items="Model.Categories" class="form-select"></select>
                         <span asp-validation-for="CategoryId" class="text-danger small"></span>
                     </div>
                     <div>
-                        <label asp-for="Price" class="form-label">Ціна, ₴</label>
+                        <label asp-for="Price" class="form-label">@Localizer["Ціна, ₴"]</label>
                         <input asp-for="Price" class="form-control" inputmode="decimal" />
                         <span asp-validation-for="Price" class="text-danger small"></span>
                     </div>
-                    <div>
-                        <label asp-for="Quantity" class="form-label">Кількість, шт.</label>
+                    <div data-quantity-field>
+                        <label asp-for="Quantity" class="form-label">@Localizer["Кількість, шт."]</label>
                         <input asp-for="Quantity" class="form-control" inputmode="numeric" />
                         <span asp-validation-for="Quantity" class="text-danger small"></span>
                     </div>
+                    <div>
+                        <label asp-for="Sku" class="form-label">@Localizer["Артикул (SKU)"]</label>
+                        <input asp-for="Sku" class="form-control" placeholder="@Localizer["Наприклад, TS-BLK-001"]" />
+                        <span asp-validation-for="Sku" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="product-variants" data-variants-section>
+                    <div class="product-section-heading">
+                        <div>
+                            <p class="product-section-kicker">@Localizer["Розміри"]</p>
+                            <h3>@Localizer["Варіанти товару (необов'язково)"]</h3>
+                        </div>
+                    </div>
+                    <p class="product-help">@Localizer["Якщо товар продається різними розмірами (S, M, L...), додайте кожен окремим рядком - загальна кількість порахується автоматично."]</p>
+                    <div data-variant-rows>
+                        @for (var i = 0; i < Model.Variants.Count; i++)
+                        {
+                            <div class="product-variant-row" data-variant-row>
+                                <input name="Variants[@i].Size" value="@Model.Variants[i].Size" class="form-control" placeholder="@Localizer["Розмір (S, M, L...)"]" />
+                                <input name="Variants[@i].Sku" value="@Model.Variants[i].Sku" class="form-control" placeholder="@Localizer["Артикул розміру"]" />
+                                <input name="Variants[@i].Quantity" value="@Model.Variants[i].Quantity" type="number" min="0" class="form-control" placeholder="@Localizer["К-сть"]" />
+                                <button type="button" class="product-variant-row__remove" data-remove-variant aria-label="@Localizer["Видалити розмір"]">✕</button>
+                            </div>
+                        }
+                    </div>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-add-variant>+ @Localizer["Додати розмір"]</button>
+                    <span asp-validation-for="Variants" class="text-danger small d-block mt-2"></span>
                 </div>
             </section>
 
             <section class="product-form-section">
-                <h2>Зображення</h2>
+                <h2>@Localizer["Зображення"]</h2>
                 @if (!string.IsNullOrWhiteSpace(Model.ExistingMainImageUrl))
                 {
                     <div class="mb-3">
-                        <div class="form-label">Поточне головне фото</div>
+                        <div class="form-label">@Localizer["Поточне головне фото"]</div>
                         <img src="@Model.ExistingMainImageUrl" class="product-current-image" alt="@Model.Name" />
                     </div>
                 }
                 <div class="mb-3">
-                    <label asp-for="MainImage" class="form-label">Замінити головне фото</label>
+                    <label asp-for="MainImage" class="form-label">@Localizer["Замінити головне фото"]</label>
                     <input asp-for="MainImage" type="file" class="form-control" accept="image/*" />
                 </div>
                 <div>
-                    <label asp-for="AdditionalImages" class="form-label">Додати ще фото</label>
+                    <label asp-for="AdditionalImages" class="form-label">@Localizer["Додати ще фото"]</label>
                     <input asp-for="AdditionalImages" type="file" class="form-control" accept="image/*" multiple />
                 </div>
             </section>
 
             <div class="product-form-actions">
-                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Скасувати</a>
-                <button type="submit" class="btn btn-primary">Зберегти зміни</button>
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">@Localizer["Скасувати"]</a>
+                <button type="submit" class="btn btn-primary">@Localizer["Зберегти зміни"]</button>
             </div>
         </form>
     </div>
@@ -96,4 +124,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/product-variants.js" asp-append-version="true"></script>
 }

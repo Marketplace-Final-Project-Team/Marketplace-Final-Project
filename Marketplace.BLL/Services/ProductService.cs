@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ClosedXML.Excel;
 using Microsoft.EntityFrameworkCore;
+using Marketplace.BLL.Common;
 using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
@@ -57,6 +59,35 @@ public class ProductService : IProductService
         var trigger = TriggerBuilder.Create()
             .WithIdentity($"product-moderation-trigger-{productId}", "moderation")
             .StartAt(DateBuilder.FutureDate(5, IntervalUnit.Second))
+            .Build();
+
+        await scheduler.ScheduleJob(job, trigger);
+    }
+
+    private async Task ScheduleTranslationJobAsync(Guid productId)
+    {
+        var scheduler = await _schedulerFactory.GetScheduler();
+
+        var jobKey = new JobKey($"product-translation-job-{productId}", "translation");
+
+        if (await scheduler.CheckExists(jobKey))
+        {
+            await scheduler.DeleteJob(jobKey);
+        }
+
+        var jobData = new JobDataMap
+        {
+            { "ProductId", productId }
+        };
+
+        var job = JobBuilder.Create<ProductTranslationJob>()
+            .WithIdentity(jobKey)
+            .UsingJobData(jobData)
+            .Build();
+
+        var trigger = TriggerBuilder.Create()
+            .WithIdentity($"product-translation-trigger-{productId}", "translation")
+            .StartAt(DateBuilder.FutureDate(7, IntervalUnit.Second))
             .Build();
 
         await scheduler.ScheduleJob(job, trigger);
@@ -275,6 +306,8 @@ public class ProductService : IProductService
             }
         }
 
+        var variants = BuildVariants(dto.Variants);
+
         var product = new Product
         {
             Id = Guid.NewGuid(),
@@ -283,17 +316,25 @@ public class ProductService : IProductService
             Name = dto.Name,
             Description = dto.Description,
             Price = dto.Price,
-            Quantity = dto.Quantity,
+            Quantity = variants.Count > 0 ? variants.Sum(v => v.Quantity) : dto.Quantity,
+            Sku = string.IsNullOrWhiteSpace(dto.Sku) ? null : dto.Sku.Trim(),
             IsAdultOnly = dto.IsAdultOnly,
             Status = ProductStatus.Pending,
             ModerationReason = null,
             CreatedAt = DateTime.UtcNow
         };
 
+        foreach (var variant in variants)
+        {
+            variant.ProductId = product.Id;
+            product.Variants.Add(variant);
+        }
+
         await _productRepository.AddAsync(product);
         await _context.SaveChangesAsync();
 
         await ScheduleModerationJobAsync(product.Id);
+        await ScheduleTranslationJobAsync(product.Id);
 
         return product;
     }
@@ -311,14 +352,18 @@ public class ProductService : IProductService
         product.Name = dto.Name;
         product.Description = dto.Description;
         product.Price = dto.Price;
-        product.Quantity = dto.Quantity;
+        product.Sku = string.IsNullOrWhiteSpace(dto.Sku) ? null : dto.Sku.Trim();
         product.IsAdultOnly = dto.IsAdultOnly;
         product.Status = ProductStatus.Pending;
         product.ModerationReason = null;
 
+        SyncVariants(product, dto.Variants);
+        product.Quantity = product.Variants.Count > 0 ? product.Variants.Sum(v => v.Quantity) : dto.Quantity;
+
         await _context.SaveChangesAsync();
 
         await ScheduleModerationJobAsync(product.Id);
+        await ScheduleTranslationJobAsync(product.Id);
 
         return product;
     }
@@ -334,5 +379,292 @@ public class ProductService : IProductService
         _context.Products.Remove(product);
         await _context.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<ServiceResult> UpdateQuantityAsync(Guid productId, int quantity)
+    {
+        if (quantity < 0)
+        {
+            return new ServiceResult { Succeeded = false, Message = "Кількість не може бути від'ємною." };
+        }
+
+        var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == productId);
+        if (product is null)
+        {
+            return new ServiceResult { Succeeded = false, Message = "Товар не знайдено." };
+        }
+
+        if (product.Variants.Count > 0)
+        {
+            return new ServiceResult { Succeeded = false, Message = "Товар має розміри - кількість редагується через сторінку товару." };
+        }
+
+        product.Quantity = quantity;
+        await _context.SaveChangesAsync();
+
+        return new ServiceResult { Succeeded = true, Message = string.Empty };
+    }
+
+    public async Task<IReadOnlyList<ReservedProductDto>> GetReservedProductsAsync(Guid businessId)
+    {
+        return await _context.OrderItems
+            .Where(oi => oi.Product.BusinessId == businessId
+                && !oi.IsReturned
+                && (oi.Order.Status == OrderStatus.Pending || oi.Order.Status == OrderStatus.Confirmed))
+            .GroupBy(oi => new { oi.ProductId, oi.Product.Name, oi.Product.Sku, oi.Product.MainImageUrl, oi.Product.Quantity })
+            .Select(g => new ReservedProductDto
+            {
+                ProductId = g.Key.ProductId,
+                ProductName = g.Key.Name,
+                Sku = g.Key.Sku,
+                MainImageUrl = g.Key.MainImageUrl,
+                ReservedQuantity = g.Sum(x => x.Quantity),
+                OrderCount = g.Select(x => x.OrderId).Distinct().Count(),
+                TotalQuantity = g.Key.Quantity
+            })
+            .OrderByDescending(r => r.ReservedQuantity)
+            .ToListAsync();
+    }
+
+    public async Task<IReadOnlyList<StockForecastDto>> GetStockForecastAsync(Guid businessId, int lookbackDays = 30)
+    {
+        var cutoff = DateTime.UtcNow.AddDays(-lookbackDays);
+
+        var salesByProduct = await _context.OrderItems
+            .Where(oi => oi.Product.BusinessId == businessId
+                && oi.Order.CreatedAt >= cutoff
+                && oi.Order.Status != OrderStatus.Canceled
+                && !oi.IsReturned)
+            .GroupBy(oi => oi.ProductId)
+            .Select(g => new { ProductId = g.Key, Sold = g.Sum(x => x.Quantity) })
+            .ToDictionaryAsync(x => x.ProductId, x => x.Sold);
+
+        var products = await _context.Products
+            .AsNoTracking()
+            .Where(p => p.BusinessId == businessId && p.Status == ProductStatus.Active)
+            .ToListAsync();
+
+        return products
+            .Select(p => new StockForecastDto
+            {
+                ProductId = p.Id,
+                ProductName = p.Name,
+                Sku = p.Sku,
+                MainImageUrl = p.MainImageUrl,
+                CurrentQuantity = p.Quantity,
+                UnitsSoldLast30Days = salesByProduct.TryGetValue(p.Id, out var sold) ? sold : 0
+            })
+            .Where(f => f.UnitsSoldLast30Days > 0)
+            .OrderBy(f => f.EstimatedDaysRemaining ?? int.MaxValue)
+            .ToList();
+    }
+
+    private static readonly string[] ExcelHeaders =
+    {
+        "Артикул (SKU)", "Назва", "Опис", "Категорія", "Ціна", "Кількість", "Статус"
+    };
+
+    public async Task<byte[]> ExportToExcelAsync(Guid businessId)
+    {
+        var products = await _context.Products
+            .AsNoTracking()
+            .Include(p => p.Category)
+            .Where(p => p.BusinessId == businessId)
+            .OrderBy(p => p.Name)
+            .ToListAsync();
+
+        using var workbook = new XLWorkbook();
+        var sheet = workbook.Worksheets.Add("Товари");
+
+        for (var col = 0; col < ExcelHeaders.Length; col++)
+        {
+            sheet.Cell(1, col + 1).Value = ExcelHeaders[col];
+            sheet.Cell(1, col + 1).Style.Font.Bold = true;
+        }
+
+        var row = 2;
+        foreach (var product in products)
+        {
+            sheet.Cell(row, 1).Value = product.Sku ?? string.Empty;
+            sheet.Cell(row, 2).Value = product.Name;
+            sheet.Cell(row, 3).Value = product.Description;
+            sheet.Cell(row, 4).Value = product.Category?.Name ?? string.Empty;
+            sheet.Cell(row, 5).Value = product.Price;
+            sheet.Cell(row, 6).Value = product.Quantity;
+            sheet.Cell(row, 7).Value = product.Status.ToString();
+            row++;
+        }
+
+        sheet.Columns().AdjustToContents();
+
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        return stream.ToArray();
+    }
+
+    public async Task<ProductImportResultDto> ImportFromExcelAsync(Guid businessId, Stream fileStream)
+    {
+        var result = new ProductImportResultDto();
+
+        var categories = await _context.Categories.AsNoTracking().ToListAsync();
+        var existingProducts = await _context.Products
+            .Where(p => p.BusinessId == businessId)
+            .ToListAsync();
+        var touchedProductIds = new List<Guid>();
+
+        using var workbook = new XLWorkbook(fileStream);
+        var sheet = workbook.Worksheet(1);
+        var lastRow = sheet.LastRowUsed()?.RowNumber() ?? 1;
+
+        for (var rowNumber = 2; rowNumber <= lastRow; rowNumber++)
+        {
+            var row = sheet.Row(rowNumber);
+            var sku = row.Cell(1).GetString().Trim();
+            var name = row.Cell(2).GetString().Trim();
+
+            if (string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(sku))
+            {
+                continue;
+            }
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                result.RowErrors.Add(new ProductImportRowError { RowNumber = rowNumber, ProductName = sku, Error = "Не вказано назву товару." });
+                continue;
+            }
+
+            var description = row.Cell(3).GetString().Trim();
+            var categoryName = row.Cell(4).GetString().Trim();
+            var category = categories.FirstOrDefault(c => string.Equals(c.Name, categoryName, StringComparison.OrdinalIgnoreCase));
+
+            if (category is null)
+            {
+                result.RowErrors.Add(new ProductImportRowError { RowNumber = rowNumber, ProductName = name, Error = $"Категорію «{categoryName}» не знайдено." });
+                continue;
+            }
+
+            if (!row.Cell(5).TryGetValue(out decimal price) || price <= 0)
+            {
+                result.RowErrors.Add(new ProductImportRowError { RowNumber = rowNumber, ProductName = name, Error = "Некоректна ціна." });
+                continue;
+            }
+
+            if (!row.Cell(6).TryGetValue(out int quantity) || quantity < 0)
+            {
+                result.RowErrors.Add(new ProductImportRowError { RowNumber = rowNumber, ProductName = name, Error = "Некоректна кількість." });
+                continue;
+            }
+
+            var existing = string.IsNullOrWhiteSpace(sku)
+                ? null
+                : existingProducts.FirstOrDefault(p => string.Equals(p.Sku, sku, StringComparison.OrdinalIgnoreCase));
+
+            if (existing is not null)
+            {
+                if (existing.Variants.Count > 0)
+                {
+                    result.RowErrors.Add(new ProductImportRowError
+                    {
+                        RowNumber = rowNumber,
+                        ProductName = name,
+                        Error = "Товар має розміри - оновлення через імпорт недоступне. Редагуйте його вручну."
+                    });
+                    continue;
+                }
+
+                existing.Name = name;
+                existing.Description = description;
+                existing.CategoryId = category.Id;
+                existing.Price = price;
+                existing.Quantity = quantity;
+                existing.Status = ProductStatus.Pending;
+                existing.ModerationReason = null;
+
+                touchedProductIds.Add(existing.Id);
+                result.UpdatedCount++;
+            }
+            else
+            {
+                var created = new Product
+                {
+                    Id = Guid.NewGuid(),
+                    BusinessId = businessId,
+                    CategoryId = category.Id,
+                    Name = name,
+                    Description = description,
+                    Price = price,
+                    Quantity = quantity,
+                    Sku = string.IsNullOrWhiteSpace(sku) ? null : sku,
+                    Status = ProductStatus.Pending,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                await _productRepository.AddAsync(created);
+                existingProducts.Add(created);
+
+                touchedProductIds.Add(created.Id);
+                result.CreatedCount++;
+            }
+        }
+
+        await _context.SaveChangesAsync();
+
+        foreach (var productId in touchedProductIds)
+        {
+            await ScheduleModerationJobAsync(productId);
+            await ScheduleTranslationJobAsync(productId);
+        }
+
+        return result;
+    }
+
+    private static List<ProductVariant> BuildVariants(IEnumerable<ProductVariantDto>? variants)
+    {
+        if (variants == null)
+        {
+            return new List<ProductVariant>();
+        }
+
+        return variants
+            .Where(v => !string.IsNullOrWhiteSpace(v.Size))
+            .GroupBy(v => v.Size.Trim(), StringComparer.OrdinalIgnoreCase)
+            .Select(g => g.Last())
+            .Select(v => new ProductVariant
+            {
+                Size = v.Size.Trim(),
+                Sku = v.Sku?.Trim() ?? string.Empty,
+                Quantity = Math.Max(0, v.Quantity)
+            })
+            .ToList();
+    }
+
+    private static void SyncVariants(Product product, IEnumerable<ProductVariantDto>? variants)
+    {
+        var incoming = BuildVariants(variants);
+        var existing = product.Variants.ToList();
+
+        foreach (var variantDto in incoming)
+        {
+            var match = existing.FirstOrDefault(v => v.Size.Equals(variantDto.Size, StringComparison.OrdinalIgnoreCase));
+            if (match != null)
+            {
+                match.Sku = variantDto.Sku;
+                match.Quantity = variantDto.Quantity;
+                existing.Remove(match);
+            }
+            else
+            {
+                variantDto.ProductId = product.Id;
+                product.Variants.Add(variantDto);
+            }
+        }
+
+        // Any size left in `existing` is no longer submitted by the seller — soft-delete it
+        // rather than hard-remove, since it may already be referenced by past order history
+        // (OrderItem -> ProductVariant is a Restrict FK, so a hard delete could fail there).
+        foreach (var stale in existing)
+        {
+            stale.IsDeleted = true;
+        }
     }
 }

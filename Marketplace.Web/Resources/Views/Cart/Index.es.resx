@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Покупки" xml:space="preserve">
+    <value>Compras</value>
+  </data>
+  <data name="Перевірте товари та кількість перед оформленням замовлення." xml:space="preserve">
+    <value>Revisa los artículos y las cantidades antes de realizar el pedido.</value>
+  </data>
+  <data name="Продовжити покупки" xml:space="preserve">
+    <value>Seguir comprando</value>
+  </data>
+  <data name="Кошик порожній" xml:space="preserve">
+    <value>Tu carrito está vacío</value>
+  </data>
+  <data name="Додайте кілька товарів із каталогу, щоб оформити замовлення." xml:space="preserve">
+    <value>Añade algunos productos del catálogo para realizar un pedido.</value>
+  </data>
+  <data name="Перейти до каталогу" xml:space="preserve">
+    <value>Ir al catálogo</value>
+  </data>
+  <data name="Товари згруповано за" xml:space="preserve">
+    <value>Los artículos están agrupados por</value>
+  </data>
+  <data name="продавцями - оформлюються одним замовленням." xml:space="preserve">
+    <value>vendedores - se procesan como un solo pedido.</value>
+  </data>
+  <data name="Продавець" xml:space="preserve">
+    <value>Vendedor</value>
+  </data>
+  <data name="шт." xml:space="preserve">
+    <value>uds.</value>
+  </data>
+  <data name="за одиницю · доступно" xml:space="preserve">
+    <value>por unidad · disponible</value>
+  </data>
+  <data name="Кількість товару" xml:space="preserve">
+    <value>Cantidad del artículo</value>
+  </data>
+  <data name="Зменшити кількість" xml:space="preserve">
+    <value>Reducir cantidad</value>
+  </data>
+  <data name="Збільшити кількість" xml:space="preserve">
+    <value>Aumentar cantidad</value>
+  </data>
+  <data name="Видалити" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
+  <data name="Разом" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="Товарів" xml:space="preserve">
+    <value>Artículos</value>
+  </data>
+  <data name="Продавців" xml:space="preserve">
+    <value>Vendedores</value>
+  </data>
+  <data name="Доставка" xml:space="preserve">
+    <value>Envío</value>
+  </data>
+  <data name="Безкоштовно" xml:space="preserve">
+    <value>Gratis</value>
+  </data>
+  <data name="До сплати" xml:space="preserve">
+    <value>A pagar</value>
+  </data>
+  <data name="Оформити замовлення" xml:space="preserve">
+    <value>Realizar pedido</value>
+  </data>
+</root>

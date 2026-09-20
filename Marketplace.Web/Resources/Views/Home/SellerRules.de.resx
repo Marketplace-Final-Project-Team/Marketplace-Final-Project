@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Для продавців" xml:space="preserve">
+    <value>Für Verkäufer</value>
+  </data>
+  <data name="Правила роботи на маркетплейсі" xml:space="preserve">
+    <value>Regeln für die Tätigkeit auf dem Marktplatz</value>
+  </data>
+  <data name="Вимоги до магазинів, товарів та поведінки продавців, які дозволяють підтримувати якісний і безпечний каталог для всіх покупців." xml:space="preserve">
+    <value>Anforderungen an Shops, Produkte und das Verhalten von Verkäufern, die dazu beitragen, einen hochwertigen und sicheren Katalog für alle Käufer zu erhalten.</value>
+  </data>
+  <data name="1. Створення магазину" xml:space="preserve">
+    <value>1. Shop-Erstellung</value>
+  </data>
+  <data name="Створити бізнес-акаунт може будь-який зареєстрований і верифікований користувач через розділ «Створити бізнес»;" xml:space="preserve">
+    <value>Jeder registrierte und verifizierte Nutzer kann über den Bereich "Unternehmen erstellen" ein Geschäftskonto anlegen;</value>
+  </data>
+  <data name="Під час реєстрації магазину потрібно вказати назву, опис діяльності та контактні дані;" xml:space="preserve">
+    <value>Bei der Registrierung eines Shops müssen Name, Tätigkeitsbeschreibung und Kontaktdaten angegeben werden;</value>
+  </data>
+  <data name="Один користувач може керувати кількома магазинами, кожен з яких проходить окрему модерацію;" xml:space="preserve">
+    <value>Ein Nutzer kann mehrere Shops verwalten, wobei jeder einzeln moderiert wird;</value>
+  </data>
+  <data name="Новий магазин перевіряється адміністрацією протягом 1–3 робочих днів перед публікацією." xml:space="preserve">
+    <value>Ein neuer Shop wird von der Verwaltung innerhalb von 1-3 Werktagen vor der Veröffentlichung geprüft.</value>
+  </data>
+  <data name="2. Вимоги до карток товарів" xml:space="preserve">
+    <value>2. Anforderungen an Produktseiten</value>
+  </data>
+  <data name="Назва товару має точно відображати суть товару, без маніпулятивних чи оманливих формулювань;" xml:space="preserve">
+    <value>Der Produktname muss das Produkt genau widerspiegeln, ohne manipulative oder irreführende Formulierungen;</value>
+  </data>
+  <data name="Опис повинен містити ключові характеристики: матеріал, розміри, комплектацію, особливості використання;" xml:space="preserve">
+    <value>Die Beschreibung muss wesentliche Merkmale enthalten: Material, Maße, Lieferumfang, Besonderheiten der Nutzung;</value>
+  </data>
+  <data name="Фотографії мають бути реальними зображеннями товару, що продається, без водяних знаків сторонніх сайтів;" xml:space="preserve">
+    <value>Fotos müssen reale Abbildungen des verkauften Produkts sein, ohne Wasserzeichen fremder Websites;</value>
+  </data>
+  <data name="Ціна повинна включати всі обов'язкові платежі - прихована доплата під час оформлення заборонена;" xml:space="preserve">
+    <value>Der Preis muss alle obligatorischen Gebühren enthalten - versteckte Aufpreise beim Checkout sind untersagt;</value>
+  </data>
+  <data name="Кількість на складі повинна оновлюватись вчасно, щоб уникнути продажу товару, якого немає в наявності." xml:space="preserve">
+    <value>Der Lagerbestand muss rechtzeitig aktualisiert werden, um den Verkauf nicht vorrätiger Artikel zu vermeiden.</value>
+  </data>
+  <data name="3. Категорії товарів" xml:space="preserve">
+    <value>3. Produktkategorien</value>
+  </data>
+  <data name="Кожен товар має бути розміщений у відповідній категорії каталогу. Розміщення товару в категорії, що не відповідає його суті, з метою підвищення видимості вважається порушенням і може призвести до зняття товару з публікації." xml:space="preserve">
+    <value>Jedes Produkt muss in der passenden Katalogkategorie eingeordnet werden. Die Einordnung eines Produkts in eine nicht zutreffende Kategorie zur Steigerung der Sichtbarkeit gilt als Verstoß und kann zur Entfernung des Produkts führen.</value>
+  </data>
+  <data name="4. Обробка замовлень" xml:space="preserve">
+    <value>4. Auftragsabwicklung</value>
+  </data>
+  <data name="Продавець зобов'язаний підтвердити або скасувати нове замовлення протягом 24 годин;" xml:space="preserve">
+    <value>Der Verkäufer muss eine neue Bestellung innerhalb von 24 Stunden bestätigen oder stornieren;</value>
+  </data>
+  <data name="Підтверджене замовлення повинно бути передане службі доставки протягом строку, вказаного в правилах доставки;" xml:space="preserve">
+    <value>Eine bestätigte Bestellung muss innerhalb der in den Versandregeln angegebenen Frist an den Versanddienst übergeben werden;</value>
+  </data>
+  <data name="У разі відсутності товару на складі продавець повинен негайно скасувати замовлення із зазначенням причини;" xml:space="preserve">
+    <value>Ist ein Artikel nicht vorrätig, muss der Verkäufer die Bestellung unverzüglich unter Angabe des Grundes stornieren;</value>
+  </data>
+  <data name="Немотивоване скасування підтверджених замовлень враховується в рейтингу магазину." xml:space="preserve">
+    <value>Unbegründete Stornierungen bestätigter Bestellungen wirken sich auf die Shop-Bewertung aus.</value>
+  </data>
+  <data name="5. Знижки та акції" xml:space="preserve">
+    <value>5. Rabatte und Aktionen</value>
+  </data>
+  <data name="Продавці можуть встановлювати тимчасові знижки на товари через кабінет продавця, вказуючи розмір знижки та період її дії. Заявлена початкова ціна повинна відповідати реальній ціні, за якою товар продавався до початку акції - штучне завищення ціни перед оголошенням «знижки» заборонено." xml:space="preserve">
+    <value>Verkäufer können über das Verkäufer-Dashboard befristete Rabatte auf Produkte einrichten, mit Angabe der Rabatthöhe und des Gültigkeitszeitraums. Der angegebene ursprüngliche Preis muss dem tatsächlichen Preis entsprechen, zu dem das Produkt vor Beginn der Aktion verkauft wurde - eine künstliche Preiserhöhung vor Ankündigung eines "Rabatts" ist untersagt.</value>
+  </data>
+  <data name="6. Робота зі спорами та поверненнями" xml:space="preserve">
+    <value>6. Umgang mit Streitfällen und Rückgaben</value>
+  </data>
+  <data name="Продавець зобов'язаний реагувати на заявки про повернення та спори, подані покупцями, протягом 2 робочих днів;" xml:space="preserve">
+    <value>Der Verkäufer muss auf Rückgabeanträge und Streitfälle von Käufern innerhalb von 2 Werktagen reagieren;</value>
+  </data>
+  <data name="У разі обґрунтованої претензії щодо якості товару продавець забезпечує повернення коштів або заміну за власний рахунок;" xml:space="preserve">
+    <value>Bei einer berechtigten Qualitätsbeanstandung sorgt der Verkäufer auf eigene Kosten für Erstattung oder Umtausch;</value>
+  </data>
+  <data name="Систематичне ігнорування заявок покупців або необґрунтовані відмови є підставою для розгляду адміністрацією та можливого блокування магазину." xml:space="preserve">
+    <value>Systematisches Ignorieren von Käuferanfragen oder unbegründete Ablehnungen berechtigen die Verwaltung zur Überprüfung und gegebenenfalls zur Sperrung des Shops.</value>
+  </data>
+  <data name="7. Комісія та виплати" xml:space="preserve">
+    <value>7. Provision und Auszahlungen</value>
+  </data>
+  <data name="MarketPlace утримує комісію з кожного успішно завершеного замовлення відповідно до тарифного плану, зазначеного в кабінеті продавця. Кошти за замовлення надходять на баланс магазину після підтвердження отримання товару покупцем (для онлайн-оплати) або після позначки «Доставлено» кур'єром (для оплати при отриманні). Вивід коштів із балансу магазину доступний у розділі фінансової статистики." xml:space="preserve">
+    <value>MarketPlace behält von jeder erfolgreich abgeschlossenen Bestellung eine Provision gemäß dem im Verkäufer-Dashboard angegebenen Tarifplan ein. Der Bestellbetrag wird dem Shop-Guthaben gutgeschrieben, nachdem der Käufer den Erhalt des Artikels bestätigt hat (bei Online-Zahlung) oder nachdem der Kurier "Geliefert" markiert hat (bei Nachnahme). Die Auszahlung des Shop-Guthabens ist im Bereich Finanzstatistik verfügbar.</value>
+  </data>
+  <data name="8. Заборонені товари та дії" xml:space="preserve">
+    <value>8. Verbotene Produkte und Handlungen</value>
+  </data>
+  <data name="продаж контрафактної продукції, підробок брендових товарів;" xml:space="preserve">
+    <value>Verkauf von gefälschten Produkten oder Nachahmungen von Markenartikeln;</value>
+  </data>
+  <data name="продаж товарів, обіг яких обмежено чи заборонено законодавством України;" xml:space="preserve">
+    <value>Verkauf von Waren, deren Verkehr durch die Gesetzgebung der Ukraine eingeschränkt oder verboten ist;</value>
+  </data>
+  <data name="накрутка відгуків, штучне завищення рейтингу магазину чи товару;" xml:space="preserve">
+    <value>Manipulation von Bewertungen oder künstliche Erhöhung der Shop- oder Produktbewertung;</value>
+  </data>
+  <data name="використання персональних даних покупців поза цілями виконання замовлення;" xml:space="preserve">
+    <value>Verwendung personenbezogener Daten von Käufern für andere Zwecke als die Auftragsabwicklung;</value>
+  </data>
+  <data name="спроби обійти комісію платформи шляхом домовленостей про оплату поза сайтом." xml:space="preserve">
+    <value>Versuche, die Provision der Plattform zu umgehen, indem Zahlungen außerhalb der Website vereinbart werden.</value>
+  </data>
+  <data name="9. Наслідки порушень" xml:space="preserve">
+    <value>9. Folgen von Verstößen</value>
+  </data>
+  <data name="Залежно від тяжкості порушення адміністрація може застосувати попередження, тимчасове зняття товару чи магазину з публікації, тимчасове блокування або остаточне видалення бізнес-акаунту без відшкодування коштів за нараховану, але не виведену комісію." xml:space="preserve">
+    <value>Je nach Schwere des Verstoßes kann die Verwaltung eine Verwarnung aussprechen, ein Produkt oder den Shop vorübergehend von der Veröffentlichung nehmen, vorübergehend sperren oder das Geschäftskonto endgültig löschen, ohne Erstattung angefallener, aber nicht ausgezahlter Provisionen.</value>
+  </data>
+</root>

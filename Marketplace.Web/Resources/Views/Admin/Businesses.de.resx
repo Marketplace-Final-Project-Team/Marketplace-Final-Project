@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Бізнеси" xml:space="preserve">
+    <value>Unternehmen</value>
+  </data>
+  <data name="На перевірці" xml:space="preserve">
+    <value>In Prüfung</value>
+  </data>
+  <data name="Активний" xml:space="preserve">
+    <value>Aktiv</value>
+  </data>
+  <data name="Призупинений" xml:space="preserve">
+    <value>Gesperrt</value>
+  </data>
+  <data name="Відхилений" xml:space="preserve">
+    <value>Abgelehnt</value>
+  </data>
+  <data name="Знайдено" xml:space="preserve">
+    <value>Gefunden</value>
+  </data>
+  <data name="магазинів." xml:space="preserve">
+    <value>Shops.</value>
+  </data>
+  <data name="Пошук за назвою" xml:space="preserve">
+    <value>Suche nach Name</value>
+  </data>
+  <data name="Пошук магазинів" xml:space="preserve">
+    <value>Shops durchsuchen</value>
+  </data>
+  <data name="Пошук за email" xml:space="preserve">
+    <value>Suche nach E-Mail</value>
+  </data>
+  <data name="Пошук за email власника" xml:space="preserve">
+    <value>Suche nach E-Mail des Inhabers</value>
+  </data>
+  <data name="Фільтр за статусом" xml:space="preserve">
+    <value>Nach Status filtern</value>
+  </data>
+  <data name="Усі статуси" xml:space="preserve">
+    <value>Alle Status</value>
+  </data>
+  <data name="Комісія від" xml:space="preserve">
+    <value>Provision von</value>
+  </data>
+  <data name="Комісія до" xml:space="preserve">
+    <value>Provision bis</value>
+  </data>
+  <data name="Сортування" xml:space="preserve">
+    <value>Sortierung</value>
+  </data>
+  <data name="Спочатку нові" xml:space="preserve">
+    <value>Neueste zuerst</value>
+  </data>
+  <data name="Спочатку старі" xml:space="preserve">
+    <value>Älteste zuerst</value>
+  </data>
+  <data name="Спочатку низька комісія" xml:space="preserve">
+    <value>Niedrigste Provision zuerst</value>
+  </data>
+  <data name="Спочатку висока комісія" xml:space="preserve">
+    <value>Höchste Provision zuerst</value>
+  </data>
+  <data name="Застосувати" xml:space="preserve">
+    <value>Anwenden</value>
+  </data>
+  <data name="Нічого не знайдено за цим запитом." xml:space="preserve">
+    <value>Für diese Suche wurden keine Ergebnisse gefunden.</value>
+  </data>
+  <data name="Магазин" xml:space="preserve">
+    <value>Shop</value>
+  </data>
+  <data name="Власник" xml:space="preserve">
+    <value>Inhaber</value>
+  </data>
+  <data name="Статус" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Комісія" xml:space="preserve">
+    <value>Provision</value>
+  </data>
+  <data name="Дії" xml:space="preserve">
+    <value>Aktionen</value>
+  </data>
+  <data name="Без назви" xml:space="preserve">
+    <value>Unbenannt</value>
+  </data>
+  <data name="Комісія, %" xml:space="preserve">
+    <value>Provision, %</value>
+  </data>
+  <data name="Активувати" xml:space="preserve">
+    <value>Aktivieren</value>
+  </data>
+  <data name="Призупинити" xml:space="preserve">
+    <value>Sperren</value>
+  </data>
+  <data name="Відхилити" xml:space="preserve">
+    <value>Ablehnen</value>
+  </data>
+</root>

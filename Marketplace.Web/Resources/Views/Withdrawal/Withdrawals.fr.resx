@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Виплати - Адмін-панель" xml:space="preserve">
+    <value>Retraits - Panneau d'administration</value>
+  </data>
+  <data name="Очікує розгляду" xml:space="preserve">
+    <value>En attente d'examen</value>
+  </data>
+  <data name="В обробці" xml:space="preserve">
+    <value>En cours de traitement</value>
+  </data>
+  <data name="Відхилено" xml:space="preserve">
+    <value>Rejeté</value>
+  </data>
+  <data name="Виплачено" xml:space="preserve">
+    <value>Payé</value>
+  </data>
+  <data name="Помилка виплати" xml:space="preserve">
+    <value>Erreur de paiement</value>
+  </data>
+  <data name="Виплати" xml:space="preserve">
+    <value>Retraits</value>
+  </data>
+  <data name="Заявки продавців на виведення коштів з балансу магазину на картку." xml:space="preserve">
+    <value>Demandes des vendeurs pour retirer des fonds du solde de la boutique vers une carte.</value>
+  </data>
+  <data name="Статус" xml:space="preserve">
+    <value>Statut</value>
+  </data>
+  <data name="Усі статуси" xml:space="preserve">
+    <value>Tous les statuts</value>
+  </data>
+  <data name="Застосувати" xml:space="preserve">
+    <value>Appliquer</value>
+  </data>
+  <data name="Скинути" xml:space="preserve">
+    <value>Réinitialiser</value>
+  </data>
+  <data name="Заявок на виплату немає." xml:space="preserve">
+    <value>Aucune demande de retrait.</value>
+  </data>
+  <data name="Магазин" xml:space="preserve">
+    <value>Boutique</value>
+  </data>
+  <data name="Сума" xml:space="preserve">
+    <value>Montant</value>
+  </data>
+  <data name="Картка" xml:space="preserve">
+    <value>Carte</value>
+  </data>
+  <data name="Отримувач" xml:space="preserve">
+    <value>Bénéficiaire</value>
+  </data>
+  <data name="Створено" xml:space="preserve">
+    <value>Créé le</value>
+  </data>
+  <data name="Дії" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="Підтвердити виплату {0} ₴ на картку {1}?" xml:space="preserve">
+    <value>Confirmer le paiement de {0} ₴ sur la carte {1} ?</value>
+  </data>
+  <data name="Виплатити" xml:space="preserve">
+    <value>Payer</value>
+  </data>
+  <data name="Причина відхилення" xml:space="preserve">
+    <value>Motif du rejet</value>
+  </data>
+  <data name="Відхилити" xml:space="preserve">
+    <value>Rejeter</value>
+  </data>
+</root>

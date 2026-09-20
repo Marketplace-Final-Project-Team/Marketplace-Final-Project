@@ -146,14 +146,14 @@ public class OrderController : Controller
             await _context.SaveChangesAsync();
             addressId = newAddress.Id;
         }
-        var scheme = Request.Scheme; 
+        var scheme = Request.Scheme;
         var host = Request.Host;
-        
+
         var result = await _orderService.CreateOrder(userId!, new OrderCreateDto
         {
             AddressId = addressId,
             PromoCode = model.PromoCode,
-            SuccessUrl = $"{scheme}://{host}/Order/MyOrders", 
+            SuccessUrl = $"{scheme}://{host}/Order/MyOrders",
             CancelUrl = $"{scheme}://{host}/Order/MyOrders"
         });
 
@@ -181,6 +181,7 @@ public class OrderController : Controller
             : "Замовлення успішно оформлено.";
         return RedirectToAction(nameof(Details), new { id = result.OrderId });
     }
+
     [HttpGet]
     public async Task<IActionResult> ValidatePromoCode(string code)
     {
@@ -193,16 +194,18 @@ public class OrderController : Controller
     public async Task<IActionResult> RequestReturn(Guid orderId, Guid orderItemId, string reason, string comment, List<IFormFile> photos)
     {
         var result = await _postSaleService.CreateRequestAsync(GetUserId(), orderItemId, reason?.Trim() ?? string.Empty, comment, photos);
+
         if (!result.Succeeded)
         {
-            TempData["Error"] = result.Message;
-            return RedirectToAction(nameof(Details), new { id = orderId });
+            return Json(new { success = false, message = result.Message });
         }
 
         await _activityLog.LogUserActionAsync(GetUserId(), "ReturnRequested", $"Подано заявку на повернення товару в замовленні (причина: {reason?.Trim()}).", relatedEntityId: orderItemId);
 
-        TempData["Success"] = "Заявку на повернення прийнято. Інструкції надішлемо на вашу пошту.";
-        return RedirectToAction(nameof(Details), new { id = orderId });
+        // Витягуємо справжній ID створеної заявки з результату (залежно від того, як названо властивість у репорт-об'єкті сервісу: Id, RequestId або Data)
+        var requestId = result.EntityId;
+
+        return Json(new { success = true, requestId = requestId });
     }
 
     [HttpPost]
@@ -358,6 +361,7 @@ public class OrderController : Controller
                 ProductId = item.ProductId,
                 ProductName = item.ProductName,
                 ImageUrl = item.Product?.MainImageUrl ?? string.Empty,
+                VariantSize = item.VariantSize,
                 UnitPrice = item.UnitPrice,
                 Quantity = item.Quantity,
                 ReturnRequest = ToViewModel(postSaleRequests.FirstOrDefault(r => r.OrderItemId == item.Id))

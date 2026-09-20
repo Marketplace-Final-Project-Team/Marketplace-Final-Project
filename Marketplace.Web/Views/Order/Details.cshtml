@@ -1,25 +1,25 @@
 @model Marketplace.Web.Models.OrderDetailsViewModel
 
 @{
-    ViewData["Title"] = "Деталі замовлення";
+    ViewData["Title"] = Localizer["Деталі замовлення"];
 }
 
 @functions {
-    private static string StatusLabel(Marketplace.Domain.Enums.OrderStatus status) => status switch
+    private string StatusLabel(Marketplace.Domain.Enums.OrderStatus status) => status switch
     {
-        Marketplace.Domain.Enums.OrderStatus.Pending => "Очікує підтвердження",
-        Marketplace.Domain.Enums.OrderStatus.Confirmed => "Підтверджено",
-        Marketplace.Domain.Enums.OrderStatus.Shipped => "Відправлено",
-        Marketplace.Domain.Enums.OrderStatus.Delivered => "Доставлено",
-        Marketplace.Domain.Enums.OrderStatus.Canceled => "Скасовано",
+        Marketplace.Domain.Enums.OrderStatus.Pending => Localizer["Очікує підтвердження"].Value,
+        Marketplace.Domain.Enums.OrderStatus.Confirmed => Localizer["Підтверджено"].Value,
+        Marketplace.Domain.Enums.OrderStatus.Shipped => Localizer["Відправлено"].Value,
+        Marketplace.Domain.Enums.OrderStatus.Delivered => Localizer["Доставлено"].Value,
+        Marketplace.Domain.Enums.OrderStatus.Canceled => Localizer["Скасовано"].Value,
         _ => status.ToString()
     };
 
-    private static string PostSaleStatusLabel(Marketplace.Domain.Enums.PostSaleRequestStatus status) => status switch
+    private string PostSaleStatusLabel(Marketplace.Domain.Enums.PostSaleRequestStatus status) => status switch
     {
-        Marketplace.Domain.Enums.PostSaleRequestStatus.Approved => "Повернення підтверджено - кошти повернуто",
-        Marketplace.Domain.Enums.PostSaleRequestStatus.Rejected => "У поверненні відмовлено",
-        _ => "Заявку на повернення подано · очікує розгляду"
+        Marketplace.Domain.Enums.PostSaleRequestStatus.Approved => Localizer["Повернення підтверджено - кошти повернуто"].Value,
+        Marketplace.Domain.Enums.PostSaleRequestStatus.Rejected => Localizer["У поверненні відмовлено"].Value,
+        _ => Localizer["Заявку на повернення подано · очікує розгляду"].Value
     };
 }
 
@@ -29,15 +29,15 @@
 }
 
 <div class="shop-page">
-    <a asp-action="Index" class="shop-back">← До всіх замовлень</a>
+    <a asp-action="Index" class="shop-back">← @Localizer["До всіх замовлень"]</a>
 
     <header class="shop-header">
         <div>
-            <div class="shop-kicker">Замовлення #@Model.Id.ToString()[..8].ToUpperInvariant()</div>
-            <h1 class="shop-title">Деталі замовлення</h1>
-            <p class="shop-subtitle">Створено @Model.CreatedAt.ToLocalTime().ToString("dd MMMM yyyy, HH:mm")</p>
+            <div class="shop-kicker">@Localizer["Замовлення #"]@Model.Id.ToString()[..8].ToUpperInvariant()</div>
+            <h1 class="shop-title">@Localizer["Деталі замовлення"]</h1>
+            <p class="shop-subtitle">@Localizer["Створено"] @Model.CreatedAt.ToLocalTime().ToString("dd MMMM yyyy, HH:mm")</p>
         </div>
-        <a asp-action="Delivery" asp-route-id="@Model.Id" class="btn btn-primary">Відстежити доставку</a>
+        <a asp-action="Delivery" asp-route-id="@Model.Id" class="btn btn-primary">@Localizer["Відстежити доставку"]</a>
     </header>
 
     @if (TempData["Success"] is string success)
@@ -52,7 +52,7 @@
     <div class="order-details-layout">
         <section class="shop-panel order-info">
             <div class="d-flex justify-content-between align-items-center gap-3">
-                <h2 class="mb-0">Склад замовлення</h2>
+                <h2 class="mb-0">@Localizer["Склад замовлення"]</h2>
                 <span class="order-status order-status--@Model.Status.ToString().ToLowerInvariant()">@StatusLabel(Model.Status)</span>
             </div>
 
@@ -70,7 +70,11 @@
                         }
                         <div>
                             <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.ProductId" class="order-line__name">@item.ProductName</a>
-                            <div class="order-line__meta">@item.Quantity шт. × @item.UnitPrice.ToString("N2") ₴</div>
+                            @if (!string.IsNullOrWhiteSpace(item.VariantSize))
+                            {
+                                <div class="order-line__variant">@Localizer["Розмір:"] <strong>@item.VariantSize</strong></div>
+                            }
+                            <div class="order-line__meta">@item.Quantity @Localizer["шт."] × @item.UnitPrice.ToString("N2") ₴</div>
                         </div>
                         <div class="order-line__total">@item.LineTotal.ToString("N2") ₴</div>
                     </div>
@@ -79,13 +83,16 @@
                     {
                         @if (item.ReturnRequest is null)
                         {
-                            <button type="button" class="btn btn-sm btn-outline-secondary order-line__return-btn my-2" data-postsale-open="return" data-order-item-id="@item.Id">Оформити повернення</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary order-line__return-btn my-2" data-postsale-open="return" data-order-item-id="@item.Id">@Localizer["Оформити повернення"]</button>
                         }
                         else
                         {
                             <div class="postsale-status postsale-status--@item.ReturnRequest.Status.ToString().ToLowerInvariant() my-2 p-3 border rounded">
                                 <strong>@PostSaleStatusLabel(item.ReturnRequest.Status)</strong>
-                                <div class="text-muted small">@item.ReturnRequest.SubmittedAtUtc.ToLocalTime().ToString("dd MMMM yyyy, HH:mm") · Причина: @item.ReturnRequest.Reason</div>
+                                <a asp-controller="Support" asp-action="RefundChatByOrderItem" asp-route-orderItemId="@item.Id" class="btn btn-sm btn-outline-primary mt-2">
+                                    Повернутися в чат
+                                </a>
+                                <div class="text-muted small">@item.ReturnRequest.SubmittedAtUtc.ToLocalTime().ToString("dd MMMM yyyy, HH:mm") · @Localizer["Причина:"] @item.ReturnRequest.Reason</div>
 
                                 @if (!string.IsNullOrWhiteSpace(item.ReturnRequest.Comment))
                                 {
@@ -98,7 +105,7 @@
                                         @foreach (var url in item.ReturnRequest.PhotoUrls)
                                         {
                                             <a href="@url" target="_blank" rel="noopener" class="me-2">
-                                                <img src="@url" alt="Фото до заявки" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" />
+                                                <img src="@url" alt="@Localizer["Фото до заявки"]" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" />
                                             </a>
                                         }
                                     </div>
@@ -106,7 +113,7 @@
 
                                 @if (!string.IsNullOrWhiteSpace(item.ReturnRequest.SellerResponse))
                                 {
-                                    <div class="mt-2 text-primary small"><strong>Відповідь продавця:</strong> @item.ReturnRequest.SellerResponse</div>
+                                    <div class="mt-2 text-primary small"><strong>@Localizer["Відповідь продавця:"]</strong> @item.ReturnRequest.SellerResponse</div>
                                 }
                             </div>
                         }
@@ -116,26 +123,26 @@
         </section>
 
         <aside class="shop-panel order-info">
-            <h2>Інформація</h2>
+            <h2>@Localizer["Інформація"]</h2>
             <dl>
                 <div class="order-info__row">
-                    <dt>Статус</dt>
+                    <dt>@Localizer["Статус"]</dt>
                     <dd>@StatusLabel(Model.Status)</dd>
                 </div>
                 <div class="order-info__row">
-                    <dt>Адреса</dt>
+                    <dt>@Localizer["Адреса"]</dt>
                     <dd>@Model.ShippingCountry, @Model.ShippingCity,<br />@Model.ShippingStreet</dd>
                 </div>
                 <div class="order-info__row">
-                    <dt>Доставка</dt>
-                    <dd>@(Model.DeliveryMethodLabel ?? "Кур'єром на вказану адресу")</dd>
+                    <dt>@Localizer["Доставка"]</dt>
+                    <dd>@(Model.DeliveryMethodLabel ?? Localizer["Кур'єром на вказану адресу"].Value)</dd>
                 </div>
                 <div class="order-info__row">
-                    <dt>Оплата</dt>
-                    <dd>@(Model.PaymentMethodLabel ?? "LiqPay (онлайн)")</dd>
+                    <dt>@Localizer["Оплата"]</dt>
+                    <dd>@(Model.PaymentMethodLabel ?? Localizer["LiqPay (онлайн)"].Value)</dd>
                 </div>
                 <div class="order-info__row">
-                    <dt>Разом</dt>
+                    <dt>@Localizer["Разом"]</dt>
                     <dd><strong>@Model.TotalAmount.ToString("N2") ₴</strong></dd>
                 </div>
             </dl>
@@ -145,12 +152,12 @@
     @if (Model.Status is Marketplace.Domain.Enums.OrderStatus.Delivered)
     {
         <section class="shop-panel postsale-panel mt-4">
-            <h2>Післяпродажний сервіс та безпека</h2>
+            <h2>@Localizer["Післяпродажний сервіс та безпека"]</h2>
             <div class="postsale-protection d-flex align-items-start gap-3 mt-3">
                 <span class="postsale-protection__icon fs-3" aria-hidden="true">🛡</span>
                 <div>
-                    <strong>Захист покупця</strong>
-                    <p class="mb-0 text-muted">Кошти продавцю переказуються лише після підтвердження отримання товару. Повернення можливе протягом 14 днів з дати доставки — окремо на кожен товар.</p>
+                    <strong>@Localizer["Захист покупця"]</strong>
+                    <p class="mb-0 text-muted">@Localizer["Кошти продавцю переказуються лише після підтвердження отримання товару. Повернення можливе протягом 14 днів з дати доставки — окремо на кожен товар."]</p>
                 </div>
             </div>
         </section>
@@ -161,34 +168,34 @@
 {
     <div class="postsale-modal" data-postsale-modal="return" hidden>
         <div class="postsale-modal__card">
-            <button type="button" class="postsale-modal__close" aria-label="Закрити" data-postsale-close>×</button>
+            <button type="button" class="postsale-modal__close" aria-label="@Localizer["Закрити"]" data-postsale-close>×</button>
             <form asp-controller="Order" asp-action="RequestReturn" method="post" enctype="multipart/form-data">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="orderId" value="@Model.Id" />
                 <input type="hidden" name="orderItemId" data-postsale-item-id-field />
 
-                <h3>Оформлення повернення</h3>
-                <p class="text-muted small">Замовлення #@Model.Id.ToString()[..8].ToUpperInvariant()</p>
+                <h3>@Localizer["Оформлення повернення"]</h3>
+                <p class="text-muted small">@Localizer["Замовлення #"]@Model.Id.ToString()[..8].ToUpperInvariant()</p>
 
-                <label class="form-label mt-2">Причина повернення</label>
+                <label class="form-label mt-2">@Localizer["Причина повернення"]</label>
                 <select class="form-select" name="reason" required>
-                    <option value="">Оберіть причину</option>
-                    <option>Товар пошкоджений або несправний</option>
-                    <option>Товар не відповідає опису</option>
-                    <option>Отримано не той товар</option>
-                    <option>Не підійшов розмір або колір</option>
-                    <option>Передумав(-ла)</option>
-                    <option>Інше</option>
+                    <option value="">@Localizer["Оберіть причину"]</option>
+                    <option>@Localizer["Товар пошкоджений або несправний"]</option>
+                    <option>@Localizer["Товар не відповідає опису"]</option>
+                    <option>@Localizer["Отримано не той товар"]</option>
+                    <option>@Localizer["Не підійшов розмір або колір"]</option>
+                    <option>@Localizer["Передумав(-ла)"]</option>
+                    <option>@Localizer["Інше"]</option>
                 </select>
 
-                <label class="form-label mt-3">Опишіть ситуацію</label>
-                <textarea class="form-control" name="comment" rows="3" minlength="10" placeholder="Розкажіть детальніше, що не так із товаром (мінімум 10 символів)..." required></textarea>
+                <label class="form-label mt-3">@Localizer["Опишіть ситуацію"]</label>
+                <textarea class="form-control" name="comment" rows="3" minlength="10" placeholder="@Localizer["Розкажіть детальніше, що не так із товаром (мінімум 10 символів)..."]" required></textarea>
 
-                <label class="form-label mt-3">Фото товару</label>
+                <label class="form-label mt-3">@Localizer["Фото товару"]</label>
                 <input type="file" class="form-control" name="photos" accept="image/*" multiple required />
-                <div class="form-text">Додайте від 1 до 5 фото — це підтвердження стану товару для продавця.</div>
+                <div class="form-text">@Localizer["Додайте від 1 до 5 фото — це підтвердження стану товару для продавця."]</div>
 
-                <button type="submit" class="btn btn-primary mt-4 w-100">Надіслати заявку</button>
+                <button type="submit" class="btn btn-primary mt-4 w-100">@Localizer["Надіслати заявку"]</button>
             </form>
         </div>
     </div>

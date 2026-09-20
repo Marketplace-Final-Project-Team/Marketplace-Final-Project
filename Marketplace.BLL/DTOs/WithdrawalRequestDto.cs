@@ -17,6 +17,6 @@ namespace Marketplace.BLL.DTOs
         public DateTime CreatedAt { get; set; }
         public DateTime? ProcessedAt { get; set; }
         public string? ProcessedByUserId { get; set; }
-        public string? RejectionReason { get; set; }
+        public string? Message { get; set; }
     }
 }

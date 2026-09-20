@@ -74,6 +74,7 @@ namespace Marketplace.BLL.Services
                 var promoCode = !string.IsNullOrWhiteSpace(dto.PromoCode)
                     ? await _promoCodeService.FindActiveAsync(dto.PromoCode)
                     : null;
+                var promoCodeApplied = false;
 
                 foreach (var cartItem in cartItems)
                 {
@@ -86,7 +87,8 @@ namespace Marketplace.BLL.Services
                         };
                     }
 
-                    if (cartItem.Product.Quantity < cartItem.Quantity)
+                    var availableStock = cartItem.ProductVariant?.Quantity ?? cartItem.Product.Quantity;
+                    if (availableStock < cartItem.Quantity)
                     {
                         return new OrderResultDto { Succeeded = false, Message = $"Недостатньо товару «{cartItem.Product.Name}» на складі." };
                     }
@@ -152,9 +154,12 @@ namespace Marketplace.BLL.Services
 
 
                     var saleDiscountPercent = bestDiscount ?? 0;
-                    var promoPercent = promoCode is not null && promoCode.BusinessId == cartItem.Product.BusinessId
-                        ? promoCode.Percent
-                        : 0;
+                    var promoApplies = promoCode is not null && promoCode.BusinessId == cartItem.Product.BusinessId;
+                    var promoPercent = promoApplies ? promoCode!.Percent : 0;
+                    if (promoApplies)
+                    {
+                        promoCodeApplied = true;
+                    }
                     var effectivePercent = saleDiscountPercent + promoPercent;
                     if (effectivePercent > 100)
                     {
@@ -172,11 +177,18 @@ namespace Marketplace.BLL.Services
                     {
                         ProductId = cartItem.ProductId,
                         ProductName = cartItem.Product.Name,
+                        ProductVariantId = cartItem.ProductVariantId,
+                        VariantSize = cartItem.ProductVariant?.Size,
+                        VariantSku = cartItem.ProductVariant?.Sku ?? cartItem.Product.Sku,
                         UnitPrice = unitPrice,
                         Quantity = cartItem.Quantity,
                         IsReturned = false
                     };
 
+                    if (cartItem.ProductVariant != null)
+                    {
+                        cartItem.ProductVariant.Quantity -= cartItem.Quantity;
+                    }
                     cartItem.Product.Quantity -= cartItem.Quantity;
                     _productRepository.Update(cartItem.Product);
 
@@ -199,6 +211,11 @@ namespace Marketplace.BLL.Services
 
                 await _orerRepository.AddAsync(order);
                 _cartItemRepository.RemoveRange(cartItems);
+
+                if (promoCodeApplied && promoCode!.IsSingleUse)
+                {
+                    promoCode.IsUsed = true;
+                }
 
                 await _context.SaveChangesAsync();
 
@@ -279,6 +296,10 @@ namespace Marketplace.BLL.Services
                         {
                             item.Product.Quantity += item.Quantity;
                         }
+                        if (item.ProductVariant != null)
+                        {
+                            item.ProductVariant.Quantity += item.Quantity;
+                        }
                     }
 
 
@@ -343,6 +364,11 @@ namespace Marketplace.BLL.Services
                 if (item.Product != null)
                 {
                     item.Product.Quantity += item.Quantity;
+
+                    if (item.ProductVariant != null)
+                    {
+                        item.ProductVariant.Quantity += item.Quantity;
+                    }
 
                     if (item.Product.Business != null)
                     {
@@ -419,7 +445,7 @@ namespace Marketplace.BLL.Services
             };
         }
 
-        public async Task<IReadOnlyList<BusinessOrderListItemDto>> GetBusinessOrders(Guid businessId, OrderStatus? statusFilter = null)
+        public async Task<IReadOnlyList<BusinessOrderListItemDto>> GetBusinessOrders(Guid businessId, OrderStatus? statusFilter = null, string? search = null, string? searchEmail = null, decimal? minAmount = null, decimal? maxAmount = null)
         {
             var query = _context.OrderItems
                 .AsNoTracking()
@@ -428,6 +454,16 @@ namespace Marketplace.BLL.Services
             if (statusFilter.HasValue)
             {
                 query = query.Where(item => item.Order.Status == statusFilter.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(item => item.Order.User.UserName != null && item.Order.User.UserName.Contains(search));
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchEmail))
+            {
+                query = query.Where(item => item.Order.User.Email != null && item.Order.User.Email.Contains(searchEmail));
             }
 
             var lines = await query
@@ -446,7 +482,7 @@ namespace Marketplace.BLL.Services
                 })
                 .ToListAsync();
 
-            return lines
+            var orders = lines
                 .GroupBy(line => line.OrderId)
                 .Select(group => new BusinessOrderListItemDto
                 {
@@ -461,6 +497,19 @@ namespace Marketplace.BLL.Services
                     ItemsCount = group.Sum(line => line.Quantity),
                     LineTotal = group.Sum(line => line.LineTotal)
                 })
+                .AsEnumerable();
+
+            if (minAmount.HasValue)
+            {
+                orders = orders.Where(o => o.LineTotal >= minAmount.Value);
+            }
+
+            if (maxAmount.HasValue)
+            {
+                orders = orders.Where(o => o.LineTotal <= maxAmount.Value);
+            }
+
+            return orders
                 .OrderByDescending(item => item.CreatedAt)
                 .ToList();
         }
@@ -496,6 +545,7 @@ namespace Marketplace.BLL.Services
                     ProductId = item.ProductId,
                     ProductName = item.ProductName,
                     ImageUrl = item.Product?.MainImageUrl ?? string.Empty,
+                    VariantSize = item.VariantSize,
                     UnitPrice = item.UnitPrice,
                     Quantity = item.Quantity,
                     BelongsToBusiness = item.Product != null && item.Product.BusinessId == businessId

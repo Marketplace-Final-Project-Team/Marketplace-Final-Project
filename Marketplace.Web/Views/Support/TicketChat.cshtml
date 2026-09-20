@@ -1,0 +1,181 @@
+@model List<Marketplace.BLL.DTOs.SupportTicketMessageDto>
+@{
+    ViewData["Title"] = "Чат з підтримкою";
+    var isAdmin = (bool)ViewBag.IsAdmin;
+    var ticketId = (Guid)ViewBag.TicketId;
+    var category = (string)ViewBag.Category;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/postsale.css" asp-append-version="true" />
+    <style>
+        .chat-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            display: flex;
+            flex-direction: column;
+            height: 70vh;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .chat-header {
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+            background: #f8f9fa;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            background: #fdfdfd;
+        }
+
+        .chat-message {
+            max-width: 70%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+            .chat-message.incoming {
+                background: #e9ecef;
+                color: #212529;
+                align-self: flex-start;
+                border-bottom-left-radius: 2px;
+            }
+
+            .chat-message.outgoing {
+                background: #0d6efd;
+                color: #fff;
+                align-self: flex-end;
+                border-bottom-right-radius: 2px;
+            }
+
+            .chat-message time {
+                display: block;
+                font-size: 0.75rem;
+                margin-top: 0.25rem;
+                opacity: 0.7;
+                text-align: right;
+            }
+
+        .chat-input-area {
+            padding: 1rem;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            gap: 0.5rem;
+            background: #fff;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+    </style>
+}
+
+<div class="shop-page">
+    <div class="chat-container">
+        <div class="chat-header d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0">Чат з підтримкою</h5>
+                <small class="text-muted">Тема: @category</small>
+            </div>
+            <div class="d-flex gap-2">
+                @if (isAdmin)
+                {
+                    <form asp-action="CloseTicket" method="post" class="d-inline">
+                        <input type="hidden" name="ticketId" value="@ticketId" />
+                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Закрити це звернення?');">Закрити звернення</button>
+                    </form>
+                    <a asp-controller="Admin" asp-action="Jobs" class="btn btn-sm btn-outline-secondary">← До задач</a>
+                }
+                else
+                {
+                    <a asp-controller="Home" asp-action="Support" class="btn btn-sm btn-outline-secondary">← До підтримки</a>
+                }
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            @foreach (var msg in Model)
+            {
+                var isOutgoing = (isAdmin && msg.IsFromAdmin) || (!isAdmin && !msg.IsFromAdmin);
+                <div class="chat-message @(isOutgoing ? "outgoing" : "incoming")">
+                    <div>@msg.Text</div>
+                    <time>@msg.SentAt.ToLocalTime().ToString("HH:mm")</time>
+                </div>
+            }
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" id="messageInput" class="form-control" placeholder="Введіть повідомлення..." autocomplete="off" />
+            <button type="button" id="sendButton" class="btn btn-primary">Надіслати</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script>
+        const ticketId = "@ticketId";
+        const currentIsAdmin = @Json.Serialize(isAdmin);
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/supportTicketChatHub")
+            .withAutomaticReconnect()
+            .build();
+
+        connection.on("ReceiveMessage", function (msg) {
+            const messagesContainer = document.getElementById("chatMessages");
+            const isOutgoing = (currentIsAdmin && msg.isFromAdmin) || (!currentIsAdmin && !msg.isFromAdmin);
+            const timeFormatted = new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const messageDiv = document.createElement("div");
+            messageDiv.className = `chat-message ${isOutgoing ? "outgoing" : "incoming"}`;
+            messageDiv.innerHTML = `
+                <div>${escapeHtml(msg.text)}</div>
+                <time>${timeFormatted}</time>
+            `;
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        });
+
+        connection.start().then(function () {
+            connection.invoke("JoinChat", ticketId).catch(err => console.error(err));
+        }).catch(err => console.error(err));
+
+        document.getElementById("sendButton").addEventListener("click", sendMessage);
+        document.getElementById("messageInput").addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+                sendMessage();
+            }
+        });
+
+        function sendMessage() {
+            const input = document.getElementById("messageInput");
+            const text = input.value.trim();
+            if (!text) return;
+
+            connection.invoke("SendMessage", ticketId, text)
+                .then(() => { input.value = ""; })
+                .catch(err => console.error(err));
+        }
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, function (m) { return map[m]; });
+        }
+
+        const container = document.getElementById("chatMessages");
+        container.scrollTop = container.scrollHeight;
+    </script>
+}

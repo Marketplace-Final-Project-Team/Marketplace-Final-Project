@@ -1,7 +1,15 @@
 @model Marketplace.Web.Models.JobsPageViewModel
 
 @{
-    ViewData["Title"] = "Задачі - Адмін-панель";
+    ViewData["Title"] = $"{Localizer["Задачі"].Value} - {SharedLocalizer["Адмін-панель"].Value}";
+}
+
+@functions {
+    private static string ReturnStatusLabel(Marketplace.Domain.Enums.PostSaleRequestStatus status) => status switch
+    {
+        Marketplace.Domain.Enums.PostSaleRequestStatus.SellerDisputed => "Продавець відхилив — потрібне остаточне рішення",
+        _ => "Очікує розгляду"
+    };
 }
 
 @section Styles {
@@ -16,8 +24,8 @@
             <header class="admin-header">
                 <div>
                     <div class="admin-kicker">Admin</div>
-                    <h1 class="admin-title">Фонові задачі</h1>
-                    <p class="admin-subtitle">Автоматична модерація товарів через Quartz.NET - планувальник, черга та журнал рішень.</p>
+                    <h1 class="admin-title">@Localizer["Фонові задачі"]</h1>
+                    <p class="admin-subtitle">@Localizer["Автоматична модерація товарів через Quartz.NET - планувальник, черга та журнал рішень."]</p>
                 </div>
             </header>
 
@@ -30,7 +38,7 @@
                 <div class="admin-alert admin-alert--error"><span>!</span><p>@error</p></div>
             }
 
-            <div class="admin-stats" aria-label="Стан планувальника">
+            <div class="admin-stats" aria-label="@Localizer["Стан планувальника"]">
                 <div class="admin-stat-card">
                     <span class="admin-stat-card__icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
@@ -39,19 +47,19 @@
                         </svg>
                     </span>
                     <div class="admin-stat-card__body">
-                        <span class="admin-stat-card__label">Планувальник Quartz</span>
-                        <strong class="admin-stat-card__value">@(Model.IsSchedulerRunning ? "Працює" : "Зупинено")</strong>
-                        <span class="admin-stat-card__hint">ProductModerationJob - модерація товарів через Gemini</span>
+                        <span class="admin-stat-card__label">@Localizer["Планувальник Quartz"]</span>
+                        <strong class="admin-stat-card__value">@(Model.IsSchedulerRunning ? Localizer["Працює"] : Localizer["Зупинено"])</strong>
+                        <span class="admin-stat-card__hint">@Localizer["ProductModerationJob - модерація товарів через Gemini"]</span>
                         @if (Model.IsSchedulerRunning)
                         {
                             <form asp-action="PauseScheduler" method="post" class="mt-2">
-                                <button type="submit" class="btn btn-sm btn-outline-secondary">Призупинити планувальник</button>
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">@Localizer["Призупинити планувальник"]</button>
                             </form>
                         }
                         else
                         {
                             <form asp-action="ResumeScheduler" method="post" class="mt-2">
-                                <button type="submit" class="btn btn-sm btn-outline-success">Відновити планувальник</button>
+                                <button type="submit" class="btn btn-sm btn-outline-success">@Localizer["Відновити планувальник"]</button>
                             </form>
                         }
                     </div>
@@ -66,49 +74,49 @@
                         </svg>
                     </span>
                     <div class="admin-stat-card__body">
-                        <span class="admin-stat-card__label">У черзі зараз</span>
+                        <span class="admin-stat-card__label">@Localizer["У черзі зараз"]</span>
                         <strong class="admin-stat-card__value">@Model.ScheduledJobs.Count</strong>
-                        <span class="admin-stat-card__hint">Товарів очікують на автоматичну перевірку</span>
+                        <span class="admin-stat-card__hint">@Localizer["Товарів очікують на автоматичну перевірку"]</span>
                     </div>
                 </div>
             </div>
 
             <div class="admin-note">
-                <strong>Як це працює</strong>
-                Після створення або редагування товару система через 5 секунд запускає перевірку тексту й зображень через Gemini AI. Залежно від результату товар отримує статус «Активний» або «Заблокований»; у разі помилки перевірки - лишається «На модерації» для ручного розгляду.
+                <strong>@Localizer["Як це працює"]</strong>
+                @Localizer["Після створення або редагування товару система через 5 секунд запускає перевірку тексту й зображень через Gemini AI. Залежно від результату товар отримує статус «Активний» або «Заблокований»; у разі помилки перевірки - лишається «На модерації» для ручного розгляду."]
             </div>
 
             <section class="admin-panel table-responsive">
                 <div class="admin-header" style="padding: 1rem 1.25rem 0;">
-                    <h2 class="admin-title" style="font-size: 1.1rem;">У черзі на модерацію</h2>
+                    <h2 class="admin-title" style="font-size: 1.1rem;">@Localizer["У черзі на модерацію"]</h2>
                 </div>
                 @if (Model.ScheduledJobs.Count == 0)
                 {
-                    <p class="admin-empty">Зараз немає товарів, що очікують на автоматичну перевірку.</p>
+                    <p class="admin-empty">@Localizer["Зараз немає товарів, що очікують на автоматичну перевірку."]</p>
                 }
                 else
                 {
                     <table class="table admin-table">
                         <thead>
                             <tr>
-                                <th>Тип</th>
-                                <th>Назва</th>
-                                <th>Запуск перевірки</th>
-                                <th class="text-end">Дії</th>
+                                <th>@Localizer["Тип"]</th>
+                                <th>@Localizer["Назва"]</th>
+                                <th>@Localizer["Запуск перевірки"]</th>
+                                <th class="text-end">@Localizer["Дії"]</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var job in Model.ScheduledJobs)
                             {
                                 <tr>
-                                    <td>@(job.EntityType == "Business" ? "Бізнес" : "Товар")</td>
+                                    <td>@(job.EntityType == "Business" ? Localizer["Бізнес"] : Localizer["Товар"])</td>
                                     <td class="admin-entity-name">@job.ProductName</td>
                                     <td>@(job.NextRunAtUtc?.ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss") ?? "-")</td>
                                     <td class="text-end">
                                         <form asp-action="RunModerationJobNow" method="post" class="d-inline">
                                             <input type="hidden" name="entityId" value="@job.EntityId" />
                                             <input type="hidden" name="entityType" value="@job.EntityType" />
-                                            <button type="submit" class="btn btn-sm btn-outline-primary">Запустити зараз</button>
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">@Localizer["Запустити зараз"]</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -120,20 +128,174 @@
 
             <section class="admin-panel table-responsive mt-3">
                 <div class="admin-header" style="padding: 1rem 1.25rem 0;">
-                    <h2 class="admin-title" style="font-size: 1.1rem;">Останні рішення модерації</h2>
+                    <h2 class="admin-title" style="font-size: 1.1rem;">Заявки на повернення</h2>
                 </div>
-                @if (Model.RecentDecisions.Count == 0)
+                @if (Model.OpenReturnRequests.Count == 0)
                 {
-                    <p class="admin-empty">Поки що немає жодного запису.</p>
+                    <p class="admin-empty">Зараз немає заявок на повернення, що очікують розгляду.</p>
                 }
                 else
                 {
                     <table class="table admin-table">
                         <thead>
                             <tr>
-                                <th>Час</th>
-                                <th>Бізнес</th>
-                                <th>Опис</th>
+                                <th>Товар</th>
+                                <th>Покупець</th>
+                                <th>Причина</th>
+                                <th>Статус</th>
+                                <th>Подано</th>
+                                <th class="text-end">Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var request in Model.OpenReturnRequests)
+                            {
+                                <tr class="@(request.Status == Marketplace.Domain.Enums.PostSaleRequestStatus.SellerDisputed ? "table-warning" : "")">
+                                    <td>
+                                        <div class="admin-entity-cell">
+                                            @if (!string.IsNullOrWhiteSpace(request.ImageUrl))
+                                            {
+                                                <img class="admin-entity-thumb" src="@request.ImageUrl" alt="@request.ProductName" />
+                                            }
+                                            <span class="admin-entity-name">@request.ProductName</span>
+                                        </div>
+                                    </td>
+                                    <td class="admin-entity-meta">@request.BuyerEmail</td>
+                                    <td class="admin-entity-meta">@request.Reason</td>
+                                    <td class="admin-entity-meta">@ReturnStatusLabel(request.Status)</td>
+                                    <td>@request.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                                    <td class="text-end">
+                                        <button type="button" class="btn btn-sm btn-outline-primary position-relative" data-bs-toggle="modal" data-bs-target="#returnRequestModal-@request.Id">
+                                            Переглянути
+                                            @if (request.UnreadFromBuyer + request.UnreadFromSeller > 0)
+                                            {
+                                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                    @(request.UnreadFromBuyer + request.UnreadFromSeller)
+                                                </span>
+                                            }
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </section>
+
+            <section class="admin-panel table-responsive mt-3">
+                <div class="admin-header" style="padding: 1rem 1.25rem 0;">
+                    <h2 class="admin-title" style="font-size: 1.1rem;">Глобальні заявки</h2>
+                </div>
+                @if (Model.OpenTickets.Count == 0)
+                {
+                    <p class="admin-empty">Зараз немає звернень від користувачів.</p>
+                }
+                else
+                {
+                    <table class="table admin-table">
+                        <thead>
+                            <tr>
+                                <th>Користувач</th>
+                                <th>Тема</th>
+                                <th>Подано</th>
+                                <th class="text-end">Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var ticket in Model.OpenTickets)
+                            {
+                                <tr>
+                                    <td class="admin-entity-meta">@ticket.UserEmail</td>
+                                    <td class="admin-entity-name">@ticket.Category</td>
+                                    <td>@ticket.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                                    <td class="text-end">
+                                        <button type="button" class="btn btn-sm btn-outline-primary position-relative" data-bs-toggle="modal" data-bs-target="#ticketModal-@ticket.Id">
+                                            Переглянути
+                                            @if (ticket.UnreadForAdmin > 0)
+                                            {
+                                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@ticket.UnreadForAdmin</span>
+                                            }
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </section>
+
+            <section class="admin-panel table-responsive">
+                <div class="admin-header" style="padding: 1rem 1.25rem 0;">
+                    <h2 class="admin-title" style="font-size: 1.1rem;">@Localizer["Регулярні задачі"]</h2>
+                </div>
+                @if (Model.RecurringJobs.Count == 0)
+                {
+                    <p class="admin-empty">@Localizer["Регулярних задач не знайдено."]</p>
+                }
+                else
+                {
+                    <table class="table admin-table">
+                        <thead>
+                            <tr>
+                                <th>@Localizer["Назва"]</th>
+                                <th>@Localizer["Опис"]</th>
+                                <th>@Localizer["Останній запуск"]</th>
+                                <th>@Localizer["Наступний запуск"]</th>
+                                <th class="text-end">@Localizer["Дії"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var job in Model.RecurringJobs)
+                            {
+                                <tr>
+                                    <td class="admin-entity-name">@job.DisplayName</td>
+                                    <td>@job.Description</td>
+                                    <td>@(job.PreviousRunAtUtc?.ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss") ?? Localizer["ще не запускалась"].Value)</td>
+                                    <td>@(job.NextRunAtUtc?.ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss") ?? "-")</td>
+                                    <td class="text-end">
+                                        <form asp-action="RunRecurringJobNow" method="post" class="d-inline">
+                                            <input type="hidden" name="groupName" value="@job.GroupName" />
+                                            <input type="hidden" name="jobName" value="@job.JobName" />
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">@Localizer["Запустити зараз"]</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </section>
+
+            <section class="admin-panel" style="padding: 1.25rem 1.5rem;">
+                <h2 class="admin-title" style="font-size: 1.1rem;">@Localizer["Налаштування Gemini API"]</h2>
+                <p class="admin-subtitle">@Localizer["Ключ і модель, які використовує автоматична модерація товарів."] @(Model.HasCustomApiKey ? Localizer["Зараз використовується ключ, збережений тут."] : Localizer["Зараз використовується ключ із конфігурації сервера."])</p>
+                <form asp-action="UpdateModerationApiKey" method="post" class="admin-toolbar">
+                    <div class="admin-search-wrap">
+                        <input type="password" class="form-control" name="apiKey" placeholder="@(Model.HasCustomApiKey ? Localizer["Введіть, щоб замінити збережений ключ"] : "Gemini API key")" autocomplete="off" />
+                    </div>
+                    <div class="admin-search-wrap">
+                        <input type="text" class="form-control" name="model" placeholder="gemini-2.5-flash" value="@Model.ModerationModel" />
+                    </div>
+                    <button type="submit" class="btn btn-outline-secondary">@Localizer["Зберегти"]</button>
+                </form>
+            </section>
+
+            <section class="admin-panel table-responsive mt-3">
+                <div class="admin-header" style="padding: 1rem 1.25rem 0;">
+                    <h2 class="admin-title" style="font-size: 1.1rem;">@Localizer["Останні рішення модерації"]</h2>
+                </div>
+                @if (Model.RecentDecisions.Count == 0)
+                {
+                    <p class="admin-empty">@Localizer["Поки що немає жодного запису."]</p>
+                }
+                else
+                {
+                    <table class="table admin-table">
+                        <thead>
+                            <tr>
+                                <th>@Localizer["Час"]</th>
+                                <th>@Localizer["Бізнес"]</th>
+                                <th>@Localizer["Опис"]</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -152,3 +314,156 @@
         </div>
     </div>
 </div>
+
+@foreach (var request in Model.OpenReturnRequests)
+{
+    <div class="modal fade" id="returnRequestModal-@request.Id" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Заявка на повернення</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрити"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        @if (!string.IsNullOrWhiteSpace(request.ImageUrl))
+                        {
+                            <img src="@request.ImageUrl" alt="@request.ProductName" style="width:56px;height:56px;object-fit:cover;border-radius:8px;" />
+                        }
+                        <div>
+                            <strong>@request.ProductName</strong>
+                            <div class="text-muted small">@request.Quantity шт. × @request.UnitPrice.ToString("N2") ₴</div>
+                        </div>
+                    </div>
+
+                    @if (request.Status == Marketplace.Domain.Enums.PostSaleRequestStatus.SellerDisputed)
+                    {
+                        <div class="alert alert-warning">
+                            <strong>Продавець відхилив це повернення.</strong>
+                            @if (!string.IsNullOrWhiteSpace(request.SellerDisputeReason))
+                            {
+                                <p class="mb-0 mt-1">Обґрунтування продавця: «@request.SellerDisputeReason»</p>
+                            }
+                        </div>
+                    }
+
+                    <p class="mb-1"><strong>Покупець:</strong> @request.BuyerEmail</p>
+                    <p class="mb-1"><strong>Причина:</strong> @request.Reason</p>
+                    @if (!string.IsNullOrWhiteSpace(request.Comment))
+                    {
+                        <p class="mb-1"><strong>Коментар:</strong> «@request.Comment»</p>
+                    }
+                    <p class="mb-3"><strong>Подано:</strong> @request.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
+
+                    @if (request.PhotoUrls.Any())
+                    {
+                        <p class="mb-1"><strong>Фото від покупця:</strong></p>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            @foreach (var url in request.PhotoUrls)
+                            {
+                                <a href="@url" target="_blank" rel="noopener">
+                                    <img src="@url" alt="Фото товару" style="width:70px;height:70px;object-fit:cover;border-radius:6px;" />
+                                </a>
+                            }
+                        </div>
+                    }
+
+                    <hr />
+                    <div id="rejectForm-@request.Id" class="collapse">
+                        <form asp-action="RejectReturnRequest" method="post">
+                            <input type="hidden" name="requestId" value="@request.Id" />
+                            <label class="form-label small">Причина відхилення</label>
+                            <textarea name="reason" class="form-control mb-2" rows="2" required minlength="5" placeholder="Поясніть покупцю, чому заявку відхилено..."></textarea>
+                            <button type="submit" class="btn btn-danger btn-sm w-100">Підтвердити відхилення</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer flex-wrap gap-2">
+                    <a asp-controller="Support" asp-action="RefundChat" asp-route-requestId="@request.Id" asp-route-isSellerChannel="false" class="btn btn-outline-secondary position-relative">
+                        Чат з покупцем
+                        @if (request.UnreadFromBuyer > 0)
+                        {
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@request.UnreadFromBuyer</span>
+                        }
+                    </a>
+                    <a asp-controller="Support" asp-action="RefundChat" asp-route-requestId="@request.Id" asp-route-isSellerChannel="true" class="btn btn-outline-secondary position-relative">
+                        Чат з продавцем
+                        @if (request.UnreadFromSeller > 0)
+                        {
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@request.UnreadFromSeller</span>
+                        }
+                    </a>
+
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="collapse" data-bs-target="#rejectForm-@request.Id">
+                        Відхилити
+                    </button>
+
+                    <form asp-action="ApproveReturnRequest" method="post" class="d-inline">
+                        <input type="hidden" name="requestId" value="@request.Id" />
+                        <button type="submit" class="btn btn-success">Підтвердити повернення</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@foreach (var ticket in Model.OpenTickets)
+{
+    <div class="modal fade" id="ticketModal-@ticket.Id" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Звернення користувача</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрити"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-1"><strong>Користувач:</strong> @ticket.UserEmail</p>
+                    <p class="mb-1"><strong>Тема:</strong> @ticket.Category</p>
+                    <p class="mb-1"><strong>Повідомлення:</strong></p>
+                    <p class="mb-3">«@ticket.Message»</p>
+                    <p class="mb-0"><strong>Подано:</strong> @ticket.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
+                </div>
+                <div class="modal-footer">
+                    <a asp-controller="Support" asp-action="TicketChat" asp-route-ticketId="@ticket.Id" class="btn btn-primary position-relative">
+                        Увійти в чат
+                        @if (ticket.UnreadForAdmin > 0)
+                        {
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@ticket.UnreadForAdmin</span>
+                        }
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        (() => {
+            let lastReturnCount = @Model.OpenReturnRequests.Count;
+            let lastTicketCount = @Model.OpenTickets.Count;
+
+            setInterval(async () => {
+                if (document.querySelector('.modal.show')) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/Admin/JobsCounts');
+                    if (!response.ok) {
+                        return;
+                    }
+
+                    const data = await response.json();
+
+                    if (data.returnCount !== lastReturnCount || data.ticketCount !== lastTicketCount) {
+                        window.location.reload();
+                    }
+                } catch (error) {
+                    console.error('Помилка опитування нових заявок:', error);
+                }
+            }, 10000);
+        })();
+    </script>
+}

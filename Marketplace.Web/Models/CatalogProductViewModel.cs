@@ -7,6 +7,8 @@ public class CatalogProductViewModel
     public string Description { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public int Quantity { get; set; }
+    public string? Sku { get; set; }
+    public List<CatalogProductVariantViewModel> Variants { get; set; } = new();
     public int LowStockThreshold { get; set; } = 5;
     public DateTime CreatedAt { get; set; }
     public string MainImageUrl { get; set; } = string.Empty;
@@ -50,5 +52,12 @@ public class CatalogRelatedProductViewModel
     public string CategoryName { get; set; } = string.Empty;
     public string MainImageUrl { get; set; } = string.Empty;
     public decimal Price { get; set; }
+    public int Quantity { get; set; }
+}
+
+public class CatalogProductVariantViewModel
+{
+    public Guid Id { get; set; }
+    public string Size { get; set; } = string.Empty;
     public int Quantity { get; set; }
 }

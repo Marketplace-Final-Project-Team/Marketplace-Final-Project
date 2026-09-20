@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Команда" xml:space="preserve">
+    <value>Équipe</value>
+  </data>
+  <data name="Власник" xml:space="preserve">
+    <value>Propriétaire</value>
+  </data>
+  <data name="Адміністратор" xml:space="preserve">
+    <value>Administrateur</value>
+  </data>
+  <data name="Бізнес-аналітик" xml:space="preserve">
+    <value>Analyste métier</value>
+  </data>
+  <data name="Менеджер товарів" xml:space="preserve">
+    <value>Gestionnaire de produits</value>
+  </data>
+  <data name="Хто має доступ до керування цим магазином." xml:space="preserve">
+    <value>Qui a accès à la gestion de cette boutique.</value>
+  </data>
+  <data name="Запросити учасника" xml:space="preserve">
+    <value>Inviter un membre</value>
+  </data>
+  <data name="Що дозволяє кожна роль" xml:space="preserve">
+    <value>Ce que chaque rôle permet</value>
+  </data>
+  <data name="Роль" xml:space="preserve">
+    <value>Rôle</value>
+  </data>
+  <data name="Статистика й фінанси" xml:space="preserve">
+    <value>Statistiques et finances</value>
+  </data>
+  <data name="Товари, промокоди та знижки" xml:space="preserve">
+    <value>Produits, codes promo et remises</value>
+  </data>
+  <data name="Налаштування магазину" xml:space="preserve">
+    <value>Paramètres de la boutique</value>
+  </data>
+  <data name="Успішно" xml:space="preserve">
+    <value>Succès</value>
+  </data>
+  <data name="Помилка" xml:space="preserve">
+    <value>Erreur</value>
+  </data>
+  <data name="Учасник" xml:space="preserve">
+    <value>Membre</value>
+  </data>
+  <data name="Статус" xml:space="preserve">
+    <value>Statut</value>
+  </data>
+  <data name="Дії" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="Активний" xml:space="preserve">
+    <value>Actif</value>
+  </data>
+  <data name="Очікує підтвердження" xml:space="preserve">
+    <value>En attente de confirmation</value>
+  </data>
+  <data name="Видалити цього учасника з команди?" xml:space="preserve">
+    <value>Retirer ce membre de l’équipe ?</value>
+  </data>
+
+  <data name="Видалити" xml:space="preserve">
+    <value>Retirer</value>
+  </data>
+  <data name="Поки що в команді лише власник магазину." xml:space="preserve">
+    <value>Pour l'instant, seul le propriétaire de la boutique fait partie de l'équipe.</value>
+  </data>
+</root>

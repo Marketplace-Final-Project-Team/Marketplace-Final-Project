@@ -17,7 +17,7 @@ namespace Marketplace.DAL.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.9")
+                .HasAnnotation("ProductVersion", "10.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -60,7 +60,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Addresses", (string)null);
+                    b.ToTable("Addresses");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Business", b =>
@@ -117,7 +117,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Businesses", (string)null);
+                    b.ToTable("Businesses");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.BusinessActionLog", b =>
@@ -154,7 +154,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("BusinessId");
 
-                    b.ToTable("BusinessActionLogs", (string)null);
+                    b.ToTable("BusinessActionLogs");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.BusinessMember", b =>
@@ -191,7 +191,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("BusinessMembers", (string)null);
+                    b.ToTable("BusinessMembers");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Cart", b =>
@@ -217,7 +217,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Carts", (string)null);
+                    b.ToTable("Carts");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.CartItem", b =>
@@ -238,6 +238,9 @@ namespace Marketplace.DAL.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ProductVariantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
@@ -250,7 +253,9 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CartItems", (string)null);
+                    b.HasIndex("ProductVariantId");
+
+                    b.ToTable("CartItems");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Category", b =>
@@ -261,6 +266,9 @@ namespace Marketplace.DAL.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsAdultOnly")
                         .HasColumnType("bit");
@@ -277,7 +285,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Discount", b =>
@@ -324,7 +332,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Discounts", (string)null);
+                    b.ToTable("Discounts");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.MarketplaceBalance", b =>
@@ -347,7 +355,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MarketplaceBalances", (string)null);
+                    b.ToTable("MarketplaceBalances");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Order", b =>
@@ -391,7 +399,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.OrderItem", b =>
@@ -422,6 +430,9 @@ namespace Marketplace.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("ProductVariantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
@@ -431,13 +442,21 @@ namespace Marketplace.DAL.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("VariantSize")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("VariantSku")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderItems", (string)null);
+                    b.HasIndex("ProductVariantId");
+
+                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.PostSaleRequest", b =>
@@ -472,6 +491,12 @@ namespace Marketplace.DAL.Migrations
                     b.Property<DateTime?>("ResolvedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("SellerConfirmDeadline")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SellerDisputeReason")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SellerResponse")
                         .HasColumnType("nvarchar(max)");
 
@@ -489,7 +514,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("OrderItemId");
 
-                    b.ToTable("PostSaleRequests", (string)null);
+                    b.ToTable("PostSaleRequests");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.PostSaleRequestImage", b =>
@@ -518,7 +543,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("PostSaleRequestId");
 
-                    b.ToTable("PostSaleRequestImages", (string)null);
+                    b.ToTable("PostSaleRequestImages");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Product", b =>
@@ -563,6 +588,9 @@ namespace Marketplace.DAL.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<string>("Sku")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -575,7 +603,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.ProductEvent", b =>
@@ -605,7 +633,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("BusinessId", "CreatedAt");
 
-                    b.ToTable("ProductEvents", (string)null);
+                    b.ToTable("ProductEvents");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.ProductImage", b =>
@@ -634,7 +662,83 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductImages", (string)null);
+                    b.ToTable("ProductImages");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.ProductTranslation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Culture")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId", "Culture")
+                        .IsUnique();
+
+                    b.ToTable("ProductTranslations");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.ProductVariant", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Size")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Sku")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId", "Size")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("ProductVariants");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.PromoCode", b =>
@@ -659,6 +763,12 @@ namespace Marketplace.DAL.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsSingleUse")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
                     b.Property<int>("Percent")
                         .HasColumnType("int");
 
@@ -675,7 +785,52 @@ namespace Marketplace.DAL.Migrations
                     b.HasIndex("Code")
                         .IsUnique();
 
-                    b.ToTable("PromoCodes", (string)null);
+                    b.ToTable("PromoCodes");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.RefundChatMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsFromAdmin")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSellerChannel")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("PostSaleRequestId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostSaleRequestId");
+
+                    b.ToTable("RefundChatMessages");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Review", b =>
@@ -713,7 +868,89 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reviews", (string)null);
+                    b.ToTable("Reviews");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.SupportTicket", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ClosedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SupportTickets");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.SupportTicketMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsFromAdmin")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("SupportTicketId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SupportTicketId");
+
+                    b.ToTable("SupportTicketMessages");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.SystemSetting", b =>
@@ -751,7 +988,7 @@ namespace Marketplace.DAL.Migrations
                     b.HasIndex("Category", "Key")
                         .IsUnique();
 
-                    b.ToTable("SystemSettings", (string)null);
+                    b.ToTable("SystemSettings");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.User", b =>
@@ -868,7 +1105,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserActionLogs", (string)null);
+                    b.ToTable("UserActionLogs");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.UserDiscount", b =>
@@ -931,7 +1168,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Wishlists", (string)null);
+                    b.ToTable("Wishlists");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.WishlistCollection", b =>
@@ -958,7 +1195,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("WishlistCollections", (string)null);
+                    b.ToTable("WishlistCollections");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.WishlistItem", b =>
@@ -990,7 +1227,55 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("WishlistId");
 
-                    b.ToTable("WishlistItems", (string)null);
+                    b.ToTable("WishlistItems");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.WithdrawalRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("BusinessId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CardNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ProcessedByUserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RecipientName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BusinessId");
+
+                    b.ToTable("WithdrawalRequests");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -1201,9 +1486,16 @@ namespace Marketplace.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Marketplace.Domain.Entities.ProductVariant", "ProductVariant")
+                        .WithMany()
+                        .HasForeignKey("ProductVariantId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Cart");
 
                     b.Navigation("Product");
+
+                    b.Navigation("ProductVariant");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Discount", b =>
@@ -1254,9 +1546,16 @@ namespace Marketplace.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Marketplace.Domain.Entities.ProductVariant", "ProductVariant")
+                        .WithMany()
+                        .HasForeignKey("ProductVariantId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Order");
 
                     b.Navigation("Product");
+
+                    b.Navigation("ProductVariant");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.PostSaleRequest", b =>
@@ -1336,6 +1635,28 @@ namespace Marketplace.DAL.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("Marketplace.Domain.Entities.ProductTranslation", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.ProductVariant", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.Product", "Product")
+                        .WithMany("Variants")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Marketplace.Domain.Entities.PromoCode", b =>
                 {
                     b.HasOne("Marketplace.Domain.Entities.Business", "Business")
@@ -1345,6 +1666,17 @@ namespace Marketplace.DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("Business");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.RefundChatMessage", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.PostSaleRequest", "PostSaleRequest")
+                        .WithMany()
+                        .HasForeignKey("PostSaleRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PostSaleRequest");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Review", b =>
@@ -1364,6 +1696,28 @@ namespace Marketplace.DAL.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.SupportTicket", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.SupportTicketMessage", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.SupportTicket", "SupportTicket")
+                        .WithMany()
+                        .HasForeignKey("SupportTicketId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SupportTicket");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.UserDiscount", b =>
@@ -1430,6 +1784,17 @@ namespace Marketplace.DAL.Migrations
                     b.Navigation("Wishlist");
 
                     b.Navigation("WishlistCollection");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.WithdrawalRequest", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.Business", "Business")
+                        .WithMany()
+                        .HasForeignKey("BusinessId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Business");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1525,6 +1890,8 @@ namespace Marketplace.DAL.Migrations
                     b.Navigation("OrderItems");
 
                     b.Navigation("Reviews");
+
+                    b.Navigation("Variants");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.User", b =>

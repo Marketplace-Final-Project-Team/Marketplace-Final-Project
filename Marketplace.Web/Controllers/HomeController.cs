@@ -4,6 +4,8 @@ using Marketplace.BLL.Interfaces;
 using Marketplace.Web.Infrastructure;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using Marketplace.Domain.Entities;
 
 namespace Marketplace.Web.Controllers
 {
@@ -11,12 +13,20 @@ namespace Marketplace.Web.Controllers
     {
         private readonly IProductService _productService;
         private readonly ICategoryService _categoryService;
+        private readonly ISupportTicketService _supportTicketService;
+        private readonly UserManager<User> _userManager;
 
-        public HomeController(IProductService productService, ICategoryService categoryService)
-        {
-            _productService = productService;
-            _categoryService = categoryService;
-        }
+        public HomeController(
+          IProductService productService,
+          ICategoryService categoryService,
+          ISupportTicketService supportTicketService,
+          UserManager<User> userManager)
+            {
+                _productService = productService;
+                _categoryService = categoryService;
+                _supportTicketService = supportTicketService;
+                _userManager = userManager;
+            }
 
         public async Task<IActionResult> Index([FromQuery] CatalogFilterViewModel filter, string? userId)
         {
@@ -43,27 +53,7 @@ namespace Marketplace.Web.Controllers
             var catalogPage = await _productService.GetCatalogPageAsync(filterDto);
 
             var featuredProducts = catalogPage.Items
-                .Select(item =>
-                {
-                    var discountPercent = item.Product.GetEffectiveDiscountPercent(userId);
-                    var hasDiscount = discountPercent > 0;
-
-                    return new CatalogProductViewModel
-                    {
-                        Id = item.Product.Id,
-                        Name = item.Product.Name,
-                        Description = item.Product.Description,
-                        Price = hasDiscount ? item.Product.GetDiscountedPrice(userId) : item.Product.Price,
-                        Quantity = item.Product.Quantity,
-                        MainImageUrl = item.Product.MainImageUrl,
-                        CategoryName = item.Product.Category?.Name ?? "Без категорії",
-                        StoreName = item.Product.Business?.StoreName ?? "Marketplace",
-                        AverageRating = item.AverageRating,
-                        ReviewCount = item.ReviewCount,
-                        OriginalPrice = hasDiscount ? item.Product.Price : null,
-                        DiscountPercent = hasDiscount ? discountPercent : null
-                    };
-                })
+                .Select(item => MapCatalogProduct(item, userId))
                 .ToList();
 
             var rawCategories = await _categoryService.GetAllCategories();
@@ -77,14 +67,45 @@ namespace Marketplace.Web.Controllers
                     Name = c.Name,
                     ColorClass = colors[index % colors.Length],
                     Icon = CategoryIcon(c.Name),
+                    ImageUrl = c.ImageUrl,
                     ProductCount = c.ActiveProductCount
                 })
                 .ToList();
+
+            const int productsPerCategorySection = 8;
+            const int maxCategorySections = 6;
+
+            var categorySections = new List<HomeCategoryProductsViewModel>();
+            foreach (var category in rawCategories.Where(c => c.ActiveProductCount > 0)
+                         .OrderByDescending(c => c.ActiveProductCount)
+                         .Take(maxCategorySections))
+            {
+                var categoryPage = await _productService.GetCatalogPageAsync(new CatalogFilterDto
+                {
+                    CategoryId = category.Id,
+                    Sort = CatalogSortOption.Popularity,
+                    Page = 1,
+                    PageSize = productsPerCategorySection
+                });
+
+                if (categoryPage.Items.Count == 0)
+                {
+                    continue;
+                }
+
+                categorySections.Add(new HomeCategoryProductsViewModel
+                {
+                    CategoryId = category.Id,
+                    CategoryName = category.Name,
+                    Products = categoryPage.Items.Select(item => MapCatalogProduct(item, userId)).ToList()
+                });
+            }
 
             var viewModel = new HomeViewModel
             {
                 FeaturedProducts = featuredProducts,
                 Categories = homeCategories,
+                CategorySections = categorySections,
                 Search = filter.Search,
                 CategoryId = filter.CategoryId,
                 SortBy = sort.ToString(),
@@ -144,10 +165,21 @@ namespace Marketplace.Web.Controllers
             return View();
         }
 
-        public IActionResult Support()
+        public async Task<IActionResult> Support()
         {
-            return View();
+            var userId = _userManager.GetUserId(User);
+
+            var activeTicket = !string.IsNullOrEmpty(userId)
+                ? await _supportTicketService.GetActiveTicketForUserAsync(userId)
+                : null;
+
+            return View(new SupportPageViewModel
+            {
+                IsAuthenticated = !string.IsNullOrEmpty(userId),
+                ActiveTicket = activeTicket
+            });
         }
+
 
         public IActionResult CookiePolicy()
         {
@@ -178,6 +210,29 @@ namespace Marketplace.Web.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        private static CatalogProductViewModel MapCatalogProduct(CatalogPageItemDto item, string? userId)
+        {
+            var discountPercent = item.Product.GetEffectiveDiscountPercent(userId);
+            var hasDiscount = discountPercent > 0;
+
+            return new CatalogProductViewModel
+            {
+                Id = item.Product.Id,
+                Name = item.Product.Name,
+                Description = item.Product.Description,
+                Price = hasDiscount ? item.Product.GetDiscountedPrice(userId) : item.Product.Price,
+                Quantity = item.Product.Quantity,
+                MainImageUrl = item.Product.MainImageUrl,
+                CategoryName = item.Product.Category?.Name ?? "Без категорії",
+                StoreName = item.Product.Business?.StoreName ?? "Marketplace",
+                AverageRating = item.AverageRating,
+                ReviewCount = item.ReviewCount,
+                OriginalPrice = hasDiscount ? item.Product.Price : null,
+                DiscountPercent = hasDiscount ? discountPercent : null,
+                IsAgeRestricted = item.Product.IsAdultOnly
+            };
         }
 
         // Keyword-matched rather than a fixed per-position list, so a category keeps a

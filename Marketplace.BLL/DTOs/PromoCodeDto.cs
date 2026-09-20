@@ -7,6 +7,8 @@ namespace Marketplace.BLL.DTOs
         public int Percent { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        public bool IsSingleUse { get; set; }
+        public bool IsUsed { get; set; }
         public bool IsActive { get; set; }
     }
 

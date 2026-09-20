@@ -17,6 +17,11 @@ namespace Marketplace.Web.Models
                 Description = product.Description,
                 Price = hasDiscount ? product.GetDiscountedPrice(userId) : product.Price,
                 Quantity = product.Quantity,
+                Sku = product.Sku,
+                Variants = product.Variants
+                    .OrderBy(v => v.Size)
+                    .Select(v => new CatalogProductVariantViewModel { Id = v.Id, Size = v.Size, Quantity = v.Quantity })
+                    .ToList(),
                 MainImageUrl = product.MainImageUrl,
                 CategoryName = product.Category?.Name ?? "Без категорії",
                 StoreName = product.Business?.StoreName ?? "Marketplace",

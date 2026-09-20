@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Баланс маркетплейсу" xml:space="preserve">
+    <value>Saldo del marketplace</value>
+  </data>
+  <data name="Комісія платформи з кожного підтвердженого замовлення - окремо від балансів продавців." xml:space="preserve">
+    <value>Comisión de la plataforma por cada pedido confirmado - independiente de los saldos de los vendedores.</value>
+  </data>
+  <data name="Накопичена комісія з підтверджених замовлень" xml:space="preserve">
+    <value>Comisión acumulada de pedidos confirmados</value>
+  </data>
+  <data name="Як це працює" xml:space="preserve">
+    <value>Cómo funciona</value>
+  </data>
+  <data name="Комісія задається окремо для кожного бізнесу (розділ «Бізнеси») і фіксується для кожної позиції замовлення в момент підтвердження продавцем (статус «Підтверджено») - продавцю зараховується сума за вирахуванням комісії, різниця йде на баланс маркетплейсу. Якщо підтверджене замовлення згодом скасовують, обидва баланси коригуються назад симетрично, за тією ставкою, що діяла на момент підтвердження." xml:space="preserve">
+    <value>La comisión se establece individualmente para cada negocio (sección «Negocios») y se fija para cada artículo del pedido en el momento en que el vendedor lo confirma (estado «Confirmado») - al vendedor se le acredita el importe menos la comisión, y la diferencia va al saldo del marketplace. Si un pedido confirmado se cancela posteriormente, ambos saldos se ajustan de forma simétrica, a la tasa vigente en el momento de la confirmación.</value>
+  </data>
+</root>

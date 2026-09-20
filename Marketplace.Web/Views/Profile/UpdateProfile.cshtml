@@ -1,7 +1,7 @@
 @model ProfileUpdateViewModel
 
 @{
-    ViewData["Title"] = "Редагування профілю";
+    ViewData["Title"] = Localizer["Редагування профілю"];
     var initial = string.IsNullOrWhiteSpace(Model.Username) ? "U" : Model.Username[..1].ToUpperInvariant();
 }
 
@@ -10,10 +10,10 @@
 }
 
 <div class="profile-page">
-    <a asp-action="Index" class="profile-back">← До кабінету</a>
+    <a asp-action="Index" class="profile-back">← @Localizer["До кабінету"]</a>
 
     <div class="address-form-card">
-        <h1>Редагування профілю</h1>
+        <h1>@Localizer["Редагування профілю"]</h1>
 
         <form asp-action="UpdateProfile" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
@@ -22,7 +22,7 @@
                 <div class="profile-avatar-upload__preview">
                     @if (!string.IsNullOrWhiteSpace(Model.CurrentAvatarUrl))
                     {
-                        <img src="@Model.CurrentAvatarUrl" alt="Поточний аватар" />
+                        <img src="@Model.CurrentAvatarUrl" alt="@Localizer["Поточний аватар"]" />
                     }
                     else
                     {
@@ -30,22 +30,22 @@
                     }
                 </div>
                 <div>
-                    <label class="btn btn-outline-primary" for="avatar-input">Змінити фото</label>
+                    <label class="btn btn-outline-primary" for="avatar-input">@Localizer["Змінити фото"]</label>
                     <input asp-for="Avatar" id="avatar-input" class="visually-hidden" accept="image/png,image/jpeg,image/webp" data-avatar-input />
-                    <p class="profile-form-hint">JPG, PNG або WEBP. Замінить поточний аватар.</p>
+                    <p class="profile-form-hint">@Localizer["JPG, PNG або WEBP. Замінить поточний аватар."]</p>
                     <span asp-validation-for="Avatar" class="text-danger small"></span>
                 </div>
             </div>
 
             <div class="address-form-field">
-                <label asp-for="Username" class="form-label">Ім'я користувача</label>
+                <label asp-for="Username" class="form-label">@Localizer["Ім'я користувача"]</label>
                 <input asp-for="Username" class="form-control" />
                 <span asp-validation-for="Username" class="text-danger small"></span>
             </div>
 
             <div class="address-form-actions">
-                <a asp-action="Index" class="btn btn-outline-secondary">Скасувати</a>
-                <button type="submit" class="btn btn-primary">Зберегти</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">@Localizer["Скасувати"]</a>
+                <button type="submit" class="btn btn-primary">@Localizer["Зберегти"]</button>
             </div>
         </form>
     </div>
@@ -69,7 +69,7 @@
 
                 var reader = new FileReader();
                 reader.onload = function (e) {
-                    previewWrap.innerHTML = '<img src="' + e.target.result + '" alt="Новий аватар" />';
+                    previewWrap.innerHTML = '<img src="' + e.target.result + '" alt="@Localizer["Новий аватар"]" />';
                 };
                 reader.readAsDataURL(file);
             });

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Запросити співробітника" xml:space="preserve">
+    <value>Mitarbeiter einladen</value>
+  </data>
+  <data name="Власник" xml:space="preserve">
+    <value>Inhaber</value>
+  </data>
+  <data name="Адміністратор" xml:space="preserve">
+    <value>Administrator</value>
+  </data>
+  <data name="Бізнес-аналітик" xml:space="preserve">
+    <value>Business-Analyst</value>
+  </data>
+  <data name="Менеджер товарів" xml:space="preserve">
+    <value>Produktmanager</value>
+  </data>
+  <data name="До команди" xml:space="preserve">
+    <value>Zurück zum Team</value>
+  </data>
+  <data name="Команда бізнесу" xml:space="preserve">
+    <value>Unternehmensteam</value>
+  </data>
+  <data name="Надішліть запит на членство - людина отримає лист із посиланням для підтвердження або відхилення." xml:space="preserve">
+    <value>Senden Sie eine Mitgliedschaftsanfrage - die Person erhält eine E-Mail mit einem Link zum Annehmen oder Ablehnen.</value>
+  </data>
+  <data name="ID користувача" xml:space="preserve">
+    <value>Benutzer-ID</value>
+  </data>
+  <data name="Наприклад, 3fa85f64-5717-4562-b3fc-2c963f66afa6" xml:space="preserve">
+    <value>z. B. 3fa85f64-5717-4562-b3fc-2c963f66afa6</value>
+  </data>
+  <data name="Це внутрішній ID акаунта, а не email. Попросіть колегу скопіювати його зі сторінки профілю." xml:space="preserve">
+    <value>Dies ist die interne Konto-ID, keine E-Mail-Adresse. Bitten Sie Ihren Kollegen, sie von der Profilseite zu kopieren.</value>
+  </data>
+  <data name="Роль у бізнесі" xml:space="preserve">
+    <value>Rolle im Unternehmen</value>
+  </data>
+  <data name="Скасувати" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="Надіслати запит" xml:space="preserve">
+    <value>Anfrage senden</value>
+  </data>
+</root>

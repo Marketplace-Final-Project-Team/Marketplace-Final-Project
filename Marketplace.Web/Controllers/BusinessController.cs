@@ -34,6 +34,9 @@ namespace Marketplace.Web.Controllers
         private readonly IProductAnalyticsService _productAnalyticsService;
         private readonly ISystemSettingsService _settingsService;
         private readonly ICategoryService _categoryService;
+        private readonly IRefundChatService _refundChatService;
+        private readonly IUserDiscountService _userDiscountService;
+        private readonly IWithdrawalService _withdrawalService;
 
         public BusinessController(
             IBusinessService businessService,
@@ -50,7 +53,10 @@ namespace Marketplace.Web.Controllers
             IActivityLogService activityLog,
             IProductAnalyticsService productAnalyticsService,
             ISystemSettingsService settingsService,
-            ICategoryService categoryService)
+            ICategoryService categoryService,
+            IRefundChatService refundChatService,
+            IUserDiscountService userDiscountService,
+            IWithdrawalService withdrawalService)
         {
             _businessService = businessService;
             _businessAccessService = businessAccessService;
@@ -67,6 +73,9 @@ namespace Marketplace.Web.Controllers
             _productAnalyticsService = productAnalyticsService;
             _settingsService = settingsService;
             _categoryService = categoryService;
+            _refundChatService = refundChatService;
+            _userDiscountService = userDiscountService;
+            _withdrawalService = withdrawalService;
         }
 
         [HttpGet]
@@ -142,6 +151,11 @@ namespace Marketplace.Web.Controllers
             var lowStockThreshold = await _settingsService.GetIntAsync("BusinessRules", "LowStockThreshold", 5);
             var traffic = await _productAnalyticsService.GetBusinessTrafficStatsAsync(businessId, start, end);
             var recentActivity = await _activityLog.GetRecentBusinessActionsAsync(businessId, take: 15);
+            var ratingStats = await _context.Reviews
+                .Where(r => r.Product.BusinessId == businessId)
+                .GroupBy(r => 1)
+                .Select(g => new { Average = g.Average(r => r.Rating), Count = g.Count() })
+                .FirstOrDefaultAsync();
 
             var periodRevenue = statsResult.Succeeded ? statsResult.Data.TotalRevenue : 0;
             var periodOrders = statsResult.Succeeded ? statsResult.Data.Stats.Sum(s => s.OrderCount) : 0;
@@ -194,6 +208,12 @@ namespace Marketplace.Web.Controllers
                 PendingProductCount = products.Count(p => p.Status == ProductStatus.Pending),
                 OutOfStockProductCount = products.Count(p => p.Quantity <= 0),
                 LowStockProductCount = products.Count(p => p.Quantity > 0 && p.Quantity <= lowStockThreshold),
+                BannedProductCount = products.Count(p => p.Status == ProductStatus.Banned),
+
+                AccountStatus = business.Status.ToString(),
+                MemberSince = business.CreatedAt,
+                AverageRating = ratingStats?.Average ?? 0,
+                ReviewCount = ratingStats?.Count ?? 0,
 
                 TotalViews = traffic.TotalViews,
                 TotalCartAdds = traffic.TotalCartAdds,
@@ -226,6 +246,19 @@ namespace Marketplace.Web.Controllers
                         })
                         .ToList()
                     : new List<BusinessDashboardTopCustomerViewModel>(),
+
+                CategoryStats = productsStatsResult.Succeeded
+                    ? productsStatsResult.Data.Stats
+                        .GroupBy(s => products.FirstOrDefault(p => p.Id == s.ProductId)?.Category?.Name ?? "Без категорії")
+                        .Select(g => new BusinessDashboardCategoryStatViewModel
+                        {
+                            CategoryName = g.Key,
+                            Revenue = g.Sum(s => s.Revenue),
+                            UnitsSold = g.Sum(s => s.TotalSales)
+                        })
+                        .OrderByDescending(c => c.Revenue)
+                        .ToList()
+                    : new List<BusinessDashboardCategoryStatViewModel>(),
 
                 RecentActivity = recentActivity
                     .Select(a => new BusinessDashboardActivityItemViewModel { Description = a.Description, CreatedAt = a.CreatedAt })
@@ -272,7 +305,7 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Orders(Guid businessId, OrderStatus? status)
+        public async Task<IActionResult> Orders(Guid businessId, OrderStatus? status, string? search, string? searchEmail, decimal? minAmount, decimal? maxAmount)
         {
             var business = await GetAccessibleBusinessOrNullAsync(businessId);
             if (business is null)
@@ -280,26 +313,42 @@ namespace Marketplace.Web.Controllers
                 return Forbid();
             }
 
-            var orders = await _orderService.GetBusinessOrders(businessId, status);
+            var orders = await _orderService.GetBusinessOrders(businessId, status, search, searchEmail, minAmount, maxAmount);
+
+            var pendingReturns = (await _postSaleService.GetRequestsForBusinessAsync(businessId))
+                .Where(r => r.Status == PostSaleRequestStatus.AwaitingSellerConfirmation)
+                .ToList();
 
             return View(new BusinessOrdersPageViewModel
             {
                 BusinessId = businessId,
                 StoreName = business.StoreName,
                 StatusFilter = status,
-                Orders = orders.Select(order => new BusinessOrderListItemViewModel
+                Search = search,
+                SearchEmail = searchEmail,
+                MinAmount = minAmount,
+                MaxAmount = maxAmount,
+                Orders = orders.Select(order =>
                 {
-                    OrderId = order.OrderId,
-                    CreatedAt = order.CreatedAt,
-                    Status = order.Status,
-                    BuyerName = order.BuyerName,
-                    BuyerEmail = order.BuyerEmail,
-                    ShippingAddress = $"{order.ShippingCity}, {order.ShippingStreet}",
-                    ItemsCount = order.ItemsCount,
-                    LineTotal = order.LineTotal
+                    var urgentReturn = pendingReturns.FirstOrDefault(r => r.OrderId == order.OrderId);
+
+                    return new BusinessOrderListItemViewModel
+                    {
+                        OrderId = order.OrderId,
+                        CreatedAt = order.CreatedAt,
+                        Status = order.Status,
+                        BuyerName = order.BuyerName,
+                        BuyerEmail = order.BuyerEmail,
+                        ShippingAddress = $"{order.ShippingCity}, {order.ShippingStreet}",
+                        ItemsCount = order.ItemsCount,
+                        LineTotal = order.LineTotal,
+                        HasUrgentReturn = urgentReturn != null,
+                        ReturnDeadline = urgentReturn?.SellerConfirmDeadline
+                    };
                 }).ToList()
             });
         }
+
 
         [HttpGet]
         public async Task<IActionResult> OrderDetails(Guid businessId, Guid orderId)
@@ -317,6 +366,29 @@ namespace Marketplace.Web.Controllers
             }
 
             var postSaleRequests = await _postSaleService.GetRequestsForOrderAsync(orderId);
+
+            var postSaleRequestViewModels = new List<BusinessPostSaleRequestViewModel>();
+            foreach (var r in postSaleRequests)
+            {
+                var unreadFromAdmin = r.Status == Marketplace.Domain.Enums.PostSaleRequestStatus.SellerDisputed
+                    ? await _refundChatService.GetUnreadCountAsync(r.Id, isSellerChannel: true, byAdmin: false)
+                    : 0;
+
+                postSaleRequestViewModels.Add(new BusinessPostSaleRequestViewModel
+                {
+                    Id = r.Id,
+                    ProductName = r.ProductName,
+                    ImageUrl = r.ImageUrl,
+                    Reason = r.Reason,
+                    Comment = r.Comment,
+                    PhotoUrls = r.PhotoUrls,
+                    Status = r.Status,
+                    SellerResponse = r.SellerResponse,
+                    CreatedAt = r.CreatedAt,
+                    SellerConfirmDeadline = r.SellerConfirmDeadline,
+                    UnreadFromAdmin = unreadFromAdmin
+                });
+            }
 
             return View(new BusinessOrderDetailsViewModel
             {
@@ -337,28 +409,18 @@ namespace Marketplace.Web.Controllers
                     ProductId = item.ProductId,
                     ProductName = item.ProductName,
                     ImageUrl = item.ImageUrl,
+                    VariantSize = item.VariantSize,
                     UnitPrice = item.UnitPrice,
                     Quantity = item.Quantity,
                     BelongsToBusiness = item.BelongsToBusiness
                 }).ToList(),
-                PostSaleRequests = postSaleRequests.Select(r => new BusinessPostSaleRequestViewModel
-                {
-                    Id = r.Id,
-                    ProductName = r.ProductName,
-                    ImageUrl = r.ImageUrl,
-                    Reason = r.Reason,
-                    Comment = r.Comment,
-                    PhotoUrls = r.PhotoUrls,
-                    Status = r.Status,
-                    SellerResponse = r.SellerResponse,
-                    CreatedAt = r.CreatedAt
-                }).ToList()
+                PostSaleRequests = postSaleRequestViewModels
             });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResolvePostSaleRequest(Guid businessId, Guid orderId, Guid requestId, PostSaleRequestStatus decision, string? sellerResponse)
+        public async Task<IActionResult> ResolvePostSaleRequest(Guid businessId, Guid orderId, Guid requestId, PostSaleRequestStatus decision, string? sellerResponse, string? returnUrl = null)
         {
             var business = await GetAccessibleBusinessOrNullAsync(businessId);
             if (business is null)
@@ -378,8 +440,109 @@ namespace Marketplace.Web.Controllers
                 ? "Рішення щодо заявки збережено."
                 : result.Message;
 
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return LocalRedirect(returnUrl);
+            }
+
             return RedirectToAction(nameof(OrderDetails), new { businessId, orderId });
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Returns(Guid businessId, string filter = "all")
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var requests = await _postSaleService.GetRequestsForBusinessAsync(businessId);
+
+            var model = new BusinessReturnsPageViewModel
+            {
+                BusinessId = businessId,
+                StoreName = business.StoreName,
+                Filter = string.IsNullOrWhiteSpace(filter) ? "all" : filter,
+                AllCount = requests.Count,
+                PendingCount = requests.Count(r => r.Status == PostSaleRequestStatus.Pending),
+                RefundedCount = requests.Count(r => r.Status == PostSaleRequestStatus.Refunded),
+                RejectedCount = requests.Count(r => r.Status == PostSaleRequestStatus.Rejected)
+            };
+
+            IEnumerable<PostSaleRequestDto> filtered = model.Filter switch
+            {
+                "pending" => requests.Where(r => r.Status == PostSaleRequestStatus.Pending),
+                "refunded" => requests.Where(r => r.Status == PostSaleRequestStatus.Refunded),
+                "rejected" => requests.Where(r => r.Status == PostSaleRequestStatus.Rejected),
+                _ => requests
+            };
+
+            model.Items = filtered.Select(r => new BusinessReturnRequestViewModel
+            {
+                Id = r.Id,
+                OrderId = r.OrderId,
+                ProductName = r.ProductName,
+                ImageUrl = r.ImageUrl,
+                BuyerName = r.BuyerName,
+                UnitPrice = r.UnitPrice,
+                Quantity = r.Quantity,
+                Reason = r.Reason,
+                Comment = r.Comment,
+                PhotoUrls = r.PhotoUrls,
+                Status = r.Status,
+                SellerResponse = r.SellerResponse,
+                CreatedAt = r.CreatedAt
+            }).ToList();
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmReturn(Guid businessId, Guid orderId, Guid requestId)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var result = await _postSaleService.SellerConfirmReturnAsync(requestId, businessId);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "ReturnConfirmedBySeller",
+                    "Продавець підтвердив повернення, кошти повернуто покупцю.",
+                    actorUserId: _userManager.GetUserId(User), relatedEntityId: requestId);
+            }
+
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            return RedirectToAction(nameof(OrderDetails), new { businessId, orderId });
+        }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DisputeReturn(Guid businessId, Guid orderId, Guid requestId, string reason)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId);
+            if (business is null)
+            {
+                return Json(new { success = false, message = "Немає доступу до цього магазину." });
+            }
+
+            var result = await _postSaleService.SellerDisputeAsync(requestId, businessId, reason);
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "ReturnDisputedBySeller",
+                    $"Продавець відхилив повернення з обґрунтуванням: {reason}",
+                    actorUserId: _userManager.GetUserId(User), relatedEntityId: requestId);
+            }
+
+            return Json(new { success = result.Succeeded, message = result.Message, requestId });
+        }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -604,6 +767,11 @@ namespace Marketplace.Web.Controllers
             var trendStart = trendEnd.AddDays(-29);
             var trendResult = await _businessService.GetBusinessStatsByPeriodAsync(businessId, trendStart, trendEnd);
 
+            var withdrawals = await _withdrawalService.GetForBusinessAsync(businessId);
+            var pendingWithdrawalsTotal = withdrawals
+                .Where(w => w.Status == WithdrawalStatus.Pending.ToString())
+                .Sum(w => w.Amount);
+
             return View(new BusinessFinanceViewModel
             {
                 BusinessId = businessId,
@@ -630,7 +798,10 @@ namespace Marketplace.Web.Controllers
                         .OrderBy(s => s.Date)
                         .Select(s => new BusinessDashboardChartPointViewModel { Date = s.Date, Revenue = s.Revenue, OrderCount = s.OrderCount })
                         .ToList()
-                    : new List<BusinessDashboardChartPointViewModel>()
+                    : new List<BusinessDashboardChartPointViewModel>(),
+                AvailableBalance = business.Balance,
+                PendingWithdrawalsTotal = pendingWithdrawalsTotal,
+                Withdrawals = withdrawals.ToList()
             });
         }
 
@@ -691,6 +862,14 @@ namespace Marketplace.Web.Controllers
             var businessDiscount = await _discountService.GetBusinessDiscount(businessId);
             var categoryDiscounts = await _discountService.GetActiveCategoryDiscountsForBusiness(businessId);
             var categories = await _categoryService.GetAllCategories();
+            var personalDiscounts = await _userDiscountService.GetActiveDiscountsForBusinessAsync(businessId);
+            var customersResult = await _businessService.GetCustomersStatsByPeriodAsync(businessId, business.CreatedAt, DateTime.UtcNow);
+            var customers = customersResult.Succeeded
+                ? customersResult.Data.Stats
+                    .Where(c => personalDiscounts.All(d => d.UserId != c.UserId))
+                    .OrderBy(c => c.UserName)
+                    .ToList()
+                : new List<Marketplace.DAL.DTOs.CustomerStatsByPeriodDto>();
 
             return View(new BusinessPromoCodesPageViewModel
             {
@@ -699,7 +878,9 @@ namespace Marketplace.Web.Controllers
                 PromoCodes = promoCodes,
                 BusinessDiscount = businessDiscount,
                 CategoryDiscounts = categoryDiscounts,
-                Categories = categories.ToList()
+                Categories = categories.ToList(),
+                PersonalDiscounts = personalDiscounts,
+                Customers = customers
             });
         }
 
@@ -749,7 +930,7 @@ namespace Marketplace.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreatePromoCode(Guid businessId, string code, int percent, DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> CreatePromoCode(Guid businessId, string code, int percent, DateTime startDate, DateTime endDate, bool isSingleUse = false)
         {
             var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.PromoCodes);
             if (business is null)
@@ -757,11 +938,12 @@ namespace Marketplace.Web.Controllers
                 return Forbid();
             }
 
-            var result = await _promoCodeService.CreateAsync(businessId, code, percent, startDate, endDate);
+            var result = await _promoCodeService.CreateAsync(businessId, code, percent, startDate, endDate, isSingleUse);
             if (result.Succeeded)
             {
+                var usageNote = isSingleUse ? "одноразовий" : "багаторазовий";
                 await _activityLog.LogBusinessActionAsync(businessId, "PromoCodeCreated",
-                    $"Створено промокод «{code}» (знижка {percent}%).",
+                    $"Створено промокод «{code}» (знижка {percent}%, {usageNote}).",
                     actorUserId: _userManager.GetUserId(User), relatedEntityId: result.EntityId);
             }
             TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
@@ -843,6 +1025,31 @@ namespace Marketplace.Web.Controllers
 
             TempData["Success"] = "Дані магазину оновлено.";
             return RedirectToAction(nameof(Settings), new { businessId = model.BusinessId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RequestAdultStatus(Guid businessId)
+        {
+            var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.EditBusinessProfile);
+            if (business is null)
+            {
+                return Forbid();
+            }
+
+            var userId = _userManager.GetUserId(User);
+            var result = await _businessService.RequestAdultStatusAsync(businessId, userId!);
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded
+                ? "Заявку на розміщення 18+ контенту подано на розгляд адміністрації."
+                : result.Message;
+
+            if (result.Succeeded)
+            {
+                await _activityLog.LogBusinessActionAsync(businessId, "AdultStatusRequested",
+                    "Магазин подав заявку на верифікацію 18+ контенту.", actorUserId: userId);
+            }
+
+            return RedirectToAction(nameof(Settings), new { businessId });
         }
 
         private async Task<Business?> GetAccessibleBusinessOrNullAsync(Guid businessId)

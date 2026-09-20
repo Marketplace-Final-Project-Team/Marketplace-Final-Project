@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Новий товар" xml:space="preserve">
+    <value>Nouvel article</value>
+  </data>
+  <data name="Назад до товарів" xml:space="preserve">
+    <value>Retour aux articles</value>
+  </data>
+  <data name="Новий запис" xml:space="preserve">
+    <value>Nouvelle fiche</value>
+  </data>
+  <data name="Додати товар" xml:space="preserve">
+    <value>Ajouter un article</value>
+  </data>
+  <data name="Заповніть основні поля. Після створення товар отримає статус «На модерації»." xml:space="preserve">
+    <value>Remplissez les champs de base. Une fois créé, l'article aura le statut « En modération ».</value>
+  </data>
+  <data name="Основна інформація" xml:space="preserve">
+    <value>Informations de base</value>
+  </data>
+  <data name="Назва товару" xml:space="preserve">
+    <value>Nom de l'article</value>
+  </data>
+  <data name="Наприклад, Бездротові навушники" xml:space="preserve">
+    <value>Par exemple, Écouteurs sans fil</value>
+  </data>
+  <data name="Опис" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Коротко опишіть товар та його переваги" xml:space="preserve">
+    <value>Décrivez brièvement l'article et ses avantages</value>
+  </data>
+  <data name="Продаж і класифікація" xml:space="preserve">
+    <value>Vente et classification</value>
+  </data>
+  <data name="Бізнес" xml:space="preserve">
+    <value>Entreprise</value>
+  </data>
+  <data name="Оберіть бізнес" xml:space="preserve">
+    <value>Sélectionnez une entreprise</value>
+  </data>
+  <data name="Категорія" xml:space="preserve">
+    <value>Catégorie</value>
+  </data>
+  <data name="Оберіть категорію" xml:space="preserve">
+    <value>Sélectionnez une catégorie</value>
+  </data>
+  <data name="Ціна, ₴" xml:space="preserve">
+    <value>Prix, ₴</value>
+  </data>
+  <data name="Кількість, шт." xml:space="preserve">
+    <value>Quantité, pcs</value>
+  </data>
+  <data name="Товар тільки для дорослих (18+)" xml:space="preserve">
+    <value>Article réservé aux adultes (18+)</value>
+  </data>
+  <data name="Медіа товару" xml:space="preserve">
+    <value>Médias de l'article</value>
+  </data>
+  <data name="Зображення" xml:space="preserve">
+    <value>Images</value>
+  </data>
+  <data name="JPG, PNG або WEBP · до 5 МБ" xml:space="preserve">
+    <value>JPG, PNG ou WEBP · jusqu'à 5 Mo</value>
+  </data>
+  <data name="Головне фото" xml:space="preserve">
+    <value>Photo principale</value>
+  </data>
+  <data name="1 файл" xml:space="preserve">
+    <value>1 fichier</value>
+  </data>
+  <data name="Перетягніть головне фото сюди" xml:space="preserve">
+    <value>Glissez la photo principale ici</value>
+  </data>
+  <data name="або" xml:space="preserve">
+    <value>ou</value>
+  </data>
+  <data name="оберіть на комп’ютері" xml:space="preserve">
+    <value>choisissez-la sur votre ordinateur</value>
+  </data>
+  <data name="Рекомендовано квадратне фото від 1000×1000 px" xml:space="preserve">
+    <value>Une photo carrée d'au moins 1000×1000 px est recommandée</value>
+  </data>
+  <data name="Воно буде першим у каталозі та на сторінці товару." xml:space="preserve">
+    <value>Elle apparaîtra en premier dans le catalogue et sur la page de l'article.</value>
+  </data>
+  <data name="Додаткові фото" xml:space="preserve">
+    <value>Photos supplémentaires</value>
+  </data>
+  <data name="0 / 8 файлів" xml:space="preserve">
+    <value>0 / 8 fichiers</value>
+  </data>
+  <data name="Додайте галерею товару" xml:space="preserve">
+    <value>Ajoutez une galerie de l'article</value>
+  </data>
+  <data name="Перетягніть кілька фото або натисніть для вибору" xml:space="preserve">
+    <value>Glissez plusieurs photos ou cliquez pour les sélectionner</value>
+  </data>
+  <data name="До 8 фото. Покажіть товар з різних ракурсів і важливі деталі." xml:space="preserve">
+    <value>Jusqu'à 8 photos. Montrez l'article sous différents angles et les détails importants.</value>
+  </data>
+  <data name="Скасувати" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="Створити товар" xml:space="preserve">
+    <value>Créer l'article</value>
+  </data>
+  <data name="Перед публікацією" xml:space="preserve">
+    <value>Avant de publier</value>
+  </data>
+  <data name="Підготуйте картку товару" xml:space="preserve">
+    <value>Préparez votre fiche article</value>
+  </data>
+  <data name="Зрозуміла назва без зайвих символів" xml:space="preserve">
+    <value>Un nom clair sans caractères superflus</value>
+  </data>
+  <data name="Детальний опис і актуальна ціна" xml:space="preserve">
+    <value>Une description détaillée et un prix à jour</value>
+  </data>
+  <data name="Якісне головне зображення" xml:space="preserve">
+    <value>Une image principale de bonne qualité</value>
+  </data>
+  <data name="Фото з кількох ракурсів" xml:space="preserve">
+    <value>Des photos sous plusieurs angles</value>
+  </data>
+  <data name="Після створення товар автоматично потрапить на модерацію." xml:space="preserve">
+    <value>Après sa création, l'article sera automatiquement soumis à modération.</value>
+  </data>
+</root>

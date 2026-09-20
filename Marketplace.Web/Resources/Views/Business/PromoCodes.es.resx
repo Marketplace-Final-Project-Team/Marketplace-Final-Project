@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Знижки та промокоди" xml:space="preserve">
+    <value>Descuentos y códigos promocionales</value>
+  </data>
+  <data name="Керуйте знижкою на весь магазин і промокодами, які покупці застосовують при оформленні замовлення." xml:space="preserve">
+    <value>Gestione un descuento para toda la tienda y los códigos promocionales que aplican los clientes al pagar.</value>
+  </data>
+  <data name="Знижка на весь магазин" xml:space="preserve">
+    <value>Descuento para toda la tienda</value>
+  </data>
+  <data name="Діє одразу на всі товари магазину замість їхніх власних знижок, поки не мине термін дії." xml:space="preserve">
+    <value>Se aplica de inmediato a todos los productos de la tienda en lugar de sus propios descuentos, hasta que caduque.</value>
+  </data>
+  <data name="Діє знижка" xml:space="preserve">
+    <value>Descuento activo</value>
+  </data>
+  <data name="до" xml:space="preserve">
+    <value>hasta</value>
+  </data>
+  <data name="Скасувати знижку на весь магазин?" xml:space="preserve">
+    <value>¿Cancelar el descuento para toda la tienda?</value>
+  </data>
+  <data name="Скасувати знижку" xml:space="preserve">
+    <value>Cancelar descuento</value>
+  </data>
+  <data name="Знижка, %" xml:space="preserve">
+    <value>Descuento, %</value>
+  </data>
+  <data name="Діє з" xml:space="preserve">
+    <value>Válido desde</value>
+  </data>
+  <data name="Діє до" xml:space="preserve">
+    <value>Válido hasta</value>
+  </data>
+  <data name="Встановити знижку" xml:space="preserve">
+    <value>Establecer descuento</value>
+  </data>
+  <data name="Знижки на категорії" xml:space="preserve">
+    <value>Descuentos por categoría</value>
+  </data>
+  <data name="Діє на товари вибраної категорії у вашому магазині. Пріоритет знижок: власна знижка товару → знижка категорії → знижка на весь магазин." xml:space="preserve">
+    <value>Se aplica a los productos de la categoría seleccionada en su tienda. Prioridad de descuentos: descuento propio del producto → descuento de categoría → descuento de toda la tienda.</value>
+  </data>
+  <data name="Категорія" xml:space="preserve">
+    <value>Categoría</value>
+  </data>
+  <data name="Знижка" xml:space="preserve">
+    <value>Descuento</value>
+  </data>
+  <data name="Скасувати знижку на цю категорію?" xml:space="preserve">
+    <value>¿Cancelar el descuento para esta categoría?</value>
+  </data>
+  <data name="Скасувати" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="Наразі немає активних знижок на категорії." xml:space="preserve">
+    <value>Actualmente no hay descuentos de categoría activos.</value>
+  </data>
+  <data name="Персональні знижки клієнтам" xml:space="preserve">
+    <value>Descuentos personales para clientes</value>
+  </data>
+  <data name="Знижка діє тільки для одного покупця на всі товари вашого магазину. Пріоритет знижок: власна знижка товару → знижка категорії → персональна знижка клієнта → знижка на весь магазин." xml:space="preserve">
+    <value>El descuento se aplica solo a un cliente para todos los productos de su tienda. Prioridad de descuentos: descuento propio del producto → descuento de categoría → descuento personal del cliente → descuento de toda la tienda.</value>
+  </data>
+  <data name="Покупець" xml:space="preserve">
+    <value>Cliente</value>
+  </data>
+  <data name="Скасувати персональну знижку цього покупця?" xml:space="preserve">
+    <value>¿Cancelar el descuento personal de este cliente?</value>
+  </data>
+  <data name="Наразі немає активних персональних знижок." xml:space="preserve">
+    <value>Actualmente no hay descuentos personales activos.</value>
+  </data>
+  <data name="Усі ваші покупці вже мають активну персональну знижку, або у вас ще не було покупців." xml:space="preserve">
+    <value>Todos sus clientes ya tienen un descuento personal activo, o aún no ha tenido clientes.</value>
+  </data>
+  <data name="Новий промокод" xml:space="preserve">
+    <value>Nuevo código promocional</value>
+  </data>
+  <data name="Код буде приведено до верхнього регістру. Покупець отримає знижку лише на товари вашого магазину в замовленні." xml:space="preserve">
+    <value>El código se convertirá a mayúsculas. El cliente obtendrá un descuento solo en los productos de su tienda dentro del pedido.</value>
+  </data>
+  <data name="Код промокоду" xml:space="preserve">
+    <value>Código promocional</value>
+  </data>
+  <data name="Наприклад, SALE20" xml:space="preserve">
+    <value>Por ejemplo, SALE20</value>
+  </data>
+  <data name="Тип використання" xml:space="preserve">
+    <value>Tipo de uso</value>
+  </data>
+  <data name="Багаторазовий" xml:space="preserve">
+    <value>Multiuso</value>
+  </data>
+  <data name="Одноразовий" xml:space="preserve">
+    <value>Un solo uso</value>
+  </data>
+  <data name="Створити промокод" xml:space="preserve">
+    <value>Crear código promocional</value>
+  </data>
+  <data name="Активні та минулі промокоди" xml:space="preserve">
+    <value>Códigos promocionales activos y pasados</value>
+  </data>
+  <data name="Ви ще не створили жодного промокоду." xml:space="preserve">
+    <value>Aún no ha creado ningún código promocional.</value>
+  </data>
+  <data name="Код" xml:space="preserve">
+    <value>Código</value>
+  </data>
+  <data name="Тип" xml:space="preserve">
+    <value>Tipo</value>
+  </data>
+  <data name="Статус" xml:space="preserve">
+    <value>Estado</value>
+  </data>
+  <data name="Активний" xml:space="preserve">
+    <value>Activo</value>
+  </data>
+  <data name="Використано" xml:space="preserve">
+    <value>Usado</value>
+  </data>
+  <data name="Неактивний" xml:space="preserve">
+    <value>Inactivo</value>
+  </data>
+  <data name="Деактивувати цей промокод?" xml:space="preserve">
+    <value>¿Desactivar este código promocional?</value>
+  </data>
+  <data name="Деактивувати" xml:space="preserve">
+    <value>Desactivar</value>
+  </data>
+</root>

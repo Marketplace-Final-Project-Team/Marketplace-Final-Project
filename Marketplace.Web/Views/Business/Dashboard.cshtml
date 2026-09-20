@@ -7,7 +7,7 @@
 @using System.Text.Json
 
 @{
-    ViewData["Title"] = $"Дашборд - {Model.StoreName}";
+    ViewData["Title"] = $"{Localizer["Дашборд"].Value} - {Model.StoreName}";
 
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
     var currentRole = !string.IsNullOrEmpty(userId)
@@ -40,6 +40,12 @@
         revenue = p.Revenue
     }), jsonOptions);
 
+    var topCustomersJson = JsonSerializer.Serialize(Model.TopCustomers.Select(c => new
+    {
+        name = c.UserName,
+        revenue = c.Revenue
+    }), jsonOptions);
+
     var trafficJson = JsonSerializer.Serialize(new
     {
         views = Model.TotalViews,
@@ -47,21 +53,29 @@
         wishlistAdds = Model.TotalWishlistAdds,
         orders = Model.PeriodOrders
     }, jsonOptions);
+
+    var categoryColors = new[] { "#3157d7", "#42a98b", "#e8a33d", "#c65f9e", "#5b8def", "#8a5b00", "#b42318", "#7a89bb" };
+    var categoryJson = JsonSerializer.Serialize(Model.CategoryStats.Select((c, i) => new
+    {
+        name = SharedLocalizer[c.CategoryName].Value,
+        revenue = c.Revenue,
+        color = categoryColors[i % categoryColors.Length]
+    }), jsonOptions);
 }
 
 @functions {
-    private static string DeltaHtml(double? percent)
+    private string DeltaHtml(double? percent)
     {
         if (percent is null)
         {
-            return "<span class=\"business-kpi__delta\">— немає даних за попередній період</span>";
+            return $"<span class=\"business-kpi__delta\">— {Localizer["немає даних за попередній період"].Value}</span>";
         }
 
         var isUp = percent.Value >= 0;
         var cls = isUp ? "business-kpi__delta--up" : "business-kpi__delta--down";
         var arrow = isUp ? "▲" : "▼";
         var sign = isUp ? "+" : "";
-        return $"<span class=\"business-kpi__delta {cls}\">{arrow} {sign}{percent.Value:0.0}% до попереднього періоду</span>";
+        return $"<span class=\"business-kpi__delta {cls}\">{arrow} {sign}{percent.Value:0.0}% {Localizer["до попереднього періоду"].Value}</span>";
     }
 }
 
@@ -70,13 +84,13 @@
 }
 
 <div class="seller-dashboard">
-    <a asp-action="Index" class="seller-order-back">← До головної панелі</a>
+    <a asp-action="Index" class="seller-order-back">← @Localizer["До головної панелі"]</a>
 
     <header class="seller-orders-header">
         <div>
             <div class="seller-dashboard__eyebrow"><span aria-hidden="true"></span> @BusinessRoleContext.PanelLabel(currentRole)</div>
-            <h1>Дашборд - @Model.StoreName</h1>
-            <p>Продажі, товари, покупці й трафік магазину за обраний період.</p>
+            <h1>@Localizer["Дашборд"] - @Model.StoreName</h1>
+            <p>@Localizer["Продажі, товари, покупці й трафік магазину за обраний період."]</p>
         </div>
     </header>
 
@@ -85,44 +99,110 @@
     <form method="get" asp-action="Dashboard" class="business-filter-form">
         <input type="hidden" name="businessId" value="@Model.BusinessId" />
         <div>
-            <label for="startDate">З дати</label>
+            <label for="startDate">@Localizer["З дати"]</label>
             <input type="date" id="startDate" class="form-control" name="startDate" value="@Model.Filter.StartDate?.ToString("yyyy-MM-dd")" />
         </div>
         <div>
-            <label for="endDate">По дату</label>
+            <label for="endDate">@Localizer["По дату"]</label>
             <input type="date" id="endDate" class="form-control" name="endDate" value="@Model.Filter.EndDate?.ToString("yyyy-MM-dd")" />
         </div>
-        <button type="submit" class="btn btn-outline-secondary">Застосувати</button>
+        <button type="submit" class="btn btn-outline-secondary">@Localizer["Застосувати"]</button>
     </form>
 
     <div class="business-kpis">
         <div class="business-kpi">
-            <span>Виручка за період</span>
+            <span>@Localizer["Виручка за період"]</span>
             <strong>@Model.PeriodRevenue.ToString("N0") ₴</strong>
             @Html.Raw(DeltaHtml(Model.RevenueDeltaPercent))
         </div>
         <div class="business-kpi">
-            <span>Замовлень за період</span>
+            <span>@Localizer["Замовлень за період"]</span>
             <strong>@Model.PeriodOrders</strong>
             @Html.Raw(DeltaHtml(Model.OrdersDeltaPercent))
         </div>
         <div class="business-kpi">
-            <span>Середній чек</span>
+            <span>@Localizer["Середній чек"]</span>
             <strong>@Model.PeriodAverageOrderValue.ToString("N0") ₴</strong>
             @Html.Raw(DeltaHtml(Model.AverageOrderValueDeltaPercent))
         </div>
-        <div class="business-kpi"><span>Баланс магазину</span><strong>@Model.Balance.ToString("N0") ₴</strong></div>
-        <div class="business-kpi"><span>Виручка за весь час</span><strong>@Model.AllTimeRevenue.ToString("N0") ₴</strong></div>
-        <div class="business-kpi"><span>Товарів усього</span><strong>@Model.TotalProductCount</strong></div>
+        <div class="business-kpi"><span>@Localizer["Баланс магазину"]</span><strong>@Model.Balance.ToString("N0") ₴</strong></div>
+        <div class="business-kpi"><span>@Localizer["Виручка за весь час"]</span><strong>@Model.AllTimeRevenue.ToString("N0") ₴</strong></div>
+        <div class="business-kpi"><span>@Localizer["Товарів усього"]</span><strong>@Model.TotalProductCount</strong></div>
+    </div>
+
+    @{
+        var accountStatusLabel = Model.AccountStatus switch
+        {
+            "Active" => Localizer["Активний"].Value,
+            "Pending" => Localizer["На розгляді"].Value,
+            "Suspended" => Localizer["Призупинено"].Value,
+            "Rejected" => Localizer["Відхилено"].Value,
+            _ => Model.AccountStatus
+        };
+
+        // IViewLocalizer's formatted indexer only substitutes {0} args when the
+        // LocalizedHtmlString is written directly to the Razor output (WriteTo);
+        // calling .Value on it returns the raw, unformatted template. So format
+        // explicitly against the plain (argument-less) lookup instead.
+        var notifications = new List<(string Text, string? Url, string Tone)>();
+        if (Model.AwaitingOrders > 0)
+        {
+            notifications.Add((string.Format(Localizer["Замовлень очікує обробки: {0}"].Value, Model.AwaitingOrders), Url.Action("Orders", "Business", new { businessId = Model.BusinessId }), "warning"));
+        }
+        if (Model.LowStockProductCount > 0)
+        {
+            notifications.Add((string.Format(Localizer["Товарів на низькому залишку: {0}"].Value, Model.LowStockProductCount), Url.Action("Index", "Products", new { businessId = Model.BusinessId, filter = "low-stock" }), "warning"));
+        }
+        if (Model.OutOfStockProductCount > 0)
+        {
+            notifications.Add((string.Format(Localizer["Немає в наявності: {0}"].Value, Model.OutOfStockProductCount), Url.Action("Index", "Products", new { businessId = Model.BusinessId, filter = "out-of-stock" }), "danger"));
+        }
+        if (Model.BannedProductCount > 0)
+        {
+            notifications.Add((string.Format(Localizer["Товарів заблоковано модерацією: {0}"].Value, Model.BannedProductCount), Url.Action("Index", "Products", new { businessId = Model.BusinessId, filter = "hidden" }), "danger"));
+        }
+    }
+
+    <div class="business-status-row">
+        <section class="business-panel business-status-card">
+            <h2>✓ @Localizer["Стан акаунту"]</h2>
+            <span class="business-status-badge business-status-badge--@Model.AccountStatus.ToLowerInvariant()">@accountStatusLabel</span>
+            <div class="business-status-card__rating">
+                <span aria-hidden="true">★</span>
+                <strong>@(Model.ReviewCount > 0 ? Model.AverageRating.ToString("0.0") : "—")</strong>
+                <span>(@Model.ReviewCount @Localizer["відгуків"])</span>
+            </div>
+            <p class="business-status-card__since">@Localizer["На маркетплейсі з"] @Model.MemberSince.ToString("dd.MM.yyyy")</p>
+        </section>
+
+        <section class="business-panel business-notifications-card">
+            <h2>🔔 @Localizer["Сповіщення"]</h2>
+            @if (notifications.Count == 0)
+            {
+                <p class="business-empty">@Localizer["Усе добре, дій не потрібно."]</p>
+            }
+            else
+            {
+                <ul class="business-notifications-list">
+                    @foreach (var notification in notifications)
+                    {
+                        <li class="business-notifications-list__item business-notifications-list__item--@notification.Tone">
+                            <a href="@notification.Url">@notification.Text</a>
+                        </li>
+                    }
+                </ul>
+            }
+        </section>
     </div>
 
     <div class="business-two-col">
-        <section class="business-panel business-chart-card">
-            <h2>Виручка та замовлення за період</h2>
+        <section class="business-panel business-chart-card" data-collapsible>
+            <h2>@Localizer["Виручка та замовлення за період"]</h2>
+            <partial name="_CollapseToggle" />
             <p class="business-panel__lead">@Model.Filter.StartDate?.ToString("dd.MM.yyyy") - @Model.Filter.EndDate?.ToString("dd.MM.yyyy")</p>
             @if (Model.Chart.Count == 0)
             {
-                <p class="business-empty">Даних за обраний період немає.</p>
+                <p class="business-empty">@Localizer["Даних за обраний період немає."]</p>
             }
             else
             {
@@ -132,12 +212,13 @@
             }
         </section>
 
-        <section class="business-panel business-chart-card">
-            <h2>Динаміка середнього чека</h2>
-            <p class="business-panel__lead">Виручка / кількість замовлень по днях.</p>
+        <section class="business-panel business-chart-card" data-collapsible>
+            <h2>@Localizer["Динаміка середнього чека"]</h2>
+            <partial name="_CollapseToggle" />
+            <p class="business-panel__lead">@Localizer["Виручка / кількість замовлень по днях."]</p>
             @if (Model.Chart.Count == 0)
             {
-                <p class="business-empty">Даних за обраний період немає.</p>
+                <p class="business-empty">@Localizer["Даних за обраний період немає."]</p>
             }
             else
             {
@@ -149,12 +230,13 @@
     </div>
 
     <div class="business-two-col">
-        <section class="business-panel">
-            <h2>Топ товари</h2>
-            <p class="business-panel__lead">За виручкою в обраному періоді.</p>
+        <section class="business-panel" data-collapsible>
+            <h2>@Localizer["Топ товари"]</h2>
+            <partial name="_CollapseToggle" />
+            <p class="business-panel__lead">@Localizer["За виручкою в обраному періоді."]</p>
             @if (Model.TopProducts.Count == 0)
             {
-                <p class="business-empty">Продажів за період немає.</p>
+                <p class="business-empty">@Localizer["Продажів за період немає."]</p>
             }
             else
             {
@@ -164,7 +246,7 @@
                 <div class="table-responsive">
                     <table class="business-table">
                         <thead>
-                            <tr><th>Товар</th><th>Виручка</th><th>Продано</th><th>Перегляди</th><th>Конверсія</th></tr>
+                            <tr><th>@Localizer["Товар"]</th><th>@Localizer["Виручка"]</th><th>@Localizer["Продано"]</th><th>@Localizer["Перегляди"]</th><th>@Localizer["Конверсія"]</th></tr>
                         </thead>
                         <tbody>
                             @foreach (var product in Model.TopProducts)
@@ -183,19 +265,23 @@
             }
         </section>
 
-        <section class="business-panel">
-            <h2>Топ покупці</h2>
-            <p class="business-panel__lead">За виручкою в обраному періоді.</p>
+        <section class="business-panel" data-collapsible>
+            <h2>@Localizer["Топ покупці"]</h2>
+            <partial name="_CollapseToggle" />
+            <p class="business-panel__lead">@Localizer["За виручкою в обраному періоді."]</p>
             @if (Model.TopCustomers.Count == 0)
             {
-                <p class="business-empty">Покупців за період немає.</p>
+                <p class="business-empty">@Localizer["Покупців за період немає."]</p>
             }
             else
             {
+                <div class="business-chart-card__canvas-wrap business-chart-card__canvas-wrap--short">
+                    <canvas id="topCustomersChart" data-chart='@Html.Raw(topCustomersJson)'></canvas>
+                </div>
                 <div class="table-responsive">
                     <table class="business-table">
                         <thead>
-                            <tr><th>Покупець</th><th>Виручка</th><th>Покупок</th></tr>
+                            <tr><th>@Localizer["Покупець"]</th><th>@Localizer["Виручка"]</th><th>@Localizer["Покупок"]</th></tr>
                         </thead>
                         <tbody>
                             @foreach (var customer in Model.TopCustomers)
@@ -214,40 +300,98 @@
     </div>
 
     <div class="business-two-col">
-        <section class="business-panel">
-            <h2>Трафік і конверсія</h2>
-            <p class="business-panel__lead">Дії покупців з товарами магазину за обраний період.</p>
+        <section class="business-panel" data-collapsible>
+            <h2>@Localizer["Трафік і конверсія"]</h2>
+            <partial name="_CollapseToggle" />
+            <p class="business-panel__lead">@Localizer["Дії покупців з товарами магазину за обраний період."]</p>
             <div class="business-chart-card__canvas-wrap business-chart-card__canvas-wrap--short">
                 <canvas id="trafficChart" data-chart="@trafficJson"></canvas>
             </div>
             <div class="business-kpis">
-                <div class="business-kpi"><span>Перегляди товарів</span><strong>@Model.TotalViews</strong></div>
-                <div class="business-kpi"><span>Додано в кошик</span><strong>@Model.TotalCartAdds</strong></div>
-                <div class="business-kpi"><span>Додано в побажання</span><strong>@Model.TotalWishlistAdds</strong></div>
-                <div class="business-kpi"><span>Конверсія в замовлення</span><strong>@Model.ConversionRatePercent.ToString("0.0")%</strong></div>
+                <div class="business-kpi"><span>@Localizer["Перегляди товарів"]</span><strong>@Model.TotalViews</strong></div>
+                <div class="business-kpi"><span>@Localizer["Додано в кошик"]</span><strong>@Model.TotalCartAdds</strong></div>
+                <div class="business-kpi"><span>@Localizer["Додано в побажання"]</span><strong>@Model.TotalWishlistAdds</strong></div>
+                <div class="business-kpi"><span>@Localizer["Конверсія в замовлення"]</span><strong>@Model.ConversionRatePercent.ToString("0.0")%</strong></div>
             </div>
         </section>
 
-        <section class="business-panel">
-            <h2>Асортимент</h2>
-            <p class="business-panel__lead">Розподіл товарів магазину за станом.</p>
+        <section class="business-panel" data-collapsible>
+            <h2>@Localizer["Асортимент"]</h2>
+            <partial name="_CollapseToggle" />
+            <p class="business-panel__lead">@Localizer["Розподіл товарів магазину за станом."]</p>
             <div class="business-chart-card__canvas-wrap business-chart-card__canvas-wrap--short">
                 <canvas id="productStatusChart" data-chart="@productStatusJson"></canvas>
             </div>
             <div class="business-kpis">
-                <div class="business-kpi"><span>Активні</span><strong>@Model.ActiveProductCount</strong></div>
-                <div class="business-kpi"><span>На модерації</span><strong>@Model.PendingProductCount</strong></div>
-                <div class="business-kpi @(Model.OutOfStockProductCount > 0 ? "business-kpi--warning" : null)"><span>Немає в наявності</span><strong>@Model.OutOfStockProductCount</strong></div>
-                <div class="business-kpi @(Model.LowStockProductCount > 0 ? "business-kpi--warning" : null)"><span>Мало на складі</span><strong>@Model.LowStockProductCount</strong></div>
+                <div class="business-kpi"><span>@Localizer["Активні"]</span><strong>@Model.ActiveProductCount</strong></div>
+                <div class="business-kpi"><span>@Localizer["На модерації"]</span><strong>@Model.PendingProductCount</strong></div>
+                <div class="business-kpi @(Model.OutOfStockProductCount > 0 ? "business-kpi--warning" : null)"><span>@Localizer["Немає в наявності"]</span><strong>@Model.OutOfStockProductCount</strong></div>
+                <div class="business-kpi @(Model.LowStockProductCount > 0 ? "business-kpi--warning" : null)"><span>@Localizer["Мало на складі"]</span><strong>@Model.LowStockProductCount</strong></div>
             </div>
         </section>
     </div>
 
-    <section class="business-panel">
-        <h2>Останні дії</h2>
+    <div class="business-two-col">
+        <section class="business-panel" data-collapsible>
+            <h2>@Localizer["Продажі за категоріями"]</h2>
+            <partial name="_CollapseToggle" />
+            <p class="business-panel__lead">@Localizer["За виручкою в обраному періоді."]</p>
+            @if (Model.CategoryStats.Count == 0)
+            {
+                <p class="business-empty">@Localizer["Продажів за цей період немає."]</p>
+            }
+            else
+            {
+                <div class="business-chart-card__canvas-wrap business-chart-card__canvas-wrap--short">
+                    <canvas id="categoryChart" data-chart='@Html.Raw(categoryJson)'></canvas>
+                </div>
+            }
+        </section>
+
+        <section class="business-panel" data-collapsible>
+            <h2>@Localizer["Категорії за виручкою"]</h2>
+            <partial name="_CollapseToggle" />
+            <p class="business-panel__lead">@Localizer["Розподіл продажів між категоріями товарів."]</p>
+            @if (Model.CategoryStats.Count == 0)
+            {
+                <p class="business-empty">@Localizer["Продажів за цей період немає."]</p>
+            }
+            else
+            {
+                var categoryTotalRevenue = Model.CategoryStats.Sum(c => c.Revenue);
+                <div class="table-responsive">
+                    <table class="business-table">
+                        <thead>
+                            <tr><th>@Localizer["Категорія"]</th><th>@Localizer["Виручка"]</th><th>@Localizer["Одиниць"]</th><th>@Localizer["Частка"]</th></tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.CategoryStats.Count; i++)
+                            {
+                                var category = Model.CategoryStats[i];
+                                var share = categoryTotalRevenue == 0 ? 0 : Math.Round(category.Revenue * 100 / categoryTotalRevenue, 1);
+                                <tr>
+                                    <td>
+                                        <span class="business-category-dot" style="background: @categoryColors[i % categoryColors.Length]"></span>
+                                        @SharedLocalizer[category.CategoryName]
+                                    </td>
+                                    <td>@category.Revenue.ToString("N0") ₴</td>
+                                    <td>@category.UnitsSold</td>
+                                    <td>@share%</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </section>
+    </div>
+
+    <section class="business-panel" data-collapsible>
+        <h2>@Localizer["Останні дії"]</h2>
+        <partial name="_CollapseToggle" />
         @if (Model.RecentActivity.Count == 0)
         {
-            <p class="business-empty">Дій поки немає.</p>
+            <p class="business-empty">@Localizer["Дій поки немає."]</p>
         }
         else
         {
@@ -268,4 +412,5 @@
     <script src="~/lib/chartjs/chart.umd.min.js"></script>
     <script src="~/js/chart-helpers.js" asp-append-version="true"></script>
     <script src="~/js/business-dashboard.js" asp-append-version="true"></script>
+    <script src="~/js/business-panel-collapse.js" asp-append-version="true"></script>
 }

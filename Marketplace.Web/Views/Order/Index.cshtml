@@ -1,17 +1,17 @@
 @model IReadOnlyList<Marketplace.Web.Models.OrderListItemViewModel>
 
 @{
-    ViewData["Title"] = "Мої замовлення";
+    ViewData["Title"] = SharedLocalizer["Мої замовлення"];
 }
 
 @functions {
-    private static string StatusLabel(Marketplace.Domain.Enums.OrderStatus status) => status switch
+    private string StatusLabel(Marketplace.Domain.Enums.OrderStatus status) => status switch
     {
-        Marketplace.Domain.Enums.OrderStatus.Pending => "Очікує підтвердження",
-        Marketplace.Domain.Enums.OrderStatus.Confirmed => "Підтверджено",
-        Marketplace.Domain.Enums.OrderStatus.Shipped => "Відправлено",
-        Marketplace.Domain.Enums.OrderStatus.Delivered => "Доставлено",
-        Marketplace.Domain.Enums.OrderStatus.Canceled => "Скасовано",
+        Marketplace.Domain.Enums.OrderStatus.Pending => Localizer["Очікує підтвердження"].Value,
+        Marketplace.Domain.Enums.OrderStatus.Confirmed => Localizer["Підтверджено"].Value,
+        Marketplace.Domain.Enums.OrderStatus.Shipped => Localizer["Відправлено"].Value,
+        Marketplace.Domain.Enums.OrderStatus.Delivered => Localizer["Доставлено"].Value,
+        Marketplace.Domain.Enums.OrderStatus.Canceled => Localizer["Скасовано"].Value,
         _ => status.ToString()
     };
 }
@@ -23,20 +23,20 @@
 <div class="shop-page">
     <header class="shop-header">
         <div>
-            <div class="shop-kicker">Особистий кабінет</div>
-            <h1 class="shop-title">Мої замовлення</h1>
-            <p class="shop-subtitle">Історія покупок, склад замовлень і поточний статус доставки.</p>
+            <div class="shop-kicker">@Localizer["Особистий кабінет"]</div>
+            <h1 class="shop-title">@SharedLocalizer["Мої замовлення"]</h1>
+            <p class="shop-subtitle">@Localizer["Історія покупок, склад замовлень і поточний статус доставки."]</p>
         </div>
-        <a asp-controller="Catalog" asp-action="Index" class="btn btn-outline-primary">До каталогу</a>
+        <a asp-controller="Catalog" asp-action="Index" class="btn btn-outline-primary">@Localizer["До каталогу"]</a>
     </header>
 
     @if (Model.Count == 0)
     {
         <section class="shop-empty">
             <div class="shop-empty__icon" aria-hidden="true">□</div>
-            <h2>Замовлень поки немає</h2>
-            <p>Після оформлення покупки вона з’явиться на цій сторінці.</p>
-            <a asp-controller="Catalog" asp-action="Index" class="btn btn-primary">Перейти до каталогу</a>
+            <h2>@Localizer["Замовлень поки немає"]</h2>
+            <p>@Localizer["Після оформлення покупки вона з’явиться на цій сторінці."]</p>
+            <a asp-controller="Catalog" asp-action="Index" class="btn btn-primary">@Localizer["Перейти до каталогу"]</a>
         </section>
     }
     else
@@ -47,14 +47,14 @@
                 <article class="order-card">
                     <div class="order-card__top">
                         <div>
-                            <div class="order-card__number">Замовлення #@order.Id.ToString()[..8].ToUpperInvariant()</div>
-                            <div class="order-card__date">@order.CreatedAt.ToLocalTime().ToString("dd MMMM yyyy, HH:mm") · @order.ItemsCount шт.</div>
+                            <div class="order-card__number">@Localizer["Замовлення #"]@order.Id.ToString()[..8].ToUpperInvariant()</div>
+                            <div class="order-card__date">@order.CreatedAt.ToLocalTime().ToString("dd MMMM yyyy, HH:mm") · @order.ItemsCount @Localizer["шт."]</div>
                         </div>
                         <span class="order-status order-status--@order.Status.ToString().ToLowerInvariant()">@StatusLabel(order.Status)</span>
                     </div>
                     <div class="order-card__bottom">
                         <div>
-                            <div class="order-card__address">Доставка: @order.ShippingAddress</div>
+                            <div class="order-card__address">@Localizer["Доставка:"] @order.ShippingAddress</div>
                             @if (!string.IsNullOrWhiteSpace(order.DeliveryMethodLabel))
                             {
                                 <div class="order-card__address">@order.DeliveryMethodLabel</div>
@@ -62,8 +62,8 @@
                             <div class="order-card__total">@order.TotalAmount.ToString("N2") ₴</div>
                         </div>
                         <div class="d-flex gap-2">
-                            <a asp-action="Details" asp-route-id="@order.Id" class="btn btn-sm btn-outline-secondary">Деталі</a>
-                            <a asp-action="Delivery" asp-route-id="@order.Id" class="btn btn-sm btn-primary">Доставка</a>
+                            <a asp-action="Details" asp-route-id="@order.Id" class="btn btn-sm btn-outline-secondary">@Localizer["Деталі"]</a>
+                            <a asp-action="Delivery" asp-route-id="@order.Id" class="btn btn-sm btn-primary">@Localizer["Доставка"]</a>
                         </div>
                     </div>
                 </article>

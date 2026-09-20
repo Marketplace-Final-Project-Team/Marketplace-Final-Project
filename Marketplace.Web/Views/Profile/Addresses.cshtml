@@ -1,7 +1,7 @@
 @model List<Marketplace.Web.Models.AddressViewModel>
 
 @{
-    ViewData["Title"] = "Мої адреси";
+    ViewData["Title"] = Localizer["Мої адреси"];
 }
 
 @section Styles {
@@ -9,14 +9,14 @@
 }
 
 <div class="profile-page">
-    <a asp-action="Index" class="profile-back">← До кабінету</a>
+    <a asp-action="Index" class="profile-back">← @Localizer["До кабінету"]</a>
 
     <div class="profile-summary" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
         <div>
-            <h1>Мої адреси</h1>
-            <p>Збережені адреси доставки для швидшого оформлення замовлення.</p>
+            <h1>@Localizer["Мої адреси"]</h1>
+            <p>@Localizer["Збережені адреси доставки для швидшого оформлення замовлення."]</p>
         </div>
-        <a asp-action="CreateAddress" class="btn btn-primary">+ Додати адресу</a>
+        <a asp-action="CreateAddress" class="btn btn-primary">+ @Localizer["Додати адресу"]</a>
     </div>
 
     @if (TempData["Success"] is string success)
@@ -32,9 +32,9 @@
     {
         <div class="profile-empty">
             <div class="profile-empty__icon" aria-hidden="true">⌂</div>
-            <h2>Адрес поки немає</h2>
-            <p>Додайте адресу, щоб не вводити її щоразу під час оформлення замовлення.</p>
-            <a asp-action="CreateAddress" class="btn btn-primary">Додати першу адресу</a>
+            <h2>@Localizer["Адрес поки немає"]</h2>
+            <p>@Localizer["Додайте адресу, щоб не вводити її щоразу під час оформлення замовлення."]</p>
+            <a asp-action="CreateAddress" class="btn btn-primary">@Localizer["Додати першу адресу"]</a>
         </div>
     }
     else
@@ -46,7 +46,7 @@
                     <div class="address-card__lines">
                         @if (address.IsDefault)
                         {
-                            <span class="address-card__badge">Основна</span>
+                            <span class="address-card__badge">@Localizer["Основна"]</span>
                         }
                         <strong>@address.Country, @address.City</strong>
                         <p>@address.Street</p>
@@ -56,13 +56,13 @@
                         {
                             <form asp-action="SetDefaultAddress" method="post">
                                 <input type="hidden" name="id" value="@address.Id" />
-                                <button type="submit" class="btn btn-sm btn-outline-secondary">Зробити основною</button>
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">@Localizer["Зробити основною"]</button>
                             </form>
                         }
-                        <a asp-action="EditAddress" asp-route-id="@address.Id" class="btn btn-sm btn-outline-primary">Редагувати</a>
-                        <form asp-action="DeleteAddress" method="post" onsubmit="return confirm('Видалити цю адресу?');">
+                        <a asp-action="EditAddress" asp-route-id="@address.Id" class="btn btn-sm btn-outline-primary">@Localizer["Редагувати"]</a>
+                        <form asp-action="DeleteAddress" method="post" onsubmit="return confirm('@Localizer["Видалити цю адресу?"]');">
                             <input type="hidden" name="id" value="@address.Id" />
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Видалити</button>
+                            <button type="submit" class="btn btn-sm btn-outline-danger">@Localizer["Видалити"]</button>
                         </form>
                     </div>
                 </div>

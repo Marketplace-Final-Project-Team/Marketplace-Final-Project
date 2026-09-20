@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Підтримка" xml:space="preserve">
+    <value>Support</value>
+  </data>
+  <data name="Чим можемо допомогти?" xml:space="preserve">
+    <value>How can we help?</value>
+  </data>
+  <data name="Відповіді на часті запитання, контакти та центр вирішення спірних питань - в одному місці." xml:space="preserve">
+    <value>Answers to frequently asked questions, contact details, and the dispute resolution center - all in one place.</value>
+  </data>
+  <data name="Email підтримки" xml:space="preserve">
+    <value>Support email</value>
+  </data>
+  <data name="Телефон" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="0 800 123 456 (щодня, 9:00–20:00)" xml:space="preserve">
+    <value>0 800 123 456 (daily, 9:00 AM-8:00 PM)</value>
+  </data>
+  <data name="Онлайн-чат" xml:space="preserve">
+    <value>Live chat</value>
+  </data>
+  <data name="Напишіть команді підтримки напряму" xml:space="preserve">
+    <value>Message the support team directly</value>
+  </data>
+  <data name="Часті запитання" xml:space="preserve">
+    <value>Frequently asked questions</value>
+  </data>
+  <data name="Як оформити повернення товару?" xml:space="preserve">
+    <value>How do I request a return?</value>
+  </data>
+  <data name="Повернення доступне протягом 14 днів після отримання замовлення. Відкрийте деталі замовлення в особистому кабінеті та натисніть «Оформити повернення» - далі просто дотримуйтесь інструкцій." xml:space="preserve">
+    <value>Returns are available within 14 days of receiving your order. Open the order details in your account and click "Request a return" - then simply follow the instructions.</value>
+  </data>
+  <data name="Як довго обробляється замовлення?" xml:space="preserve">
+    <value>How long does order processing take?</value>
+  </data>
+  <data name="Продавець підтверджує замовлення протягом 1 робочого дня, після чого починається доставка кур'єром - орієнтовно 2–4 робочі дні." xml:space="preserve">
+    <value>The seller confirms the order within 1 business day, after which courier delivery begins - approximately 2-4 business days.</value>
+  </data>
+  <data name="Які способи оплати підтримуються?" xml:space="preserve">
+    <value>What payment methods are supported?</value>
+  </data>
+  <data name="Наразі доступна онлайн-оплата через LiqPay. Ми працюємо над додаванням Apple Pay, Google Pay та оплати частинами." xml:space="preserve">
+    <value>Online payment via LiqPay is currently available. We are working on adding Apple Pay, Google Pay, and installment payments.</value>
+  </data>
+  <data name="Що робити, якщо товар не відповідає опису?" xml:space="preserve">
+    <value>What should I do if the item doesn't match its description?</value>
+  </data>
+  <data name="Кошти покупця заморожуються на транзитному рахунку маркетплейсу до підтвердження отримання. Якщо товар не відповідає опису - відкрийте спір у деталях замовлення, і команда підтримки допоможе вирішити ситуацію." xml:space="preserve">
+    <value>The buyer's funds are held in the marketplace's escrow account until receipt is confirmed. If the item doesn't match its description, open a dispute in the order details, and the support team will help resolve the situation.</value>
+  </data>
+  <data name="Як стати продавцем на платформі?" xml:space="preserve">
+    <value>How do I become a seller on the platform?</value>
+  </data>
+  <data name="Створіть бізнес-акаунт у розділі «Панель продавця» → «Створити бізнес». Після модерації адміністратором ви зможете додавати товари та отримувати замовлення." xml:space="preserve">
+    <value>Create a business account in the "Seller dashboard" → "Create a business" section. After moderation by an administrator, you will be able to add products and receive orders.</value>
+  </data>
+  <data name="Закрити" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Онлайн-чат тимчасово недоступний" xml:space="preserve">
+    <value>Live chat is temporarily unavailable</value>
+  </data>
+  <data name="Ми ще під'єднуємо живу підтримку. Напишіть нам на" xml:space="preserve">
+    <value>We're still connecting live support. Email us at</value>
+  </data>
+  <data name="відповімо якнайшвидше." xml:space="preserve">
+    <value>we'll respond as soon as possible.</value>
+  </data>
+</root>

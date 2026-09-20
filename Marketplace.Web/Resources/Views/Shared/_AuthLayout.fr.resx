@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Перейти до форми" xml:space="preserve">
+    <value>Aller au formulaire</value>
+  </data>
+  <data name="Про Marketplace" xml:space="preserve">
+    <value>À propos de Marketplace</value>
+  </data>
+  <data name="Marketplace - на головну" xml:space="preserve">
+    <value>Marketplace - accueil</value>
+  </data>
+  <data name="Твій маркетплейс щодня" xml:space="preserve">
+    <value>Votre marketplace au quotidien</value>
+  </data>
+  <data name="Купуй простіше." xml:space="preserve">
+    <value>Achetez plus simplement.</value>
+  </data>
+  <data name="Продавай сміливіше." xml:space="preserve">
+    <value>Vendez plus audacieusement.</value>
+  </data>
+  <data name="Усе потрібне - від локальних брендів до улюблених товарів - в одному безпечному просторі." xml:space="preserve">
+    <value>Tout ce dont vous avez besoin - des marques locales à vos produits préférés - en un seul endroit sécurisé.</value>
+  </data>
+  <data name="Хіт" xml:space="preserve">
+    <value>Tendance</value>
+  </data>
+  <data name="Новинки сезону" xml:space="preserve">
+    <value>Nouveautés de la saison</value>
+  </data>
+  <data name="від 299 ₴" xml:space="preserve">
+    <value>à partir de 299 ₴</value>
+  </data>
+  <data name="Для дому" xml:space="preserve">
+    <value>Pour la maison</value>
+  </data>
+  <data name="від 149 ₴" xml:space="preserve">
+    <value>à partir de 149 ₴</value>
+  </data>
+  <data name="Електроніка" xml:space="preserve">
+    <value>Électronique</value>
+  </data>
+  <data name="від 899 ₴" xml:space="preserve">
+    <value>à partir de 899 ₴</value>
+  </data>
+  <data name="Переваги Marketplace" xml:space="preserve">
+    <value>Avantages de Marketplace</value>
+  </data>
+  <data name="Захищені покупки" xml:space="preserve">
+    <value>Achats sécurisés</value>
+  </data>
+  <data name="Перевірені продавці" xml:space="preserve">
+    <value>Vendeurs vérifiés</value>
+  </data>
+  <data name="Зручна доставка" xml:space="preserve">
+    <value>Livraison pratique</value>
+  </data>
+  <data name="На головну" xml:space="preserve">
+    <value>Retour à l'accueil</value>
+  </data>
+</root>

@@ -11,6 +11,8 @@ public class CartItemViewModel
     public string ImageUrl { get; set; } = string.Empty;
     public int Quantity { get; set; }
     public int StockQuantity { get; set; }
+    public Guid? ProductVariantId { get; set; }
+    public string? VariantSize { get; set; }
     public decimal LineTotal => Price * Quantity;
 }
 
@@ -66,7 +68,9 @@ public static class CartGrouping
                 Price = item.Price,
                 ImageUrl = item.ImageUrl,
                 Quantity = item.Quantity,
-                StockQuantity = item.StockQuantity
+                StockQuantity = item.StockQuantity,
+                ProductVariantId = item.ProductVariantId,
+                VariantSize = item.VariantSize
             });
         }
 

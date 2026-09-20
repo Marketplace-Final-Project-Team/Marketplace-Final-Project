@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Політика використання кукі" xml:space="preserve">
+    <value>Cookie Policy</value>
+  </data>
+  <data name="Як ми використовуємо кукі-файли" xml:space="preserve">
+    <value>How we use cookies</value>
+  </data>
+  <data name="Прозоро про те, які кукі ставить цей сайт, навіщо вони потрібні та скільки часу зберігаються." xml:space="preserve">
+    <value>A transparent look at which cookies this site sets, why they are needed, and how long they are kept.</value>
+  </data>
+  <data name="Обов'язкові кукі" xml:space="preserve">
+    <value>Essential cookies</value>
+  </data>
+  <data name="Потрібні для роботи сайту - без них неможливо увійти в акаунт чи оформити замовлення. Їх не можна вимкнути." xml:space="preserve">
+    <value>Required for the site to function - without them you cannot sign in to your account or place an order. They cannot be disabled.</value>
+  </data>
+  <data name="Кукі" xml:space="preserve">
+    <value>Cookie</value>
+  </data>
+  <data name="Призначення" xml:space="preserve">
+    <value>Purpose</value>
+  </data>
+  <data name="Термін дії" xml:space="preserve">
+    <value>Duration</value>
+  </data>
+  <data name="Зберігає ваш вхід в акаунт" xml:space="preserve">
+    <value>Keeps you signed in to your account</value>
+  </data>
+  <data name="До виходу з акаунту" xml:space="preserve">
+    <value>Until you sign out</value>
+  </data>
+  <data name="Захист форм від підробки запитів (CSRF)" xml:space="preserve">
+    <value>Protects forms against request forgery (CSRF)</value>
+  </data>
+  <data name="Сесія" xml:space="preserve">
+    <value>Session</value>
+  </data>
+  <data name="Запам'ятовує ваш вибір у цьому вікні (прийняти / відхилити)" xml:space="preserve">
+    <value>Remembers your choice in this consent banner (accept / decline)</value>
+  </data>
+  <data name="365 днів" xml:space="preserve">
+    <value>365 days</value>
+  </data>
+  <data name="Функціональні кукі" xml:space="preserve">
+    <value>Functional cookies</value>
+  </data>
+  <data name="Вмикають додаткові зручності. Ставляться лише якщо ви натиснули «Прийняти» у вікні згоди - якщо відхилили, ці функції просто не використовують кукі." xml:space="preserve">
+    <value>Enable additional conveniences. Set only if you clicked &quot;Accept&quot; in the consent banner - if you declined, these features simply work without cookies.</value>
+  </data>
+  <data name="Список ID нещодавно переглянутих товарів для блоку «Нещодавно переглянуті» на головній" xml:space="preserve">
+    <value>List of recently viewed product IDs for the "Recently viewed" block on the homepage</value>
+  </data>
+  <data name="15 хвилин" xml:space="preserve">
+    <value>15 minutes</value>
+  </data>
+  <data name="Обраний спосіб доставки (Нова пошта / Укрпошта / Meest) для конкретного замовлення" xml:space="preserve">
+    <value>Selected delivery method (Nova Poshta / Ukrposhta / Meest) for a specific order</value>
+  </data>
+  <data name="Дані в локальному сховищі браузера" xml:space="preserve">
+    <value>Data in the browser's local storage</value>
+  </data>
+  <data name="Це не кукі - вони не передаються на сервер - але для повноти картини: сайт також зберігає у &lt;code&gt;localStorage&lt;/code&gt; вашого браузера деякі суто клієнтські налаштування (колекції списку бажань, збережені пошукові запити, локальні чернетки налаштувань магазину). Ці дані ніколи не покидають ваш пристрій." xml:space="preserve">
+    <value>These are not cookies - they are never sent to the server - but for completeness: the site also stores some purely client-side settings in your browser's &lt;code&gt;localStorage&lt;/code&gt; (wishlist collections, saved search queries, local drafts of store settings). This data never leaves your device.</value>
+  </data>
+  <data name="Керування вибором" xml:space="preserve">
+    <value>Managing your choices</value>
+  </data>
+  <data name="Ви можете змінити свій вибір щодо функціональних кукі в будь-який момент." xml:space="preserve">
+    <value>You can change your choice regarding functional cookies at any time.</value>
+  </data>
+  <data name="Змінити налаштування кукі" xml:space="preserve">
+    <value>Change cookie settings</value>
+  </data>
+</root>

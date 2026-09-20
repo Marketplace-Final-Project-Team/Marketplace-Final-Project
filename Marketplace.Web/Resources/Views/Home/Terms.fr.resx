@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Правила користування платформою MarketPlace" xml:space="preserve">
+    <value>Règles d'utilisation de la plateforme MarketPlace</value>
+  </data>
+  <data name="Ці Умови регулюють відносини між MarketPlace, покупцями та продавцями, які реєструються й здійснюють операції на Платформі." xml:space="preserve">
+    <value>Les présentes Conditions régissent les relations entre MarketPlace, les acheteurs et les vendeurs qui s'inscrivent et effectuent des opérations sur la Plateforme.</value>
+  </data>
+  <data name="1. Прийняття умов" xml:space="preserve">
+    <value>1. Acceptation des conditions</value>
+  </data>
+  <data name="Реєструючи обліковий запис або здійснюючи покупку без реєстрації, ви укладаєте угоду з MarketPlace і погоджуєтесь дотримуватись цих Умов використання, а також Політики конфіденційності та Політики кукі. Якщо ви не погоджуєтесь із будь-яким положенням, будь ласка, не використовуйте Платформу." xml:space="preserve">
+    <value>En créant un compte ou en effectuant un achat sans inscription, vous concluez un accord avec MarketPlace et acceptez de respecter les présentes Conditions d'utilisation, ainsi que la Politique de confidentialité et la Politique relative aux cookies. Si vous n'acceptez pas l'une de ces dispositions, veuillez ne pas utiliser la Plateforme.</value>
+  </data>
+  <data name="2. Реєстрація облікового запису" xml:space="preserve">
+    <value>2. Inscription du compte</value>
+  </data>
+  <data name="Для оформлення замовлень і продажу товарів необхідна реєстрація з підтвердженням електронної пошти;" xml:space="preserve">
+    <value>Une inscription avec confirmation par e-mail est nécessaire pour passer des commandes et vendre des produits ;</value>
+  </data>
+  <data name="Ви зобов'язані надавати достовірну інформацію про себе під час реєстрації;" xml:space="preserve">
+    <value>Vous devez fournir des informations exactes vous concernant lors de l'inscription ;</value>
+  </data>
+  <data name="Ви несете відповідальність за конфіденційність свого пароля та всі дії, вчинені під вашим обліковим записом;" xml:space="preserve">
+    <value>Vous êtes responsable de la confidentialité de votre mot de passe et de toutes les actions effectuées via votre compte ;</value>
+  </data>
+  <data name="Один користувач може мати лише один обліковий запис, якщо інше не погоджено окремо з адміністрацією;" xml:space="preserve">
+    <value>Un même utilisateur ne peut détenir qu'un seul compte, sauf accord contraire convenu séparément avec l'administration ;</value>
+  </data>
+  <data name="MarketPlace залишає за собою право заблокувати обліковий запис у разі порушення цих Умов." xml:space="preserve">
+    <value>MarketPlace se réserve le droit de bloquer un compte en cas de violation des présentes Conditions.</value>
+  </data>
+  <data name="3. Купівля товарів" xml:space="preserve">
+    <value>3. Achat de produits</value>
+  </data>
+  <data name="Ціни на товари вказані в гривнях і включають усі обов'язкові збори, якщо не зазначено інше;" xml:space="preserve">
+    <value>Les prix des produits sont indiqués en hryvnias et incluent tous les frais obligatoires, sauf indication contraire ;</value>
+  </data>
+  <data name="Оформлення замовлення є пропозицією купівлі, яка вважається прийнятою після підтвердження продавцем;" xml:space="preserve">
+    <value>Passer une commande constitue une offre d'achat, réputée acceptée dès sa confirmation par le vendeur ;</value>
+  </data>
+  <data name="Доступні способи оплати: онлайн-оплата через платіжну систему та оплата готівкою/карткою при отриманні;" xml:space="preserve">
+    <value>Moyens de paiement disponibles : paiement en ligne via le système de paiement et paiement en espèces/par carte à la livraison ;</value>
+  </data>
+  <data name="Кошти за замовлення з онлайн-оплатою резервуються та переказуються продавцю лише після підтвердження отримання товару покупцем - це працює за принципом «Захист покупця»;" xml:space="preserve">
+    <value>Les fonds des commandes payées en ligne sont bloqués et ne sont versés au vendeur qu'après confirmation de réception de l'article par l'acheteur - conformément au principe de « Protection acheteur » ;</value>
+  </data>
+  <data name="Продавець зобов'язаний передати товар службі доставки протягом строку, вказаного в картці товару." xml:space="preserve">
+    <value>Le vendeur doit remettre l'article au service de livraison dans le délai indiqué sur la fiche produit.</value>
+  </data>
+  <data name="4. Права та обов'язки продавців" xml:space="preserve">
+    <value>4. Droits et obligations des vendeurs</value>
+  </data>
+  <data name="Продавець самостійно встановлює ціни, описи та фотографії своїх товарів і несе відповідальність за їх достовірність;" xml:space="preserve">
+    <value>Le vendeur fixe lui-même les prix, descriptions et photos de ses produits et est responsable de leur exactitude ;</value>
+  </data>
+  <data name="Заборонено продавати контрафактну продукцію, товари, обіг яких обмежений законодавством, або товари, що вводять покупця в оману;" xml:space="preserve">
+    <value>Il est interdit de vendre des produits contrefaits, des marchandises dont la circulation est restreinte par la loi, ou des produits induisant l'acheteur en erreur ;</value>
+  </data>
+  <data name="Продавець зобов'язаний підтримувати актуальну інформацію про наявність товару на складі;" xml:space="preserve">
+    <value>Le vendeur doit maintenir à jour les informations relatives à la disponibilité des stocks ;</value>
+  </data>
+  <data name="Продавець зобов'язаний оперативно реагувати на запити покупців щодо статусу замовлення, повернень і спорів;" xml:space="preserve">
+    <value>Le vendeur doit répondre rapidement aux demandes des acheteurs concernant le statut des commandes, les retours et les litiges ;</value>
+  </data>
+  <data name="MarketPlace стягує комісію з кожного успішного продажу відповідно до тарифів, вказаних у кабінеті продавця;" xml:space="preserve">
+    <value>MarketPlace prélève une commission sur chaque vente réussie, conformément aux tarifs indiqués dans l'espace vendeur ;</value>
+  </data>
+  <data name="Систематичні порушення (скасовані замовлення, обґрунтовані скарги, товари неналежної якості) можуть призвести до тимчасового або постійного блокування магазину." xml:space="preserve">
+    <value>Des infractions répétées (commandes annulées, plaintes justifiées, produits non conformes) peuvent entraîner le blocage temporaire ou définitif de la boutique.</value>
+  </data>
+  <data name="5. Заборонена поведінка" xml:space="preserve">
+    <value>5. Comportements interdits</value>
+  </data>
+  <data name="На Платформі заборонено:" xml:space="preserve">
+    <value>Sur la Plateforme, il est interdit de :</value>
+  </data>
+  <data name="розміщувати неправдиву, образливу чи таку, що вводить в оману, інформацію;" xml:space="preserve">
+    <value>publier des informations fausses, offensantes ou trompeuses ;</value>
+  </data>
+  <data name="намагатись обійти механізми оплати чи комісії Платформи, домовляючись про пряму оплату поза сайтом;" xml:space="preserve">
+    <value>tenter de contourner les mécanismes de paiement ou la commission de la Plateforme en convenant d'un paiement direct hors du site ;</value>
+  </data>
+  <data name="використовувати автоматизовані засоби (боти, скрапери) для масового збору даних із каталогу;" xml:space="preserve">
+    <value>utiliser des outils automatisés (robots, extracteurs de données) pour collecter en masse des données du catalogue ;</value>
+  </data>
+  <data name="публікувати відгуки за винагороду або створювати фейкові акаунти для накрутки рейтингу;" xml:space="preserve">
+    <value>publier des avis rémunérés ou créer de faux comptes pour manipuler une note ;</value>
+  </data>
+  <data name="здійснювати дії, що порушують чинне законодавство України." xml:space="preserve">
+    <value>commettre des actes contraires à la législation ukrainienne en vigueur.</value>
+  </data>
+  <data name="6. Інтелектуальна власність" xml:space="preserve">
+    <value>6. Propriété intellectuelle</value>
+  </data>
+  <data name="Дизайн, логотип, програмний код та інші елементи Платформи є власністю MarketPlace і захищені законодавством про авторське право. Контент, який завантажують продавці (фото, описи товарів), залишається їхньою власністю, але, розміщуючи його на Платформі, продавець надає MarketPlace невиключну ліцензію на його використання для демонстрації товару в межах сервісу." xml:space="preserve">
+    <value>Le design, le logo, le code source et les autres éléments de la Plateforme sont la propriété de MarketPlace et sont protégés par le droit d'auteur. Les contenus téléversés par les vendeurs (photos, descriptions de produits) restent leur propriété ; toutefois, en les publiant sur la Plateforme, le vendeur accorde à MarketPlace une licence non exclusive pour les utiliser afin de présenter le produit au sein du service.</value>
+  </data>
+  <data name="7. Обмеження відповідальності" xml:space="preserve">
+    <value>7. Limitation de responsabilité</value>
+  </data>
+  <data name="MarketPlace виступає посередником між покупцями та продавцями і не є виробником або власником товарів, що продаються на Платформі. Відповідальність за якість, комплектність і відповідність товару опису несе продавець. MarketPlace не гарантує безперебійну роботу сайту та не несе відповідальності за збитки, спричинені технічними збоями, крім випадків, прямо передбачених законодавством." xml:space="preserve">
+    <value>MarketPlace agit en tant qu'intermédiaire entre acheteurs et vendeurs et n'est ni fabricant ni propriétaire des produits vendus sur la Plateforme. La responsabilité de la qualité, de l'exhaustivité et de la conformité du produit à sa description incombe au vendeur. MarketPlace ne garantit pas le fonctionnement ininterrompu du site et n'est pas responsable des dommages causés par des dysfonctionnements techniques, sauf dans les cas expressément prévus par la loi.</value>
+  </data>
+  <data name="8. Зміна умов" xml:space="preserve">
+    <value>8. Modification des conditions</value>
+  </data>
+  <data name="MarketPlace має право вносити зміни до цих Умов у будь-який час. Актуальна версія завжди доступна на цій сторінці. Продовження використання Платформи після публікації змін означає вашу згоду з оновленими Умовами." xml:space="preserve">
+    <value>MarketPlace se réserve le droit de modifier les présentes Conditions à tout moment. La version en vigueur est toujours disponible sur cette page. La poursuite de l'utilisation de la Plateforme après la publication de modifications vaut acceptation des Conditions mises à jour.</value>
+  </data>
+  <data name="9. Контакти" xml:space="preserve">
+    <value>9. Contact</value>
+  </data>
+  <data name="З питань, пов'язаних із цими Умовами, звертайтеся через сторінку" xml:space="preserve">
+    <value>Pour toute question relative à ces Conditions, veuillez nous contacter via la page</value>
+  </data>
+  <data name="Підтримки" xml:space="preserve">
+    <value>Assistance</value>
+  </data>
+</root>

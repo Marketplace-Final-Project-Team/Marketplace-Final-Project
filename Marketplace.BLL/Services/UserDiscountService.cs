@@ -36,7 +36,7 @@ namespace Marketplace.BLL.Services
                 return new ServiceResult
                 {
                     Succeeded = false,
-                    Message = "User not found"
+                    Message = "Користувача не знайдено"
                 };
                 
             }
@@ -45,7 +45,7 @@ namespace Marketplace.BLL.Services
                 return new ServiceResult
                 {
                     Succeeded = false,
-                    Message = "Business not found"
+                    Message = "Бізнес не знайдено"
                 };
             }
             var active_discount = await _context.UserDiscounts
@@ -54,7 +54,7 @@ namespace Marketplace.BLL.Services
                 return new ServiceResult
                 {
                     Succeeded = false,
-                    Message = "Active discount already exists for this user and business"
+                    Message = "Для цього покупця вже діє персональна знижка"
                 };
             }
             var maxDiscountPercent = await _settingsService.GetIntAsync("BusinessRules", "MaxDiscountPercent", 90);
@@ -121,7 +121,7 @@ namespace Marketplace.BLL.Services
                 return new ServiceResult
                 {
                     Succeeded = false,
-                    Message = "User not found"
+                    Message = "Користувача не знайдено"
                 };
 
             }
@@ -131,7 +131,7 @@ namespace Marketplace.BLL.Services
                 return new ServiceResult
                 {
                     Succeeded = false,
-                    Message = "Business not found"
+                    Message = "Бізнес не знайдено"
                 };
             }
             var active_discount = await _context.UserDiscounts
@@ -141,7 +141,7 @@ namespace Marketplace.BLL.Services
                 return new ServiceResult
                 {
                     Succeeded = false,
-                    Message = "No active discount found for this user and business"
+                    Message = "Активної персональної знижки для цього покупця не знайдено"
                 };
             }
             active_discount.EndDate = DateTime.UtcNow.AddSeconds(-1);
@@ -149,7 +149,7 @@ namespace Marketplace.BLL.Services
             return new ServiceResult
             {
                 Succeeded = true,
-                Message = "Discount removed successfully"
+                Message = "Знижку успішно видалено"
             };
         }
         public async Task<UserDiscountGetDto> GetUserDiscountAsync(string userId, Guid businessId)
@@ -186,6 +186,44 @@ namespace Marketplace.BLL.Services
                 EndDate = discount.EndDate,
                 IsActive = true
             };
+        }
+
+        public async Task<List<UserDiscountGetDto>> GetActiveDiscountsForBusinessAsync(Guid businessId)
+        {
+            var now = DateTime.UtcNow;
+            return await _context.UserDiscounts
+                .Where(ud => ud.BusinessId == businessId && ud.EndDate > now && ud.StartDate <= now)
+                .Select(ud => new UserDiscountGetDto
+                {
+                    UserId = ud.UserId,
+                    UserName = ud.User.UserName,
+                    BusinessId = ud.BusinessId,
+                    Percent = ud.Percent,
+                    StartDate = ud.StartDate,
+                    EndDate = ud.EndDate,
+                    IsActive = true
+                })
+                .OrderBy(ud => ud.UserName)
+                .ToListAsync();
+        }
+
+        public async Task<List<UserDiscountGetDto>> GetActiveDiscountsForUserAsync(string userId)
+        {
+            var now = DateTime.UtcNow;
+            return await _context.UserDiscounts
+                .Where(ud => ud.UserId == userId && ud.EndDate > now && ud.StartDate <= now)
+                .Select(ud => new UserDiscountGetDto
+                {
+                    UserId = ud.UserId,
+                    BusinessId = ud.BusinessId,
+                    StoreName = ud.Business.StoreName,
+                    Percent = ud.Percent,
+                    StartDate = ud.StartDate,
+                    EndDate = ud.EndDate,
+                    IsActive = true
+                })
+                .OrderBy(ud => ud.EndDate)
+                .ToListAsync();
         }
     }
 }

@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Сторінку не знайдено";
+    ViewData["Title"] = Localizer["Сторінку не знайдено"].Value;
 }
 
 @section Styles {
@@ -14,15 +14,14 @@
         </div>
 
         <div class="error-copy">
-            <div class="error-kicker">Здається, ви заблукали</div>
-            <h1>Такої сторінки немає</h1>
+            <div class="error-kicker">@Localizer["Здається, ви заблукали"]</div>
+            <h1>@Localizer["Такої сторінки немає"]</h1>
             <p>
-                Можливо, адресу введено з помилкою, сторінку переміщено або товар
-                більше не доступний.
+                @Localizer["Можливо, адресу введено з помилкою, сторінку переміщено або товар більше не доступний."]
             </p>
             <div class="error-actions">
-                <a asp-controller="Home" asp-action="Index" class="btn btn-primary">На головну</a>
-                <a asp-controller="Catalog" asp-action="Index" class="btn btn-outline-secondary">Відкрити каталог</a>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary">@Localizer["На головну"]</a>
+                <a asp-controller="Catalog" asp-action="Index" class="btn btn-outline-secondary">@Localizer["Відкрити каталог"]</a>
             </div>
         </div>
     </section>

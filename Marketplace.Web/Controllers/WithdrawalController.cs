@@ -22,6 +22,7 @@ namespace Marketplace.Web.Controllers
             _withdrawalService = withdrawalService;
             _userManager = userManager;
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Guid businessId, decimal amount, string cardNumber, string recipientName)
@@ -34,14 +35,14 @@ namespace Marketplace.Web.Controllers
             {
                 return BadRequest("Amount must be greater than zero.");
             }
-            Console.WriteLine("VSEEEE OK ");
             var business = await _businessService.GetByIdAsync(businessId);
             if (business == null)
             {
                 return NotFound();
             }
             var userId = _userManager.GetUserId(User);
-            if (userId == null) {
+            if (userId == null)
+            {
                 return Unauthorized();
             }
             var hasAcces = await _businessAccessService.HasAccessAsync(businessId, userId, BusinessMemberRole.Owner);
@@ -53,15 +54,76 @@ namespace Marketplace.Web.Controllers
             if (!result.Succeeded)
             {
                 return BadRequest(result.Message);
-            }   
-            return Ok(); 
+            }
+            return Ok();
         }
+
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllWithdrawals(WithdrawalStatus? status)
         {
             var withdrawals = await _withdrawalService.GetAllWithdrawalsAsync(status);
             return Ok(withdrawals);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Withdrawals(WithdrawalStatus? status)
+        {
+            var withdrawals = await _withdrawalService.GetAllWithdrawalsAsync(status);
+            return View(new Marketplace.Web.Models.WithdrawalsAdminViewModel
+            {
+                StatusFilter = status,
+                Withdrawals = withdrawals
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ApproveWithdrawal(Guid requestId)
+        {
+            var currentAdminId = _userManager.GetUserId(User);
+
+            var result = await _withdrawalService.ApproveWithdrawalRequestAsync(requestId, currentAdminId!);
+
+            if (result.Succeeded)
+            {
+                TempData["Success"] = "Виплату успішно здійснено.";
+            }
+            else
+            {
+                TempData["Error"] = result.Message;
+            }
+
+            return RedirectToAction("Withdrawals");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RejectWithdrawal(Guid requestId, string reason)
+        {
+            var currentAdminId = _userManager.GetUserId(User);
+
+            if (string.IsNullOrWhiteSpace(reason))
+            {
+                TempData["Error"] = "Вкажіть причину відхилення.";
+                return RedirectToAction("Withdrawals");
+            }
+
+            var result = await _withdrawalService.RejectWithdrawalRequestAsync(requestId, reason.Trim(), currentAdminId!);
+
+            if (result.Succeeded)
+            {
+                TempData["Success"] = "Запит відхилено.";
+            }
+            else
+            {
+                TempData["Error"] = result.Message;
+            }
+
+            return RedirectToAction("Withdrawals");
         }
     }
 }

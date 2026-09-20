@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Сповіщення" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
+  <data name="очікує підтвердження" xml:space="preserve">
+    <value>awaiting confirmation</value>
+  </data>
+  <data name="підтверджено" xml:space="preserve">
+    <value>confirmed</value>
+  </data>
+  <data name="відправлено" xml:space="preserve">
+    <value>shipped</value>
+  </data>
+  <data name="доставлено" xml:space="preserve">
+    <value>delivered</value>
+  </data>
+  <data name="скасовано" xml:space="preserve">
+    <value>canceled</value>
+  </data>
+  <data name="До кабінету" xml:space="preserve">
+    <value>Back to account</value>
+  </data>
+  <data name="Статус замовлень, нові товари та підбірки для вас - в одному місці." xml:space="preserve">
+    <value>Order status updates, new products and picks for you - all in one place.</value>
+  </data>
+  <data name="Категорії сповіщень" xml:space="preserve">
+    <value>Notification categories</value>
+  </data>
+  <data name="Про замовлення" xml:space="preserve">
+    <value>Orders</value>
+  </data>
+  <data name="Нові товари" xml:space="preserve">
+    <value>New products</value>
+  </data>
+  <data name="Акційні пропозиції" xml:space="preserve">
+    <value>Special offers</value>
+  </data>
+  <data name="Це стрічка поточних статусів ваших замовлень - історія проміжних змін статусу не зберігається." xml:space="preserve">
+    <value>This is a feed of your orders' current statuses - the history of intermediate status changes is not kept.</value>
+  </data>
+  <data name="Подій ще немає" xml:space="preserve">
+    <value>No events yet</value>
+  </data>
+  <data name="Тут з'являться оновлення статусів після першого замовлення." xml:space="preserve">
+    <value>Status updates will appear here after your first order.</value>
+  </data>
+  <data name="Перейти до каталогу" xml:space="preserve">
+    <value>Go to catalog</value>
+  </data>
+  <data name="Замовлення #" xml:space="preserve">
+    <value>Order #</value>
+  </data>
+  <data name="Щойно з'явилися в каталозі - можливо, саме те, що ви шукали." xml:space="preserve">
+    <value>Just added to the catalog - maybe exactly what you were looking for.</value>
+  </data>
+  <data name="Поки нічого нового" xml:space="preserve">
+    <value>Nothing new yet</value>
+  </data>
+  <data name="Нові товари з'являться тут одразу після додавання в каталог." xml:space="preserve">
+    <value>New products will appear here as soon as they're added to the catalog.</value>
+  </data>
+  <data name="Новинка" xml:space="preserve">
+    <value>New</value>
+  </data>
+  <data name="Персональна підбірка популярних товарів на платформі." xml:space="preserve">
+    <value>A personal selection of popular products on the platform.</value>
+  </data>
+  <data name="Підбірок поки немає" xml:space="preserve">
+    <value>No picks yet</value>
+  </data>
+  <data name="Рекомендації з'являться тут, щойно в каталозі буде більше товарів з відгуками." xml:space="preserve">
+    <value>Recommendations will appear here as soon as the catalog has more products with reviews.</value>
+  </data>
+  <data name="Рекомендуємо" xml:space="preserve">
+    <value>Recommended</value>
+  </data>
+</root>
