@@ -131,6 +131,7 @@ builder.Services.AddScoped<IUserDiscountService, UserDiscountService>();
 builder.Services.AddScoped<IRefundChatService, RefundChatService>();
 builder.Services.AddScoped<ISupportTicketService, SupportTicketService>();
 builder.Services.AddScoped<IWithdrawalService, WithdrawalService>();
+builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddSignalR();
 
 // LiqPay configuration
@@ -143,6 +144,7 @@ builder.Services.AddScoped<IDeliveryProviderService, DeliveryProviderService>();
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<IEmailSender, EmailSender>();
+
 
 var app = builder.Build();
 
