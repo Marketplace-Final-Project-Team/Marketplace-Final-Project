@@ -92,6 +92,8 @@ builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 var app = builder.Build();
 
+app.MapHealthChecks("/health");
+
 using (var scope = app.Services.CreateScope())
 {
     await Marketplace.DAL.Seed.DbSeeder.SeedAsync(scope.ServiceProvider);
