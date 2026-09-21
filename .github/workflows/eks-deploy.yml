@@ -48,3 +48,20 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker push $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --name marketplace-eks \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Deploy to EKS
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          kubectl set image deployment/marketplace-web \
+            marketplace-web=$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            -n default
+
+          kubectl rollout status deployment/marketplace-web -n default
