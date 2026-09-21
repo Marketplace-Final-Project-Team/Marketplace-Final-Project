@@ -17,6 +17,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddHealthChecks();
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     //if (builder.Environment.IsDevelopment())
