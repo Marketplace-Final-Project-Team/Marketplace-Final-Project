@@ -346,17 +346,20 @@
         <span class="product-section-kicker">@Localizer["Запитання та відповіді"]</span>
         <h2 id="qa-title">@Localizer["Запитайте продавця"]</h2>
 
+        <div class="product-qa__summary">
+            <p class="product-qa__hint">@Localizer["Продавець «{0}» відповідає на запитання протягом 1–2 робочих днів.", Model.StoreName]</p>
+            @if (User.Identity?.IsAuthenticated != true)
+            {
+                <a asp-controller="Auth" asp-action="SignIn" asp-route-returnUrl="@Context.Request.Path" class="product-button product-button--secondary">@Localizer["Увійти, щоб поставити запитання"]</a>
+            }
+        </div>
+
         @if (User.Identity?.IsAuthenticated == true)
         {
             <div class="product-qa__form">
                 <textarea rows="2" placeholder="@Localizer["Наприклад: чи підходить цей товар для..."]" data-qa-input maxlength="500"></textarea>
                 <button type="button" class="product-button product-button--secondary" data-qa-submit>@Localizer["Надіслати запитання"]</button>
             </div>
-            <p class="product-qa__hint">@Localizer["Продавець «{0}» відповідає на запитання протягом 1–2 робочих днів.", Model.StoreName]</p>
-        }
-        else
-        {
-            <a asp-controller="Auth" asp-action="SignIn" asp-route-returnUrl="@Context.Request.Path" class="product-button product-button--secondary">@Localizer["Увійти, щоб поставити запитання"]</a>
         }
 
         <div class="product-qa__list" data-qa-list>

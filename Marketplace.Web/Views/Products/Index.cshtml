@@ -10,14 +10,20 @@
     {
         businessId = selectedBusinessId,
         search = Model.Search,
-        filter = tabFilter
+        filter = tabFilter,
+        categoryId = Model.CategoryId
     }) ?? "#";
 }
 
 @section Styles {
+    <link rel="stylesheet" href="~/css/business.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/products.css" asp-append-version="true" />
 }
 <div class="products-page">
+    @if (selectedBusinessId.HasValue)
+    {
+        <partial name="_BusinessNav" model="selectedBusinessId.Value" />
+    }
     <header class="products-heading">
         <div>
             <div class="products-eyebrow">@Localizer["Панель продавця"]</div>
@@ -82,9 +88,18 @@
             </div>
         </div>
 
+        @if (Model.CategoryId.HasValue)
+        {
+            <div class="products-filter-pill">
+                @Localizer["Категорія:"] <strong>@SharedLocalizer[Model.CategoryName ?? string.Empty]</strong>
+                <a href="@Url.Action(nameof(Marketplace.Web.Controllers.ProductsController.Index), new { businessId = selectedBusinessId, search = Model.Search, filter = Model.Filter })">✕</a>
+            </div>
+        }
+
         <form asp-action="Index" method="get" class="products-search-form">
             <input type="hidden" name="businessId" value="@selectedBusinessId" />
             <input type="hidden" name="filter" value="@Model.Filter" />
+            <input type="hidden" name="categoryId" value="@Model.CategoryId" />
             <input type="search" name="search" value="@Model.Search" class="form-control" placeholder="@Localizer["Пошук за назвою або артикулом"]" />
             <button type="submit" class="btn btn-outline-secondary">@Localizer["Шукати"]</button>
         </form>

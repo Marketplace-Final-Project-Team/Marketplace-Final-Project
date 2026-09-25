@@ -7,6 +7,8 @@
 
 @{
     var current = ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty;
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty;
+    var isProductsSection = string.Equals(currentController, "Products", StringComparison.OrdinalIgnoreCase);
 
     string ActiveClass(string action) => string.Equals(current, action, StringComparison.OrdinalIgnoreCase)
         ? "is-active"
@@ -27,6 +29,11 @@
         @if (BusinessPermissions.Statistics.Contains(role))
         {
             <a class="@ActiveClass("Dashboard")" asp-action="Dashboard" asp-route-businessId="@Model">@Localizer["Дашборд"]</a>
+        }
+
+        @if (BusinessPermissions.ProductCrud.Contains(role))
+        {
+            <a class="@(isProductsSection ? "is-active" : "")" asp-controller="Products" asp-action="Index" asp-route-businessId="@Model">@Localizer["Товари"]</a>
         }
 
         <a class="@ActiveClass("Orders")" asp-action="Orders" asp-route-businessId="@Model">@SharedLocalizer["Замовлення"]</a>

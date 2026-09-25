@@ -5,6 +5,8 @@ namespace Marketplace.Web.Models.Products
         public List<ProductListItemViewModel> Items { get; set; } = new();
         public string? Search { get; set; }
         public string Filter { get; set; } = "all";
+        public Guid? CategoryId { get; set; }
+        public string? CategoryName { get; set; }
 
         public int AllCount { get; set; }
         public int ActiveCount { get; set; }
