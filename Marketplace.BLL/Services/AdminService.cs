@@ -1,4 +1,4 @@
-﻿using Marketplace.BLL.Common;
+using Marketplace.BLL.Common;
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
@@ -16,6 +16,7 @@ namespace Marketplace.BLL.Services
     public class AdminService : IAdminService
     {
         private readonly IGenericRepository<Product> _productRepo;
+
         private readonly UserManager<User> _userManager;
         private readonly IBusinessRepository _businessRepo;
         private readonly IOrderRepository _orderRepository;
@@ -611,5 +612,138 @@ namespace Marketplace.BLL.Services
                 BannedProductCount = products.Count(p => p.Status == ProductStatus.Banned)
             };
         }
+        public async Task<IReadOnlyList<ReviewAppealAdminDto>> GetPendingAppeals()
+        {
+            return await _context.ReviewAppeals
+            .AsNoTracking()
+            .Where(ra => ra.Status == ReviewAppealStatus.Pending && ra.Review.Status == ReviewStatus.Rejected)
+            .Select(ra => new ReviewAppealAdminDto
+            {
+                Id = ra.Id,
+                ReviewId = ra.ReviewId,
+
+                UserId = ra.UserId,
+                UserName = ra.User.UserName ?? string.Empty,
+
+                OldBody = ra.OriginalBody,
+                OldRating = ra.OriginalRating,
+                RejectionReason = ra.OriginalModerationReason,
+
+                NewBody = ra.Body,
+                NewRating = ra.Rating,
+
+                ProductName = ra.Review.Product.Name,
+                ProductId = ra.Review.ProductId,
+
+                CreatedAt = ra.CreatedAt
+            })
+            .ToListAsync();
+            }
+        public async Task<ServiceResult> ProcessAppeal(Guid appealId, bool approve, string adminUserId, string? reason)
+        {
+            if (string.IsNullOrWhiteSpace(adminUserId))
+            {
+                return new ServiceResult { Succeeded = false, Message = "Не вдалося визначити адміністратора" };
+            }
+
+            var normalizedReason = string.IsNullOrWhiteSpace(reason) ? null : reason.Trim();
+            if (normalizedReason?.Length > 1000)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Причина не може перевищувати 1000 символів" };
+            }
+            if (!approve && normalizedReason == null)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Вкажіть причину відхилення апеляції" };
+            }
+
+            var appeal = await _context.ReviewAppeals
+                .Include(ra => ra.Review)
+                .FirstOrDefaultAsync(ra => ra.Id == appealId && ra.Review != null && !ra.Review.IsDeleted);
+            if (appeal == null)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Апеляцію не знайдено" };
+            }
+            if (appeal.Status != ReviewAppealStatus.Pending)
+            {
+                return new ServiceResult
+                {
+                    Succeeded = false,
+                    Message = "Цю апеляцію вже було оброблено"
+                };
+            }
+
+            if (appeal.Review.Status != ReviewStatus.Rejected)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Апеляцію можна обробити лише для відхиленого відгуку" };
+            }
+
+            var now = DateTime.UtcNow;
+            appeal.ProcessedByAdminId = adminUserId;
+            appeal.ProcessedAt = now;
+            appeal.DecisionReason = normalizedReason;
+            if (approve)
+            {
+                appeal.Review.Body = appeal.Body;
+                appeal.Review.Rating = appeal.Rating;
+                appeal.Review.Status = ReviewStatus.Approved;
+                appeal.Status = ReviewAppealStatus.Approved;
+            }
+            else
+            {
+                appeal.Review.Status = ReviewStatus.Rejected;
+                appeal.Status = ReviewAppealStatus.Rejected;
+            }
+            await _context.SaveChangesAsync();
+            return new ServiceResult { Succeeded = true, Message = "Апеляцію оброблено" };
+        }
+        public async Task<ServiceResult> DeleteReview(Guid reviewId)
+        {
+            var review = await _context.Reviews
+                .FirstOrDefaultAsync(r => r.Id == reviewId && !r.IsDeleted);
+            if (review == null)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Відгук не знайдено" };
+            }
+
+            if (await _context.ReviewAppeals.AnyAsync(a => a.ReviewId == reviewId && a.Status == ReviewAppealStatus.Pending))
+            {
+                return new ServiceResult { Succeeded = false, Message = "Відгук не можна видалити, поки апеляція очікує розгляду" };
+            }
+
+            review.IsDeleted = true;
+            await _context.SaveChangesAsync();
+            return new ServiceResult { Succeeded = true, Message = "Відгук видалено" };
+        }
+        public async Task<ServiceResult> RejectReview(Guid reviewId, string adminUserId, string reason)
+        {
+            if (string.IsNullOrWhiteSpace(adminUserId))
+            {
+                return new ServiceResult { Succeeded = false, Message = "Не вдалося визначити адміністратора" };
+            }
+
+            if (string.IsNullOrWhiteSpace(reason))
+            {
+                return new ServiceResult { Succeeded = false, Message = "Вкажіть причину відхилення відгуку" };
+            }
+
+            if (reason.Trim().Length > 1000)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Причина не може перевищувати 1000 символів" };
+            }
+
+            var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == reviewId && !r.IsDeleted && r.Status != ReviewStatus.Rejected);
+            if (review == null)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Відгук не знайдено" };
+            }
+
+            review.Status = ReviewStatus.Rejected;
+            review.ModeratedByAdminId = adminUserId;
+            review.ModeratedAt = DateTime.UtcNow;
+            review.ModerationReason = reason.Trim();
+            await _context.SaveChangesAsync();
+            return new ServiceResult { Succeeded = true, Message = "Відгук відхилено" };
+        }
+
     }
 }

@@ -25,5 +25,11 @@ namespace Marketplace.BLL.Interfaces
         Task<DataResult<AdminCommissionStatsDto>> GetCommissionStatsByPeriodAsync(DateTime? startDate, DateTime? endDate);
         Task<decimal> GetTotalCommissionAsync();
         Task<AdminStatisticsOverviewDto> GetStatisticsAsync(DateTime? startDate, DateTime? endDate, Guid? businessId = null);
+
+
+        Task<IReadOnlyList<ReviewAppealAdminDto>> GetPendingAppeals();
+        Task<ServiceResult> ProcessAppeal(Guid appealId, bool approve, string adminUserId, string? reason);
+        Task<ServiceResult> DeleteReview(Guid reviewId);
+        Task<ServiceResult> RejectReview(Guid reviewId, string adminUserId, string reason);
     }
 }

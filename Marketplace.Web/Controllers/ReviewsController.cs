@@ -121,5 +121,30 @@ namespace Marketplace.Web.Controllers
 
             return RedirectToAction("Details", "Catalog", new { id = productId });
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateReviewAppeal(ReviewAppealCreateDto dto)
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Challenge();
+            }
+
+            dto.UserId = userId;
+            var result = await _reviewService.CreateReviewAppeal(dto);
+            if (!result.Succeeded)
+            {
+                TempData["Error"] = result.Message;
+            }
+            else
+            {
+                TempData["Success"] = result.Message;
+            }
+
+            return result.EntityId is Guid productId
+                ? RedirectToAction("Details", "Catalog", new { id = productId })
+                : RedirectToAction("Index", "Home");
+        }
     }
 }
