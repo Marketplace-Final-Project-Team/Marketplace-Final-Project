@@ -10,5 +10,6 @@ namespace Marketplace.BLL.Interfaces
         Task<ServiceResult> DeleteReview(Guid reviewId, string userId);
         Task<IReadOnlyList<ReviewDto>> GetReviewsByProductId(Guid productId);
         Task<ReviewUpdateDto?> GetReviewUpdateDtoAsync(Guid reviewId, string userId);
+        Task<ServiceResult> CreateReviewAppeal(ReviewAppealCreateDto dto);
     }
 }

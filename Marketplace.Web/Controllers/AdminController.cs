@@ -821,5 +821,71 @@ namespace Marketplace.Web.Controllers
             TempData["Success"] = "Задачу запущено негайно.";
             return RedirectToAction("Jobs");
         }
+        [HttpGet]
+        public async Task<IActionResult> GetPendingAppeals()
+        {
+            var appeals = await _adminService.GetPendingAppeals();
+            var appealViewModels = appeals.Select(a => new ReviewAppealAdminDto
+            {
+                Id = a.Id,
+                ReviewId = a.ReviewId,
+                ProductId = a.ProductId,
+                ProductName = a.ProductName,
+                UserId = a.UserId,
+                UserName = a.UserName,
+                OldBody = a.OldBody,
+                OldRating = a.OldRating,
+                RejectionReason = a.RejectionReason,
+                NewBody = a.NewBody,
+                NewRating = a.NewRating,
+                CreatedAt = a.CreatedAt
+            }).ToList();
+            return Ok(appealViewModels);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ProcessAppeal(Guid appealId, bool approve, string? reason)
+        {
+            var result = await _adminService.ProcessAppeal(appealId, approve, CurrentAdminId ?? string.Empty, reason);
+            return ModerationResult(result);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteReview(Guid reviewId)
+        {
+            var result = await _adminService.DeleteReview(reviewId);
+            return ModerationResult(result);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RejectReview(Guid reviewId, string reason)
+        {
+            var result = await _adminService.RejectReview(reviewId, CurrentAdminId ?? string.Empty, reason);
+            return ModerationResult(result);
+        }
+
+        private IActionResult ModerationResult(ServiceResult result)
+        {
+            var response = new { message = result.Message };
+            if (result.Succeeded)
+            {
+                return Ok(response);
+            }
+
+            if (result.Message.Contains("не знайдено", StringComparison.OrdinalIgnoreCase))
+            {
+                return NotFound(response);
+            }
+
+            if (result.Message.Contains("вже було оброблено", StringComparison.OrdinalIgnoreCase)
+                || result.Message.Contains("очікує розгляду", StringComparison.OrdinalIgnoreCase)
+                || result.Message.Contains("лише для відхиленого", StringComparison.OrdinalIgnoreCase))
+            {
+                return Conflict(response);
+            }
+
+            return BadRequest(response);
+        }
+
     }
 }

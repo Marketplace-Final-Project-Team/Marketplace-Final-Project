@@ -47,6 +47,8 @@ namespace Marketplace.DAL.Data
 
         public DbSet<WithdrawalRequest> WithdrawalRequests { get; set; }
 
+        public DbSet<ReviewAppeal> ReviewAppeals { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -206,6 +208,18 @@ namespace Marketplace.DAL.Data
                 .WithMany(p => p.Reviews)
                 .HasForeignKey(r => r.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<ReviewAppeal>().HasQueryFilter(ra => !ra.IsDeleted);
+            builder.Entity<ReviewAppeal>()
+                .HasOne(ra => ra.Review)
+                .WithMany()
+                .HasForeignKey(ra => ra.ReviewId)
+                .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<ReviewAppeal>()
+                .HasOne(ra => ra.User)
+                .WithMany()
+                .HasForeignKey(ra => ra.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Discount>()
                 .HasOne(d => d.Product)
