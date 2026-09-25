@@ -36,6 +36,12 @@
     max-width: 46rem;
 }
 
+.support-hero__meta {
+    font-size: 0.8rem;
+    margin-top: 0.85rem !important;
+    opacity: 0.75;
+}
+
 .support-contacts {
     display: grid;
     gap: 1rem;
