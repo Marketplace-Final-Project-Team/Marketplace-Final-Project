@@ -30,6 +30,37 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
+    @if (isAuthenticated)
+    {
+        <div style="position:fixed; bottom:10px; right:10px; width:300px; border:1px solid #ccc; background:white; padding:10px; z-index:9999;">
+            <div id="testChatMessages" style="height:200px; overflow-y:auto; border:1px solid #eee; margin-bottom:8px; padding:5px; font-size:13px;"></div>
+            <input type="text" id="testChatInput" style="width:70%;" placeholder="Повідомлення..." />
+            <button id="testChatSend">Send</button>
+        </div>
+
+        <script>
+                document.getElementById('testChatSend').addEventListener('click', async function () {
+                    const input = document.getElementById('testChatInput');
+                    const messagesDiv = document.getElementById('testChatMessages');
+                    const text = input.value;
+                    if (!text) return;
+
+                    messagesDiv.innerHTML += `<div><b>You:</b> ${text}</div>`;
+                    input.value = '';
+
+                    const response = await fetch('/api/chat/send', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: text })
+                    });
+
+                    const data = await response.json();
+                    messagesDiv.innerHTML += `<div><b>Bot:</b> ${response.ok ? data.message : JSON.stringify(data)}</div>`;
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                });
+        </script>
+    }
+
     <header class="site-header">
         <div class="site-header__top">
             <div class="site-header__inner">

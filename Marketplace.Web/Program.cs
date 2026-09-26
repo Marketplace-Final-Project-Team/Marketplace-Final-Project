@@ -136,6 +136,11 @@ builder.Services.AddScoped<IWithdrawalService, WithdrawalService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddSignalR();
 
+builder.Services.AddScoped<IGeminiChatApiClient, GeminiChatApiClient>();
+builder.Services.AddScoped<ChatToolDispatcher>();
+builder.Services.AddScoped<IChatToolsService, ChatToolsService>();
+builder.Services.AddScoped<IGeminiChatService, GeminiChatService>();
+
 // LiqPay configuration
 builder.Services.Configure<LiqPayOptions>(builder.Configuration.GetSection("LiqPay"));
 builder.Services.AddScoped<IPaymentService, LiqPayPaymentService>();
