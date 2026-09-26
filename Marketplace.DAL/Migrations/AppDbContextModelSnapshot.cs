@@ -22,6 +22,51 @@ namespace Marketplace.DAL.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Marketplace.Domain.Entities.AIChatMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FunctionArgsJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FunctionName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FunctionResponseJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ThoughtSignature")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AIChatMessages");
+                });
+
             modelBuilder.Entity("Marketplace.Domain.Entities.Address", b =>
                 {
                     b.Property<Guid>("Id")
@@ -830,7 +875,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("PostSaleRequestId");
 
-                    b.ToTable("RefundChatMessages");
+                    b.ToTable("RefundChatMessage");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Review", b =>
@@ -1411,6 +1456,17 @@ namespace Marketplace.DAL.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Marketplace.Domain.Entities.AIChatMessage", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.User", "User")
+                        .WithMany("AIChatMessages")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Marketplace.Domain.Entities.Address", b =>
                 {
                     b.HasOne("Marketplace.Domain.Entities.User", "User")
@@ -1896,6 +1952,8 @@ namespace Marketplace.DAL.Migrations
 
             modelBuilder.Entity("Marketplace.Domain.Entities.User", b =>
                 {
+                    b.Navigation("AIChatMessages");
+
                     b.Navigation("Addresses");
 
                     b.Navigation("Reviews");
