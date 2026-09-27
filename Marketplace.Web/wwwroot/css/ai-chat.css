@@ -266,13 +266,23 @@
     background: #f6f8fb;
     border: 1px solid var(--ai-chat-line);
     border-radius: 0.85rem;
+    box-sizing: border-box;
     color: var(--ai-chat-ink);
     flex: 1;
     font: inherit;
     max-height: 6.5rem;
     min-height: 2.5rem;
+    overflow-y: auto;
     padding: 0.55rem 0.8rem;
     resize: none;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.ai-chat__input::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
 }
 
 .ai-chat__input:focus {
