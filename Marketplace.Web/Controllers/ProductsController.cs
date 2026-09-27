@@ -189,6 +189,13 @@ public class ProductsController : Controller
         return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> ExportExample()
+    {
+        var fileBytes = await _productService.GetImportExampleAsync();
+        return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "приклад-імпорту-товарів.xlsx");
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ImportExcel(Guid businessId, IFormFile? file)
