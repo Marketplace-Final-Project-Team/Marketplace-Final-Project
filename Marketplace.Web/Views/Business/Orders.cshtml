@@ -120,7 +120,7 @@
                                 @if (order.HasUrgentReturn)
                                 {
                                     <span class="badge bg-danger mt-1">
-                                        Потрібне підтвердження повернення · до @order.ReturnDeadline?.ToLocalTime().ToString("dd.MM HH:mm")
+                                        @Localizer["Потрібне підтвердження повернення"] · @Localizer["до"] @order.ReturnDeadline?.ToLocalTime().ToString("dd.MM HH:mm")
                                     </span>
                                 }
                             </td>
