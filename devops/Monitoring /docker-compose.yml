@@ -1,4 +1,4 @@
-serves:
+services:
   
   # ===== Monitoring =====
     prometheus:
