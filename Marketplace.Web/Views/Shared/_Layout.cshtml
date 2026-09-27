@@ -26,39 +26,14 @@
     <link rel="stylesheet" href="~/css/footer.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/search-autocomplete.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/cookie-consent.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/ai-chat.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Marketplace.Web.styles.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     @if (isAuthenticated)
     {
-        <div style="position:fixed; bottom:10px; right:10px; width:300px; border:1px solid #ccc; background:white; padding:10px; z-index:9999;">
-            <div id="testChatMessages" style="height:200px; overflow-y:auto; border:1px solid #eee; margin-bottom:8px; padding:5px; font-size:13px;"></div>
-            <input type="text" id="testChatInput" style="width:70%;" placeholder="Повідомлення..." />
-            <button id="testChatSend">Send</button>
-        </div>
-
-        <script>
-                document.getElementById('testChatSend').addEventListener('click', async function () {
-                    const input = document.getElementById('testChatInput');
-                    const messagesDiv = document.getElementById('testChatMessages');
-                    const text = input.value;
-                    if (!text) return;
-
-                    messagesDiv.innerHTML += `<div><b>You:</b> ${text}</div>`;
-                    input.value = '';
-
-                    const response = await fetch('/api/chat/send', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: text })
-                    });
-
-                    const data = await response.json();
-                    messagesDiv.innerHTML += `<div><b>Bot:</b> ${response.ok ? data.message : JSON.stringify(data)}</div>`;
-                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                });
-        </script>
+        <partial name="_AIChatWidget" />
     }
 
     <header class="site-header">
@@ -335,6 +310,10 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/cookie-consent.js" asp-append-version="true"></script>
     <script src="~/js/search-autocomplete.js" asp-append-version="true"></script>
+    @if (isAuthenticated)
+    {
+        <script src="~/js/ai-chat.js" asp-append-version="true"></script>
+    }
     @await RenderSectionAsync("Scripts", required: false)
 
 
