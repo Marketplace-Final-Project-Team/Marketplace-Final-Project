@@ -40,7 +40,7 @@ public class ProductsController : Controller
         _sharedLocalizer = sharedLocalizer;
     }
 
-    public async Task<IActionResult> Index(Guid? businessId, string? search, string filter = "all")
+    public async Task<IActionResult> Index(Guid? businessId, string? search, string filter = "all", Guid? categoryId = null)
     {
         var userId = GetCurrentUserId();
         if (userId is null) return Challenge();
@@ -78,6 +78,8 @@ public class ProductsController : Controller
         {
             Search = search,
             Filter = string.IsNullOrWhiteSpace(filter) ? "all" : filter,
+            CategoryId = categoryId,
+            CategoryName = categoryId.HasValue ? products.FirstOrDefault(p => p.CategoryId == categoryId.Value)?.Category?.Name : null,
             AllCount = products.Count,
             ActiveCount = products.Count(p => p.Status == ProductStatus.Active),
             PendingCount = products.Count(p => p.Status == ProductStatus.Pending),
@@ -94,6 +96,11 @@ public class ProductsController : Controller
             "hidden" => products.Where(IsHidden),
             _ => products
         };
+
+        if (categoryId.HasValue)
+        {
+            filtered = filtered.Where(p => p.CategoryId == categoryId.Value);
+        }
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -125,6 +132,45 @@ public class ProductsController : Controller
         }).ToList();
 
         return View(model);
+    }
+
+    public async Task<IActionResult> Categories(Guid? businessId)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Challenge();
+
+        var businesses = await _businessAccessService.GetAccessibleBusinessesAsync(userId, BusinessPermissions.ProductCrud);
+        if (businesses.Count == 0)
+        {
+            TempData["Error"] = "У вас поки немає бізнесу з доступом до керування товарами.";
+            return View(new List<ProductCategorySummaryViewModel>());
+        }
+
+        var selectedBusinessId = businessId ?? businesses[0].Id;
+        if (!await _businessAccessService.HasAccessAsync(selectedBusinessId, userId, BusinessPermissions.ProductCrud))
+        {
+            return Forbid();
+        }
+
+        ViewBag.SelectedBusinessId = selectedBusinessId;
+
+        var products = await _productService.GetByBusinessAsync(selectedBusinessId);
+        var allCategories = await _categoryRepository.GetAllAsync();
+
+        var summaries = allCategories
+            .Select(c => new ProductCategorySummaryViewModel
+            {
+                CategoryId = c.Id,
+                CategoryName = c.Name,
+                ProductCount = products.Count(p => p.CategoryId == c.Id),
+                ActiveProductCount = products.Count(p => p.CategoryId == c.Id && p.Status == ProductStatus.Active)
+            })
+            .Where(c => c.ProductCount > 0)
+            .OrderByDescending(c => c.ProductCount)
+            .ThenBy(c => c.CategoryName)
+            .ToList();
+
+        return View(summaries);
     }
 
     [HttpGet]
