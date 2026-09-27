@@ -28,7 +28,7 @@
 
         @if (BusinessPermissions.Statistics.Contains(role))
         {
-            <a class="@ActiveClass("Dashboard")" asp-action="Dashboard" asp-route-businessId="@Model">@Localizer["Дашборд"]</a>
+            <a class="@ActiveClass("Dashboard")" asp-controller="Business" asp-action="Dashboard" asp-route-businessId="@Model">@Localizer["Дашборд"]</a>
         }
 
         @if (BusinessPermissions.ProductCrud.Contains(role))
@@ -36,29 +36,29 @@
             <a class="@(isProductsSection ? "is-active" : "")" asp-controller="Products" asp-action="Index" asp-route-businessId="@Model">@Localizer["Товари"]</a>
         }
 
-        <a class="@ActiveClass("Orders")" asp-action="Orders" asp-route-businessId="@Model">@SharedLocalizer["Замовлення"]</a>
-        <a class="@ActiveClass("Returns")" asp-action="Returns" asp-route-businessId="@Model">@Localizer["Повернення"]</a>
+        <a class="@ActiveClass("Orders")" asp-controller="Business" asp-action="Orders" asp-route-businessId="@Model">@SharedLocalizer["Замовлення"]</a>
+        <a class="@ActiveClass("Returns")" asp-controller="Business" asp-action="Returns" asp-route-businessId="@Model">@Localizer["Повернення"]</a>
 
         @if (BusinessPermissions.Statistics.Contains(role))
         {
-            <a class="@ActiveClass("Finance")" asp-action="Finance" asp-route-businessId="@Model">@Localizer["Фінанси"]</a>
-            <a class="@ActiveClass("Performance")" asp-action="Performance" asp-route-businessId="@Model">@Localizer["Ефективність"]</a>
-            <a class="@ActiveClass("Growth")" asp-action="Growth" asp-route-businessId="@Model">@Localizer["Розвиток"]</a>
+            <a class="@ActiveClass("Finance")" asp-controller="Business" asp-action="Finance" asp-route-businessId="@Model">@Localizer["Фінанси"]</a>
+            <a class="@ActiveClass("Performance")" asp-controller="Business" asp-action="Performance" asp-route-businessId="@Model">@Localizer["Ефективність"]</a>
+            <a class="@ActiveClass("Growth")" asp-controller="Business" asp-action="Growth" asp-route-businessId="@Model">@Localizer["Розвиток"]</a>
         }
 
         @if (BusinessPermissions.PromoCodes.Contains(role))
         {
-            <a class="@ActiveClass("PromoCodes")" asp-action="PromoCodes" asp-route-businessId="@Model">@Localizer["Знижки"]</a>
+            <a class="@ActiveClass("PromoCodes")" asp-controller="Business" asp-action="PromoCodes" asp-route-businessId="@Model">@Localizer["Знижки"]</a>
         }
 
         @if (BusinessPermissions.ManageTeam.Contains(role))
         {
-            <a class="@ActiveClass("Team")" asp-action="Team" asp-route-businessId="@Model">@Localizer["Команда"]</a>
+            <a class="@ActiveClass("Team")" asp-controller="Business" asp-action="Team" asp-route-businessId="@Model">@Localizer["Команда"]</a>
         }
 
         @if (BusinessPermissions.EditBusinessProfile.Contains(role))
         {
-            <a class="@ActiveClass("Settings")" asp-action="Settings" asp-route-businessId="@Model">@Localizer["Налаштування"]</a>
+            <a class="@ActiveClass("Settings")" asp-controller="Business" asp-action="Settings" asp-route-businessId="@Model">@Localizer["Налаштування"]</a>
         }
     </nav>
 }

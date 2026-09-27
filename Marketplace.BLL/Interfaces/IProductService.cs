@@ -17,6 +17,7 @@ namespace Marketplace.BLL.Interfaces
         Task<IReadOnlyList<CatalogProductDto>> GetSearchSuggestionsAsync(string? term, int limit = 8, bool allowAdultContent = false);
         Task<byte[]> ExportToExcelAsync(Guid businessId);
         Task<ProductImportResultDto> ImportFromExcelAsync(Guid businessId, Stream fileStream);
+        Task<byte[]> GetImportExampleAsync();
         Task<IReadOnlyList<ReservedProductDto>> GetReservedProductsAsync(Guid businessId);
         Task<IReadOnlyList<StockForecastDto>> GetStockForecastAsync(Guid businessId, int lookbackDays = 30);
         Task<ServiceResult> UpdateQuantityAsync(Guid productId, int quantity);

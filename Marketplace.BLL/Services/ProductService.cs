@@ -502,6 +502,62 @@ public class ProductService : IProductService
         return stream.ToArray();
     }
 
+    public async Task<byte[]> GetImportExampleAsync()
+    {
+        var sampleCategories = await _context.Categories
+            .AsNoTracking()
+            .OrderBy(c => c.Name)
+            .Select(c => c.Name)
+            .Take(2)
+            .ToListAsync();
+
+        var categoryA = sampleCategories.ElementAtOrDefault(0) ?? "Електроніка";
+        var categoryB = sampleCategories.ElementAtOrDefault(1) ?? "Одяг";
+
+        using var workbook = new XLWorkbook();
+        var sheet = workbook.Worksheets.Add("Товари");
+
+        for (var col = 0; col < ExcelHeaders.Length; col++)
+        {
+            sheet.Cell(1, col + 1).Value = ExcelHeaders[col];
+            sheet.Cell(1, col + 1).Style.Font.Bold = true;
+        }
+
+        var exampleRows = new (string Sku, string Name, string Description, string Category, decimal Price, int Quantity)[]
+        {
+            ("", "Бездротові навушники Sound Pro", "Навушники з активним шумозаглушенням і зарядом до 30 годин.", categoryA, 1499.00m, 25),
+            ("SKU-00231", "Джинсова куртка", "Класична джинсова куртка унісекс, розмір вказується під час створення товару.", categoryB, 1450.00m, 12)
+        };
+
+        var row = 2;
+        foreach (var example in exampleRows)
+        {
+            sheet.Cell(row, 1).Value = example.Sku;
+            sheet.Cell(row, 2).Value = example.Name;
+            sheet.Cell(row, 3).Value = example.Description;
+            sheet.Cell(row, 4).Value = example.Category;
+            sheet.Cell(row, 5).Value = example.Price;
+            sheet.Cell(row, 6).Value = example.Quantity;
+            sheet.Cell(row, 7).Value = string.Empty;
+            row++;
+        }
+
+        var noteRow = row + 1;
+        sheet.Cell(noteRow, 1).Value = "Підказки:";
+        sheet.Cell(noteRow, 1).Style.Font.Bold = true;
+        sheet.Cell(noteRow + 1, 1).Value = "- Порожній «Артикул (SKU)» = новий товар буде створено.";
+        sheet.Cell(noteRow + 2, 1).Value = "- Якщо «Артикул (SKU)» збігається з наявним товаром - товар оновиться.";
+        sheet.Cell(noteRow + 3, 1).Value = "- «Категорія» має точно збігатися з назвою наявної категорії каталогу.";
+        sheet.Cell(noteRow + 4, 1).Value = "- «Статус» не імпортується - будь-який змінений товар повторно йде на модерацію.";
+        sheet.Cell(noteRow + 5, 1).Value = "- Товари з розмірами (одяг/взуття) через імпорт не оновлюються - редагуйте їх вручну.";
+
+        sheet.Columns().AdjustToContents();
+
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        return stream.ToArray();
+    }
+
     public async Task<ProductImportResultDto> ImportFromExcelAsync(Guid businessId, Stream fileStream)
     {
         var result = new ProductImportResultDto();

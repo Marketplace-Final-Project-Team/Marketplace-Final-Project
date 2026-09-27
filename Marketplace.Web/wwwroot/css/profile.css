@@ -216,7 +216,7 @@
 }
 
 .profile-hub-card {
-    align-items: flex-start;
+    align-items: center;
     background: #fff;
     border: 1px solid var(--profile-line);
     border-radius: 1.1rem;

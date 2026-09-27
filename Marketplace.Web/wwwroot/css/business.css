@@ -125,6 +125,16 @@
 .seller-alert p { margin: 0; }
 .seller-alert strong { display: block; font-size: 0.78rem; }
 
+.seller-alert--warning {
+    background: #fff9e8;
+    border-color: #f4d77d;
+    color: #755000;
+}
+
+.seller-alert--warning > span {
+    background: #c8870b;
+}
+
 .seller-store-list {
     display: grid;
     gap: 1.5rem;
