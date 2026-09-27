@@ -1,4 +1,4 @@
-name: EKS Build and Push
+name: ECR Build
 
 on:
   push:
