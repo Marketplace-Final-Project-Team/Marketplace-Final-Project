@@ -33,27 +33,31 @@
         @if (businessOptions.Any())
         {
             <div class="products-heading__actions">
-                <a asp-action="ExportExcel" asp-route-businessId="@selectedBusinessId" class="btn btn-outline-secondary">@Localizer["Експорт"]</a>
-                <form asp-action="ImportExcel" method="post" enctype="multipart/form-data" class="products-import-form">
-                    <input type="hidden" name="businessId" value="@selectedBusinessId" />
-                    <label class="btn btn-outline-secondary" for="importFile">@Localizer["Імпорт"]</label>
-                    <input type="file" id="importFile" name="file" accept=".xlsx" class="visually-hidden" data-auto-submit />
-                </form>
+                <div class="dropdown">
+                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        @Localizer["Прайс (Excel)"]
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end products-price-menu">
+                        <li><a class="dropdown-item" asp-action="ExportExcel" asp-route-businessId="@selectedBusinessId">@Localizer["Експортувати асортимент"]</a></li>
+                        <li><label class="dropdown-item" for="importFile" role="button">@Localizer["Імпортувати з файлу"]</label></li>
+                        <li><hr class="dropdown-divider" /></li>
+                        <li><a class="dropdown-item" asp-action="ExportExample">@Localizer["Завантажити приклад файлу"]</a></li>
+                        <li><hr class="dropdown-divider" /></li>
+                        <li>
+                            <p class="dropdown-item-text products-price-menu__hint">
+                                @Localizer["Рядок з артикулом наявного товару оновить його, рядок без артикулу створить новий. «Категорія» має точно збігатися з назвою в каталозі; товари з розмірами через імпорт не оновлюються. Змінені товари повторно проходять модерацію."]
+                            </p>
+                        </li>
+                    </ul>
+                    <form asp-action="ImportExcel" method="post" enctype="multipart/form-data" class="products-import-form">
+                        <input type="hidden" name="businessId" value="@selectedBusinessId" />
+                        <input type="file" id="importFile" name="file" accept=".xlsx" class="visually-hidden" data-auto-submit />
+                    </form>
+                </div>
                 <a asp-action="Create" class="btn btn-primary">+ @Localizer["Додати товар"]</a>
             </div>
         }
     </header>
-
-    @if (businessOptions.Any())
-    {
-        <div class="product-note mb-3">
-            <strong>@Localizer["Як працює імпорт/експорт прайсу"]</strong>
-            <p class="mb-2">
-                @Localizer["Натисніть «Експорт», щоб отримати Excel-файл із поточним асортиментом. Відредагуйте його і завантажте назад кнопкою «Імпорт»: рядки з артикулом наявного товару оновлять його, рядки без артикулу створять нові товари. «Категорія» має точно збігатися з назвою категорії в каталозі, а товари з розмірами (одяг/взуття) через імпорт не оновлюються - редагуйте їх вручну. Після імпорту змінені товари повторно проходять модерацію."]
-            </p>
-            <a asp-action="ExportExample">@Localizer["Завантажити приклад файлу →"]</a>
-        </div>
-    }
 
     @if (selectedBusinessId.HasValue)
     {

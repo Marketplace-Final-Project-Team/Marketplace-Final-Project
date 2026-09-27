@@ -238,6 +238,26 @@
     display: inline-flex;
 }
 
+.products-price-menu {
+    padding: 0.4rem;
+    width: 20rem;
+}
+
+.products-price-menu .dropdown-item {
+    border-radius: 0.6rem;
+    cursor: pointer;
+    padding: 0.5rem 0.75rem;
+}
+
+.products-price-menu__hint {
+    color: var(--products-muted);
+    font-size: 0.76rem;
+    line-height: 1.45;
+    margin: 0;
+    padding: 0.25rem 0.75rem 0.1rem;
+    white-space: normal;
+}
+
 .products-search-form {
     display: flex;
     gap: 0.6rem;
