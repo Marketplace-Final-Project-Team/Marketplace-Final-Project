@@ -24,6 +24,7 @@ public class OrderController : Controller
     private readonly IGenericRepository<Address> _addressRepository;
     private readonly AppDbContext _context;
     private readonly IActivityLogService _activityLog;
+    private readonly INotificationService _notificationService;
 
     public OrderController(
         IOrderService orderService,
@@ -33,7 +34,8 @@ public class OrderController : Controller
         IPromoCodeService promoCodeService,
         IGenericRepository<Address> addressRepository,
         AppDbContext context,
-        IActivityLogService activityLog)
+        IActivityLogService activityLog,
+        INotificationService notificationService)
     {
         _orderService = orderService;
         _cartService = cartService;
@@ -43,6 +45,7 @@ public class OrderController : Controller
         _addressRepository = addressRepository;
         _context = context;
         _activityLog = activityLog;
+        _notificationService = notificationService;
     }
 
     [HttpGet]
@@ -65,7 +68,14 @@ public class OrderController : Controller
     public async Task<IActionResult> Details(Guid id)
     {
         var model = await BuildOrderDetails(id);
-        return model is null ? NotFound() : View(model);
+        if (model is null)
+        {
+            return NotFound();
+        }
+
+        await _notificationService.MarkOrderViewedAsync(GetUserId(), id);
+
+        return View(model);
     }
 
     [HttpGet]

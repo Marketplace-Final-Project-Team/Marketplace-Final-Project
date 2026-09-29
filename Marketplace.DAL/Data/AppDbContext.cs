@@ -47,7 +47,6 @@ namespace Marketplace.DAL.Data
         public DbSet<RefundChatMessage> RefundChatMessages { get; set; }
 
         public DbSet<WithdrawalRequest> WithdrawalRequests { get; set; }
-        public DbSet<RefundChatMessage> ChatMessages { get; set; }
         public DbSet<AIChatMessage> AIChatMessages { get; set; }
 
         public DbSet<ReviewAppeal> ReviewAppeals { get; set; }

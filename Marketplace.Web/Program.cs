@@ -135,6 +135,8 @@ builder.Services.AddScoped<ISupportTicketService, SupportTicketService>();
 builder.Services.AddScoped<IWithdrawalService, WithdrawalService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddSignalR();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<Marketplace.BLL.Interfaces.INotificationPusher, Marketplace.Web.Infrastructure.SignalRNotificationPusher>();
 
 builder.Services.AddScoped<IGeminiChatApiClient, GeminiChatApiClient>();
 builder.Services.AddScoped<ChatToolDispatcher>();
@@ -208,6 +210,7 @@ app.MapStaticAssets();
 app.MapControllers();
 app.MapHub<Marketplace.Web.Hubs.RefundChatHub>("/refundChatHub");
 app.MapHub<Marketplace.Web.Hubs.SupportTicketChatHub>("/supportTicketChatHub");
+app.MapHub<Marketplace.Web.Hubs.NotificationHub>("/notificationHub");
 app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}")

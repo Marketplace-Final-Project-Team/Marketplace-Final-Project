@@ -1,7 +1,9 @@
 ﻿using Marketplace.BLL.Interfaces;
+using Marketplace.DAL.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace Marketplace.Web.Hubs
@@ -10,10 +12,14 @@ namespace Marketplace.Web.Hubs
     public class RefundChatHub : Hub
     {
         private readonly IRefundChatService _chatService;
+        private readonly IHubContext<NotificationHub> _notificationHub;
+        private readonly AppDbContext _context;
 
-        public RefundChatHub(IRefundChatService chatService)
+        public RefundChatHub(IRefundChatService chatService, IHubContext<NotificationHub> notificationHub, AppDbContext context)
         {
             _chatService = chatService;
+            _notificationHub = notificationHub;
+            _context = context;
         }
 
         private static string BuildGroupName(Guid requestId, bool isSellerChannel) =>
@@ -52,6 +58,20 @@ namespace Marketplace.Web.Hubs
                 text = message.Text,
                 sentAt = message.SentAt
             });
+
+           
+            if (isAdmin && !isSellerChannel)
+            {
+                var request = await _context.PostSaleRequests.FirstOrDefaultAsync(r => r.Id == requestId);
+                if (request is not null)
+                {
+                    await _notificationHub.Clients.User(request.BuyerId).SendAsync("ReceiveNotification", new
+                    {
+                        text = "Нове повідомлення від адміністратора щодо вашого повернення.",
+                        type = "RefundChat"
+                    });
+                }
+            }
         }
     }
 }
