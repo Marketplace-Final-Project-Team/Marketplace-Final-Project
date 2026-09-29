@@ -24,5 +24,8 @@ namespace Marketplace.Domain.Entities
 
         public DateTime? SellerConfirmDeadline { get; set; }
         public string? SellerDisputeReason { get; set; }
+
+        public DateTime? BuyerLastViewedAt { get; set; }
+        public DateTime? StatusChangedAt { get; set; }
     }
 }

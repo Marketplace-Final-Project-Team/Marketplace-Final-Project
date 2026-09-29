@@ -119,51 +119,112 @@
         }
     </section>
 
-    <section class="business-panel" data-collapsible>
+    <section class="business-panel payout-section" data-collapsible>
         <partial name="_CollapseToggle" />
-        <h2>@Localizer["Виплати"]</h2>
-        <p class="business-panel__lead">@Localizer["Доступний баланс:"] <strong>@Model.AvailableBalance.ToString("N2") ₴</strong>@(Model.PendingWithdrawalsTotal > 0 ? $" ({Localizer["з них"].Value} {Model.PendingWithdrawalsTotal:N2} ₴ {Localizer["вже в заявках на розгляді"].Value})" : "")</p>
-        @if (BusinessRoleContext.CanRequestPayout(currentRole))
-        {
-            <button type="button" class="seller-button seller-button--secondary mt-2" data-open-payout-request>@Localizer["Запросити виплату"]</button>
-        }
-        else
-        {
-            <p class="business-empty">@Localizer["Запит на виплату може подати лише власник магазину."]</p>
-        }
+        <h2 class="mb-3">@Localizer["Виплати"]</h2>
 
-        @if (Model.Withdrawals.Count == 0)
-        {
-            <p class="business-empty mt-3">@Localizer["Заявок на виплату ще не було."]</p>
-        }
-        else
-        {
-            <div class="table-responsive mt-3">
-                <table class="business-table">
-                    <thead>
-                        <tr><th>@Localizer["Дата"]</th><th>@Localizer["Сума"]</th><th>@Localizer["Картка"]</th><th>@Localizer["Отримувач"]</th><th>@Localizer["Статус"]</th></tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var withdrawal in Model.Withdrawals)
-                        {
-                            <tr>
-                                <td>@withdrawal.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
-                                <td>@withdrawal.Amount.ToString("N2") ₴</td>
-                                <td>@MaskCard(withdrawal.CardNumber)</td>
-                                <td>@withdrawal.RecipientName</td>
-                                <td>
-                                    @WithdrawalStatusLabel(withdrawal.Status)
-                                    @if (!string.IsNullOrWhiteSpace(withdrawal.Message))
-                                    {
-                                        <div class="business-panel__lead" style="margin:0;">@withdrawal.Message</div>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+        <div class="payout-grid mt-3">
+            <!-- Карточка баланса -->
+            <div class="payout-card payout-card--primary">
+                <div class="payout-card__header">
+                    <span class="payout-card__label">@Localizer["Доступний баланс"]</span>
+                    @if (Model.PendingWithdrawalsTotal > 0)
+                    {
+                        <span class="payout-badge payout-badge--warning">
+                            @Localizer["В обробці:"] @Model.PendingWithdrawalsTotal.ToString("N2") ₴
+                        </span>
+                    }
+                </div>
+                
+                <div class="payout-card__amount">
+                    @Model.AvailableBalance.ToString("N2") ₴
+                </div>
+
+                <div class="payout-card__actions">
+                    @if (BusinessRoleContext.CanRequestPayout(currentRole))
+                    {
+                        <button type="button" 
+                                class="seller-button seller-button--primary btn-payout-action" 
+                                data-open-payout-request 
+                                @(Model.AvailableBalance <= 0 ? "disabled" : "")>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+                                <path d="M12 5v14M5 12h14"/>
+                            </svg>
+                            @Localizer["Запросити виплату"]
+                        </button>
+                    }
+                    else
+                    {
+                        <p class="business-empty mb-0">@Localizer["Запит на виплату може подати лише власник магазину."]</p>
+                    }
+                </div>
             </div>
-        }
+
+            <!-- Информационный блок -->
+            <div class="payout-card payout-card--info">
+                <h4 class="payout-card__sub-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+                    </svg>
+                    @Localizer["Умови та регламент"]
+                </h4>
+                <ul class="payout-info-list">
+                    <li><span>@Localizer["Мінімальна сума:"]</span> <strong>0.01 ₴</strong></li>
+                    <li><span>@Localizer["Термін обробки:"]</span> <strong>1–3 робочі дні</strong></li>
+                    <li><span>@Localizer["Комісія:"]</span> <strong>0%</strong></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Таблица истории или Empty State -->
+        <div class="payout-history mt-4">
+            <h3 class="h6 text-muted mb-3">@Localizer["Історія заявок"]</h3>
+
+            @if (Model.Withdrawals.Count == 0)
+            {
+                <div class="payout-empty-state">
+                    <div class="payout-empty-state__icon">💳</div>
+                    <div>
+                        <h5 class="mb-1">@Localizer["Заявок на виплату ще не було"]</h5>
+                        <p class="text-muted mb-0 small">@Localizer["Після оформлення першого запиту тут з'явиться детальний статус та історія транзакцій."]</p>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="business-table">
+                        <thead>
+                            <tr>
+                                <th>@Localizer["Дата"]</th>
+                                <th>@Localizer["Сума"]</th>
+                                <th>@Localizer["Картка"]</th>
+                                <th>@Localizer["Отримувач"]</th>
+                                <th>@Localizer["Статус"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var withdrawal in Model.Withdrawals)
+                            {
+                                <tr>
+                                    <td>@withdrawal.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                                    <td><strong>@withdrawal.Amount.ToString("N2") ₴</strong></td>
+                                    <td>@MaskCard(withdrawal.CardNumber)</td>
+                                    <td>@withdrawal.RecipientName</td>
+                                    <td>
+                                        @WithdrawalStatusLabel(withdrawal.Status)
+                                        @if (!string.IsNullOrWhiteSpace(withdrawal.Message))
+                                        {
+                                            <div class="business-panel__lead" style="margin:0;">@withdrawal.Message</div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
     </section>
 
     <section class="business-panel">
