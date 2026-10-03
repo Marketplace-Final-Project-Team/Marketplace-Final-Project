@@ -10,7 +10,7 @@ services:
       #ports:
       #  - "9090:9090"
       volumes:
-        - ./Monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+        - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       restart: unless-stopped
 
     grafana:
@@ -19,7 +19,7 @@ services:
       #ports:
       #  - "3000:3000"
       volumes:
-        - ./Monitoring/grafana/provisioning:/etc/grafana/provisioning
+        - ./grafana/provisioning:/etc/grafana/provisioning
       depends_on:
         - prometheus
       restart: unless-stopped
@@ -29,4 +29,4 @@ services:
       image: grafana/k6:2.1.0
       container_name: marketplace-k6
       volumes:
-        - ./Monitoring/k6:/scripts
+        - ./k6:/scripts
