@@ -1,6 +1,7 @@
 @model ProfileUpdateViewModel
 
 @{
+    Layout = "_ProfileLayout";
     ViewData["Title"] = Localizer["Редагування профілю"];
     var initial = string.IsNullOrWhiteSpace(Model.Username) ? "U" : Model.Username[..1].ToUpperInvariant();
 }
