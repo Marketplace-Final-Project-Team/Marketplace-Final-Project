@@ -90,7 +90,16 @@ public class CatalogueController : Controller
             PageSize = result.PageSize,
             TotalPages = result.TotalPages,
             SelectedCategoryName = selectedCategory?.Name,
-            SelectedCategoryImageUrl = selectedCategory?.ImageUrl
+            SelectedCategoryImageUrl = selectedCategory?.ImageUrl,
+            CategoryTiles = categories
+                .Select(category => new CatalogCategoryTileViewModel
+                {
+                    Id = category.Id,
+                    Name = category.Name,
+                    ImageUrl = category.ImageUrl,
+                    ProductCount = category.ActiveProductCount
+                })
+                .ToList()
         };
 
         return View("~/Views/Catalog/Index.cshtml", model);

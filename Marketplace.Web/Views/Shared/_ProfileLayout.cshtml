@@ -1,0 +1,19 @@
+@{
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile-nav.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+}
+
+<div class="profile-shell">
+    <partial name="_ProfileNav" />
+    <div class="profile-shell__content">
+        @RenderBody()
+    </div>
+</div>
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+}
