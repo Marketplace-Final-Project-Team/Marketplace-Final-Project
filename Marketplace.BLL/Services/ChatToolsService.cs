@@ -11,8 +11,7 @@ using Marketplace.Domain.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Reflection.Metadata.Ecma335;
+using Marketplace.DAL.Interfaces;
 
 namespace Marketplace.BLL.Services
 {
@@ -28,8 +27,8 @@ namespace Marketplace.BLL.Services
         private readonly IGenericRepository<Category> _categoryRepo;
         private readonly IGenericRepository<BusinessMember> _businessMemberRepo;
         private readonly IGenericRepository<Business> _businessRepo;
-        private readonly OrderRepository _orderRepo;
-        private readonly BusinessAccessService _businessAccessService;
+        private readonly IOrderRepository _orderRepo;
+        private readonly IBusinessAccessService _businessAccessService;
         private readonly AppDbContext _context;
 
         private readonly DateTime RightNow = DateTime.UtcNow.Date;
@@ -45,8 +44,8 @@ namespace Marketplace.BLL.Services
             IGenericRepository<Category> categoryRepo,
             IGenericRepository<BusinessMember> businessMemberRepo,
             IGenericRepository<Business> businessRepo,
-            OrderRepository orderRepo,
-            BusinessAccessService buisnessAccessService,
+            IOrderRepository orderRepo,
+            IBusinessAccessService buisnessAccessService,
             AppDbContext context
             )
         {
