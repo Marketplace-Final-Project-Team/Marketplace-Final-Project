@@ -1502,3 +1502,173 @@
         grid-template-columns: 1fr;
     }
 }
+
+
+
+/* ---------- Withdrawal-specific status pills ---------- */
+
+.admin-status--processing {
+    background: #e8f1ff;
+    color: #1d4ed8;
+}
+
+.admin-status--completed {
+    background: #e8f7ef;
+    color: #16794a;
+}
+
+.admin-status--failed {
+    background: #feeceb;
+    color: #b42318;
+}
+
+/* ---------- Withdrawals page ---------- */
+
+.admin-card-chip {
+    align-items: center;
+    color: var(--admin-ink);
+    display: inline-flex;
+    font-variant-numeric: tabular-nums;
+    gap: 0.4rem;
+}
+
+    .admin-card-chip svg {
+        color: var(--admin-muted);
+        flex: 0 0 auto;
+    }
+
+.admin-amount {
+    font-weight: 750;
+}
+
+.admin-status-note {
+    color: var(--admin-muted);
+    font-size: 0.76rem;
+    margin-top: 0.25rem;
+    max-width: 14rem;
+}
+
+.admin-empty-state {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 3.5rem 1rem;
+    text-align: center;
+}
+
+.admin-empty-state__icon {
+    align-items: center;
+    background: var(--admin-soft);
+    border-radius: 50%;
+    color: var(--admin-muted);
+    display: flex;
+    height: 3.25rem;
+    justify-content: center;
+    width: 3.25rem;
+}
+
+.admin-empty-state strong {
+    color: var(--admin-ink);
+    font-size: 0.98rem;
+}
+
+.admin-empty-state span {
+    color: var(--admin-muted);
+    font-size: 0.85rem;
+    max-width: 22rem;
+}
+
+.admin-pill-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-bottom: 1.5rem;
+}
+
+.admin-pill-filter__btn {
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-line);
+    border-radius: 999px;
+    color: var(--admin-muted);
+    font-size: 0.88rem;
+    font-weight: 650;
+    padding: 0.55rem 1.15rem;
+    text-decoration: none;
+    transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+    white-space: nowrap;
+}
+
+    .admin-pill-filter__btn:hover {
+        border-color: var(--admin-primary);
+        color: var(--admin-primary);
+    }
+
+    .admin-pill-filter__btn.is-active {
+        background: var(--admin-primary);
+        border-color: var(--admin-primary);
+        box-shadow: 0 0.4rem 1rem rgba(54, 89, 217, 0.28);
+        color: #fff;
+    }
+
+.admin-kpi-row {
+    display: flex;
+    flex-wrap: wrap;
+    border: 1px solid var(--admin-line);
+    border-radius: 0.9rem;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.admin-kpi {
+    border-right: 1px solid var(--admin-line);
+    flex: 1 1 10rem;
+    padding: 1rem 1.25rem;
+}
+
+    .admin-kpi:last-child {
+        border-right: none;
+    }
+
+    .admin-kpi span {
+        color: var(--admin-muted);
+        display: block;
+        font-size: 0.78rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .admin-kpi strong {
+        color: var(--admin-ink);
+        display: block;
+        font-size: 1.3rem;
+        font-weight: 780;
+    }
+
+@media (max-width: 767.98px) {
+    .admin-kpi {
+        border-bottom: 1px solid var(--admin-line);
+        border-right: none;
+        flex: 1 1 45%;
+    }
+}
+
+.admin-panel--flat {
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-line);
+    border-radius: 0.9rem;
+    box-shadow: none;
+    padding: 1.35rem 1.5rem;
+}
+
+    .admin-panel--flat h2 {
+        color: var(--admin-ink);
+        font-size: 1.05rem;
+        font-weight: 750;
+        margin: 0 0 0.3rem;
+    }
+
+    .admin-panel--flat > p {
+        color: var(--admin-muted);
+        font-size: 0.85rem;
+        margin: 0 0 1rem;
+    }

@@ -22,6 +22,7 @@ namespace Marketplace.BLL.Services
         private readonly IMarketplaceBalanceService _marketplaceBalanceService;
         private readonly IOrderService _orderService;
         private readonly ISchedulerFactory _schedulerFactory;
+        private readonly INotificationPusher _notificationPusher;
 
         public PostSaleService(
              AppDbContext context,
@@ -29,7 +30,8 @@ namespace Marketplace.BLL.Services
              IPaymentService paymentService,
              IMarketplaceBalanceService marketplaceBalanceService,
              IOrderService orderService,
-             ISchedulerFactory schedulerFactory)
+             ISchedulerFactory schedulerFactory,
+             INotificationPusher notificationPusher)
         {
             _context = context;
             _imageStorageService = imageStorageService;
@@ -37,7 +39,7 @@ namespace Marketplace.BLL.Services
             _marketplaceBalanceService = marketplaceBalanceService;
             _orderService = orderService;
             _schedulerFactory = schedulerFactory;
-
+            _notificationPusher = notificationPusher;
         }
 
         public async Task<ServiceResult> CreateRequestAsync(string buyerId, Guid orderItemId, string reason, string comment, List<IFormFile> photos)
@@ -248,11 +250,11 @@ namespace Marketplace.BLL.Services
             request.SellerConfirmDeadline ??= DateTime.UtcNow.AddDays(7);
             request.SellerDisputeReason = null;
             request.UpdatedAt = DateTime.UtcNow;
+            request.StatusChangedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
 
-            // Плануємо автоматичну обробку рівно на момент дедлайну — ТІЛЬКИ при першому
-            // підтвердженні. При повторному (після спору продавця) — задача вже запланована раніше.
+          
             if (isFirstApproval)
             {
                 var scheduler = await _schedulerFactory.GetScheduler();
@@ -270,6 +272,9 @@ namespace Marketplace.BLL.Services
 
                 await scheduler.ScheduleJob(job, trigger);
             }
+
+            await _notificationPusher.PushToUserAsync(request.BuyerId,
+                "Адміністратор підтвердив вашу заявку на повернення — очікуємо продавця.", "ReturnStatus");
 
             return new ServiceResult { Succeeded = true, Message = "Заявку підтверджено. Очікуємо підтвердження продавця.", EntityId = request.Id };
         }
@@ -297,11 +302,15 @@ namespace Marketplace.BLL.Services
             request.SellerResponse = reason.Trim();
             request.ResolvedAt = DateTime.UtcNow;
             request.UpdatedAt = DateTime.UtcNow;
+            request.StatusChangedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
 
             var scheduler2 = await _schedulerFactory.GetScheduler();
             await scheduler2.DeleteJob(new JobKey($"postsale-deadline-job-{request.Id}", "postsale"));
+
+            await _notificationPusher.PushToUserAsync(request.BuyerId,
+                "У вашій заявці на повернення відмовлено.", "ReturnStatus");
 
             return new ServiceResult { Succeeded = true, Message = "Заявку відхилено.", EntityId = request.Id };
         }
@@ -336,6 +345,7 @@ namespace Marketplace.BLL.Services
             request.Status = PostSaleRequestStatus.SellerDisputed;
             request.SellerDisputeReason = reason.Trim();
             request.UpdatedAt = DateTime.UtcNow;
+            request.StatusChangedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
 
@@ -402,12 +412,16 @@ namespace Marketplace.BLL.Services
                 request.Status = PostSaleRequestStatus.Refunded;
                 request.ResolvedAt = DateTime.UtcNow;
                 request.UpdatedAt = DateTime.UtcNow;
+                request.StatusChangedAt = DateTime.UtcNow;
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
                 var scheduler = await _schedulerFactory.GetScheduler();
                 await scheduler.DeleteJob(new JobKey($"postsale-deadline-job-{request.Id}", "postsale"));
+
+                await _notificationPusher.PushToUserAsync(request.BuyerId,
+                    "Продавець підтвердив повернення — кошти вже повернуто.", "ReturnStatus");
 
                 return new ServiceResult { Succeeded = true, Message = "Повернення підтверджено, кошти повернуто покупцю.", EntityId = request.Id };
 

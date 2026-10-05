@@ -7,10 +7,7 @@ using Quartz;
 
 namespace Marketplace.BLL.Services
 {
-    // Запускається ОДНОРАЗОВО, точно в момент SellerConfirmDeadline (планується в
-    // PostSaleService.AdminApproveAsync). Якщо продавець нічого не зробив за 7 днів:
-    // 1. Пробуємо списати з балансу магазину (як при звичайному підтвердженні продавцем).
-    // 2. Якщо коштів не вистачає — маркетплейс покриває повернення сам і призупиняє магазин.
+
     public class PostSaleAutoResolveJob : IJob
     {
         public const string ActivityLogAction = "PostSaleAutoResolved";
@@ -21,6 +18,7 @@ namespace Marketplace.BLL.Services
         private readonly IMarketplaceBalanceService _marketplaceBalanceService;
         private readonly IActivityLogService _activityLog;
         private readonly ILogger<PostSaleAutoResolveJob> _logger;
+        private readonly INotificationPusher _notificationPusher;
 
         public PostSaleAutoResolveJob(
             AppDbContext context,
@@ -28,7 +26,8 @@ namespace Marketplace.BLL.Services
             IOrderService orderService,
             IMarketplaceBalanceService marketplaceBalanceService,
             IActivityLogService activityLog,
-            ILogger<PostSaleAutoResolveJob> logger)
+            ILogger<PostSaleAutoResolveJob> logger,
+            INotificationPusher notificationPusher)
         {
             _context = context;
             _paymentService = paymentService;
@@ -36,6 +35,7 @@ namespace Marketplace.BLL.Services
             _marketplaceBalanceService = marketplaceBalanceService;
             _activityLog = activityLog;
             _logger = logger;
+            _notificationPusher = notificationPusher;
         }
 
         public async Task Execute(IJobExecutionContext context)
@@ -48,8 +48,7 @@ namespace Marketplace.BLL.Services
                         .ThenInclude(p => p!.Business)
                 .FirstOrDefaultAsync(r => r.Id == requestId);
 
-            // Захисна перевірка — можливо, продавець уже підтвердив, або адмін вже
-            // остаточно відхилив заявку раніше, ніж спрацював цей таймер. Тоді нічого не робимо.
+           
             if (request is null || request.Status != PostSaleRequestStatus.AwaitingSellerConfirmation)
             {
                 _logger.LogInformation("Заявка {RequestId} вже не потребує автообробки (статус змінився).", requestId);
@@ -81,7 +80,7 @@ namespace Marketplace.BLL.Services
 
                 if (business.Balance >= netAmount)
                 {
-                    // На балансі продавця вистачає коштів — списуємо з нього, як завжди.
+                   
                     var stockResult = await _orderService.RefundOrderItemAsync(request.OrderItemId);
                     if (!stockResult.Succeeded)
                     {
@@ -96,8 +95,7 @@ namespace Marketplace.BLL.Services
                 }
                 else
                 {
-                    // Коштів на балансі магазину не вистачає — маркетплейс покриває повну суму сам
-                    // і призупиняє роботу магазину до з'ясування обставин.
+                   
                     var marketplaceBalance = await _marketplaceBalanceService.GetOrCreateTrackedAsync();
                     marketplaceBalance.Balance -= amount;
 
@@ -113,9 +111,13 @@ namespace Marketplace.BLL.Services
                 request.Status = PostSaleRequestStatus.Refunded;
                 request.ResolvedAt = DateTime.UtcNow;
                 request.UpdatedAt = DateTime.UtcNow;
+                request.StatusChangedAt = DateTime.UtcNow;
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
+
+                await _notificationPusher.PushToUserAsync(request.BuyerId,
+                    "Ваше повернення оброблено автоматично — кошти повернуто.", "ReturnStatus");
 
                 _logger.LogInformation("Заявка {RequestId} автоматично оброблена, статус Refunded.", requestId);
             }

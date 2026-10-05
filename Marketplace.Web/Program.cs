@@ -59,6 +59,15 @@ builder.Services.AddQuartz(q =>
         .WithIdentity("pending-order-expiry-trigger", "cleanup")
         .StartNow()
         .WithSimpleSchedule(x => x.WithIntervalInHours(1).RepeatForever()));
+
+    var cleanupJobKey = new JobKey("cleanup-old-ai-chat-messages-job", "cleanup");
+
+    q.AddJob<CleanupOldAIChatMessagesJob>(opts => opts.WithIdentity(cleanupJobKey));
+
+    q.AddTrigger(opts => opts
+        .ForJob(cleanupJobKey)
+        .WithIdentity("cleanup-old-ai-chat-messages-trigger", "cleanup")
+        .WithCronSchedule("0 0 3 * * ?"));
 });
 
 builder.Services.AddQuartzHostedService(opt =>
@@ -135,6 +144,8 @@ builder.Services.AddScoped<ISupportTicketService, SupportTicketService>();
 builder.Services.AddScoped<IWithdrawalService, WithdrawalService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddSignalR();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<Marketplace.BLL.Interfaces.INotificationPusher, Marketplace.Web.Infrastructure.SignalRNotificationPusher>();
 
 builder.Services.AddScoped<IGeminiChatApiClient, GeminiChatApiClient>();
 builder.Services.AddScoped<ChatToolDispatcher>();
@@ -208,6 +219,7 @@ app.MapStaticAssets();
 app.MapControllers();
 app.MapHub<Marketplace.Web.Hubs.RefundChatHub>("/refundChatHub");
 app.MapHub<Marketplace.Web.Hubs.SupportTicketChatHub>("/supportTicketChatHub");
+app.MapHub<Marketplace.Web.Hubs.NotificationHub>("/notificationHub");
 app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}")

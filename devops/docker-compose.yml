@@ -39,7 +39,7 @@ services:
         web:
           condition: service_started
       restart: unless-stopped
-
+  
   # ===== Monitoring =====
     prometheus:
       image: prom/prometheus:v3.13.2

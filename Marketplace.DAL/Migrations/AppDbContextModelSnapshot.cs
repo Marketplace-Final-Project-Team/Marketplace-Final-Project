@@ -514,6 +514,9 @@ namespace Marketplace.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<DateTime?>("BuyerLastViewedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
@@ -547,6 +550,9 @@ namespace Marketplace.DAL.Migrations
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("StatusChangedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -875,7 +881,7 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("PostSaleRequestId");
 
-                    b.ToTable("RefundChatMessage");
+                    b.ToTable("RefundChatMessages");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Review", b =>
