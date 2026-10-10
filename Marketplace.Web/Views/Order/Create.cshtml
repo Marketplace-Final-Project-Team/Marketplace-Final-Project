@@ -2,6 +2,25 @@
 
 @{
     ViewData["Title"] = Localizer["Оформлення замовлення"];
+    var checkoutMessages = new Dictionary<string, string>
+    {
+        ["Промокод недійсний або термін його дії минув."] = Localizer["Промокод недійсний або термін його дії минув."].Value,
+        ["Нова пошта"] = Localizer["Нова пошта"].Value,
+        ["Укрпошта"] = Localizer["Укрпошта"].Value,
+        ["Оплата при отриманні"] = Localizer["Оплата при отриманні"].Value,
+        ["LiqPay (онлайн)"] = Localizer["LiqPay (онлайн)"].Value,
+        ["Завантаження відділень…"] = Localizer["Завантаження відділень…"].Value,
+        ["Відділень не знайдено"] = Localizer["Відділень не знайдено"].Value,
+        ["Оберіть відділення"] = Localizer["Оберіть відділення"].Value,
+        ["Не вдалося завантажити відділення"] = Localizer["Не вдалося завантажити відділення"].Value,
+        ["Спочатку оберіть місто"] = Localizer["Спочатку оберіть місто"].Value,
+        ["Місто не знайдено"] = Localizer["Місто не знайдено"].Value,
+        ["Не вдалося завантажити міста"] = Localizer["Не вдалося завантажити міста"].Value,
+        ["Введіть промокод."] = Localizer["Введіть промокод."].Value,
+        ["Такий промокод не знайдено або він вже не діє."] = Localizer["Такий промокод не знайдено або він вже не діє."].Value,
+        ["Промокод {0} застосовано: знижка {1}% на товари магазину «{2}»."] = Localizer["Промокод {0} застосовано: знижка {1}% на товари магазину «{2}»."].Value,
+        ["Не вдалося перевірити промокод. Спробуйте ще раз."] = Localizer["Не вдалося перевірити промокод. Спробуйте ще раз."].Value,
+    };
     var units = Model.Items.Sum(item => item.Quantity);
 }
 
@@ -10,6 +29,8 @@
     <link rel="stylesheet" href="~/css/checkout.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/cart-sellers.css" asp-append-version="true" />
 }
+
+<script id="checkout-messages" type="application/json">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(checkoutMessages))</script>
 
 <div class="shop-page">
     <a asp-controller="Cart" asp-action="Index" class="shop-back">← @Localizer["Назад до кошика"]</a>
@@ -172,13 +193,17 @@
 
                         <div class="checkout-review-block">
                             <h3>@Localizer["Дані отримувача"]</h3>
-                            <p data-review-recipient>-</p>
+                            <dl>
+                                <div class="checkout-review-row"><dt>@Localizer["Отримувач"]</dt><dd data-review-recipient>-</dd></div>
+                                <div class="checkout-review-row"><dt>@Localizer["Телефон"]</dt><dd data-review-phone>-</dd></div>
+                            </dl>
                         </div>
 
                         <div class="checkout-review-block">
                             <h3>@Localizer["Доставка та оплата"]</h3>
                             <dl>
-                                <div class="checkout-review-row"><dt>@Localizer["Спосіб доставки"]</dt><dd data-review-carrier>-</dd></div>
+                                <div class="checkout-review-row"><dt>@Localizer["Служба доставки"]</dt><dd data-review-carrier>-</dd></div>
+                                <div class="checkout-review-row"><dt>@Localizer["Адреса"]</dt><dd data-review-address>-</dd></div>
                                 <div class="checkout-review-row"><dt>@Localizer["Спосіб оплати"]</dt><dd data-review-payment>-</dd></div>
                             </dl>
                         </div>
