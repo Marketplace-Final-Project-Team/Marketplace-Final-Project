@@ -1,6 +1,7 @@
 @model ProfileViewModel
 
 @{
+    Layout = "_ProfileLayout";
     ViewData["Title"] = SharedLocalizer["Мій профіль"];
     var profileInitial = string.IsNullOrWhiteSpace(Model.Username)
         ? "U"

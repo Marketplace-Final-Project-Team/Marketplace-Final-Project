@@ -15,6 +15,16 @@
         _ => status.ToString()
     };
 
+    private static string StatusModifier(Marketplace.Domain.Enums.WithdrawalStatus status) => status switch
+    {
+        Marketplace.Domain.Enums.WithdrawalStatus.Pending => "pending",
+        Marketplace.Domain.Enums.WithdrawalStatus.Processing => "processing",
+        Marketplace.Domain.Enums.WithdrawalStatus.Rejected => "rejected",
+        Marketplace.Domain.Enums.WithdrawalStatus.Completed => "completed",
+        Marketplace.Domain.Enums.WithdrawalStatus.Failed => "failed",
+        _ => "pending"
+    };
+
     private static string MaskCard(string cardNumber) => cardNumber.Length >= 4
         ? $"•••• {cardNumber[^4..]}"
         : cardNumber;
@@ -46,79 +56,175 @@
                 <div class="admin-alert admin-alert--error"><span>!</span><p>@error</p></div>
             }
 
-            <form method="get" asp-action="Withdrawals" class="admin-toolbar admin-toolbar--center">
-                <div>
-                    <label for="status" class="admin-toolbar__label">@Localizer["Статус"]</label>
-                    <select id="status" name="status" class="form-select">
-                        <option value="">@Localizer["Усі статуси"]</option>
-                        @foreach (var value in Enum.GetValues<Marketplace.Domain.Enums.WithdrawalStatus>())
-                        {
-                            <option value="@value" selected="@(Model.StatusFilter == value)">@StatusLabel(value)</option>
-                        }
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-outline-secondary">@Localizer["Застосувати"]</button>
-                @if (Model.StatusFilter.HasValue)
-                {
-                    <a asp-action="Withdrawals" class="btn btn-outline-secondary">@Localizer["Скинути"]</a>
-                }
-            </form>
+            @{
+                var pendingRequests = Model.Withdrawals
+                    .Where(w => w.Status == Marketplace.Domain.Enums.WithdrawalStatus.Pending.ToString())
+                    .ToList();
+                var resolvedRequests = Model.Withdrawals
+                    .Where(w => w.Status != Marketplace.Domain.Enums.WithdrawalStatus.Pending.ToString())
+                    .OrderByDescending(w => w.CreatedAt)
+                    .ToList();
+                var pendingSum = pendingRequests.Sum(w => w.Amount);
+                var completedSum = resolvedRequests
+                    .Where(w => w.Status == Marketplace.Domain.Enums.WithdrawalStatus.Completed.ToString())
+                    .Sum(w => w.Amount);
+            }
 
-            <section class="admin-panel table-responsive">
+            <div class="admin-kpi-row">
+                <div class="admin-kpi">
+                    <span>@Localizer["Очікують дій"]</span>
+                    <strong>@pendingRequests.Count</strong>
+                </div>
+                <div class="admin-kpi">
+                    <span>@Localizer["Сума в очікуванні"]</span>
+                    <strong>@pendingSum.ToString("N0") ₴</strong>
+                </div>
+                <div class="admin-kpi">
+                    <span>@Localizer["Виплачено (у перегляді)"]</span>
+                    <strong>@completedSum.ToString("N0") ₴</strong>
+                </div>
+                <div class="admin-kpi">
+                    <span>@Localizer["Усього заявок"]</span>
+                    <strong>@Model.Withdrawals.Count</strong>
+                </div>
+            </div>
+
+            <div class="admin-pill-filter" role="tablist" aria-label="@Localizer["Фільтр за статусом"]">
+                <a asp-action="Withdrawals" class="admin-pill-filter__btn @(!Model.StatusFilter.HasValue ? "is-active" : "")" role="tab" aria-selected="@(!Model.StatusFilter.HasValue)">
+                    @Localizer["Усі статуси"]
+                </a>
+                @foreach (var value in Enum.GetValues<Marketplace.Domain.Enums.WithdrawalStatus>())
+                {
+                    <a asp-action="Withdrawals" asp-route-status="@value" class="admin-pill-filter__btn @(Model.StatusFilter == value ? "is-active" : "")" role="tab" aria-selected="@(Model.StatusFilter == value)">
+                        @StatusLabel(value)
+                    </a>
+                }
+            </div>
+
+            <section class="admin-panel admin-panel--flat mb-3">
+                <h2>@(Model.StatusFilter.HasValue ? StatusLabel(Model.StatusFilter.Value) : Localizer["Усі заявки"].Value)</h2>
+                <p>@Localizer["Розгляньте та підтвердіть або відхиліть запити продавців на виведення коштів."]</p>
+
                 @if (Model.Withdrawals.Count == 0)
                 {
-                    <p class="admin-empty">@Localizer["Заявок на виплату немає."]</p>
+                    <p class="admin-empty" style="padding: 1.5rem 0;">@Localizer["Заявок за цим фільтром немає."]</p>
                 }
                 else
                 {
-                    <table class="table admin-table">
-                        <thead>
-                            <tr>
-                                <th>@Localizer["Магазин"]</th>
-                                <th>@Localizer["Сума"]</th>
-                                <th>@Localizer["Картка"]</th>
-                                <th>@Localizer["Отримувач"]</th>
-                                <th>@Localizer["Створено"]</th>
-                                <th>@Localizer["Статус"]</th>
-                                <th class="text-end">@Localizer["Дії"]</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var request in Model.Withdrawals)
-                            {
+                    <div class="table-responsive">
+                        <table class="table admin-table">
+                            <thead>
                                 <tr>
-                                    <td class="admin-entity-name">@request.BusinessName</td>
-                                    <td>@request.Amount.ToString("N2") ₴</td>
-                                    <td>@MaskCard(request.CardNumber)</td>
-                                    <td>@request.RecipientName</td>
-                                    <td>@request.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
-                                    <td>
-                                        @StatusLabel(Enum.Parse<Marketplace.Domain.Enums.WithdrawalStatus>(request.Status))
-                                        @if (!string.IsNullOrWhiteSpace(request.Message))
-                                        {
-                                            <div class="admin-stat-card__hint">@request.Message</div>
-                                        }
-                                    </td>
-                                    <td class="text-end">
-                                        @if (request.Status == Marketplace.Domain.Enums.WithdrawalStatus.Pending.ToString())
-                                        {
-                                            <form asp-action="ApproveWithdrawal" method="post" class="d-inline" onsubmit="return confirm('@Localizer["Підтвердити виплату {0} ₴ на картку {1}?", request.Amount.ToString("N2"), MaskCard(request.CardNumber)]');">
-                                                <input type="hidden" name="requestId" value="@request.Id" />
-                                                <button type="submit" class="btn btn-sm btn-outline-success">@Localizer["Виплатити"]</button>
-                                            </form>
-                                            <form asp-action="RejectWithdrawal" method="post" class="admin-inline-form">
-                                                <input type="hidden" name="requestId" value="@request.Id" />
-                                                <input type="text" name="reason" placeholder="@Localizer["Причина відхилення"]" class="admin-inline-form__input" required />
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">@Localizer["Відхилити"]</button>
-                                            </form>
-                                        }
-                                    </td>
+                                    <th>@Localizer["Магазин"]</th>
+                                    <th>@Localizer["Сума"]</th>
+                                    <th>@Localizer["Картка"]</th>
+                                    <th>@Localizer["Отримувач"]</th>
+                                    <th>@Localizer["Створено"]</th>
+                                    <th>@Localizer["Статус"]</th>
+                                    <th class="text-end">@Localizer["Дії"]</th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach (var request in Model.Withdrawals)
+                                {
+                                    var rowStatus = Enum.Parse<Marketplace.Domain.Enums.WithdrawalStatus>(request.Status);
+                                    <tr>
+                                        <td>
+                                            <div class="admin-entity-cell">
+                                                <span class="admin-entity-placeholder" aria-hidden="true">@request.BusinessName[..1].ToUpperInvariant()</span>
+                                                <span class="admin-entity-name">@request.BusinessName</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="admin-amount">@request.Amount.ToString("N2") ₴</span></td>
+                                        <td>
+                                            <span class="admin-card-chip">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
+                                                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                                                    <path d="M2 10h20" />
+                                                </svg>
+                                                @MaskCard(request.CardNumber)
+                                            </span>
+                                        </td>
+                                        <td class="admin-entity-meta">@request.RecipientName</td>
+                                        <td class="admin-entity-meta">@request.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                                        <td>
+                                            <span class="admin-status admin-status--@StatusModifier(rowStatus)">@StatusLabel(rowStatus)</span>
+                                            @if (!string.IsNullOrWhiteSpace(request.Message))
+                                            {
+                                                <div class="admin-status-note">@request.Message</div>
+                                            }
+                                        </td>
+                                        <td class="text-end">
+                                            @if (rowStatus == Marketplace.Domain.Enums.WithdrawalStatus.Pending)
+                                            {
+                                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#withdrawalModal-@request.Id">
+                                                    @Localizer["Детальніше"]
+                                                </button>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 }
             </section>
+
+            @foreach (var request in pendingRequests)
+            {
+                <div class="modal fade" id="withdrawalModal-@request.Id" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">@Localizer["Заявка на виплату"]</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["Закрити"]"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <span class="admin-entity-placeholder" aria-hidden="true">@request.BusinessName[..1].ToUpperInvariant()</span>
+                                    <div>
+                                        <strong>@request.BusinessName</strong>
+                                        <div class="text-muted small">@request.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</div>
+                                    </div>
+                                </div>
+
+                                <p class="mb-1"><strong>@Localizer["Сума:"]</strong> @request.Amount.ToString("N2") ₴</p>
+                                <p class="mb-1"><strong>@Localizer["Картка:"]</strong> @MaskCard(request.CardNumber)</p>
+                                <p class="mb-1"><strong>@Localizer["Отримувач:"]</strong> @request.RecipientName</p>
+
+                                <hr />
+                                <div id="withdrawalRejectForm-@request.Id" class="collapse">
+                                    <form asp-action="RejectWithdrawal" method="post">
+                                        <input type="hidden" name="requestId" value="@request.Id" />
+                                        <label class="form-label small">@Localizer["Причина відхилення"]</label>
+                                        <textarea name="reason" class="form-control mb-2" rows="2" required minlength="5" placeholder="@Localizer["Поясніть продавцю, чому заявку відхилено..."]"></textarea>
+                                        <button type="submit" class="btn btn-danger btn-sm w-100">@Localizer["Підтвердити відхилення"]</button>
+                                    </form>
+                                </div>
+                                <div id="withdrawalApproveConfirm-@request.Id" class="collapse">
+                                    <div class="alert alert-success mb-2">
+                                        @Localizer["Ви точно впевнені, що хочете виплатити"] <strong>@request.Amount.ToString("N2") ₴</strong> @Localizer["на картку"] <strong>@MaskCard(request.CardNumber)</strong>?
+                                    </div>
+                                    <form asp-action="ApproveWithdrawal" method="post">
+                                        <input type="hidden" name="requestId" value="@request.Id" />
+                                        <button type="submit" class="btn btn-success btn-sm w-100">@Localizer["Так, виплатити"]</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="collapse" data-bs-target="#withdrawalRejectForm-@request.Id">
+                                    @Localizer["Відхилити"]
+                                </button>
+
+                                <button type="button" class="btn btn-outline-success" data-bs-toggle="collapse" data-bs-target="#withdrawalApproveConfirm-@request.Id">
+                                    @Localizer["Виплатити"]
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
         </div>
     </div>
 </div>

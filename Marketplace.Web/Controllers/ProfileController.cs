@@ -172,6 +172,16 @@ namespace Marketplace.Web.Controllers
             return View(new WishlistPageViewModel { Id = wishlist.Id, Items = items });
         }
 
+        [HttpGet]
+        public async Task<IActionResult> RecentlyViewed()
+        {
+            return View(new RecentlyViewedPageViewModel
+            {
+                ConsentAccepted = Marketplace.Web.Infrastructure.CookieConsent.IsAccepted(Request.Cookies),
+                Items = await Marketplace.Web.Infrastructure.RecentlyViewedCookie.LoadAsync(_productService, Request.Cookies)
+            });
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddToWishlist(Guid productId, string? returnUrl)

@@ -1,3 +1,8 @@
+/* The full-width carousel bleeds out of the page container; clip on body (not .home-page) so it is not cut at the container edge. */
+body {
+    overflow-x: clip;
+}
+
 .home-page {
     --home-ink: #111827;
     --home-muted: #5d687a;
@@ -6,7 +11,8 @@
     --home-soft: #f4f6fb;
     color: var(--home-ink);
     margin-top: -1rem;
-    padding-bottom: 4rem;
+    margin-bottom: -2rem;
+    padding-bottom: 0;
 }
 
 
@@ -482,7 +488,7 @@
     display: grid;
     gap: 0;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    margin: 1.25rem 0 4rem;
+    margin: 2.5rem 0 0;
 }
 
 .home-benefits > div {
@@ -626,10 +632,10 @@
     border-radius: 0.75rem;
     display: flex;
     font-size: 1.35rem;
-    height: 2.8rem;
+    height: 3.2rem;
     justify-content: center;
     margin-bottom: 1.2rem;
-    width: 2.8rem;
+    width: 3.2rem;
 }
 
 .category-card strong,
@@ -650,7 +656,7 @@
 .home-products {
     display: grid;
     gap: 1rem;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .home-product {
@@ -1263,6 +1269,10 @@
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
+    .home-products {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .home-promo {
         grid-template-columns: 1fr;
     }
@@ -1362,5 +1372,125 @@
     .home-promo__badge--order {
         bottom: -0.5rem;
         left: 0;
+    }
+}
+
+/* ---------- Category hero carousel ---------- */
+
+.home-carousel {
+    margin: 0 calc(50% - 50vw) 2.5rem;
+    width: 100vw;
+}
+
+.home-carousel .carousel {
+    overflow: hidden;
+}
+
+.home-carousel__slide {
+    align-items: flex-end;
+    background-color: #1a2340;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: #fff;
+    display: flex;
+    height: clamp(15rem, 30vw, 33rem);
+    justify-content: center;
+    position: relative;
+    text-decoration: none;
+}
+
+.home-carousel__slide::before {
+    background: linear-gradient(0deg, rgba(10, 16, 36, 0.78), rgba(10, 16, 36, 0.05) 60%);
+    content: "";
+    inset: 0;
+    position: absolute;
+}
+
+.home-carousel__slide:hover {
+    color: #fff;
+}
+
+.home-carousel__caption {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0 4rem 2.6rem;
+    position: relative;
+    text-align: center;
+}
+
+.home-carousel__caption small {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    opacity: 0.85;
+    text-transform: uppercase;
+}
+
+.home-carousel__caption strong {
+    font-size: clamp(1.6rem, 4vw, 2.8rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+.home-carousel__caption em {
+    font-size: 0.95rem;
+    font-style: normal;
+    opacity: 0.9;
+}
+
+.home-carousel .carousel-control-prev,
+.home-carousel .carousel-control-next {
+    opacity: 1;
+    width: 5rem;
+}
+
+.home-carousel__arrow {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(6px);
+    border-radius: 50%;
+    color: #fff;
+    display: inline-flex;
+    font-size: 2.4rem;
+    height: 3.2rem;
+    justify-content: center;
+    line-height: 1;
+    padding-bottom: 0.2rem;
+    transition: background-color 0.15s ease;
+    width: 3.2rem;
+}
+
+.home-carousel .carousel-control-prev:hover .home-carousel__arrow,
+.home-carousel .carousel-control-next:hover .home-carousel__arrow {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.home-carousel .carousel-indicators {
+    margin-bottom: 0.9rem;
+}
+
+.home-carousel .carousel-indicators [data-bs-target] {
+    border-radius: 999px;
+    height: 0.5rem;
+    width: 0.5rem;
+}
+
+@media (max-width: 575.98px) {
+    .home-carousel__caption {
+        padding: 0 3rem 2.4rem;
+    }
+
+    .home-carousel .carousel-control-prev,
+    .home-carousel .carousel-control-next {
+        width: 3.4rem;
+    }
+
+    .home-carousel__arrow {
+        font-size: 1.5rem;
+        height: 2.2rem;
+        width: 2.2rem;
     }
 }

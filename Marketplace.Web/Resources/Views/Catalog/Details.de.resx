@@ -301,4 +301,31 @@
   <data name="Немає в наявності" xml:space="preserve">
     <value>Nicht auf Lager</value>
   </data>
+  <data name="Відгуки про {0}" xml:space="preserve">
+    <value>Bewertungen zu {0}</value>
+  </data>
+  <data name="Задати питання" xml:space="preserve">
+    <value>Frage stellen</value>
+  </data>
+  <data name="Коментарі" xml:space="preserve">
+    <value>Kommentare</value>
+  </data>
+  <data name="Питання" xml:space="preserve">
+    <value>Fragen</value>
+  </data>
+  <data name="Спочатку нові" xml:space="preserve">
+    <value>Neueste zuerst</value>
+  </data>
+  <data name="Спочатку старі" xml:space="preserve">
+    <value>Älteste zuerst</value>
+  </data>
+  <data name="Найвища оцінка" xml:space="preserve">
+    <value>Beste Bewertung</value>
+  </data>
+  <data name="Найнижча оцінка" xml:space="preserve">
+    <value>Schlechteste Bewertung</value>
+  </data>
+  <data name="Сортування відгуків" xml:space="preserve">
+    <value>Bewertungen sortieren</value>
+  </data>
 </root>

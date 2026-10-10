@@ -15,11 +15,20 @@
 
 /* ---------- Product Q&A ---------- */
 
+.product-qa__summary {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    justify-content: space-between;
+    margin-bottom: 1.4rem;
+}
+
 .product-qa__form {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
-    margin: 1rem 0 0.5rem;
+    margin: 0 0 0.5rem;
 }
 
 .product-qa__form textarea {
@@ -35,7 +44,7 @@
 .product-qa__hint {
     color: var(--product-muted);
     font-size: 0.8rem;
-    margin: 0 0 1rem;
+    margin: 0;
 }
 
 .product-qa__empty {

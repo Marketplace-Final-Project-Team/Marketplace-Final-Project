@@ -20,16 +20,16 @@
     transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
 }
 
-.notif-tabs__btn:hover {
-    border-color: var(--profile-primary);
-    color: var(--profile-primary);
-}
+    .notif-tabs__btn:hover {
+        border-color: var(--profile-primary);
+        color: var(--profile-primary);
+    }
 
-.notif-tabs__btn.is-active {
-    background: var(--profile-primary);
-    border-color: var(--profile-primary);
-    color: #fff;
-}
+    .notif-tabs__btn.is-active {
+        background: var(--profile-primary);
+        border-color: var(--profile-primary);
+        color: #fff;
+    }
 
 .notif-tabs__badge {
     background: rgba(23, 32, 51, 0.08);
@@ -65,10 +65,10 @@
     transition: box-shadow 0.15s ease, transform 0.15s ease;
 }
 
-.notif-product-card:hover {
-    box-shadow: 0 0.65rem 1.6rem rgba(23, 32, 51, 0.1);
-    transform: translateY(-2px);
-}
+    .notif-product-card:hover {
+        box-shadow: 0 0.65rem 1.6rem rgba(23, 32, 51, 0.1);
+        transform: translateY(-2px);
+    }
 
 .notif-product-card__media {
     align-items: center;
@@ -79,29 +79,29 @@
     position: relative;
 }
 
-.notif-product-card__media img {
-    height: 100%;
-    object-fit: cover;
-    width: 100%;
-}
+    .notif-product-card__media img {
+        height: 100%;
+        object-fit: cover;
+        width: 100%;
+    }
 
-.notif-product-card__media span[aria-hidden] {
-    color: var(--profile-muted);
-    font-size: 2rem;
-    font-weight: 700;
-}
+    .notif-product-card__media span[aria-hidden] {
+        color: var(--profile-muted);
+        font-size: 2rem;
+        font-weight: 700;
+    }
 
-.notif-product-card__media small {
-    background: var(--profile-primary);
-    border-radius: 999px;
-    color: #fff;
-    font-size: 0.7rem;
-    font-weight: 650;
-    padding: 0.15rem 0.55rem;
-    position: absolute;
-    right: 0.6rem;
-    top: 0.6rem;
-}
+    .notif-product-card__media small {
+        background: var(--profile-primary);
+        border-radius: 999px;
+        color: #fff;
+        font-size: 0.7rem;
+        font-weight: 650;
+        padding: 0.15rem 0.55rem;
+        position: absolute;
+        right: 0.6rem;
+        top: 0.6rem;
+    }
 
 .notif-product-card__body {
     display: flex;
@@ -123,4 +123,157 @@
 .notif-product-card__body strong {
     color: var(--profile-primary);
     margin-top: 0.25rem;
+}
+
+/* ==================================================================
+   Дзвіночок глобальних сповіщень у шапці сайту (чати повернень/підтримки)
+   ================================================================== */
+
+.notif-bell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: inherit;
+}
+
+    .notif-bell:hover {
+        background: rgba(0, 0, 0, 0.05);
+    }
+
+.notif-bell__badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: #dc3545;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+    .notif-bell__badge[hidden] {
+        display: none;
+    }
+
+.notif-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 360px;
+    max-width: 90vw;
+    max-height: 420px;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+    z-index: 1050;
+}
+
+    .notif-dropdown[hidden] {
+        display: none;
+    }
+
+.notif-dropdown__header {
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    border-bottom: 1px solid #eee;
+    color: #172033;
+}
+
+.notif-dropdown__empty {
+    padding: 1.5rem 1rem;
+    text-align: center;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.notif-item {
+    display: block;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f2f2f2;
+    text-decoration: none;
+    color: #172033;
+}
+
+    .notif-item:hover {
+        background: #f8f9fa;
+        color: #172033;
+    }
+
+.notif-item__text {
+    font-size: 0.88rem;
+    line-height: 1.35;
+    color: #172033;
+}
+
+.notif-item__time {
+    font-size: 0.75rem;
+    color: #999;
+    margin-top: 2px;
+}
+
+/* Toast */
+.notif-toast-container {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.notif-toast {
+    background: #fff;
+    border-left: 4px solid #0d6efd;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    padding: 0.85rem 1rem;
+    max-width: 320px;
+    font-size: 0.88rem;
+    color: #172033;
+    animation: notif-toast-in 0.25s ease-out;
+    cursor: pointer;
+}
+
+    .notif-toast.notif-toast--out {
+        animation: notif-toast-out 0.25s ease-in forwards;
+    }
+
+@keyframes notif-toast-in {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes notif-toast-out {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(20px);
+    }
 }

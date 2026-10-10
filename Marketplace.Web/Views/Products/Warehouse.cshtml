@@ -7,10 +7,15 @@
 }
 
 @section Styles {
+    <link rel="stylesheet" href="~/css/business.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/products.css" asp-append-version="true" />
 }
 
 <div class="products-page">
+    @if (businessId.HasValue)
+    {
+        <partial name="_BusinessNav" model="businessId.Value" />
+    }
     <a asp-action="Index" asp-route-businessId="@businessId" class="products-back">← @Localizer["Назад до товарів"]</a>
     <header class="products-heading">
         <div>

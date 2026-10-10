@@ -125,6 +125,16 @@
 .seller-alert p { margin: 0; }
 .seller-alert strong { display: block; font-size: 0.78rem; }
 
+.seller-alert--warning {
+    background: #fff9e8;
+    border-color: #f4d77d;
+    color: #755000;
+}
+
+.seller-alert--warning > span {
+    background: #c8870b;
+}
+
 .seller-store-list {
     display: grid;
     gap: 1.5rem;
@@ -1478,4 +1488,145 @@
     transform: translateY(-50%);
     pointer-events: none;
 }
- 
+
+
+.payout-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+}
+
+.payout-card {
+    background: #fdfdfd;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.payout-card--primary {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-color: #dee2e6;
+}
+
+.payout-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.payout-card__label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.payout-card__amount {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 1rem;
+}
+
+.seller-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    border-radius: 10px;
+    border: 1.5px solid transparent;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.seller-button--primary {
+    background-color: #3561e7;
+    color: #ffffff;
+    border-color: #3561e7;
+}
+
+    .seller-button--primary:hover:not(:disabled) {
+        background-color: #284ec7;
+        border-color: #284ec7;
+        color: #ffffff;
+    }
+
+    .seller-button--primary:disabled {
+        background-color: #a5b8f6;
+        border-color: #a5b8f6;
+        color: #ffffff;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+.seller-button--secondary {
+    background-color: #ffffff;
+    color: #3561e7;
+    border-color: #3561e7;
+}
+
+    .seller-button--secondary:hover:not(:disabled) {
+        background-color: #f4f7fe;
+        color: #284ec7;
+    }
+
+.payout-card__sub-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+}
+
+.payout-info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+    .payout-info-list li {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.35rem 0;
+        border-bottom: 1px dashed #e9ecef;
+    }
+
+        .payout-info-list li:last-child {
+            border-bottom: none;
+        }
+
+
+.payout-empty-state {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 1px dashed #ced4da;
+}
+
+.payout-empty-state__icon {
+    font-size: 2rem;
+    line-height: 1;
+    padding: 0.75rem;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.payout-badge--warning {
+    background: #fff3cd;
+    color: #664d03;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+}

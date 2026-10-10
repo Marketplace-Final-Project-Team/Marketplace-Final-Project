@@ -20,6 +20,7 @@ public class OrderController : Controller
     private readonly IPostSaleService _postSaleService;
     private readonly IPromoCodeService _promoCodeService;
     private readonly IActivityLogService _activityLog;
+    private readonly INotificationService _notificationService;
 
     public OrderController(
         IOrderService orderService,
@@ -27,7 +28,8 @@ public class OrderController : Controller
         IProductService productService,
         IPostSaleService postSaleService,
         IPromoCodeService promoCodeService,
-        IActivityLogService activityLog)
+        IActivityLogService activityLog,
+        INotificationService notificationService)
     {
         _orderService = orderService;
         _cartService = cartService;
@@ -35,6 +37,7 @@ public class OrderController : Controller
         _postSaleService = postSaleService;
         _promoCodeService = promoCodeService;
         _activityLog = activityLog;
+        _notificationService = notificationService;
     }
 
     [HttpGet]
@@ -57,7 +60,14 @@ public class OrderController : Controller
     public async Task<IActionResult> Details(Guid id)
     {
         var model = await BuildOrderDetails(id);
-        return model is null ? NotFound() : View(model);
+        if (model is null)
+        {
+            return NotFound();
+        }
+
+        await _notificationService.MarkOrderViewedAsync(GetUserId(), id);
+
+        return View(model);
     }
 
     [HttpGet]
