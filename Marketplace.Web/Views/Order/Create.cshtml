@@ -17,14 +17,14 @@
         <div>
             <div class="shop-kicker">@Localizer["Оформлення"]</div>
             <h1 class="shop-title">@Localizer["Оформлення замовлення"]</h1>
-            <p class="shop-subtitle">@Localizer["Оберіть адресу, перевірте доставку й оплату, підтвердіть замовлення."]</p>
+            <p class="shop-subtitle">@Localizer["Вкажіть дані отримувача, перевірте доставку й оплату, підтвердіть замовлення."]</p>
         </div>
     </header>
 
     <div class="checkout-stepper" role="list" aria-label="@Localizer["Кроки оформлення замовлення"]">
         <div class="checkout-stepper__step" data-step-indicator="1">
             <span class="checkout-stepper__dot" aria-hidden="true">1</span>
-            <span class="checkout-stepper__label">@Localizer["Адреса"]</span>
+            <span class="checkout-stepper__label">@Localizer["Отримувач"]</span>
         </div>
         <div class="checkout-stepper__step" data-step-indicator="2">
             <span class="checkout-stepper__dot" aria-hidden="true">2</span>
@@ -43,55 +43,34 @@
     <form asp-action="Create" method="post" class="checkout-form" id="checkout-form">
         <div class="checkout-layout">
             <div class="checkout-card">
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger m-3" role="alert"></div>
+                <div asp-validation-summary="All" class="alert alert-danger m-3" role="alert"></div>
 
                 <div class="checkout-section">
                     <section class="checkout-step" data-step="1">
-                        <h2>@Localizer["Адреса доставки"]</h2>
-
-                        @if (Model.SavedAddresses.Count > 0)
-                        {
-                            <div class="checkout-address-options">
-                                @foreach (var address in Model.SavedAddresses)
-                                {
-                                    <label class="checkout-address-option">
-                                        <input type="radio" name="SelectedAddressId" value="@address.Id" checked="@(Model.SelectedAddressId == address.Id)" />
-                                        <span data-address-label="@address.Id">
-                                            <strong>
-                                                @address.Country, @address.City
-                                                @if (address.IsDefault)
-                                                {
-                                                    <span class="checkout-address-option__badge">@Localizer["Основна"]</span>
-                                                }
-                                            </strong>
-                                            <span>@address.Street</span>
-                                        </span>
-                                    </label>
-                                }
-                                <label class="checkout-address-option">
-                                    <input type="radio" name="SelectedAddressId" value="" checked="@(!Model.SelectedAddressId.HasValue)" />
-                                    <span><strong>@Localizer["Нова адреса"]</strong><span>@Localizer["Вкажіть іншу адресу доставки"]</span></span>
-                                </label>
+                        <h2>@Localizer["Дані отримувача"]</h2>
+                        <div class="checkout-fields">
+                            <div>
+                                <label asp-for="RecipientLastName" class="form-label">@Localizer["Прізвище"] *</label>
+                                <input asp-for="RecipientLastName" type="text" class="form-control" placeholder="@Localizer["Введіть своє прізвище"]" autocomplete="family-name" required maxlength="100" aria-describedby="RecipientLastName-error" />
+                                <span asp-validation-for="RecipientLastName" id="RecipientLastName-error" class="text-danger small"></span>
                             </div>
-                        }
-
-                        <div class="checkout-new-address-fields" data-new-address-fields hidden="@(Model.SavedAddresses.Count > 0 && Model.IsUsingSavedAddress)">
-                            <div class="checkout-fields">
-                                <div>
-                                    <label asp-for="Country" class="form-label">@Localizer["Країна"]</label>
-                                    <input asp-for="Country" class="form-control" />
-                                    <span asp-validation-for="Country" class="text-danger small"></span>
+                            <div>
+                                <label asp-for="RecipientFirstName" class="form-label">@Localizer["Ім’я"] *</label>
+                                <input asp-for="RecipientFirstName" type="text" class="form-control" placeholder="@Localizer["Введіть своє ім’я"]" autocomplete="given-name" required maxlength="100" aria-describedby="RecipientFirstName-error" />
+                                <span asp-validation-for="RecipientFirstName" id="RecipientFirstName-error" class="text-danger small"></span>
+                            </div>
+                            <div>
+                                <label for="RecipientPhoneNumber" class="form-label">@Localizer["Телефон"] *</label>
+                                <div class="checkout-phone">
+                                    <span class="checkout-phone__prefix" id="RecipientPhone-prefix">+380</span>
+                                    <input id="RecipientPhoneNumber" type="tel" class="form-control" data-phone-number
+                                           data-phone-invalid="@Localizer["Введіть український номер: +380 та 9 цифр"]"
+                                           value="@(Model.RecipientPhone?.StartsWith("+380") == true ? Model.RecipientPhone[4..] : string.Empty)"
+                                           placeholder="@Localizer["Введіть номер телефону"]" autocomplete="tel-national" inputmode="numeric"
+                                           required maxlength="9" pattern="[0-9]{9}" aria-describedby="RecipientPhone-prefix RecipientPhone-error" />
                                 </div>
-                                <div>
-                                    <label asp-for="City" class="form-label">@Localizer["Місто"]</label>
-                                    <input asp-for="City" class="form-control" placeholder="@Localizer["Київ"]" />
-                                    <span asp-validation-for="City" class="text-danger small"></span>
-                                </div>
-                                <div class="wide">
-                                    <label asp-for="Street" class="form-label">@Localizer["Вулиця, будинок, квартира"]</label>
-                                    <input asp-for="Street" class="form-control" placeholder="@Localizer["вул. Хрещатик, 1, кв. 10"]" />
-                                    <span asp-validation-for="Street" class="text-danger small"></span>
-                                </div>
+                                <input asp-for="RecipientPhone" type="hidden" data-phone-full />
+                                <span asp-validation-for="RecipientPhone" id="RecipientPhone-error" class="text-danger small"></span>
                             </div>
                         </div>
                     </section>
@@ -157,11 +136,11 @@
                             <div class="checkout-fields">
                                 <div>
                                     <label class="form-label">@Localizer["Місто доставки"]</label>
-                                    <input type="text" name="DeliveryCity" class="form-control" placeholder="@Localizer["Наприклад, Львів"]" required value="@Model.DeliveryCity" />
+                                    <input type="text" name="DeliveryCity" class="form-control" placeholder="@Localizer["Наприклад, Львів"]" required maxlength="100" value="@Model.DeliveryCity" />
                                 </div>
                                 <div>
                                     <label class="form-label">@Localizer["Адреса доставки"]</label>
-                                    <input type="text" name="DeliveryStreet" class="form-control" placeholder="@Localizer["вул. Хрещатик, 1, кв. 10"]" required value="@Model.DeliveryStreet" />
+                                    <input type="text" name="DeliveryStreet" class="form-control" placeholder="@Localizer["вул. Хрещатик, 1, кв. 10"]" required maxlength="250" value="@Model.DeliveryStreet" />
                                 </div>
                             </div>
                         </div>
@@ -192,8 +171,8 @@
                         <h2>@Localizer["Перевірте замовлення"]</h2>
 
                         <div class="checkout-review-block">
-                            <h3>@Localizer["Адреса доставки"]</h3>
-                            <p data-review-address>-</p>
+                            <h3>@Localizer["Дані отримувача"]</h3>
+                            <p data-review-recipient>-</p>
                         </div>
 
                         <div class="checkout-review-block">

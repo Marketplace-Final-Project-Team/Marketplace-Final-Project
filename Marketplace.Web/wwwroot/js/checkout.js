@@ -10,67 +10,54 @@
     const backButton = form.querySelector("[data-step-back]");
     const submitButton = form.querySelector("[data-step-submit]");
 
-    const addressRadios = () => Array.from(form.querySelectorAll('input[name="SelectedAddressId"]'));
-    const newAddressFields = form.querySelector("[data-new-address-fields]");
-    const newAddressInputs = newAddressFields
-        ? Array.from(newAddressFields.querySelectorAll("input"))
-        : [];
+    const phoneNumber = form.querySelector("[data-phone-number]");
+    const phoneFull = form.querySelector("[data-phone-full]");
+    if (phoneNumber && phoneFull) {
+        const nationalDigits = (value) => {
+            let digits = value.replace(/[^0-9]/g, "");
+            if (digits.length === 12 && digits.startsWith("380")) digits = digits.slice(3);
+            else if (digits.length === 10 && digits.startsWith("0")) digits = digits.slice(1);
+            return digits;
+        };
+        const syncPhone = () => {
+            phoneNumber.setCustomValidity("");
+            const position = phoneNumber.selectionStart;
+            const clean = nationalDigits(phoneNumber.value).slice(0, 9);
+            if (phoneNumber.value !== clean) {
+                phoneNumber.value = clean;
+                if (position !== null) phoneNumber.setSelectionRange(Math.min(position, clean.length), Math.min(position, clean.length));
+            }
+            phoneFull.value = `+380${clean}`;
+        };
+        phoneNumber.addEventListener("input", syncPhone);
+        phoneNumber.addEventListener("change", syncPhone);
+        phoneNumber.addEventListener("paste", (event) => {
+            event.preventDefault();
+            const pasted = nationalDigits(event.clipboardData.getData("text"));
+            if (pasted.length > 9) {
+                phoneNumber.setCustomValidity(phoneNumber.dataset.phoneInvalid);
+                phoneNumber.reportValidity();
+                return;
+            }
+            const start = phoneNumber.selectionStart ?? 0;
+            const end = phoneNumber.selectionEnd ?? phoneNumber.value.length;
+            phoneNumber.value = (phoneNumber.value.slice(0, start) + pasted + phoneNumber.value.slice(end)).slice(0, 9);
+            phoneNumber.setSelectionRange(Math.min(start + pasted.length, 9), Math.min(start + pasted.length, 9));
+            phoneNumber.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+        syncPhone();
+    }
 
     let current = 1;
 
-    const isNewAddressChosen = () => {
-        const radios = addressRadios();
-        if (radios.length === 0) {
-            return true;
+    const updateReviewRecipient = () => {
+        const summary = form.querySelector("[data-review-recipient]");
+        if (summary) {
+            summary.textContent = ["RecipientLastName", "RecipientFirstName", "RecipientPhone"]
+                .map((name) => form.querySelector(`[name="${name}"]`)?.value.trim())
+                .filter(Boolean).join(" ");
         }
-        const chosen = radios.find((radio) => radio.checked);
-        return !chosen || chosen.value === "";
     };
-
-    const updateAddressOptionStyling = () => {
-        form.querySelectorAll(".checkout-address-option").forEach((option) => {
-            const radio = option.querySelector('input[name="SelectedAddressId"]');
-            option.classList.toggle("is-selected", !!radio && radio.checked);
-        });
-    };
-
-    const updateReviewAddress = () => {
-        const summary = form.querySelector("[data-review-address]");
-        if (!summary) {
-            return;
-        }
-
-        if (!isNewAddressChosen()) {
-            const chosen = addressRadios().find((radio) => radio.checked);
-            const label = chosen ? form.querySelector(`[data-address-label="${chosen.value}"]`) : null;
-            summary.textContent = label ? label.textContent.trim() : "";
-            return;
-        }
-
-        const country = form.querySelector('[name="Country"]')?.value.trim() || "";
-        const city = form.querySelector('[name="City"]')?.value.trim() || "";
-        const street = form.querySelector('[name="Street"]')?.value.trim() || "";
-        const parts = [country, city, street].filter(Boolean);
-        summary.textContent = parts.length > 0 ? parts.join(", ") : "Адресу не вказано";
-    };
-
-    const syncNewAddressFieldsState = () => {
-        const showNewAddressFields = isNewAddressChosen();
-
-        if (newAddressFields) {
-            newAddressFields.hidden = addressRadios().length > 0 && !showNewAddressFields;
-        }
-
-        newAddressInputs.forEach((input) => {
-            input.required = showNewAddressFields;
-        });
-
-        updateAddressOptionStyling();
-        updateReviewAddress();
-    };
-
-    addressRadios().forEach((radio) => radio.addEventListener("change", syncNewAddressFieldsState));
-    newAddressInputs.forEach((input) => input.addEventListener("input", updateReviewAddress));
 
     const showStep = (stepNumber) => {
         steps.forEach((step) => {
@@ -90,7 +77,7 @@
         current = stepNumber;
 
         if (stepNumber === steps.length) {
-            updateReviewAddress();
+            updateReviewRecipient();
             updateReviewCarrier();
             updateReviewPayment();
         }
@@ -144,6 +131,9 @@
         );
 
         for (const field of fields) {
+            if (field.required && ["text", "tel"].includes(field.type)) {
+                field.value = field.value.trim();
+            }
             if (!field.checkValidity()) {
                 field.reportValidity();
                 return false;
@@ -182,7 +172,36 @@
         });
     }
 
-    syncNewAddressFieldsState();
+    // Validate hidden steps ourselves so the browser can focus the invalid field.
+    form.noValidate = true;
+    let submitting = false;
+    form.addEventListener("submit", (event) => {
+        if (submitting || event.defaultPrevented) {
+            event.preventDefault();
+            return;
+        }
+        // Enter in a field advances only one step; creation requires the review step.
+        if (current < steps.length) {
+            event.preventDefault();
+            if (validateStep(current)) showStep(current + 1);
+            return;
+        }
+        for (let step = 1; step <= steps.length; step++) {
+            showStep(step);
+            if (!validateStep(step)) {
+                event.preventDefault();
+                return;
+            }
+        }
+        submitting = true;
+        if (submitButton) submitButton.disabled = true;
+        if (backButton) backButton.disabled = true;
+    });
+    window.addEventListener("pageshow", () => {
+        submitting = false;
+        if (submitButton) submitButton.disabled = false;
+        if (backButton) backButton.disabled = false;
+    });
     showStep(1);
 
     // ---------- Delivery carrier selection ----------
@@ -215,6 +234,8 @@
         cityInput.insertAdjacentElement("afterend", citySuggest);
 
         let cityDebounce;
+        let citySearchVersion = 0;
+        let branchLoadVersion = 0;
         const escapeHtml = (value) => {
             const div = document.createElement("div");
             div.textContent = value ?? "";
@@ -227,6 +248,7 @@
         };
 
         const resetBranches = (placeholder) => {
+            branchLoadVersion++;
             branchSelect.innerHTML = `<option value="">${escapeHtml(placeholder)}</option>`;
             branchSelect.disabled = true;
             branchRefInput.value = "";
@@ -235,9 +257,11 @@
 
         const loadBranches = (cityRef, preselectBranchRef) => {
             resetBranches("Завантаження відділень…");
+            const loadVersion = branchLoadVersion;
             fetch(`/Delivery/Branches?cityId=${encodeURIComponent(cityRef)}`)
                 .then((response) => (response.ok ? response.json() : []))
                 .then((branches) => {
+                    if (loadVersion !== branchLoadVersion || cityRefInput.value !== cityRef) return;
                     if (!Array.isArray(branches) || branches.length === 0) {
                         resetBranches("Відділень не знайдено");
                         return;
@@ -263,10 +287,16 @@
                         }
                     }
                 })
-                .catch(() => resetBranches("Не вдалося завантажити відділення"));
+                .catch(() => {
+                    if (loadVersion === branchLoadVersion && cityRefInput.value === cityRef) {
+                        resetBranches("Не вдалося завантажити відділення");
+                    }
+                });
         };
 
         cityInput.addEventListener("input", () => {
+            const searchVersion = ++citySearchVersion;
+            closeCitySuggest();
             cityRefInput.value = "";
             cityNameInput.value = "";
             resetBranches("Спочатку оберіть місто");
@@ -282,6 +312,7 @@
                 fetch(`/Delivery/Cities?search=${encodeURIComponent(term)}&limit=8`)
                     .then((response) => (response.ok ? response.json() : []))
                     .then((cities) => {
+                        if (searchVersion !== citySearchVersion) return;
                         if (!Array.isArray(cities) || cities.length === 0) {
                             citySuggest.innerHTML = `<div class="checkout-np-suggest__empty">Місто не знайдено</div>`;
                             citySuggest.hidden = false;
@@ -299,6 +330,7 @@
 
                         citySuggest.querySelectorAll("button").forEach((btn) => {
                             btn.addEventListener("click", () => {
+                                citySearchVersion++;
                                 cityInput.value = btn.dataset.cityName;
                                 cityRefInput.value = btn.dataset.cityRef;
                                 cityNameInput.value = btn.dataset.cityName;
@@ -308,6 +340,7 @@
                         });
                     })
                     .catch(() => {
+                        if (searchVersion !== citySearchVersion) return;
                         citySuggest.innerHTML = `<div class="checkout-np-suggest__empty">Не вдалося завантажити міста</div>`;
                         citySuggest.hidden = false;
                     });
@@ -339,6 +372,12 @@
     const totalEl = document.querySelector("[data-order-total]");
 
     if (promoApply && promoInput && totalEl) {
+        promoInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                promoApply.click();
+            }
+        });
         const baseTotal = parseFloat(totalEl.dataset.orderTotal.replace(",", "."));
 
         const formatCurrency = (value) =>

@@ -193,4 +193,7 @@
   <data name="Надіслати заявку" xml:space="preserve">
     <value>Antrag senden</value>
   </data>
+  <data name="Отримувач" xml:space="preserve">
+    <value>Empfänger</value>
+  </data>
 </root>

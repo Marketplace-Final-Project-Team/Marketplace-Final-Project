@@ -217,4 +217,34 @@
   <data name="До сплати" xml:space="preserve">
     <value>Total due</value>
   </data>
+  <data name="Отримувач" xml:space="preserve">
+    <value>Recipient</value>
+  </data>
+  <data name="Дані отримувача" xml:space="preserve">
+    <value>Recipient details</value>
+  </data>
+  <data name="Прізвище" xml:space="preserve">
+    <value>Last name</value>
+  </data>
+  <data name="Ім’я" xml:space="preserve">
+    <value>First name</value>
+  </data>
+  <data name="Телефон" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="Вкажіть дані отримувача, перевірте доставку й оплату, підтвердіть замовлення." xml:space="preserve">
+    <value>Enter recipient details, check delivery and payment, and confirm your order.</value>
+  </data>
+  <data name="Введіть своє прізвище" xml:space="preserve">
+    <value>Enter your last name</value>
+  </data>
+  <data name="Введіть своє ім’я" xml:space="preserve">
+    <value>Enter your first name</value>
+  </data>
+  <data name="Введіть номер телефону" xml:space="preserve">
+    <value>Enter phone number</value>
+  </data>
+  <data name="Введіть український номер: +380 та 9 цифр" xml:space="preserve">
+    <value>Enter a Ukrainian number: +380 followed by 9 digits</value>
+  </data>
 </root>
