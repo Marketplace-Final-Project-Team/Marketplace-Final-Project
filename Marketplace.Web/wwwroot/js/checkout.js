@@ -4,6 +4,9 @@
         return;
     }
 
+    const messages = JSON.parse(document.getElementById("checkout-messages").textContent);
+    const t = (key) => messages[key] || key;
+
     const steps = Array.from(form.querySelectorAll("[data-step]"));
     const indicators = Array.from(document.querySelectorAll("[data-step-indicator]"));
     const nextButton = form.querySelector("[data-step-next]");
@@ -53,10 +56,12 @@
     const updateReviewRecipient = () => {
         const summary = form.querySelector("[data-review-recipient]");
         if (summary) {
-            summary.textContent = ["RecipientLastName", "RecipientFirstName", "RecipientPhone"]
+            summary.textContent = ["RecipientLastName", "RecipientFirstName"]
                 .map((name) => form.querySelector(`[name="${name}"]`)?.value.trim())
                 .filter(Boolean).join(" ");
         }
+        const phone = form.querySelector("[data-review-phone]");
+        if (phone) phone.textContent = phoneFull?.value.trim() || "-";
     };
 
     const showStep = (stepNumber) => {
@@ -88,15 +93,10 @@
     const carrierLabel = () => {
         const carrier = form.querySelector('input[name="DeliveryCarrier"]:checked')?.value;
         if (carrier === "NovaPoshta") {
-            const cityName = form.querySelector("[data-np-city-name]")?.value;
-            const branchName = form.querySelector("[data-np-branch-name]")?.value;
-            return cityName && branchName ? `Нова пошта - ${branchName}, ${cityName}` : "Нова пошта";
+            return t("Нова пошта");
         }
         if (carrier === "Ukrposhta" || carrier === "Meest") {
-            const label = carrier === "Ukrposhta" ? "Укрпошта" : "Meest Express";
-            const city = form.querySelector('[name="DeliveryCity"]')?.value;
-            const street = form.querySelector('[name="DeliveryStreet"]')?.value;
-            return city && street ? `${label} - ${city}, ${street}` : label;
+            return carrier === "Ukrposhta" ? t("Укрпошта") : "Meest Express";
         }
         return "-";
     };
@@ -104,11 +104,19 @@
     const updateReviewCarrier = () => {
         const summary = form.querySelector("[data-review-carrier]");
         if (summary) summary.textContent = carrierLabel();
+        const address = form.querySelector("[data-review-address]");
+        const novaPoshta = form.querySelector('input[name="DeliveryCarrier"]:checked')?.value === "NovaPoshta";
+        const fields = novaPoshta
+            ? ["[data-np-city-name]", "[data-np-branch-name]"]
+            : ['[name="DeliveryCity"]', '[name="DeliveryStreet"]'];
+        if (address) address.textContent = fields
+            .map((selector) => form.querySelector(selector)?.value.trim())
+            .filter(Boolean).join(", ") || "-";
     };
 
     const paymentLabel = () => {
         const method = form.querySelector('input[name="PaymentMethod"]:checked')?.value;
-        return method === "CashOnDelivery" ? "Оплата при отриманні" : "LiqPay (онлайн)";
+        return method === "CashOnDelivery" ? t("Оплата при отриманні") : t("LiqPay (онлайн)");
     };
 
     const updateReviewPayment = () => {
@@ -256,19 +264,19 @@
         };
 
         const loadBranches = (cityRef, preselectBranchRef) => {
-            resetBranches("Завантаження відділень…");
+            resetBranches(t("Завантаження відділень…"));
             const loadVersion = branchLoadVersion;
             fetch(`/Delivery/Branches?cityId=${encodeURIComponent(cityRef)}`)
                 .then((response) => (response.ok ? response.json() : []))
                 .then((branches) => {
                     if (loadVersion !== branchLoadVersion || cityRefInput.value !== cityRef) return;
                     if (!Array.isArray(branches) || branches.length === 0) {
-                        resetBranches("Відділень не знайдено");
+                        resetBranches(t("Відділень не знайдено"));
                         return;
                     }
 
                     branchSelect.innerHTML =
-                        `<option value="">Оберіть відділення</option>` +
+                        `<option value="">${escapeHtml(t("Оберіть відділення"))}</option>` +
                         branches
                             .map((branch) => {
                                 const id = branch.id || branch.Id;
@@ -289,7 +297,7 @@
                 })
                 .catch(() => {
                     if (loadVersion === branchLoadVersion && cityRefInput.value === cityRef) {
-                        resetBranches("Не вдалося завантажити відділення");
+                        resetBranches(t("Не вдалося завантажити відділення"));
                     }
                 });
         };
@@ -299,7 +307,7 @@
             closeCitySuggest();
             cityRefInput.value = "";
             cityNameInput.value = "";
-            resetBranches("Спочатку оберіть місто");
+            resetBranches(t("Спочатку оберіть місто"));
 
             clearTimeout(cityDebounce);
             const term = cityInput.value.trim();
@@ -314,7 +322,7 @@
                     .then((cities) => {
                         if (searchVersion !== citySearchVersion) return;
                         if (!Array.isArray(cities) || cities.length === 0) {
-                            citySuggest.innerHTML = `<div class="checkout-np-suggest__empty">Місто не знайдено</div>`;
+                            citySuggest.innerHTML = `<div class="checkout-np-suggest__empty">${escapeHtml(t("Місто не знайдено"))}</div>`;
                             citySuggest.hidden = false;
                             return;
                         }
@@ -341,7 +349,7 @@
                     })
                     .catch(() => {
                         if (searchVersion !== citySearchVersion) return;
-                        citySuggest.innerHTML = `<div class="checkout-np-suggest__empty">Не вдалося завантажити міста</div>`;
+                        citySuggest.innerHTML = `<div class="checkout-np-suggest__empty">${escapeHtml(t("Не вдалося завантажити міста"))}</div>`;
                         citySuggest.hidden = false;
                     });
             }, 300);
@@ -381,7 +389,7 @@
         const baseTotal = parseFloat(totalEl.dataset.orderTotal.replace(",", "."));
 
         const formatCurrency = (value) =>
-            value.toLocaleString("uk-UA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            value.toLocaleString(document.documentElement.lang || "uk-UA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
         const showMessage = (text, isError) => {
             if (!promoMessage) return;
@@ -395,7 +403,7 @@
             promoInput.value = code;
 
             if (!code) {
-                showMessage("Введіть промокод.", true);
+                showMessage(t("Введіть промокод."), true);
                 return;
             }
 
@@ -407,7 +415,7 @@
                 const result = await response.json();
 
                 if (!result.succeeded) {
-                    showMessage(result.message || "Такий промокод не знайдено або він вже не діє.", true);
+                    showMessage(messages[result.message] || t("Такий промокод не знайдено або він вже не діє."), true);
                     if (promoSummaryRow) promoSummaryRow.hidden = true;
                     totalEl.textContent = `${formatCurrency(baseTotal)} ₴`;
                     return;
@@ -415,14 +423,14 @@
 
                 const newTotal = baseTotal - result.discountAmount;
 
-                showMessage(`Промокод ${result.code} застосовано: знижка ${result.percent}% на товари магазину «${result.storeName}».`, false);
+                showMessage(t("Промокод {0} застосовано: знижка {1}% на товари магазину «{2}».").replace("{0}", result.code).replace("{1}", result.percent).replace("{2}", result.storeName), false);
                 if (promoSummaryRow && promoSummaryValue) {
                     promoSummaryRow.hidden = false;
                     promoSummaryValue.textContent = `−${formatCurrency(result.discountAmount)} ₴`;
                 }
                 totalEl.textContent = `${formatCurrency(newTotal)} ₴`;
             } catch {
-                showMessage("Не вдалося перевірити промокод. Спробуйте ще раз.", true);
+                showMessage(t("Не вдалося перевірити промокод. Спробуйте ще раз."), true);
             } finally {
                 promoApply.disabled = false;
             }

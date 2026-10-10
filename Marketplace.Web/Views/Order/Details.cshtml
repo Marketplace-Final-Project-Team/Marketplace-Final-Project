@@ -136,20 +136,27 @@
                 {
                     <div class="order-info__row">
                         <dt>@Localizer["Отримувач"]</dt>
-                        <dd>@Model.RecipientLastName @Model.RecipientFirstName<br />@Model.RecipientPhone</dd>
+                        <dd>@Model.RecipientLastName @Model.RecipientFirstName</dd>
+                    </div>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.RecipientPhone))
+                {
+                    <div class="order-info__row">
+                        <dt>@Localizer["Телефон"]</dt>
+                        <dd>@Model.RecipientPhone</dd>
                     </div>
                 }
                 <div class="order-info__row">
-                    <dt>@Localizer["Адреса"]</dt>
-                    <dd>@Model.ShippingCountry, @Model.ShippingCity,<br />@Model.ShippingStreet</dd>
+                    <dt>@Localizer["Служба доставки"]</dt>
+                    <dd>@((Model.DeliveryCarrierLabel != null ? Localizer[Model.DeliveryCarrierLabel].Value : null) ?? Localizer["Кур'єром на вказану адресу"].Value)</dd>
                 </div>
                 <div class="order-info__row">
-                    <dt>@Localizer["Доставка"]</dt>
-                    <dd>@(Model.DeliveryMethodLabel ?? Localizer["Кур'єром на вказану адресу"].Value)</dd>
+                    <dt>@Localizer["Адреса"]</dt>
+                    <dd>@Model.ShippingCity, @Model.ShippingStreet</dd>
                 </div>
                 <div class="order-info__row">
                     <dt>@Localizer["Оплата"]</dt>
-                    <dd>@(Model.PaymentMethodLabel ?? Localizer["LiqPay (онлайн)"].Value)</dd>
+                    <dd>@((Model.PaymentMethodLabel != null ? Localizer[Model.PaymentMethodLabel].Value : null) ?? Localizer["LiqPay (онлайн)"].Value)</dd>
                 </div>
                 <div class="order-info__row">
                     <dt>@Localizer["Разом"]</dt>

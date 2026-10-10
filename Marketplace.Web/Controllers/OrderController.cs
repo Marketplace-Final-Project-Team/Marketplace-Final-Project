@@ -52,6 +52,7 @@ public class OrderController : Controller
             TotalAmount = order.TotalAmount,
             ItemsCount = order.Items.Sum(item => item.Quantity),
             ShippingAddress = $"{order.ShippingCity}, {order.ShippingStreet}",
+            DeliveryCarrierLabel = GetDeliveryCarrierLabel(order),
             DeliveryMethodLabel = GetDeliveryLabel(order)
         }).ToList());
     }
@@ -217,6 +218,13 @@ public class OrderController : Controller
         });
     }
 
+    private string? GetDeliveryCarrierLabel(Order order)
+    {
+        return string.IsNullOrWhiteSpace(order.DeliveryCarrier)
+            ? GetDeliveryChoice(order.Id)?.Split(" - ", 2)[0]
+            : DeliveryCarriers.Label(order.DeliveryCarrier);
+    }
+
     private string? GetDeliveryLabel(Order order)
     {
         return string.IsNullOrWhiteSpace(order.DeliveryCarrier)
@@ -306,6 +314,7 @@ public class OrderController : Controller
             ShippingCountry = order.ShippingCountry,
             ShippingCity = order.ShippingCity,
             ShippingStreet = order.ShippingStreet,
+            DeliveryCarrierLabel = GetDeliveryCarrierLabel(order),
             DeliveryMethodLabel = GetDeliveryLabel(order),
             PaymentMethodLabel = string.IsNullOrWhiteSpace(order.PaymentMethod)
                 ? GetPaymentChoice(order.Id) : PaymentMethods.Label(order.PaymentMethod),
