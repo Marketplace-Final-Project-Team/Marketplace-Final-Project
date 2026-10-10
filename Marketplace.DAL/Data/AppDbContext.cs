@@ -2,6 +2,7 @@
 using Marketplace.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace Marketplace.DAL.Data
 {
@@ -46,6 +47,7 @@ namespace Marketplace.DAL.Data
         public DbSet<RefundChatMessage> RefundChatMessages { get; set; }
 
         public DbSet<WithdrawalRequest> WithdrawalRequests { get; set; }
+        public DbSet<AIChatMessage> AIChatMessages { get; set; }
 
         public DbSet<ReviewAppeal> ReviewAppeals { get; set; }
 
@@ -76,7 +78,8 @@ namespace Marketplace.DAL.Data
             builder.Entity<SystemSetting>().HasQueryFilter(s => !s.IsDeleted);
             builder.Entity<MarketplaceBalance>().HasQueryFilter(mb => !mb.IsDeleted);
             builder.Entity<RefundChatMessage>().HasQueryFilter(m => !m.IsDeleted);
-          
+            builder.Entity<AIChatMessage>().HasQueryFilter(d => !d.IsDeleted);
+
 
             builder.Entity<Business>()
                 .HasOne(b => b.Owner)
@@ -335,6 +338,16 @@ namespace Marketplace.DAL.Data
                 .WithMany()
                 .HasForeignKey(wr => wr.BusinessId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<AIChatMessage>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.HasOne(x => x.User)
+                    .WithMany(x => x.AIChatMessages)
+                    .HasForeignKey(x => x.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
 
             builder.Entity<Product>().Navigation(p => p.Category).AutoInclude();
             builder.Entity<Product>().Navigation(p => p.Images).AutoInclude();

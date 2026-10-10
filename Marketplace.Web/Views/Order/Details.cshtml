@@ -18,7 +18,10 @@
     private string PostSaleStatusLabel(Marketplace.Domain.Enums.PostSaleRequestStatus status) => status switch
     {
         Marketplace.Domain.Enums.PostSaleRequestStatus.Approved => Localizer["Повернення підтверджено - кошти повернуто"].Value,
+        Marketplace.Domain.Enums.PostSaleRequestStatus.Refunded => Localizer["Повернення підтверджено - кошти повернуто"].Value,
         Marketplace.Domain.Enums.PostSaleRequestStatus.Rejected => Localizer["У поверненні відмовлено"].Value,
+        Marketplace.Domain.Enums.PostSaleRequestStatus.AwaitingSellerConfirmation => Localizer["Адміністратор схвалив повернення · очікує підтвердження продавця"].Value,
+        Marketplace.Domain.Enums.PostSaleRequestStatus.SellerDisputed => Localizer["Продавець оскаржив повернення · на розгляді адміністратора"].Value,
         _ => Localizer["Заявку на повернення подано · очікує розгляду"].Value
     };
 }
@@ -90,7 +93,7 @@
                             <div class="postsale-status postsale-status--@item.ReturnRequest.Status.ToString().ToLowerInvariant() my-2 p-3 border rounded">
                                 <strong>@PostSaleStatusLabel(item.ReturnRequest.Status)</strong>
                                 <a asp-controller="Support" asp-action="RefundChatByOrderItem" asp-route-orderItemId="@item.Id" class="btn btn-sm btn-outline-primary mt-2">
-                                    Повернутися в чат
+                                    @Localizer["Повернутися в чат"]
                                 </a>
                                 <div class="text-muted small">@item.ReturnRequest.SubmittedAtUtc.ToLocalTime().ToString("dd MMMM yyyy, HH:mm") · @Localizer["Причина:"] @item.ReturnRequest.Reason</div>
 

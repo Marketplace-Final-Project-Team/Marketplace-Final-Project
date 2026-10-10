@@ -17,5 +17,6 @@ namespace Marketplace.Domain.Entities
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public ICollection<WishlistCollection> WishlistCollections { get; set;} = new List<WishlistCollection>();
         public ICollection<UserDiscount> UserDiscounts { get; set; } = new List<UserDiscount>();
+        public ICollection<AIChatMessage> AIChatMessages { get; set; } = new List<AIChatMessage>();
     }
 }

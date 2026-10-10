@@ -41,16 +41,28 @@
             const pendingWrap = document.querySelector("[data-ticket-pending]");
             const categorySelect = document.querySelector("[data-ticket-category]");
             const messageField = document.querySelector("[data-ticket-message]");
+            const errorField = document.querySelector("[data-ticket-error]");
 
             const category = categorySelect.value;
             const message = messageField.value.trim();
 
+            const showError = (text) => {
+                if (errorField) {
+                    errorField.textContent = text;
+                    errorField.hidden = false;
+                }
+            };
+
+            if (errorField) {
+                errorField.hidden = true;
+            }
+
             if (!category) {
-                alert("Оберіть тему звернення.");
+                showError("Оберіть тему звернення.");
                 return;
             }
             if (message.length < 10) {
-                alert("Опишіть ситуацію детальніше — щонайменше 10 символів.");
+                showError("Опишіть ситуацію детальніше — щонайменше 10 символів.");
                 return;
             }
 
@@ -86,13 +98,13 @@
                         window.location.reload();
                     }, 1500);
                 } else {
-                    alert("Помилка: " + (result.message || "Не вдалося надіслати заявку."));
+                    showError(result.message || "Не вдалося надіслати заявку.");
                     submitButton.disabled = false;
                     submitButton.textContent = "Надіслати заявку";
                 }
             } catch (error) {
                 console.error("Помилка відправки заявки:", error);
-                alert("Сталася помилка з'єднання із сервером.");
+                showError("Сталася помилка з'єднання із сервером.");
                 submitButton.disabled = false;
                 submitButton.textContent = "Надіслати заявку";
             }

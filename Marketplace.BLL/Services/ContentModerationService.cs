@@ -45,15 +45,12 @@ namespace Marketplace.BLL.Services
                     ?? throw new InvalidOperationException("Gemini API key не налаштований");
                 var model = await _settingsService.GetAsync("GoogleAI", "Model")
                     ?? _configuration["GoogleAI:Model"]
-                    ?? "gemini-2.5-flash";
+                    ?? "gemini-3.6-flash";
 
                 var url = $"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={apiKey}";
                 var response = await _httpClient.PostAsJsonAsync(url, requestBody);
                 if (!response.IsSuccessStatusCode)
                 {
-                    // The generic exception ProductModerationJob logs only says "403 Forbidden" -
-                    // the actual reason (bad model name, revoked key, no billing, quota) is in this
-                    // body and otherwise never reaches any log.
                     var errorBody = await response.Content.ReadAsStringAsync();
                     _logger.LogWarning("Gemini API повернув {StatusCode} для моделі {Model}: {ErrorBody}",
                         (int)response.StatusCode, model, errorBody);
@@ -203,133 +200,5 @@ namespace Marketplace.BLL.Services
 
             return await CallGeminiModerationAsync(requestBody, "тексту та зображень бізнеса");
         }
-
-        //
-        //    public async Task<ModerationResult> CheckImageAsync(string imageUrl)
-        //    {
-        //        var imageBytes = await _httpClient.GetByteArrayAsync(imageUrl);
-        //        var base64Image = Convert.ToBase64String(imageBytes);
-        //        var mimeType = GetMimeType(imageUrl);
-
-        //        var requestBody = new
-        //        {
-        //            contents = new[]
-        //            {
-        //                    new
-        //                    {
-        //                        parts = new object[]
-        //                        {
-        //                            new
-        //                            {
-        //                                text =
-        //                                """
-        //                                Проаналізуй це зображення на предмет забороненого контенту для маркетплейсу товарів.
-        //                                Перевір наявність: контенту 18+ (порнографія, оголене тіло), насильства, зброї, наркотиків, шокуючого/жорстокого контенту.
-        //                                Поверни ВИКЛЮЧНО JSON без жодного додаткового тексту, у форматі:
-        //                                {"isAdult": bool, "isViolent": bool, "containsProhibited": bool, "reason": "коротке пояснення українською або null"}
-        //                                """
-        //                            },
-        //                            new
-        //                            {
-        //                                inline_data = new
-        //                                {
-        //                                    mime_type = mimeType,
-        //                                    data = base64Image
-        //                                }
-        //                            }
-        //                        }
-        //                    }
-        //                },
-        //            generationConfig = new
-        //            {
-        //                temperature = 0,
-        //                responseMimeType = "application/json"
-        //            }
-        //        };
-
-        //        return await CallGeminiModerationAsync(requestBody, $"зображення {imageUrl}");
-        //    }
-
-        //    public async Task<ModerationResult> CheckImagesAsync(List<string> imageUrls)
-        //    {
-        //        var parts = new List<object>
-        //        {
-        //            new
-        //            {
-        //                text =
-        //                """
-        //                Проаналізуй ВСІ наступні зображення разом на предмет забороненого контенту для маркетплейсу товарів.
-        //                Перевір наявність: контенту 18+ (порнографія, оголене тіло), насильства, зброї, наркотиків, шокуючого/жорстокого контенту.
-        //                Якщо ХОЧА Б ОДНЕ зображення містить заборонений контент — вважай перевірку не пройденою.
-        //                Поверни ВИКЛЮЧНО один JSON-об'єкт (не масив) без жодного додаткового тексту, у форматі:
-        //                {"isAdult": bool, "isViolent": bool, "containsProhibited": bool, "reason": "коротке пояснення українською, яке саме зображення і чому, або null"
-        //                """
-        //            }
-        //        };
-
-        //        foreach (var url in imageUrls)
-        //        {
-        //            var bytes = await _httpClient.GetByteArrayAsync(url);
-
-        //            parts.Add(new
-        //            {
-        //                inline_data = new { mime_type = GetMimeType(url), data = Convert.ToBase64String(bytes) }
-        //            });
-        //        }
-
-        //        var requestBody = new
-        //        {
-        //            contents = new[]
-        //            {
-        //                    new
-        //                    {
-        //                        parts = parts,
-        //                    }
-        //                },
-        //            generationConfig = new
-        //            {
-        //                temperature = 0,
-        //                responseMimeType = "application/json"
-        //            }
-        //        };
-
-        //        return await CallGeminiModerationAsync(requestBody, $"зображень");
-        //    }
-
-        //    public async Task<ModerationResult> CheckTextAsync(string text)
-        //    {
-        //        var requestBody = new
-        //        {
-        //            contents = new[]
-        //                {
-        //            new
-        //            {
-        //                parts = new object[]
-        //                {
-        //                    new
-        //                    {
-        //                        text = $$"""
-        //                        Проаналізуй наступний текст (назва та опис товару на маркетплейсі) на предмет забороненого контенту.
-        //                        Перевір наявність: контенту 18+, ненормативної лексики, образ, погроз, заклику до насильства,
-        //                        заборонених товарів (зброя, наркотики, підробки).
-        //                        Поверни ВИКЛЮЧНО JSON без жодного додаткового тексту, у форматі:
-        //                        {"isAdult": bool, "isViolent": bool, "containsProhibited": bool, "reason": "коротке пояснення українською або null"}
-
-        //                        Текст для перевірки:
-        //                        "{{text}}"
-        //                        """
-        //                    }
-        //                }
-        //            }
-        //        },
-        //            generationConfig = new
-        //            {
-        //                temperature = 0,
-        //                responseMimeType = "application/json"
-        //            }
-        //        };
-
-        //        return await CallGeminiModerationAsync(requestBody, "тексту");
-        //    }
     }
 }

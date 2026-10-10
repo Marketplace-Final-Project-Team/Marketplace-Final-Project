@@ -6,6 +6,7 @@
 
 <nav class="products-subnav" aria-label="@Localizer["Розділи товарів"]">
     <a class="@ActiveClass("Index")" asp-action="Index" asp-route-businessId="@Model">@SharedLocalizer["Мої товари"]</a>
+    <a class="@ActiveClass("Categories")" asp-action="Categories" asp-route-businessId="@Model">@Localizer["Категорії"]</a>
     <a class="@ActiveClass("Warehouse")" asp-action="Warehouse" asp-route-businessId="@Model">@Localizer["Склад"]</a>
     <a class="@ActiveClass("Reserved")" asp-action="Reserved" asp-route-businessId="@Model">@Localizer["Зарезервовані"]</a>
     <a class="@ActiveClass("StockPlanning")" asp-action="StockPlanning" asp-route-businessId="@Model">@Localizer["Планування запасів"]</a>

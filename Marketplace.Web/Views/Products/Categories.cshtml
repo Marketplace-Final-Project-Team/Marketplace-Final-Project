@@ -1,0 +1,58 @@
+@model IEnumerable<Marketplace.Web.Models.Products.ProductCategorySummaryViewModel>
+
+@{
+    ViewData["Title"] = Localizer["Категорії"];
+    var items = Model.ToList();
+    var businessId = ViewBag.SelectedBusinessId as Guid?;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/business.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/products.css" asp-append-version="true" />
+}
+
+<div class="products-page">
+    @if (businessId.HasValue)
+    {
+        <partial name="_BusinessNav" model="businessId.Value" />
+    }
+
+    <header class="products-heading">
+        <div>
+            <div class="products-eyebrow">@Localizer["Панель продавця"]</div>
+            <h1 class="products-title">@Localizer["Категорії"]</h1>
+            <p class="products-subtitle">@Localizer["Розподіл ваших товарів за категоріями каталогу."]</p>
+        </div>
+    </header>
+
+    @if (businessId.HasValue)
+    {
+        <partial name="_ProductsNav" model="businessId.Value" />
+    }
+
+    @if (items.Count == 0)
+    {
+        <section class="product-empty">
+            <div class="product-empty__icon" aria-hidden="true">□</div>
+            <h2>@Localizer["Товарів поки немає"]</h2>
+            <p>@Localizer["Додайте товари, щоб побачити розподіл за категоріями."]</p>
+        </section>
+    }
+    else
+    {
+        <div class="products-category-grid">
+            @foreach (var category in items)
+            {
+                <article class="products-category-card">
+                    <h2>@SharedLocalizer[category.CategoryName]</h2>
+                    <span class="products-category-card__count">@category.ProductCount @Localizer["товарів"]</span>
+                    @if (category.ActiveProductCount != category.ProductCount)
+                    {
+                        <span class="products-category-card__active">@category.ActiveProductCount @Localizer["активних"]</span>
+                    }
+                    <a asp-action="Index" asp-route-businessId="@businessId" asp-route-categoryId="@category.CategoryId" class="btn btn-outline-primary btn-sm">@Localizer["Переглянути"]</a>
+                </article>
+            }
+        </div>
+    }
+</div>

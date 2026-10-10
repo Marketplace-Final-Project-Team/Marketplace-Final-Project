@@ -1,6 +1,7 @@
 @model Marketplace.Web.Models.WishlistCollectionDetailsViewModel
 
 @{
+    Layout = "_ProfileLayout";
     ViewData["Title"] = Model.Collection.Name;
     var returnUrl = Context.Request.Path + Context.Request.QueryString;
 }

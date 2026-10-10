@@ -5,8 +5,6 @@ namespace Marketplace.Domain.Entities
 {
 	public class Discount : BaseEntity
 	{
-		public Guid Id { get; set; } = Guid.NewGuid();
-
 		public Guid? ProductId { get; set; }
 		public Product? Product { get; set; } = null!;
 

@@ -61,11 +61,15 @@
     color: #d64545;
 }
 
-.postsale-status--pending {
+.postsale-status--pending,
+.postsale-status--awaitingsellerconfirmation,
+.postsale-status--sellerdisputed {
     background: #fff6e0;
 }
 
-.postsale-status--pending strong {
+.postsale-status--pending strong,
+.postsale-status--awaitingsellerconfirmation strong,
+.postsale-status--sellerdisputed strong {
     color: #b8860b;
 }
 

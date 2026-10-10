@@ -30,31 +30,9 @@ namespace Marketplace.Web.Controllers
 
         public async Task<IActionResult> Index([FromQuery] CatalogFilterViewModel filter, string? userId)
         {
-            const int pageSize = 6;
             filter.Page = filter.Page <= 0 ? 1 : filter.Page;
 
-            // "Популярне зараз" should actually rank by sales, not just show the newest
-            // listings — but only when the caller hasn't explicitly asked for another sort.
             var sort = Request.Query.ContainsKey("Sort") ? filter.Sort : CatalogSortOption.Popularity;
-
-            var filterDto = new CatalogFilterDto
-            {
-                Search = filter.Search,
-                CategoryId = filter.CategoryId,
-                MinPrice = filter.MinPrice,
-                MaxPrice = filter.MaxPrice,
-                InStockOnly = filter.InStockOnly,
-                MinRating = filter.MinRating,
-                Sort = sort,
-                Page = filter.Page,
-                PageSize = pageSize
-            };
-
-            var catalogPage = await _productService.GetCatalogPageAsync(filterDto);
-
-            var featuredProducts = catalogPage.Items
-                .Select(item => MapCatalogProduct(item, userId))
-                .ToList();
 
             var rawCategories = await _categoryService.GetAllCategories();
 
@@ -103,15 +81,12 @@ namespace Marketplace.Web.Controllers
 
             var viewModel = new HomeViewModel
             {
-                FeaturedProducts = featuredProducts,
                 Categories = homeCategories,
                 CategorySections = categorySections,
                 Search = filter.Search,
                 CategoryId = filter.CategoryId,
                 SortBy = sort.ToString(),
-                RecentlyViewed = (await GetRecentlyViewedAsync()).Take(3).ToList(),
-                AverageRating = featuredProducts.Any() ? featuredProducts.Average(p => p.AverageRating) : null,
-                ReviewCount = featuredProducts.Sum(p => p.ReviewCount)
+                RecentlyViewed = (await RecentlyViewedCookie.LoadAsync(_productService, Request.Cookies)).Take(3).ToList()
             };
 
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
@@ -127,37 +102,6 @@ namespace Marketplace.Web.Controllers
         {
             var suggestions = await _productService.GetSearchSuggestionsAsync(term);
             return Json(suggestions);
-        }
-
-        private async Task<List<CatalogRelatedProductViewModel>> GetRecentlyViewedAsync()
-        {
-            Request.Cookies.TryGetValue(RecentlyViewedCookie.Name, out var raw);
-            var ids = RecentlyViewedCookie.Parse(raw);
-
-            var items = new List<CatalogRelatedProductViewModel>();
-            foreach (var id in ids)
-            {
-                // Re-fetched from the database on every request — a product that was
-                // deleted, banned, or sold out since the visit just won't come back here,
-                // so this never shows stale name/price/stock data from an earlier view.
-                var product = await _productService.GetCatalogProductAsync(id);
-                if (product is null)
-                {
-                    continue;
-                }
-
-                items.Add(new CatalogRelatedProductViewModel
-                {
-                    Id = product.Id,
-                    Name = product.Name,
-                    CategoryName = product.Category?.Name ?? "Без категорії",
-                    MainImageUrl = product.MainImageUrl,
-                    Price = product.Price,
-                    Quantity = product.Quantity
-                });
-            }
-
-            return items;
         }
 
         public IActionResult Privacy()

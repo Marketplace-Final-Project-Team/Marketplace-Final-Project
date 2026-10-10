@@ -1,6 +1,8 @@
 using Marketplace.BLL.Interfaces;
+using Marketplace.DAL.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace Marketplace.Web.Hubs
@@ -9,10 +11,14 @@ namespace Marketplace.Web.Hubs
     public class SupportTicketChatHub : Hub
     {
         private readonly ISupportTicketService _ticketService;
+        private readonly IHubContext<NotificationHub> _notificationHub;
+        private readonly AppDbContext _context;
 
-        public SupportTicketChatHub(ISupportTicketService ticketService)
+        public SupportTicketChatHub(ISupportTicketService ticketService, IHubContext<NotificationHub> notificationHub, AppDbContext context)
         {
             _ticketService = ticketService;
+            _notificationHub = notificationHub;
+            _context = context;
         }
 
         public async Task JoinChat(Guid ticketId)
@@ -48,6 +54,20 @@ namespace Marketplace.Web.Hubs
                 text = message.Text,
                 sentAt = message.SentAt
             });
+
+          
+            if (isAdmin)
+            {
+                var ticket = await _context.SupportTickets.FirstOrDefaultAsync(t => t.Id == ticketId);
+                if (ticket is not null)
+                {
+                    await _notificationHub.Clients.User(ticket.UserId).SendAsync("ReceiveNotification", new
+                    {
+                        text = "Адміністратор відповів у вашому зверненні до підтримки.",
+                        type = "SupportTicket"
+                    });
+                }
+            }
         }
     }
 }

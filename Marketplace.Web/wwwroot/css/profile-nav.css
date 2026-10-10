@@ -1,0 +1,122 @@
+.profile-shell {
+    align-items: start;
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: 15.5rem minmax(0, 1fr);
+    padding-top: 1.4rem;
+}
+
+.profile-shell__content {
+    min-width: 0;
+}
+
+.profile-shell__content .profile-page,
+.profile-shell__content .shop-page {
+    padding-top: 0;
+}
+
+.profile-shell__content .profile-back {
+    display: none;
+}
+
+.profile-nav {
+    background: #fff;
+    border: 1px solid #e5e9f1;
+    border-radius: 1rem;
+    box-shadow: 0 0.35rem 1.35rem rgba(23, 32, 51, 0.055);
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    padding: 1rem;
+    position: sticky;
+    top: 1rem;
+}
+
+.profile-nav__user {
+    align-items: center;
+    border-bottom: 1px solid #e5e9f1;
+    color: #172033;
+    display: flex;
+    gap: 0.7rem;
+    padding-bottom: 0.9rem;
+    text-decoration: none;
+}
+
+.profile-nav__avatar {
+    align-items: center;
+    background: linear-gradient(135deg, #3157d7, #6c83e6);
+    border-radius: 50%;
+    color: #fff;
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-weight: 850;
+    height: 2.4rem;
+    justify-content: center;
+    width: 2.4rem;
+}
+
+.profile-nav__user-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+    min-width: 0;
+}
+
+.profile-nav__user-text small {
+    color: #667085;
+    font-size: 0.72rem;
+}
+
+.profile-nav__user-text strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.profile-nav__group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.profile-nav__group h3 {
+    color: #667085;
+    font-size: 0.72rem;
+    font-weight: 750;
+    letter-spacing: 0.04em;
+    margin: 0 0 0.35rem;
+    text-transform: uppercase;
+}
+
+.profile-nav__group a {
+    border-radius: 0.55rem;
+    color: #344054;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.42rem 0.6rem;
+    text-decoration: none;
+}
+
+.profile-nav__group a:hover {
+    background: #f6f8fc;
+    color: #172033;
+}
+
+.profile-nav__group a.is-active {
+    background: #3157d7;
+    color: #fff;
+}
+
+@media (max-width: 991.98px) {
+    .profile-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-nav {
+        position: static;
+    }
+
+    .profile-shell__content .profile-back {
+        display: inline-block;
+    }
+}

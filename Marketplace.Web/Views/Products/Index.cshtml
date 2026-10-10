@@ -10,14 +10,20 @@
     {
         businessId = selectedBusinessId,
         search = Model.Search,
-        filter = tabFilter
+        filter = tabFilter,
+        categoryId = Model.CategoryId
     }) ?? "#";
 }
 
 @section Styles {
+    <link rel="stylesheet" href="~/css/business.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/products.css" asp-append-version="true" />
 }
 <div class="products-page">
+    @if (selectedBusinessId.HasValue)
+    {
+        <partial name="_BusinessNav" model="selectedBusinessId.Value" />
+    }
     <header class="products-heading">
         <div>
             <div class="products-eyebrow">@Localizer["Панель продавця"]</div>
@@ -27,12 +33,27 @@
         @if (businessOptions.Any())
         {
             <div class="products-heading__actions">
-                <a asp-action="ExportExcel" asp-route-businessId="@selectedBusinessId" class="btn btn-outline-secondary">@Localizer["Експорт"]</a>
-                <form asp-action="ImportExcel" method="post" enctype="multipart/form-data" class="products-import-form">
-                    <input type="hidden" name="businessId" value="@selectedBusinessId" />
-                    <label class="btn btn-outline-secondary" for="importFile">@Localizer["Імпорт"]</label>
-                    <input type="file" id="importFile" name="file" accept=".xlsx" class="visually-hidden" data-auto-submit />
-                </form>
+                <div class="dropdown">
+                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        @Localizer["Прайс (Excel)"]
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end products-price-menu">
+                        <li><a class="dropdown-item" asp-action="ExportExcel" asp-route-businessId="@selectedBusinessId">@Localizer["Експортувати асортимент"]</a></li>
+                        <li><label class="dropdown-item" for="importFile" role="button">@Localizer["Імпортувати з файлу"]</label></li>
+                        <li><hr class="dropdown-divider" /></li>
+                        <li><a class="dropdown-item" asp-action="ExportExample">@Localizer["Завантажити приклад файлу"]</a></li>
+                        <li><hr class="dropdown-divider" /></li>
+                        <li>
+                            <p class="dropdown-item-text products-price-menu__hint">
+                                @Localizer["Рядок з артикулом наявного товару оновить його, рядок без артикулу створить новий. «Категорія» має точно збігатися з назвою в каталозі; товари з розмірами через імпорт не оновлюються. Змінені товари повторно проходять модерацію."]
+                            </p>
+                        </li>
+                    </ul>
+                    <form asp-action="ImportExcel" method="post" enctype="multipart/form-data" class="products-import-form">
+                        <input type="hidden" name="businessId" value="@selectedBusinessId" />
+                        <input type="file" id="importFile" name="file" accept=".xlsx" class="visually-hidden" data-auto-submit />
+                    </form>
+                </div>
                 <a asp-action="Create" class="btn btn-primary">+ @Localizer["Додати товар"]</a>
             </div>
         }
@@ -82,9 +103,18 @@
             </div>
         </div>
 
+        @if (Model.CategoryId.HasValue)
+        {
+            <div class="products-filter-pill">
+                @Localizer["Категорія:"] <strong>@SharedLocalizer[Model.CategoryName ?? string.Empty]</strong>
+                <a href="@Url.Action(nameof(Marketplace.Web.Controllers.ProductsController.Index), new { businessId = selectedBusinessId, search = Model.Search, filter = Model.Filter })">✕</a>
+            </div>
+        }
+
         <form asp-action="Index" method="get" class="products-search-form">
             <input type="hidden" name="businessId" value="@selectedBusinessId" />
             <input type="hidden" name="filter" value="@Model.Filter" />
+            <input type="hidden" name="categoryId" value="@Model.CategoryId" />
             <input type="search" name="search" value="@Model.Search" class="form-control" placeholder="@Localizer["Пошук за назвою або артикулом"]" />
             <button type="submit" class="btn btn-outline-secondary">@Localizer["Шукати"]</button>
         </form>
