@@ -15,6 +15,9 @@ public class OrderListItemViewModel
 
 public class OrderDetailsViewModel
 {
+    public string RecipientLastName { get; set; } = string.Empty;
+    public string RecipientFirstName { get; set; } = string.Empty;
+    public string RecipientPhone { get; set; } = string.Empty;
     public Guid Id { get; set; }
     public DateTime CreatedAt { get; set; }
     public OrderStatus Status { get; set; }

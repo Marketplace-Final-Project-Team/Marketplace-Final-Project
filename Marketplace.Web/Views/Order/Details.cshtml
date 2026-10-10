@@ -129,6 +129,13 @@
                     <dt>@Localizer["Статус"]</dt>
                     <dd>@StatusLabel(Model.Status)</dd>
                 </div>
+                @if (!string.IsNullOrWhiteSpace(Model.RecipientLastName))
+                {
+                    <div class="order-info__row">
+                        <dt>@Localizer["Отримувач"]</dt>
+                        <dd>@Model.RecipientLastName @Model.RecipientFirstName<br />@Model.RecipientPhone</dd>
+                    </div>
+                }
                 <div class="order-info__row">
                     <dt>@Localizer["Адреса"]</dt>
                     <dd>@Model.ShippingCountry, @Model.ShippingCity,<br />@Model.ShippingStreet</dd>

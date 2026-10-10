@@ -1,10 +1,8 @@
 using System.Security.Claims;
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
-using Marketplace.DAL.Data;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
-using Marketplace.Domain.Interfaces;
 using Marketplace.Web.Infrastructure;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -21,8 +19,6 @@ public class OrderController : Controller
     private readonly IProductService _productService;
     private readonly IPostSaleService _postSaleService;
     private readonly IPromoCodeService _promoCodeService;
-    private readonly IGenericRepository<Address> _addressRepository;
-    private readonly AppDbContext _context;
     private readonly IActivityLogService _activityLog;
 
     public OrderController(
@@ -31,8 +27,6 @@ public class OrderController : Controller
         IProductService productService,
         IPostSaleService postSaleService,
         IPromoCodeService promoCodeService,
-        IGenericRepository<Address> addressRepository,
-        AppDbContext context,
         IActivityLogService activityLog)
     {
         _orderService = orderService;
@@ -40,8 +34,6 @@ public class OrderController : Controller
         _productService = productService;
         _postSaleService = postSaleService;
         _promoCodeService = promoCodeService;
-        _addressRepository = addressRepository;
-        _context = context;
         _activityLog = activityLog;
     }
 
@@ -57,7 +49,7 @@ public class OrderController : Controller
             TotalAmount = order.TotalAmount,
             ItemsCount = order.Items.Sum(item => item.Quantity),
             ShippingAddress = $"{order.ShippingCity}, {order.ShippingStreet}",
-            DeliveryMethodLabel = GetDeliveryChoice(order.Id)
+            DeliveryMethodLabel = GetDeliveryLabel(order)
         }).ToList());
     }
 
@@ -80,7 +72,6 @@ public class OrderController : Controller
     {
         var model = new OrderCreateViewModel();
         await PopulateCart(model);
-        await PopulateSavedAddresses(model);
 
         if (model.Items.Count == 0)
         {
@@ -103,64 +94,34 @@ public class OrderController : Controller
 
         if (!ModelState.IsValid)
         {
-            await PopulateSavedAddresses(model);
             return View(model);
         }
 
         var userId = GetUserId();
-        Guid addressId;
-
-        if (model.IsUsingSavedAddress)
-        {
-            if (!model.SelectedAddressId.HasValue)
-            {
-                ModelState.AddModelError(string.Empty, "Будь ласка, оберіть збережену адресу.");
-                await PopulateSavedAddresses(model);
-                return View(model);
-            }
-
-            var savedAddress = await _addressRepository.FirstOrDefaultAsync(
-                a => a.Id == model.SelectedAddressId.Value && a.UserId == userId);
-
-            if (savedAddress is null)
-            {
-                ModelState.AddModelError(string.Empty, "Обрана адреса не знайдена.");
-                await PopulateSavedAddresses(model);
-                return View(model);
-            }
-
-            addressId = savedAddress.Id;
-        }
-        else
-        {
-            var newAddress = new Address
-            {
-                UserId = userId,
-                Country = model.Country!.Trim(),
-                City = model.City!.Trim(),
-                Street = model.Street!.Trim(),
-                IsDefault = false
-            };
-
-            await _addressRepository.AddAsync(newAddress);
-            await _context.SaveChangesAsync();
-            addressId = newAddress.Id;
-        }
         var scheme = Request.Scheme;
         var host = Request.Host;
 
         var result = await _orderService.CreateOrder(userId!, new OrderCreateDto
         {
-            AddressId = addressId,
+            RecipientLastName = model.RecipientLastName,
+            RecipientFirstName = model.RecipientFirstName,
+            RecipientPhone = model.RecipientPhone,
+            DeliveryCarrier = model.DeliveryCarrier,
+            PaymentMethod = model.PaymentMethod,
+            ShippingCity = model.DeliveryCarrier == DeliveryCarriers.NovaPoshta
+                ? model.NovaPoshtaCityName! : model.DeliveryCity!,
+            ShippingStreet = model.DeliveryCarrier == DeliveryCarriers.NovaPoshta
+                ? model.NovaPoshtaBranchName! : model.DeliveryStreet!,
+            NovaPoshtaCityRef = model.DeliveryCarrier == DeliveryCarriers.NovaPoshta ? model.NovaPoshtaCityRef : null,
+            NovaPoshtaBranchRef = model.DeliveryCarrier == DeliveryCarriers.NovaPoshta ? model.NovaPoshtaBranchRef : null,
             PromoCode = model.PromoCode,
-            SuccessUrl = $"{scheme}://{host}/Order/MyOrders",
-            CancelUrl = $"{scheme}://{host}/Order/MyOrders"
+            SuccessUrl = $"{scheme}://{host}/Order",
+            CancelUrl = $"{scheme}://{host}/Order"
         });
 
         if (!result.Succeeded)
         {
             ModelState.AddModelError(string.Empty, result.Message);
-            await PopulateSavedAddresses(model);
             return View(model);
         }
 
@@ -246,6 +207,13 @@ public class OrderController : Controller
         });
     }
 
+    private string? GetDeliveryLabel(Order order)
+    {
+        return string.IsNullOrWhiteSpace(order.DeliveryCarrier)
+            ? GetDeliveryChoice(order.Id)
+            : $"{DeliveryCarriers.Label(order.DeliveryCarrier)} - {order.ShippingCity}, {order.ShippingStreet}";
+    }
+
     private string? GetDeliveryChoice(Guid orderId)
     {
         return Request.Cookies.TryGetValue(OrderDeliveryCookie.NameFor(orderId), out var label) && !string.IsNullOrWhiteSpace(label)
@@ -306,34 +274,6 @@ public class OrderController : Controller
         model.SellerGroups = await CartGrouping.GroupBySellerAsync(model.Items, _productService);
     }
 
-    private async Task PopulateSavedAddresses(OrderCreateViewModel model)
-    {
-        var userId = GetUserId();
-        var addresses = await _addressRepository.FindAsync(a => a.UserId == userId);
-
-        model.SavedAddresses = addresses
-            .OrderByDescending(a => a.IsDefault)
-            .ThenByDescending(a => a.CreatedAt)
-            .Select(a => new AddressViewModel
-            {
-                Id = a.Id,
-                Country = a.Country,
-                City = a.City,
-                Street = a.Street,
-                IsDefault = a.IsDefault
-            })
-            .ToList();
-
-        if (!model.SelectedAddressId.HasValue)
-        {
-            var defaultAddress = model.SavedAddresses.FirstOrDefault(a => a.IsDefault) ?? model.SavedAddresses.FirstOrDefault();
-            if (defaultAddress is not null)
-            {
-                model.SelectedAddressId = defaultAddress.Id;
-            }
-        }
-    }
-
     private async Task<OrderDetailsViewModel?> BuildOrderDetails(Guid id)
     {
         var order = await _orderService.GetUserOrder(GetUserId(), id);
@@ -350,11 +290,15 @@ public class OrderController : Controller
             CreatedAt = order.CreatedAt,
             Status = order.Status,
             TotalAmount = order.TotalAmount,
+            RecipientLastName = order.RecipientLastName,
+            RecipientFirstName = order.RecipientFirstName,
+            RecipientPhone = order.RecipientPhone,
             ShippingCountry = order.ShippingCountry,
             ShippingCity = order.ShippingCity,
             ShippingStreet = order.ShippingStreet,
-            DeliveryMethodLabel = GetDeliveryChoice(order.Id),
-            PaymentMethodLabel = GetPaymentChoice(order.Id),
+            DeliveryMethodLabel = GetDeliveryLabel(order),
+            PaymentMethodLabel = string.IsNullOrWhiteSpace(order.PaymentMethod)
+                ? GetPaymentChoice(order.Id) : PaymentMethods.Label(order.PaymentMethod),
             Items = order.Items.Select(item => new OrderLineViewModel
             {
                 Id = item.Id,
