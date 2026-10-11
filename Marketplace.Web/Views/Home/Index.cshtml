@@ -2,12 +2,6 @@
 
 @{
     ViewData["Title"] = SharedLocalizer["Головна"].Value;
-    var topProduct = Model.TopProduct;
-    var topProductName = topProduct?.Name ?? string.Empty;
-    if (topProduct is not null)
-    {
-        topProductName = (await ProductTranslator.GetLocalizedAsync(topProduct.Id, topProduct.Name, string.Empty, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)).Name;
-    }
 }
 
 @section Styles {
@@ -15,148 +9,64 @@
 }
 
 <div class="home-page">
-    <section class="home-hero">
-        <div class="home-hero__content">
-            <div class="home-pill"><span></span> @Localizer["Покупки без зайвих кроків"]</div>
-            <h1>@Localizer["Усе потрібне - <em>в одному місці</em>"]</h1>
-            <p>@Localizer["Знаходьте товари для роботи, дому й відпочинку. Порівнюйте пропозиції, додавайте до кошика та стежте за доставкою."]</p>
+    @{
+        var heroSlides = Model.Categories.Where(c => !string.IsNullOrWhiteSpace(c.ImageUrl)).ToList();
 
-            <form asp-controller="Catalog" asp-action="Index" method="get" class="home-search" role="search" data-search-wrapper>
-                <span aria-hidden="true">⌕</span>
-                <input name="Search" id="homeSearchInput" placeholder="@Localizer["Що ви шукаєте?"]" aria-label="@SharedLocalizer["Пошук товарів"]" data-search-autocomplete autocomplete="off" />
-                <button type="submit">@Localizer["Знайти"]</button>
-            </form>
+        // Wikimedia-hosted category photos are stored as 500px thumbnails; the hero is far wider,
+        // so ask for the 1280px rendition first and keep the stored one as a fallback layer.
+        string HeroBackground(string url)
+        {
+            var safe = url.Replace("'", "%27");
+            var large = safe.Contains("upload.wikimedia.org") ? safe.Replace("/500px-", "/1280px-") : safe;
+            return large == safe ? $"url('{safe}')" : $"url('{large}'), url('{safe}')";
+        }
+    }
 
-            <div class="home-hero__actions">
-                <a asp-controller="Catalogue" asp-action="Index" class="home-button home-button--primary">@Localizer["Перейти до каталогу"] <span>→</span></a>
-                @if (User.Identity?.IsAuthenticated != true)
+    @if (heroSlides.Count > 0)
+    {
+        <section class="home-carousel" aria-label="@SharedLocalizer["Категорії"]">
+            <div id="homeHeroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000" data-bs-pause="hover" data-bs-touch="true">
+                @if (heroSlides.Count > 1)
                 {
-                    <a asp-controller="Auth" asp-action="SignUp" class="home-button home-button--ghost">@SharedLocalizer["Створити акаунт"]</a>
+                    <div class="carousel-indicators">
+                        @for (var i = 0; i < heroSlides.Count; i++)
+                        {
+                            <button type="button" data-bs-target="#homeHeroCarousel" data-bs-slide-to="@i"
+                                    class="@(i == 0 ? "active" : null)" aria-current="@(i == 0 ? "true" : null)"
+                                    aria-label="@SharedLocalizer[heroSlides[i].Name]"></button>
+                        }
+                    </div>
                 }
-                else
-                {
-                    <a asp-controller="Order" asp-action="Index" class="home-button home-button--ghost">@SharedLocalizer["Мої замовлення"]</a>
-                }
-            </div>
-
-            <div class="home-hero__proof">
-                <div><strong>@Localizer["Зручно для кожного"]</strong><small>@Localizer["від пошуку до доставки"]</small></div>
-            </div>
-        </div>
-
-        <div class="home-hero__visual" aria-label="@Localizer["Популярні пропозиції"]">
-            <div class="visual-orbit visual-orbit--one"></div>
-            <div class="visual-orbit visual-orbit--two"></div>
-
-            <div class="visual-main-card position-relative">
-
-                @if (topProduct is not null && topProduct.IsAgeRestricted)
-                {
-                    <span class="position-absolute top-0 end-0 bg-danger text-white text-xs fw-bold px-2 py-1 rounded-pill z-1 m-2 shadow">
-                        18+
-                    </span>
-                }
-
-                <div class="visual-main-card__top">
-                    <span class="visual-tag">@(topProduct is not null ? Localizer["Популярний вибір"].Value : Localizer["Каталог"].Value)</span>
-                    <span class="visual-heart" aria-hidden="true">♡</span>
-                </div>
-                <div class="visual-product">
-                    <div class="visual-product__halo"></div>
-                    @if (topProduct is not null && !string.IsNullOrWhiteSpace(topProduct.MainImageUrl))
+                <div class="carousel-inner">
+                    @for (var i = 0; i < heroSlides.Count; i++)
                     {
-                        <img src="@topProduct.MainImageUrl" alt="@topProductName" class="visual-product__image" />
-                    }
-                    else
-                    {
-                        <div class="visual-product__shape" aria-hidden="true">
-                            <span></span>
+                        var slide = heroSlides[i];
+                        <div class="carousel-item @(i == 0 ? "active" : null)">
+                            <a asp-controller="Catalogue" asp-action="Index" asp-route-categoryId="@slide.Id"
+                               class="home-carousel__slide" style="background-image:@Html.Raw(HeroBackground(slide.ImageUrl!))">
+                                <span class="home-carousel__caption">
+                                    <small>@SharedLocalizer["Категорії"]</small>
+                                    <strong>@SharedLocalizer[slide.Name]</strong>
+                                    <em>@slide.ProductCount @(slide.ProductCount == 1 ? Localizer["товар"].Value : slide.ProductCount is >= 2 and <= 4 ? Localizer["товари"].Value : Localizer["товарів"].Value)</em>
+                                </span>
+                            </a>
                         </div>
                     }
                 </div>
-                <div class="visual-main-card__copy">
-                    @if (topProduct is not null)
-                    {
-                        <small>@SharedLocalizer[topProduct.CategoryName]</small>
-                        <strong>
-                            @topProductName - @topProduct.Price.ToString("N0") ₴
-                            @if (topProduct.OriginalPrice.HasValue && topProduct.OriginalPrice.Value > topProduct.Price)
-                            {
-                                <span class="text-muted text-decoration-line-through small ms-1">@topProduct.OriginalPrice.Value.ToString("N0") ₴</span>
-                            }
-                        </strong>
-                        <button type="button" class="btn btn-link p-0 text-start text-decoration-none"
-                                onclick="checkAgeAndAction('@topProduct.Id', @topProduct.IsAgeRestricted.ToString().ToLower())">
-                            @Localizer["Переглянути товар →"]
-                        </button>
-                    }
-                    else
-                    {
-                        <small>Marketplace</small>
-                        <strong>@Localizer["Товари ще завантажуються"]</strong>
-                        <a asp-controller="Catalogue" asp-action="Index">@Localizer["Перейти до каталогу →"]</a>
-                    }
-                </div>
-            </div>
-
-            <div class="visual-float-card visual-float-card--rating">
-                <span class="visual-float-card__icon">★</span>
-                @if (Model.AverageRating.HasValue)
+                @if (heroSlides.Count > 1)
                 {
-                    <div><strong>@Model.AverageRating.Value.ToString("0.0")</strong><small>@Model.ReviewCount @Localizer["відгуків покупців"]</small></div>
-                }
-                else
-                {
-                    <div><strong>@Localizer["Новий каталог"]</strong><small>@Localizer["Будьте першим, хто залишить відгук"]</small></div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#homeHeroCarousel" data-bs-slide="prev">
+                        <span class="home-carousel__arrow" aria-hidden="true">‹</span>
+                        <span class="visually-hidden">@Localizer["Попередній"]</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#homeHeroCarousel" data-bs-slide="next">
+                        <span class="home-carousel__arrow" aria-hidden="true">›</span>
+                        <span class="visually-hidden">@Localizer["Наступний"]</span>
+                    </button>
                 }
             </div>
-            <div class="visual-float-card visual-float-card--delivery">
-                <span class="visual-float-card__icon">✓</span>
-                <div><strong>@Localizer["Швидка доставка"]</strong><small>@Localizer["статус завжди під рукою"]</small></div>
-            </div>
-        </div>
-    </section>
-
-    <section class="home-benefits" aria-label="@Localizer["Переваги маркетплейсу"]">
-        <div><span>✓</span><p><strong>@Localizer["Перевірені товари"]</strong><small>@Localizer["зрозумілий статус наявності"]</small></p></div>
-        <div><span>↺</span><p><strong>@Localizer["Просте повернення"]</strong><small>@Localizer["прозорий процес покупки"]</small></p></div>
-        <div><span>□</span><p><strong>@Localizer["Зручний кошик"]</strong><small>@Localizer["керуйте кількістю онлайн"]</small></p></div>
-        <div><span>→</span><p><strong>@Localizer["Контроль доставки"]</strong><small>@Localizer["від замовлення до отримання"]</small></p></div>
-    </section>
-
-    <section class="home-section">
-        <div class="home-section__heading">
-            <div>
-                <span class="home-section__kicker">@Localizer["Обирайте швидше"]</span>
-                <h2>@Localizer["Популярні категорії"]</h2>
-            </div>
-            <a asp-controller="Catalogue" asp-action="Index">@Localizer["Увесь каталог →"]</a>
-        </div>
-
-        @if (Model.Categories.Count == 0)
-        {
-            <p class="text-secondary">@Localizer["Категорії ще не додані."]</p>
-        }
-        else
-        {
-            <div class="category-grid">
-                @foreach (var category in Model.Categories)
-                {
-                    var hasImage = !string.IsNullOrWhiteSpace(category.ImageUrl);
-                    <a asp-controller="Catalogue" asp-action="Index" asp-route-categoryId="@category.Id"
-                       class="category-card @(hasImage ? "category-card--photo" : $"category-card--{category.ColorClass}")"
-                       style="@(hasImage ? $"background-image:url('{category.ImageUrl}')" : null)">
-                        @if (!hasImage)
-                        {
-                            <span class="category-card__icon">@category.Icon</span>
-                        }
-                        <strong>@SharedLocalizer[category.Name]</strong>
-                        <small>@category.ProductCount @(category.ProductCount == 1 ? Localizer["товар"].Value : category.ProductCount is >= 2 and <= 4 ? Localizer["товари"].Value : Localizer["товарів"].Value)</small>
-                    </a>
-                }
-            </div>
-        }
-    </section>
+        </section>
+    }
 
     @foreach (var categorySection in Model.CategorySections)
     {
@@ -278,73 +188,45 @@
         </section>
     }
 
-    <section class="home-promo">
-        <div class="home-promo__content">
-            <span class="home-section__kicker">@Localizer["Для продавців"]</span>
-            <h2>@Localizer["Перетворіть ідею на власний магазин"]</h2>
-            <p>@Localizer["Додавайте товари, керуйте залишками та отримуйте замовлення в одному робочому просторі."]</p>
-            @if (User.Identity?.IsAuthenticated == true)
-            {
-                <a asp-controller="Business" asp-action="Create" class="home-button home-button--light">@Localizer["Створити бізнес →"]</a>
-            }
-            else
-            {
-                <a asp-controller="Auth" asp-action="SignUp" class="home-button home-button--light">@Localizer["Почати продавати →"]</a>
-            }
+    <section class="home-section">
+        <div class="home-section__heading">
+            <div>
+                <span class="home-section__kicker">@Localizer["Обирайте швидше"]</span>
+                <h2>@Localizer["Популярні категорії"]</h2>
+            </div>
+            <a asp-controller="Catalogue" asp-action="Index">@Localizer["Увесь каталог →"]</a>
         </div>
-        <div class="home-promo__visual" aria-hidden="true">
-            <div class="home-promo__glow"></div>
-            <div class="home-promo__badge home-promo__badge--growth">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="m17 7-9.5 9.5L3 12" /><path d="m22 7-9.5 9.5" /></svg>
-                @Localizer["+24% цього тижня"]
+
+        @if (Model.Categories.Count == 0)
+        {
+            <p class="text-secondary">@Localizer["Категорії ще не додані."]</p>
+        }
+        else
+        {
+            <div class="category-grid">
+                @foreach (var category in Model.Categories)
+                {
+                    var hasImage = !string.IsNullOrWhiteSpace(category.ImageUrl);
+                    <a asp-controller="Catalogue" asp-action="Index" asp-route-categoryId="@category.Id"
+                       class="category-card @(hasImage ? "category-card--photo" : $"category-card--{category.ColorClass}")"
+                       style="@(hasImage ? $"background-image:url('{category.ImageUrl}')" : null)">
+                        @if (!hasImage)
+                        {
+                            <span class="category-card__icon">@category.Icon</span>
+                        }
+                        <strong>@SharedLocalizer[category.Name]</strong>
+                        <small>@category.ProductCount @(category.ProductCount == 1 ? Localizer["товар"].Value : category.ProductCount is >= 2 and <= 4 ? Localizer["товари"].Value : Localizer["товарів"].Value)</small>
+                    </a>
+                }
             </div>
-            <div class="home-promo__badge home-promo__badge--order">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18" /><path d="M16 10a4 4 0 0 1-8 0" /></svg>
-                @Localizer["Нове замовлення"]
-            </div>
-            <div class="home-promo__dashboard">
-                <div class="dashboard-top"><span></span><span></span><span></span></div>
-                <div class="dashboard-body">
-                    <div class="dashboard-sidebar"></div>
-                    <div class="dashboard-content">
-                        <span></span>
-                        <div class="dashboard-bars">
-                            <i style="--bar-h: 40%"></i>
-                            <i style="--bar-h: 72%"></i>
-                            <i style="--bar-h: 55%"></i>
-                            <i style="--bar-h: 88%"></i>
-                            <i style="--bar-h: 68%"></i>
-                            <i style="--bar-h: 95%"></i>
-                        </div>
-                        <svg class="dashboard-trend" viewBox="0 0 220 46" preserveAspectRatio="none">
-                            <polyline points="0,34 30,26 60,30 90,16 120,20 150,8 180,14 220,2" />
-                        </svg>
-                    </div>
-                </div>
-            </div>
-        </div>
+        }
     </section>
 
-    <section class="home-steps" aria-label="@Localizer["Як почати продавати"]">
-        <span class="home-section__kicker">@Localizer["Три кроки"]</span>
-        <h2>@Localizer["Від ідеї до першого продажу"]</h2>
-        <div class="home-steps__grid">
-            <div class="home-step">
-                <span class="home-step__number">1</span>
-                <h3>@Localizer["Створіть магазин"]</h3>
-                <p>@Localizer["Назва, опис і логотип - займає кілька хвилин."]</p>
-            </div>
-            <div class="home-step">
-                <span class="home-step__number">2</span>
-                <h3>@Localizer["Додайте товари"]</h3>
-                <p>@Localizer["Фото, ціна, категорія - і товар вже в каталозі."]</p>
-            </div>
-            <div class="home-step">
-                <span class="home-step__number">3</span>
-                <h3>@Localizer["Отримуйте замовлення"]</h3>
-                <p>@Localizer["Керуйте продажами й доставкою з панелі продавця."]</p>
-            </div>
-        </div>
+    <section class="home-benefits" aria-label="@Localizer["Переваги маркетплейсу"]">
+        <div><span>✓</span><p><strong>@Localizer["Перевірені товари"]</strong><small>@Localizer["зрозумілий статус наявності"]</small></p></div>
+        <div><span>↺</span><p><strong>@Localizer["Просте повернення"]</strong><small>@Localizer["прозорий процес покупки"]</small></p></div>
+        <div><span>□</span><p><strong>@Localizer["Зручний кошик"]</strong><small>@Localizer["керуйте кількістю онлайн"]</small></p></div>
+        <div><span>→</span><p><strong>@Localizer["Контроль доставки"]</strong><small>@Localizer["від замовлення до отримання"]</small></p></div>
     </section>
 </div>
 
@@ -393,22 +275,6 @@
                 alert("@Localizer["Доступ обмежено для осіб молодше 18 років."]");
                 modal.classList.add('d-none');
             }
-        }
-
-        const homeSteps = document.querySelectorAll('.home-step');
-        if (homeSteps.length && 'IntersectionObserver' in window) {
-            const stepsObserver = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                        stepsObserver.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.2 });
-
-            homeSteps.forEach((step) => stepsObserver.observe(step));
-        } else {
-            homeSteps.forEach((step) => step.classList.add('is-visible'));
         }
     </script>
 }

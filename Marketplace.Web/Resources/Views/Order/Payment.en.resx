@@ -79,4 +79,7 @@
   <data name="Не відбулось перенаправлення? Перейти вручну" xml:space="preserve">
     <value>Not redirected? Continue manually</value>
   </data>
+  <data name="Мої замовлення" xml:space="preserve">
+    <value>My orders</value>
+  </data>
 </root>

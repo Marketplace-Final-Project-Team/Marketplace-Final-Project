@@ -217,4 +217,79 @@
   <data name="До сплати" xml:space="preserve">
     <value>Total a pagar</value>
   </data>
+  <data name="Отримувач" xml:space="preserve">
+    <value>Destinatario</value>
+  </data>
+  <data name="Дані отримувача" xml:space="preserve">
+    <value>Datos del destinatario</value>
+  </data>
+  <data name="Прізвище" xml:space="preserve">
+    <value>Apellido</value>
+  </data>
+  <data name="Ім’я" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="Телефон" xml:space="preserve">
+    <value>Teléfono</value>
+  </data>
+  <data name="Вкажіть дані отримувача, перевірте доставку й оплату, підтвердіть замовлення." xml:space="preserve">
+    <value>Introduce los datos del destinatario, revisa la entrega y el pago y confirma el pedido.</value>
+  </data>
+  <data name="Введіть своє прізвище" xml:space="preserve">
+    <value>Introduce tu apellido</value>
+  </data>
+  <data name="Введіть своє ім’я" xml:space="preserve">
+    <value>Introduce tu nombre</value>
+  </data>
+  <data name="Введіть номер телефону" xml:space="preserve">
+    <value>Introduce el número de teléfono</value>
+  </data>
+  <data name="Введіть український номер: +380 та 9 цифр" xml:space="preserve">
+    <value>Introduce un número ucraniano: +380 seguido de 9 dígitos</value>
+  </data>
+  <data name="Служба доставки" xml:space="preserve">
+    <value>Servicio de entrega</value>
+  </data>
+  <data name="LiqPay (онлайн)" xml:space="preserve">
+    <value>LiqPay (en línea)</value>
+  </data>
+  <data name="Завантаження відділень…" xml:space="preserve">
+    <value>Cargando oficinas…</value>
+  </data>
+  <data name="Відділень не знайдено" xml:space="preserve">
+    <value>No se encontraron oficinas</value>
+  </data>
+  <data name="Оберіть відділення" xml:space="preserve">
+    <value>Selecciona una oficina</value>
+  </data>
+  <data name="Не вдалося завантажити відділення" xml:space="preserve">
+    <value>No se pudieron cargar las oficinas</value>
+  </data>
+  <data name="Місто не знайдено" xml:space="preserve">
+    <value>Ciudad no encontrada</value>
+  </data>
+  <data name="Не вдалося завантажити міста" xml:space="preserve">
+    <value>No se pudieron cargar las ciudades</value>
+  </data>
+  <data name="Введіть промокод." xml:space="preserve">
+    <value>Introduce un código promocional.</value>
+  </data>
+  <data name="Такий промокод не знайдено або він вже не діє." xml:space="preserve">
+    <value>Este código promocional no existe o ya no es válido.</value>
+  </data>
+  <data name="Промокод {0} застосовано: знижка {1}% на товари магазину «{2}»." xml:space="preserve">
+    <value>Código {0} aplicado: {1}% de descuento en productos de «{2}».</value>
+  </data>
+  <data name="Не вдалося перевірити промокод. Спробуйте ще раз." xml:space="preserve">
+    <value>No se pudo verificar el código promocional. Inténtalo de nuevo.</value>
+  </data>
+  <data name="Розмір:" xml:space="preserve">
+    <value>Talla:</value>
+  </data>
+  <data name="Мої замовлення" xml:space="preserve">
+    <value>Mis pedidos</value>
+  </data>
+  <data name="Промокод недійсний або термін його дії минув." xml:space="preserve">
+    <value>El código promocional no es válido o ha caducado.</value>
+  </data>
 </root>

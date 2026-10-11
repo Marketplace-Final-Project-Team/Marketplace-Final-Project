@@ -41,6 +41,10 @@
         else
         {
             <div class="delivery-address">
+                <div class="text-secondary small mb-1">@Localizer["Служба доставки"]</div>
+                <strong>@((Model.DeliveryCarrierLabel != null ? Localizer[Model.DeliveryCarrierLabel].Value : null) ?? Localizer["Не вказано"].Value)</strong>
+            </div>
+            <div class="delivery-address">
                 <div class="text-secondary small mb-1">@Localizer["Адреса доставки"]</div>
                 <strong>@Model.ShippingCountry, @Model.ShippingCity, @Model.ShippingStreet</strong>
             </div>
