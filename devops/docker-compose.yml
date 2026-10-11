@@ -63,6 +63,23 @@ services:
       depends_on:
         - prometheus
       restart: unless-stopped
+  
+  # ===== Website Availability =====
+    blackbox:
+      image: prom/blackbox-exporter:v0.29.0
+      container_name: marketplace-blackbox
+      restart: unless-stopped
+
+  # ===== Server Metrics =====
+    node-exporter:
+      image: prom/node-exporter:v1.9.1
+      container_name: marketplace-node-exporter
+      command:
+        - "--path.rootfs=/host"
+      volumes:
+        - /:/host:ro,rslave
+      pid: host
+      restart: unless-stopped
 
   # ===== Load Testing =====
     k6:
