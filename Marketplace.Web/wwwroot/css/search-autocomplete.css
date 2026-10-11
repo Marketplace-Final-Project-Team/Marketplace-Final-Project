@@ -31,7 +31,7 @@
 
 .search-suggest__item {
     align-items: center;
-    color: inherit;
+    color: #172033;
     display: flex;
     gap: 0.7rem;
     padding: 0.55rem 0.9rem;
@@ -49,6 +49,7 @@
     border-radius: 0.55rem;
     display: flex;
     flex-shrink: 0;
+    color: #3157d7;
     font-weight: 700;
     height: 2.4rem;
     justify-content: center;

@@ -100,4 +100,7 @@
   <data name="На сайт" xml:space="preserve">
     <value>Back to site</value>
   </data>
+  <data name="Чати повернень" xml:space="preserve">
+    <value>Return chats</value>
+  </data>
 </root>

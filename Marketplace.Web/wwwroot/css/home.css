@@ -1494,3 +1494,24 @@ body {
         width: 2.2rem;
     }
 }
+
+/* ---------- View bar above the category sections ---------- */
+
+.home-view-bar {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin: 0 0 1.25rem;
+}
+
+.home-view-bar__label {
+    color: var(--home-muted);
+    font-size: 0.85rem;
+    font-weight: 650;
+}
+
+.home-view-bar .home-view-toggle {
+    margin-bottom: 0;
+}
