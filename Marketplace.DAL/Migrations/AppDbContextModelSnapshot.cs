@@ -25,7 +25,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.AIChatMessage", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -70,7 +69,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.Address", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("City")
@@ -111,7 +109,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.Business", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AdultRejectionReason")
@@ -205,7 +202,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.BusinessMember", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("BusinessId")
@@ -242,7 +238,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.Cart", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -268,7 +263,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.CartItem", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("CartId")
@@ -306,7 +300,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.Category", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -336,7 +329,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.Discount", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("BusinessId")
@@ -383,7 +375,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.MarketplaceBalance", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Balance")
@@ -406,14 +397,42 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.Order", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("DeliveryCarrier")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<string>("NovaPoshtaBranchRef")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NovaPoshtaCityRef")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RecipientFirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("RecipientLastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("RecipientPhone")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("ShippingCity")
                         .IsRequired()
@@ -450,7 +469,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.OrderItem", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("CommissionAmount")
@@ -507,7 +525,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.PostSaleRequest", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("BuyerId")
@@ -571,7 +588,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.PostSaleRequestImage", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -600,7 +616,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.Product", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("BusinessId")
@@ -690,7 +705,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.ProductImage", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -719,7 +733,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.ProductTranslation", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -757,7 +770,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.ProductVariant", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -795,7 +807,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.PromoCode", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("BusinessId")
@@ -842,7 +853,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.RefundChatMessage", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -887,7 +897,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.Review", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Body")
@@ -939,7 +948,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.ReviewAppeal", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Body")
@@ -1002,7 +1010,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.SupportTicket", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Category")
@@ -1042,7 +1049,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.SupportTicketMessage", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -1084,7 +1090,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.SystemSetting", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Category")
@@ -1239,7 +1244,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.UserDiscount", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("BusinessId")
@@ -1361,7 +1365,6 @@ namespace Marketplace.DAL.Migrations
             modelBuilder.Entity("Marketplace.Domain.Entities.WithdrawalRequest", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Amount")
