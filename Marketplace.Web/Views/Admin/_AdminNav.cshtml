@@ -119,6 +119,14 @@
             </span>
             <span>@Localizer["Виплати"]</span>
         </a>
+        <a class="admin-sidebar__link @ActiveClass("AdminRefundsInbox")" asp-controller="Support" asp-action="AdminRefundsInbox">
+            <span class="admin-sidebar__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="19" height="19">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+            </span>
+            <span>@Localizer["Чати повернень"]</span>
+        </a>
         <a class="admin-sidebar__link @ActiveClass("BusinessLimits")" asp-controller="Admin" asp-action="BusinessLimits">
             <span class="admin-sidebar__icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="19" height="19">
