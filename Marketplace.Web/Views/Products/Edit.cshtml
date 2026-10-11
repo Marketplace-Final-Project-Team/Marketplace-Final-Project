@@ -97,6 +97,7 @@
 
             <section class="product-form-section">
                 <h2>@Localizer["Зображення"]</h2>
+
                 @if (!string.IsNullOrWhiteSpace(Model.ExistingMainImageUrl))
                 {
                     <div class="mb-3">
@@ -108,6 +109,29 @@
                     <label asp-for="MainImage" class="form-label">@Localizer["Замінити головне фото"]</label>
                     <input asp-for="MainImage" type="file" class="form-control" accept="image/*" />
                 </div>
+
+                @if (Model.ExistingAdditionalImageUrls is { Count: > 0 })
+                {
+                    <div class="mb-3">
+                        <div class="form-label">@Localizer["Поточні додаткові фото"]</div>
+                        <div class="d-flex flex-wrap gap-3">
+                            @foreach (var img in Model.ExistingAdditionalImageUrls)
+                            {
+                                <div class="position-relative" data-existing-image>
+                                    <img src="@img" alt="" width="120" class="rounded" />
+                                    <input type="hidden" name="ExistingAdditionalImageUrls" value="@img" />
+                                    <button type="button"
+                                            class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                            onclick="this.closest('[data-existing-image]').remove()"
+                                            aria-label="@Localizer["Видалити фото"]">
+                                        ✕
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
                 <div>
                     <label asp-for="AdditionalImages" class="form-label">@Localizer["Додати ще фото"]</label>
                     <input asp-for="AdditionalImages" type="file" class="form-control" accept="image/*" multiple />

@@ -454,6 +454,7 @@ public class ProductsController : Controller
             IsAdultOnly = product.IsAdultOnly,
             CategoryId = product.CategoryId,
             ExistingMainImageUrl = product.MainImageUrl,
+            ExistingAdditionalImageUrls = product.Images.Select(i => i.ImageUrl).ToList(),
             Categories = await BuildCategoryOptionsAsync(product.CategoryId, isAdultApproved)
         });
     }
@@ -481,6 +482,7 @@ public class ProductsController : Controller
             var currentBusiness = businesses.FirstOrDefault(b => b.Id == accessible.Product!.BusinessId);
             bool isAdultApproved = currentBusiness?.AdultStatus == AdultContentStatus.Approved;
 
+            model.ExistingMainImageUrl = accessible.Product!.MainImageUrl;
             model.Categories = await BuildCategoryOptionsAsync(model.CategoryId, isAdultApproved);
             return View(model);
         }
@@ -502,7 +504,8 @@ public class ProductsController : Controller
                     .ToList(),
                 IsAdultOnly = model.IsAdultOnly,
                 MainImage = model.MainImage,
-                AdditionalImages = model.AdditionalImages
+                AdditionalImages = model.AdditionalImages,
+                ExistingAdditionalImageUrls = model.ExistingAdditionalImageUrls ?? new List<string>()
             });
 
             if (updated is null) return NotFound();
@@ -521,6 +524,7 @@ public class ProductsController : Controller
             bool isAdultApproved = currentBusiness?.AdultStatus == AdultContentStatus.Approved;
 
             model.Categories = await BuildCategoryOptionsAsync(model.CategoryId, isAdultApproved);
+            model.ExistingMainImageUrl = accessible.Product!.MainImageUrl;
             return View(model);
         }
 

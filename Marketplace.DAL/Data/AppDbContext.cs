@@ -349,6 +349,17 @@ namespace Marketplace.DAL.Data
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
+
+            foreach (var entityType in builder.Model.GetEntityTypes())
+            {
+                if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
+                {
+                    builder.Entity(entityType.ClrType)
+                        .Property(nameof(BaseEntity.Id))
+                        .ValueGeneratedNever();
+                }
+            }
+
             builder.Entity<Product>().Navigation(p => p.Category).AutoInclude();
             builder.Entity<Product>().Navigation(p => p.Images).AutoInclude();
             builder.Entity<Product>().Navigation(p => p.Business).AutoInclude();

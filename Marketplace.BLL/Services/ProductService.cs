@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using ClosedXML.Excel;
-using Microsoft.EntityFrameworkCore;
 using Marketplace.BLL.Common;
 using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
@@ -11,6 +6,8 @@ using Marketplace.DAL.Data;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
 using Marketplace.Domain.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Quartz;
 using AdultContentStatus = Marketplace.Domain.Entities.AdultContentStatus;
 
@@ -19,17 +16,20 @@ namespace Marketplace.BLL.Services;
 public class ProductService : IProductService
 {
     private readonly IGenericRepository<Product> _productRepository;
+    private readonly IGenericRepository<ProductImage> _productImageRepository;
     private readonly IImageStorageService _imageStorageService;
     private readonly AppDbContext _context;
     private readonly ISchedulerFactory _schedulerFactory;
 
     public ProductService(
         IGenericRepository<Product> productRepository,
+        IGenericRepository<ProductImage> productImageRepository,
         IImageStorageService imageStorageService,
         AppDbContext context,
         ISchedulerFactory schedulerFactory)
     {
         _productRepository = productRepository;
+        _productImageRepository = productImageRepository;   
         _imageStorageService = imageStorageService;
         _context = context;
         _schedulerFactory = schedulerFactory;
@@ -91,6 +91,19 @@ public class ProductService : IProductService
             .Build();
 
         await scheduler.ScheduleJob(job, trigger);
+    }
+
+    private async Task<List<string>> UploadManyAsync(IEnumerable<IFormFile>? files)
+    {
+        if (files == null) return new List<string>();
+
+        var list = files.ToList();
+        var urls = await Task.WhenAll(list.Select(f => _imageStorageService.UploadImageAsync(f)));
+
+        var failed = list.Where((_, i) => urls[i] == null).Select(f => f.FileName).ToList();
+        if (failed.Count > 0) throw new InvalidOperationException($"Не вдалося завантажити зображення: {string.Join(", ", failed)}.");
+       
+        return urls.Select(u => u!).ToList();
     }
 
     public async Task<IReadOnlyList<Product>> GetCatalogAsync(string? search = null, bool allowAdultContent = false)
@@ -306,7 +319,16 @@ public class ProductService : IProductService
             }
         }
 
+        if (dto.MainImage == null)
+            throw new InvalidOperationException("Головне зображення товару обов'язкове.");
+
         var variants = BuildVariants(dto.Variants);
+
+        var mainImageUrl = await _imageStorageService.UploadImageAsync(dto.MainImage);
+        if (mainImageUrl == null)
+            throw new InvalidOperationException("Не вдалося завантажити головне зображення.");
+
+        var additionalImageUrls = await UploadManyAsync(dto.AdditionalImages);
 
         var product = new Product
         {
@@ -321,8 +343,18 @@ public class ProductService : IProductService
             IsAdultOnly = dto.IsAdultOnly,
             Status = ProductStatus.Pending,
             ModerationReason = null,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            MainImageUrl = mainImageUrl!,
         };
+
+        foreach (var url in additionalImageUrls)
+        {
+            product.Images.Add(new ProductImage
+            {
+                ProductId = product.Id,
+                ImageUrl = url
+            });
+        }
 
         foreach (var variant in variants)
         {
@@ -343,10 +375,28 @@ public class ProductService : IProductService
     {
         var product = await _context.Products
             .Include(p => p.Images)
+            .Include(p => p.Variants)
             .FirstOrDefaultAsync(p => p.Id == dto.Id);
 
-        if (product == null)
-            return null;
+        if (product == null) return null;
+
+        string? newMainUrl = null;
+        if (dto.MainImage != null)
+        {
+            newMainUrl = await _imageStorageService.UploadImageAsync(dto.MainImage);
+            if (newMainUrl == null) throw new InvalidOperationException("Не вдалося завантажити головне зображення.");
+        }
+
+        var newAdditionalUrls = await UploadManyAsync(dto.AdditionalImages);
+
+        var keepUrls = (dto.ExistingAdditionalImageUrls ?? new List<string>())
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var toRemove = product.Images
+            .Where(img => !keepUrls.Contains(img.ImageUrl))
+            .ToList();
+
+        _context.RemoveRange(toRemove);
 
         product.CategoryId = dto.CategoryId;
         product.Name = dto.Name;
@@ -357,8 +407,23 @@ public class ProductService : IProductService
         product.Status = ProductStatus.Pending;
         product.ModerationReason = null;
 
+        if (newMainUrl != null) product.MainImageUrl = newMainUrl;
+
+        foreach (var url in newAdditionalUrls)
+        {
+            product.Images.Add(new ProductImage
+            {
+                ProductId = product.Id,
+                ImageUrl = url
+            });
+        }
+
         SyncVariants(product, dto.Variants);
-        product.Quantity = product.Variants.Count > 0 ? product.Variants.Sum(v => v.Quantity) : dto.Quantity;
+
+        var activeVariants = product.Variants.Where(v => !v.IsDeleted).ToList();
+        product.Quantity = activeVariants.Count > 0
+            ? activeVariants.Sum(v => v.Quantity)
+            : dto.Quantity;
 
         await _context.SaveChangesAsync();
 
