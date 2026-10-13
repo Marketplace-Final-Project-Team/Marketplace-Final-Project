@@ -133,7 +133,9 @@ public class CatalogueController : Controller
                 Name = candidate.Name,
                 CategoryName = candidate.Category?.Name ?? "Без категорії",
                 MainImageUrl = candidate.MainImageUrl,
-                Price = candidate.Price,
+                Price = candidate.GetDiscountedPrice(userId),
+                OriginalPrice = candidate.GetEffectiveDiscountPercent(userId) > 0 ? candidate.Price : null,
+                DiscountPercent = candidate.GetEffectiveDiscountPercent(userId),
                 Quantity = candidate.Quantity
             })
             .ToList();

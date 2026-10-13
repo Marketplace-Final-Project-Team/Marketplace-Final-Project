@@ -105,6 +105,13 @@
 
             <div class="product-price-block">
                 <span class="product-price-block__label">@Localizer["Ціна"]</span>
+                @if (Model.HasDiscount)
+                {
+                    <div class="product-price-block__discount product-discount">
+                        <del>@Model.OriginalPrice!.Value.ToString("N2") ₴</del>
+                        <span class="badge bg-danger">−@Model.DiscountPercent!.Value.ToString("0.##")%</span>
+                    </div>
+                }
                 <strong>@Model.Price.ToString("N2") ₴</strong>
                 <small>@Localizer["Ціна вказана з урахуванням усіх податків"]</small>
             </div>
@@ -396,6 +403,13 @@
                             <span>@SharedLocalizer[related.CategoryName]</span>
                             <a asp-action="Details" asp-route-id="@related.Id">@relatedName</a>
                             <strong>@related.Price.ToString("N2") ₴</strong>
+                            @if (related.OriginalPrice.HasValue)
+                            {
+                                <div class="product-discount">
+                                    <del>@related.OriginalPrice.Value.ToString("N2") ₴</del>
+                                    <span class="badge bg-danger">−@related.DiscountPercent.ToString("0.##")%</span>
+                                </div>
+                            }
                         </div>
                     </article>
                 }

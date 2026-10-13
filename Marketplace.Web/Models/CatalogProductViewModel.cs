@@ -47,6 +47,8 @@ public class CatalogProductViewModel
 
 public class CatalogRelatedProductViewModel
 {
+    public decimal? OriginalPrice { get; set; }
+    public decimal DiscountPercent { get; set; }
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string CategoryName { get; set; } = string.Empty;

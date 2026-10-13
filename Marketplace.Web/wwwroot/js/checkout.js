@@ -351,9 +351,20 @@
             promoMessage.classList.toggle("checkout-promo__message--error", !!isError);
         };
 
+        let promoRevision = 0;
+        const resetPromoPreview = () => {
+            promoRevision += 1;
+            if (promoSummaryRow) promoSummaryRow.hidden = true;
+            if (promoMessage) promoMessage.hidden = true;
+            totalEl.textContent = `${formatCurrency(baseTotal)} ₴`;
+        };
+        promoInput.addEventListener("input", resetPromoPreview);
+
         promoApply.addEventListener("click", async () => {
             const code = promoInput.value.trim().toUpperCase();
             promoInput.value = code;
+            resetPromoPreview();
+            const requestRevision = promoRevision;
 
             if (!code) {
                 showMessage("Введіть промокод.", true);
@@ -366,6 +377,7 @@
                     headers: { "X-Requested-With": "XMLHttpRequest" }
                 });
                 const result = await response.json();
+                if (requestRevision !== promoRevision) return;
 
                 if (!result.succeeded) {
                     showMessage(result.message || "Такий промокод не знайдено або він вже не діє.", true);
@@ -383,7 +395,9 @@
                 }
                 totalEl.textContent = `${formatCurrency(newTotal)} ₴`;
             } catch {
-                showMessage("Не вдалося перевірити промокод. Спробуйте ще раз.", true);
+                if (requestRevision === promoRevision) {
+                    showMessage("Не вдалося перевірити промокод. Спробуйте ще раз.", true);
+                }
             } finally {
                 promoApply.disabled = false;
             }

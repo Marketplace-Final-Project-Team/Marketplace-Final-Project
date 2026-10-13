@@ -177,7 +177,7 @@
                                 <div class="d-flex flex-column">
                                     @if (item.DiscountPercent > 0)
                                     {
-                                        var discountedPrice = item.Price * (1 - (item.DiscountPercent / 100m));
+                                        var discountedPrice = Marketplace.Domain.Pricing.DiscountCalculator.CalculatePrice(item.Price, item.DiscountPercent);
                                         <div class="d-flex align-items-center gap-2">
                                             <span class="fw-semibold text-danger">@discountedPrice.ToString("N2") ₴</span>
                                             <span class="text-muted text-decoration-line-through small">@item.Price.ToString("N2") ₴</span>

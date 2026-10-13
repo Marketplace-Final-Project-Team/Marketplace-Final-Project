@@ -7,6 +7,7 @@ using Marketplace.DAL.Data;
 using Marketplace.DAL.Interfaces;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
+using Marketplace.Domain.Pricing;
 using Marketplace.Domain.Interfaces;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
@@ -75,6 +76,7 @@ namespace Marketplace.BLL.Services
                     ? await _promoCodeService.FindActiveAsync(dto.PromoCode)
                     : null;
                 var promoCodeApplied = false;
+                var now = DateTime.UtcNow;
 
                 foreach (var cartItem in cartItems)
                 {
@@ -92,68 +94,7 @@ namespace Marketplace.BLL.Services
                     {
                         return new OrderResultDto { Succeeded = false, Message = $"Недостатньо товару «{cartItem.Product.Name}» на складі." };
                     }
-                    var business = await _businessRepository.FirstOrDefaultAsync(b => b.Id == cartItem.Product.BusinessId);
-                    var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == cartItem.Product.CategoryId);
-                    
-
-                    var now = DateTime.UtcNow;
-                    var productDiscount = cartItem.Product.Discounts?
-                        .FirstOrDefault(d => d.ProductId == cartItem.Product.Id && d.DiscountType == DiscountType.Product && d.StartDate <= now && d.EndDate >= now);
-
-                    var businessDiscount = business?.Discounts?
-                        .FirstOrDefault(d => d.BusinessId == cartItem.Product.BusinessId && d.DiscountType == DiscountType.Business && d.StartDate <= now && d.EndDate >= now);
-
-                    var categoryDiscount = category?.Discounts?
-                        .FirstOrDefault(d => d.DiscountType == DiscountType.Category && d.StartDate <= now && d.BusinessId == cartItem.Product.BusinessId && d.CategoryId == cartItem.Product.CategoryId && d.EndDate >= now);
-
-                    var userdiscount = await _context.UserDiscounts
-                        .FirstOrDefaultAsync(ud => ud.UserId == userId && ud.BusinessId == cartItem.Product.BusinessId && ud.StartDate <= DateTime.UtcNow && ud.EndDate >= DateTime.UtcNow);
-
-                    // A business-wide sale is dominant over the product's own sale — it replaces
-                    // it rather than stacking with it. A matching promo code still stacks on top
-                    // of whichever one of those applies.
-                    decimal? bestDiscount = 0;
-                    if (userdiscount != null)
-                    {
-                        var alldiscounts = new List<decimal>();
-                        if (productDiscount != null)
-                        {
-                            alldiscounts.Add(productDiscount.Percent);
-                        }
-                        if (categoryDiscount != null) { 
-                            alldiscounts.Add(categoryDiscount.Percent);
-                        }
-                        if (userdiscount != null)
-                        {
-                            alldiscounts.Add(userdiscount.Percent);
-                        }
-                        if (businessDiscount != null)
-                        {
-                            alldiscounts.Add(businessDiscount.Percent);
-                        }
-                        bestDiscount = alldiscounts.Any() ? alldiscounts.Max() : 0;
-                    }
-                    else
-                    {
-                        if (productDiscount != null)
-                        {
-                            bestDiscount = productDiscount.Percent;
-                        }
-                        else if (categoryDiscount != null)
-                        {
-                            bestDiscount = categoryDiscount.Percent;
-
-                        }
-
-                        else if (businessDiscount != null)
-                        {
-                            bestDiscount = businessDiscount.Percent;
-                        }
-                    }
-
-
-
-                    var saleDiscountPercent = bestDiscount ?? 0;
+                    var saleDiscountPercent = DiscountCalculator.GetEffectiveDiscountPercent(cartItem.Product, userId, now);
                     var promoApplies = promoCode is not null && promoCode.BusinessId == cartItem.Product.BusinessId;
                     var promoPercent = promoApplies ? promoCode!.Percent : 0;
                     if (promoApplies)
@@ -161,17 +102,7 @@ namespace Marketplace.BLL.Services
                         promoCodeApplied = true;
                     }
                     var effectivePercent = saleDiscountPercent + promoPercent;
-                    if (effectivePercent > 100)
-                    {
-                        effectivePercent = 100;
-                    }
-
-                    
-
-
-                    var unitPrice = effectivePercent > 0
-                        ? Math.Round(cartItem.Product.Price * (1m - effectivePercent / 100m), 2, MidpointRounding.AwayFromZero)
-                        : Math.Round(cartItem.Product.Price, 2, MidpointRounding.AwayFromZero);
+                    var unitPrice = DiscountCalculator.CalculatePrice(cartItem.Product.Price, effectivePercent);
 
                     var orderItem = new OrderItem
                     {

@@ -105,7 +105,7 @@ public class ProductsController : Controller
 
         model.Items = filtered.Select(p =>
         {
-            var activeDiscount = p.GetActiveProductDiscount();
+            var discountPercent = p.GetEffectiveDiscountPercent();
 
             return new ProductListItemViewModel
             {
@@ -119,8 +119,8 @@ public class ProductsController : Controller
                 Status = p.Status.ToString(),
                 CategoryName = p.Category?.Name ?? string.Empty,
                 ModerationReason = p.ModerationReason,
-                HasDiscount = activeDiscount != null,
-                DiscountPercent = activeDiscount != null ? (int)activeDiscount.Percent : 0
+                HasDiscount = discountPercent > 0,
+                DiscountPercent = discountPercent
             };
         }).ToList();
 

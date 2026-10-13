@@ -28,8 +28,9 @@ namespace Marketplace.Web.Controllers
                 _userManager = userManager;
             }
 
-        public async Task<IActionResult> Index([FromQuery] CatalogFilterViewModel filter, string? userId)
+        public async Task<IActionResult> Index([FromQuery] CatalogFilterViewModel filter)
         {
+            var userId = _userManager.GetUserId(User);
             const int pageSize = 6;
             filter.Page = filter.Page <= 0 ? 1 : filter.Page;
 
@@ -109,7 +110,7 @@ namespace Marketplace.Web.Controllers
                 Search = filter.Search,
                 CategoryId = filter.CategoryId,
                 SortBy = sort.ToString(),
-                RecentlyViewed = (await GetRecentlyViewedAsync()).Take(3).ToList(),
+                RecentlyViewed = (await GetRecentlyViewedAsync(userId)).Take(3).ToList(),
                 AverageRating = featuredProducts.Any() ? featuredProducts.Average(p => p.AverageRating) : null,
                 ReviewCount = featuredProducts.Sum(p => p.ReviewCount)
             };
@@ -129,7 +130,7 @@ namespace Marketplace.Web.Controllers
             return Json(suggestions);
         }
 
-        private async Task<List<CatalogRelatedProductViewModel>> GetRecentlyViewedAsync()
+        private async Task<List<CatalogRelatedProductViewModel>> GetRecentlyViewedAsync(string? userId)
         {
             Request.Cookies.TryGetValue(RecentlyViewedCookie.Name, out var raw);
             var ids = RecentlyViewedCookie.Parse(raw);
@@ -152,7 +153,9 @@ namespace Marketplace.Web.Controllers
                     Name = product.Name,
                     CategoryName = product.Category?.Name ?? "Без категорії",
                     MainImageUrl = product.MainImageUrl,
-                    Price = product.Price,
+                    Price = product.GetDiscountedPrice(userId),
+                    OriginalPrice = product.GetEffectiveDiscountPercent(userId) > 0 ? product.Price : null,
+                    DiscountPercent = product.GetEffectiveDiscountPercent(userId),
                     Quantity = product.Quantity
                 });
             }
