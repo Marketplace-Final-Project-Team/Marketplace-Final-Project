@@ -142,7 +142,7 @@
                 <span class="support-chat-stub__icon" aria-hidden="true">💬</span>
                 <h3>@Localizer["Чат відкрито"]</h3>
                 <p class="text-muted">@Localizer["Тема:"] @Model.ActiveTicket.Category</p>
-                <a asp-controller="Support" asp-action="TicketChat" asp-route-ticketId="@Model.ActiveTicket.Id" class="btn btn-primary w-100 position-relative">
+              <a asp-controller="Support" asp-action="TicketChat" asp-route-ticketId="@Model.ActiveTicket.Id" class="btn btn-primary w-100 position-relative mt-3">
                     @Localizer["Повернутися в чат"]
                     @if (Model.ActiveTicket.UnreadForAdmin > 0)
                     {

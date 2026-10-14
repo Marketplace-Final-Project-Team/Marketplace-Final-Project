@@ -65,10 +65,10 @@ button.support-contact-card {
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-button.support-contact-card:hover {
-    border-color: var(--support-primary);
-    box-shadow: 0 0.5rem 1.4rem rgba(23, 32, 51, 0.1);
-}
+    button.support-contact-card:hover {
+        border-color: var(--support-primary);
+        box-shadow: 0 0.5rem 1.4rem rgba(23, 32, 51, 0.1);
+    }
 
 .support-contact-card__icon {
     align-items: center;
@@ -101,10 +101,10 @@ button.support-contact-card:hover {
     margin-bottom: 2rem;
 }
 
-.support-section h2 {
-    font-weight: 700;
-    margin-bottom: 1rem;
-}
+    .support-section h2 {
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
 
 .support-section__lead {
     color: var(--support-muted);
@@ -116,10 +116,10 @@ button.support-contact-card:hover {
     background: #fff;
 }
 
-.support-section table code {
-    color: var(--support-primary);
-    font-size: 0.85rem;
-}
+    .support-section table code {
+        color: var(--support-primary);
+        font-size: 0.85rem;
+    }
 
 .support-faq-item {
     background: #fff;
@@ -142,11 +142,11 @@ button.support-contact-card:hover {
     width: 100%;
 }
 
-.support-faq-item__question span {
-    color: var(--support-muted);
-    font-size: 1.1rem;
-    transition: transform 0.15s ease;
-}
+    .support-faq-item__question span {
+        color: var(--support-muted);
+        font-size: 1.1rem;
+        transition: transform 0.15s ease;
+    }
 
 .support-faq-item.is-open .support-faq-item__question span {
     transform: rotate(45deg);
@@ -157,6 +157,8 @@ button.support-contact-card:hover {
     margin: 0;
     padding: 0 1.25rem 1.1rem;
 }
+
+/* ---------- Вікно чату підтримки ---------- */
 
 .support-chat-stub {
     align-items: center;
@@ -171,11 +173,15 @@ button.support-contact-card:hover {
 
 .support-chat-stub__card {
     background: #fff;
-    border-radius: 1.1rem;
-    max-width: 24rem;
-    padding: 1.75rem;
+    border-radius: 1.25rem;
+    box-shadow: 0 1.5rem 4rem rgba(15, 23, 42, 0.3);
+    max-height: calc(100vh - 2rem);
+    max-width: 32rem;
+    overflow-y: auto;
+    padding: 2.25rem 2.25rem 2rem;
     position: relative;
     text-align: center;
+    width: 100%;
 }
 
 .support-chat-stub__close {
@@ -191,16 +197,59 @@ button.support-contact-card:hover {
 
 .support-chat-stub__icon {
     display: block;
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
 }
 
 .support-chat-stub__card h3 {
+    font-size: 1.5rem;
     font-weight: 700;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
 }
 
 .support-chat-stub__card p {
     color: var(--support-muted);
+    font-size: 0.95rem;
+    line-height: 1.55;
     margin: 0;
+}
+
+    .support-chat-stub__card p.small {
+        font-size: 0.85rem;
+    }
+
+/* Форма звернення: підписи й поля вирівняні по лівому краю */
+.support-chat-stub__card [data-ticket-form] {
+    margin-top: 1.5rem;
+    text-align: left;
+}
+
+.support-chat-stub__card .form-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+}
+
+.support-chat-stub__card .form-select,
+.support-chat-stub__card .form-control {
+    border-radius: 0.75rem;
+    font-size: 0.95rem;
+    padding: 0.7rem 0.95rem;
+}
+
+.support-chat-stub__card textarea.form-control {
+    min-height: 8.5rem;
+    resize: vertical;
+}
+
+.support-chat-stub__card .btn {
+    border-radius: 0.75rem;
+    font-weight: 700;
+    padding: 0.8rem 1rem;
+}
+
+@media (max-width: 575.98px) {
+    .support-chat-stub__card {
+        padding: 1.75rem 1.25rem 1.5rem;
+    }
 }

@@ -137,8 +137,14 @@ namespace Marketplace.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("HeldBalance")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastScheduledPayoutAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("LogoUrl")
                         .IsRequired()
@@ -147,6 +153,18 @@ namespace Marketplace.DAL.Migrations
                     b.Property<string>("OwnerId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal?>("ScheduledPayoutAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid?>("ScheduledPayoutCardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("ScheduledPayoutDayOfMonth")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ScheduledPayoutEnabled")
+                        .HasColumnType("bit");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -161,6 +179,8 @@ namespace Marketplace.DAL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("OwnerId");
+
+                    b.HasIndex("ScheduledPayoutCardId");
 
                     b.ToTable("Businesses");
                 });
@@ -458,6 +478,12 @@ namespace Marketplace.DAL.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("HeldAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsBalanceReleased")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -997,6 +1023,42 @@ namespace Marketplace.DAL.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ReviewAppeals");
+                });
+
+            modelBuilder.Entity("Marketplace.Domain.Entities.SavedPayoutCard", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BusinessId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CardNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("RecipientName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BusinessId");
+
+                    b.ToTable("SavedPayoutCards");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.SupportTicket", b =>
@@ -1569,7 +1631,14 @@ namespace Marketplace.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Marketplace.Domain.Entities.SavedPayoutCard", "ScheduledPayoutCard")
+                        .WithMany()
+                        .HasForeignKey("ScheduledPayoutCardId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Owner");
+
+                    b.Navigation("ScheduledPayoutCard");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.BusinessActionLog", b =>
@@ -1856,6 +1925,17 @@ namespace Marketplace.DAL.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Marketplace.Domain.Entities.SavedPayoutCard", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.Business", "Business")
+                        .WithMany("SavedPayoutCards")
+                        .HasForeignKey("BusinessId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Business");
+                });
+
             modelBuilder.Entity("Marketplace.Domain.Entities.SupportTicket", b =>
                 {
                     b.HasOne("Marketplace.Domain.Entities.User", "User")
@@ -2013,6 +2093,8 @@ namespace Marketplace.DAL.Migrations
                     b.Navigation("Members");
 
                     b.Navigation("Products");
+
+                    b.Navigation("SavedPayoutCards");
 
                     b.Navigation("UserDiscounts");
                 });

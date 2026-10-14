@@ -86,7 +86,7 @@
                     <div class="admin-stat-card__body">
                         <span class="admin-stat-card__label">@Localizer["Очікують верифікації 18+"]</span>
                         <strong class="admin-stat-card__value">@Model.PendingAdultRequests</strong>
-                        <span class="admin-stat-card__hint">@Localizer["Заявки магазинів на розміщення 18+ контенту"]</span>
+                        <span class="admin-stat-card__hint"><a asp-action="Jobs">@Localizer["Переглянути →"]</a></span>
                     </div>
                 </div>
                 <div class="admin-stat-card @(Model.PendingWithdrawals > 0 ? "admin-stat-card--warning" : null)">
@@ -117,40 +117,6 @@
                     </div>
                 </div>
             </div>
-
-            @if (Model.AdultRequestsQueue.Count > 0)
-            {
-                <h2 class="admin-section-heading">@Localizer["Заявки на 18+ контент"]</h2>
-                <section class="admin-panel table-responsive">
-                    <table class="table admin-table">
-                        <thead>
-                            <tr><th>@Localizer["Магазин"]</th><th>@Localizer["Власник"]</th><th class="text-end">@Localizer["Дії"]</th></tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var business in Model.AdultRequestsQueue)
-                            {
-                                <tr>
-                                    <td class="admin-entity-name">@(string.IsNullOrWhiteSpace(business.Name) ? Localizer["Без назви"] : business.Name)</td>
-                                    <td>@business.Owner</td>
-                                    <td class="text-end">
-                                        <form asp-action="ApproveAdultStatus" method="post" class="d-inline">
-                                            <input type="hidden" name="businessId" value="@business.Id" />
-                                            <input type="hidden" name="returnUrl" value="@Url.Action("Index")" />
-                                            <button type="submit" class="btn btn-sm btn-outline-success">@Localizer["Підтвердити 18+"]</button>
-                                        </form>
-                                        <form asp-action="RejectAdultStatus" method="post" class="admin-inline-form">
-                                            <input type="hidden" name="businessId" value="@business.Id" />
-                                            <input type="hidden" name="returnUrl" value="@Url.Action("Index")" />
-                                            <input type="text" name="reason" placeholder="@Localizer["Причина відхилення"]" class="admin-inline-form__input" required />
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">@Localizer["Відхилити"]</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </section>
-            }
 
             <h2 class="admin-section-heading">@Localizer["Швидкі дії"]</h2>
             <div class="admin-quick-links">

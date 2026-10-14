@@ -466,6 +466,16 @@ namespace Marketplace.Web.Controllers
 
             var openTickets = await _supportTicketService.GetOpenTicketsForAdminAsync();
 
+            var adultRequests = (await _adminService.GetPendingAdultRequestsAsync())
+                .Select(b => new AdultRequestViewModel
+                {
+                    Id = b.Id,
+                    Name = b.Name,
+                    Owner = b.Owner,
+                    LogoUrl = b.LogoUrl
+                })
+                .ToList();
+
             return View(new JobsPageViewModel
             {
                 IsSchedulerRunning = scheduler.IsStarted && !scheduler.InStandbyMode && !scheduler.IsShutdown,
@@ -475,7 +485,8 @@ namespace Marketplace.Web.Controllers
                 HasCustomApiKey = !string.IsNullOrEmpty(await _settingsService.GetAsync("GoogleAI", "ApiKey")),
                 ModerationModel = await _settingsService.GetAsync("GoogleAI", "Model"),
                 OpenReturnRequests = openReturnRequests,
-                OpenTickets = openTickets
+                OpenTickets = openTickets,
+                AdultRequests = adultRequests
             });
         }
 
@@ -796,8 +807,9 @@ namespace Marketplace.Web.Controllers
         {
             var returnCount = (await _postSaleService.GetAllOpenRequestsAsync()).Count;
             var ticketCount = (await _supportTicketService.GetOpenTicketsForAdminAsync()).Count;
+            var adultCount = (await _adminService.GetPendingAdultRequestsAsync()).Count;
 
-            return Json(new { returnCount, ticketCount });
+            return Json(new { returnCount, ticketCount, adultCount });
         }
 
         [HttpPost]

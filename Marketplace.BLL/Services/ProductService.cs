@@ -98,6 +98,7 @@ public class ProductService : IProductService
         var query = _context.Products
             .AsNoTracking()
             .Include(p => p.Category)
+            .Include(p => p.Discounts)
             .Include(p => p.Business)
                 .ThenInclude(b => b.Discounts)  
             .Include(p => p.Category)

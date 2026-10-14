@@ -16,6 +16,12 @@ namespace Marketplace.Web.Models.Businesses
         public decimal AvailableBalance { get; set; }
         public decimal PendingWithdrawalsTotal { get; set; }
         public List<Marketplace.BLL.DTOs.WithdrawalRequestDto> Withdrawals { get; set; } = new();
+        public decimal HeldBalance { get; set; }
+        public List<Marketplace.BLL.DTOs.SavedPayoutCardDto> SavedCards { get; set; } = new();
+        public bool ScheduledPayoutEnabled { get; set; }
+        public int? ScheduledPayoutDayOfMonth { get; set; }
+        public decimal? ScheduledPayoutAmount { get; set; }
+        public Guid? ScheduledPayoutCardId { get; set; }
     }
 
     public class BusinessPerformanceViewModel

@@ -390,7 +390,13 @@
                     window.location.href = pendingTargetUrl;
                 }
             } else {
-                alert("@Localizer["Доступ обмежено для осіб молодше 18 років."]");
+                const restrictedMessage = "@Localizer["Доступ обмежено для осіб молодше 18 років."]";
+      
+                if (window.siteDialog) {
+                    siteDialog.alert(restrictedMessage, { type: "warning" });
+                } else {
+                    alert(restrictedMessage);
+                }
                 modal.classList.add('d-none');
             }
         }

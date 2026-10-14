@@ -122,6 +122,21 @@ namespace Marketplace.BLL.Services
             await _context.PostSaleRequests.AddAsync(request);
             await _context.SaveChangesAsync();
 
+            var scheduler = await _schedulerFactory.GetScheduler();
+            var jobKey = new JobKey($"postsale-ai-moderation-job-{request.Id}", "postsale-moderation");
+
+            var job = JobBuilder.Create<PostSaleRequestModerationJob>()
+                .WithIdentity(jobKey)
+                .UsingJobData("RequestId", request.Id.ToString())
+                .Build();
+
+            var trigger = TriggerBuilder.Create()
+                .WithIdentity($"postsale-ai-moderation-trigger-{request.Id}", "postsale-moderation")
+                .StartAt(DateBuilder.FutureDate(5, IntervalUnit.Second))
+                .Build();
+
+            await scheduler.ScheduleJob(job, trigger);
+
             return new ServiceResult { Succeeded = true, Message = "Заявку подано", EntityId = request.Id };
         }
 

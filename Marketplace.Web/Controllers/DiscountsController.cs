@@ -46,7 +46,8 @@ namespace Marketplace.Web.Controllers
 
             var hasAccess = await _businessAccessService.HasAccessAsync(product.BusinessId, CurrentUserId, BusinessPermissions.ProductCrud);
             if (!hasAccess) return Forbid();
-
+            startDate = startDate.Date <= DateTime.Today ? DateTime.UtcNow : startDate.Date.ToUniversalTime();
+            endDate = endDate.Date.AddDays(1).AddTicks(-1).ToUniversalTime();
             try
             {
                 await _discountService.SetDiscountAsync(productId, percent, startDate, endDate);
