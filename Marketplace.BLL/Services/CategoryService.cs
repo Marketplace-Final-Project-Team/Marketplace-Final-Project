@@ -11,6 +11,9 @@ namespace Marketplace.BLL.Services
 {
     public class CategoryService : ICategoryService
     {
+        
+        public const string FallbackCategoryName = "Інше";
+
         private readonly IGenericRepository<Category> _categoryRepository;
         private readonly AppDbContext _context;
 
@@ -19,6 +22,9 @@ namespace Marketplace.BLL.Services
             _categoryRepository = categoryService;
             _context = context;
         }
+
+        private static bool IsFallback(string? name)
+            => string.Equals(name?.Trim(), FallbackCategoryName, StringComparison.OrdinalIgnoreCase);
 
         public async Task<ServiceResult> CreateCategory(string categoryName, string? imageUrl = null)
         {
@@ -60,6 +66,16 @@ namespace Marketplace.BLL.Services
                 return new ServiceResult { Succeeded = false, Message = "Категорії з таким айді не існує" };
             }
 
+           
+            if (isAdultOnly && IsFallback(category.Name))
+            {
+                return new ServiceResult
+                {
+                    Succeeded = false,
+                    Message = $"Категорію «{FallbackCategoryName}» не можна позначити як 18+: вона системна."
+                };
+            }
+
             category.IsAdultOnly = isAdultOnly;
             _categoryRepository.Update(category);
             await _context.SaveChangesAsync();
@@ -76,12 +92,22 @@ namespace Marketplace.BLL.Services
                 return new ServiceResult { Succeeded = false, Message = "Категорії з таким айді не існує" };
             }
 
+           
+            if (IsFallback(category.Name) && !IsFallback(newCategoryName))
+            {
+                return new ServiceResult
+                {
+                    Succeeded = false,
+                    Message = $"Категорію «{FallbackCategoryName}» не можна перейменувати: вона системна."
+                };
+            }
+
             if (await _categoryRepository.ExistsAsync(c => c.Name.ToLower() == newCategoryName.ToLower() && c.Id != categoryId))
             {
                 return new ServiceResult { Succeeded = false, Message = "Така категорія вже існує" };
             }
 
-            category.Name = newCategoryName;
+            category.Name = IsFallback(category.Name) ? FallbackCategoryName : newCategoryName;
             category.ImageUrl = string.IsNullOrWhiteSpace(imageUrl) ? null : imageUrl.Trim();
             _categoryRepository.Update(category);
             await _context.SaveChangesAsync();
@@ -98,11 +124,51 @@ namespace Marketplace.BLL.Services
                 return new ServiceResult { Succeeded = false, Message = "Категорії з таким айді не існує" };
             }
 
+            if (IsFallback(category.Name))
+            {
+                return new ServiceResult
+                {
+                    Succeeded = false,
+                    Message = $"Категорію «{FallbackCategoryName}» видалити не можна: до неї переносяться товари видалених категорій."
+                };
+            }
+
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
+        
+            var fallback = await _context.Categories
+                .FirstOrDefaultAsync(c => c.Name == FallbackCategoryName && c.Id != categoryId);
+
+            if (fallback == null)
+            {
+                fallback = new Category { Name = FallbackCategoryName, IsAdultOnly = false };
+                _context.Categories.Add(fallback);
+                await _context.SaveChangesAsync();
+            }
+
+            var fallbackId = fallback.Id;
+
+            var movedProducts = await _context.Products
+                .Where(p => p.CategoryId == categoryId)
+                .ExecuteUpdateAsync(s => s.SetProperty(p => p.CategoryId, fallbackId));
+
+            await _context.Set<Discount>()
+                .Where(d => d.CategoryId == categoryId)
+                .ExecuteUpdateAsync(s => s.SetProperty(d => d.IsDeleted, true));
+
             category.IsDeleted = true;
             _categoryRepository.Update(category);
             await _context.SaveChangesAsync();
 
-            return new ServiceResult { Succeeded = true, Message = string.Empty };
+            await transaction.CommitAsync();
+
+            return new ServiceResult
+            {
+                Succeeded = true,
+                Message = movedProducts > 0
+                    ? $"Категорію видалено. Товарів перенесено в «{FallbackCategoryName}»: {movedProducts}."
+                    : "Категорію видалено."
+            };
         }
 
         public async Task<Category> GetByIdAsync(Guid categoryId)

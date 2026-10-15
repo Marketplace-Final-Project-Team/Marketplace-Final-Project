@@ -4,6 +4,8 @@
     var isAdmin = (bool)ViewBag.IsAdmin;
     var requestId = (Guid)ViewBag.RequestId;
     var isSellerChannel = (bool)ViewBag.IsSellerChannel;
+    var backUrl = ViewBag.BackUrl as string ?? "/Order";
+    var backLabel = ViewBag.BackLabel as string ?? "← До моїх замовлень";
 }
 
 @section Styles {
@@ -22,10 +24,7 @@
                     <span class="chat-header__status"><i aria-hidden="true"></i> @(isSellerChannel ? "Канал із продавцем" : "Канал із покупцем")</span>
                 </div>
             </div>
-            @if (!isAdmin)
-            {
-                <a asp-controller="Order" asp-action="Index" class="chat-action">← До моїх замовлень</a>
-            }
+            <a href="@backUrl" class="chat-action">@backLabel</a>
         </header>
 
         <section class="chat-context chat-context--product" aria-label="Товар і замовлення">
@@ -40,7 +39,6 @@
         <div class="chat-messages" id="chatMessages">
             @foreach (var msg in Model)
             {
-
                 var isOutgoing = (isAdmin && msg.IsFromAdmin) || (!isAdmin && !msg.IsFromAdmin);
                 <div class="chat-message @(isOutgoing ? "outgoing" : "incoming")">
                     <div>@msg.Text</div>
@@ -64,7 +62,6 @@
 </div>
 
 @section Scripts {
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
     <script>
         const requestId = "@requestId";
@@ -72,41 +69,37 @@
         const currentIsAdmin = @Json.Serialize(isAdmin);
 
         const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/refundChatHub")
-        .withAutomaticReconnect()
-        .build();
-
+            .withUrl("/refundChatHub")
+            .withAutomaticReconnect()
+            .build();
 
         connection.on("ReceiveMessage", function (msg) {
-        const messagesContainer = document.getElementById("chatMessages");
+            const messagesContainer = document.getElementById("chatMessages");
 
+            const isOutgoing = (currentIsAdmin && msg.isFromAdmin) || (!currentIsAdmin && !msg.isFromAdmin);
 
-        const isOutgoing = (currentIsAdmin && msg.isFromAdmin) || (!currentIsAdmin && !msg.isFromAdmin);
+            const timeFormatted = new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-        const timeFormatted = new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const messageDiv = document.createElement("div");
+            messageDiv.className = `chat-message ${isOutgoing ? "outgoing" : "incoming"}`;
+            messageDiv.innerHTML = `
+                <div>${escapeHtml(msg.text)}</div>
+                <time>${timeFormatted}</time>
+            `;
 
-        const messageDiv = document.createElement("div");
-        messageDiv.className = `chat-message ${isOutgoing ? "outgoing" : "incoming"}`;
-        messageDiv.innerHTML = `
-        <div>${escapeHtml(msg.text)}</div>
-        <time>${timeFormatted}</time>
-        `;
-
-        messagesContainer.appendChild(messageDiv);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         });
 
         connection.start().then(function () {
-
-        connection.invoke("JoinChat", requestId, isSellerChannel).catch(err => console.error(err));
+            connection.invoke("JoinChat", requestId, isSellerChannel).catch(err => console.error(err));
         }).catch(err => console.error(err));
-
 
         document.getElementById("sendButton").addEventListener("click", sendMessage);
         document.getElementById("messageInput").addEventListener("keypress", function (e) {
-        if (e.key === "Enter") {
-        sendMessage();
-        }
+            if (e.key === "Enter") {
+                sendMessage();
+            }
         });
 
         document.querySelectorAll("[data-chat-quick-reply]").forEach(function (button) {
@@ -118,20 +111,20 @@
         });
 
         function sendMessage() {
-        const input = document.getElementById("messageInput");
-        const text = input.value.trim();
-        if (!text) return;
+            const input = document.getElementById("messageInput");
+            const text = input.value.trim();
+            if (!text) return;
 
-        connection.invoke("SendMessage", requestId, isSellerChannel, text)
-        .then(() => {
-        input.value = "";
-        })
-        .catch(err => console.error(err));
+            connection.invoke("SendMessage", requestId, isSellerChannel, text)
+                .then(() => {
+                    input.value = "";
+                })
+                .catch(err => console.error(err));
         }
 
         function escapeHtml(text) {
-        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-        return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, function (m) { return map[m]; });
         }
 
         const container = document.getElementById("chatMessages");

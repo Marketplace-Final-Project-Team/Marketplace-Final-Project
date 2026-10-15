@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using ClosedXML.Excel;
-using Microsoft.EntityFrameworkCore;
 using Marketplace.BLL.Common;
 using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
@@ -11,6 +6,7 @@ using Marketplace.DAL.Data;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
 using Marketplace.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Quartz;
 using AdultContentStatus = Marketplace.Domain.Entities.AdultContentStatus;
 
@@ -206,6 +202,7 @@ public class ProductService : IProductService
         var query = _context.Products
             .AsNoTracking()
             .Include(p => p.Category)
+            .Include(p => p.Discounts)
             .Include(p => p.Business)
                 .ThenInclude(b => b.Discounts)  
             .Include(p => p.Category)
@@ -387,6 +384,7 @@ public class ProductService : IProductService
     public async Task<Product?> GetByIdAsync(Guid id)
     {
         return await _context.Products
+            .AsNoTracking()
             .Include(p => p.Category)
             .Include(p => p.Business)
                 .ThenInclude(b => b.Discounts)   
@@ -413,6 +411,9 @@ public class ProductService : IProductService
                 throw new InvalidOperationException("Ваш магазин не має підтвердженого статусу для розміщення товарів 18+.");
             }
         }
+
+        if (dto.MainImage == null)
+            throw new InvalidOperationException("Головне зображення товару обов'язкове.");
 
         var variants = BuildVariants(dto.Variants);
         var resolvedSku = await ResolveSkuAsync(dto.BusinessId, dto.Sku);
@@ -463,11 +464,12 @@ public class ProductService : IProductService
     public async Task<Product?> UpdateAsync(ProductEditDto dto)
     {
         var product = await _context.Products
+            .IgnoreAutoIncludes()
             .Include(p => p.Images)
+            .Include(p => p.Variants)
             .FirstOrDefaultAsync(p => p.Id == dto.Id);
 
-        if (product == null)
-            return null;
+        if (product == null) return null;
 
         var resolvedSku = await ResolveSkuAsync(product.BusinessId, dto.Sku, product.Id);
         var removedImageIds = dto.RemovedAdditionalImageIds.ToHashSet();
@@ -499,7 +501,11 @@ public class ProductService : IProductService
         product.ModerationReason = null;
 
         SyncVariants(product, dto.Variants);
-        product.Quantity = product.Variants.Count > 0 ? product.Variants.Sum(v => v.Quantity) : dto.Quantity;
+
+        var activeVariants = product.Variants.Where(v => !v.IsDeleted).ToList();
+        product.Quantity = activeVariants.Count > 0
+            ? activeVariants.Sum(v => v.Quantity)
+            : dto.Quantity;
 
         if (imagesToRemove.Count > 0)
         {
@@ -524,17 +530,56 @@ public class ProductService : IProductService
     }
 
     public async Task<bool> DeleteAsync(Guid id)
+        => await DeleteOrArchiveAsync(id) != ProductDeleteOutcome.NotFound;
+
+    public async Task<ProductDeleteOutcome> DeleteOrArchiveAsync(Guid id)
     {
         var product = await _context.Products
             .FirstOrDefaultAsync(p => p.Id == id);
 
         if (product == null)
-            return false;
+            return ProductDeleteOutcome.NotFound;
+
+        var hasOrders = await _context.OrderItems
+            .IgnoreQueryFilters()
+            .AnyAsync(oi => oi.ProductId == id);
+
+        if (hasOrders)
+        {
+            if (product.Status != ProductStatus.Archived)
+            {
+                product.Status = ProductStatus.Archived;
+                product.ModerationReason = null;
+                await _context.SaveChangesAsync();
+            }
+
+            return ProductDeleteOutcome.Archived;
+        }
 
         _context.Products.Remove(product);
         await _context.SaveChangesAsync();
-        return true;
+        return ProductDeleteOutcome.Deleted;
     }
+
+    public async Task<(int OpenOrders, bool HasOrders)> GetOrderUsageAsync(Guid productId)
+    {
+        var hasOrders = await _context.OrderItems
+            .IgnoreQueryFilters()
+            .AnyAsync(oi => oi.ProductId == productId);
+
+        var openOrders = await _context.OrderItems
+            .Where(oi => oi.ProductId == productId
+                && !oi.IsReturned
+                && (oi.Order.Status == OrderStatus.Pending
+                    || oi.Order.Status == OrderStatus.Confirmed
+                    || oi.Order.Status == OrderStatus.Shipped))
+            .Select(oi => oi.OrderId)
+            .Distinct()
+            .CountAsync();
+
+        return (openOrders, hasOrders);
+    }
+
 
     public async Task<ServiceResult> UpdateQuantityAsync(Guid productId, int quantity)
     {

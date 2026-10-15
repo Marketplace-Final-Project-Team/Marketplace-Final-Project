@@ -2,5 +2,6 @@
   <Project Path="Marketplace.BLL/Marketplace.BLL.csproj" />
   <Project Path="Marketplace.DAL/Marketplace.DAL.csproj" />
   <Project Path="Marketplace.Domain/Marketplace.Domain.csproj" />
+  <Project Path="Marketplace.Tests/Marketplace.Tests.csproj" />
   <Project Path="Marketplace.Web/Marketplace.Web.csproj" />
 </Solution>

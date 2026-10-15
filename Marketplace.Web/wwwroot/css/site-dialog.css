@@ -1,0 +1,172 @@
+
+
+html.site-dialog-open {
+    overflow: hidden;
+    scrollbar-gutter: stable;
+}
+
+.site-dialog-overlay {
+    align-items: center;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(3px);
+    display: flex;
+    inset: 0;
+    justify-content: center;
+    opacity: 0;
+    padding: 1rem;
+    position: fixed;
+    transition: opacity 0.16s ease;
+    z-index: 2147483000; 
+}
+
+    .site-dialog-overlay.is-open {
+        opacity: 1;
+    }
+
+.site-dialog {
+    background: #fff;
+    border-radius: 1.1rem;
+    box-shadow: 0 1.5rem 4rem rgba(15, 23, 42, 0.35);
+    color: #172033;
+    padding: 1.75rem 1.5rem 1.35rem;
+    text-align: center;
+    transform: translateY(8px) scale(0.97);
+    transition: transform 0.16s ease;
+    width: min(26rem, 100%);
+}
+
+.site-dialog-overlay.is-open .site-dialog {
+    transform: none;
+}
+
+.site-dialog__icon {
+    align-items: center;
+    border-radius: 50%;
+    display: flex;
+    height: 3.4rem;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    width: 3.4rem;
+}
+
+.site-dialog--error .site-dialog__icon {
+    background: #fee4e2;
+    color: #d92d20;
+}
+
+.site-dialog--success .site-dialog__icon {
+    background: #def7eb;
+    color: #16794a;
+}
+
+.site-dialog--warning .site-dialog__icon {
+    background: #fff1c7;
+    color: #b54708;
+}
+
+.site-dialog--info .site-dialog__icon,
+.site-dialog--question .site-dialog__icon {
+    background: #e7eeff;
+    color: #3157d7;
+}
+
+.site-dialog__title {
+    font-size: 1.15rem;
+    font-weight: 750;
+    margin: 0 0 0.4rem;
+}
+
+.site-dialog__message {
+    color: #475467;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0 0 1.4rem;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+}
+
+.site-dialog__actions {
+    display: flex;
+    gap: 0.6rem;
+}
+
+.site-dialog__btn {
+    background: #fff;
+    border: 1px solid transparent;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    flex: 1;
+    font-size: 0.92rem;
+    font-weight: 700;
+    padding: 0.7rem 1rem;
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+    .site-dialog__btn:focus-visible {
+        box-shadow: 0 0 0 0.24rem rgba(49, 87, 215, 0.25);
+        outline: 0;
+    }
+
+.site-dialog__btn--primary {
+    background: #3157d7;
+    color: #fff;
+}
+
+    .site-dialog__btn--primary:hover {
+        background: #2445bd;
+    }
+
+.site-dialog__btn--danger {
+    background: #d92d20;
+    color: #fff;
+}
+
+    .site-dialog__btn--danger:hover {
+        background: #b42318;
+    }
+
+    .site-dialog__btn--danger:focus-visible {
+        box-shadow: 0 0 0 0.24rem rgba(217, 45, 32, 0.25);
+    }
+
+.site-dialog__btn--secondary {
+    border-color: #d0d5dd;
+    color: #344054;
+}
+
+    .site-dialog__btn--secondary:hover {
+        background: #f6f8fc;
+    }
+
+.site-dialog__input {
+    border: 1px solid #d0d5dd;
+    border-radius: 0.75rem;
+    font-size: 0.95rem;
+    margin: 0 0 1.4rem;
+    padding: 0.65rem 0.85rem;
+    text-align: left;
+    width: 100%;
+}
+
+    .site-dialog__input:focus {
+        border-color: #3157d7;
+        box-shadow: 0 0 0 0.24rem rgba(49, 87, 215, 0.18);
+        outline: 0;
+    }
+
+.site-dialog--prompt .site-dialog__message {
+    margin-bottom: 0.9rem;
+}
+
+@media (max-width: 420px) {
+    .site-dialog__actions {
+        flex-direction: column-reverse;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .site-dialog-overlay,
+    .site-dialog {
+        transition: none;
+    }
+}

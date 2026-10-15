@@ -23,14 +23,23 @@ namespace Marketplace.Web.Controllers
             _userManager = userManager;
         }
 
+        
+        private async Task<(string? UserId, bool HasAccess)> CheckOwnerAccessAsync(Guid businessId)
+        {
+            var userId = _userManager.GetUserId(User);
+            if (userId == null)
+            {
+                return (null, false);
+            }
+
+            var hasAccess = await _businessAccessService.HasAccessAsync(businessId, userId, BusinessMemberRole.Owner);
+            return (userId, hasAccess);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Guid businessId, decimal amount, string cardNumber, string recipientName)
+        public async Task<IActionResult> Create(Guid businessId, decimal amount, Guid? savedCardId, string? cardNumber, string? recipientName, bool rememberCard = false)
         {
-            if (string.IsNullOrWhiteSpace(cardNumber) || string.IsNullOrWhiteSpace(recipientName))
-            {
-                return BadRequest("Card number and recipient name are required.");
-            }
             if (amount <= 0)
             {
                 return BadRequest("Amount must be greater than zero.");
@@ -40,17 +49,57 @@ namespace Marketplace.Web.Controllers
             {
                 return NotFound();
             }
-            var userId = _userManager.GetUserId(User);
+
+            var (userId, hasAccess) = await CheckOwnerAccessAsync(businessId);
             if (userId == null)
             {
                 return Unauthorized();
             }
-            var hasAcces = await _businessAccessService.HasAccessAsync(businessId, userId, BusinessMemberRole.Owner);
-            if (!hasAcces)
+            if (!hasAccess)
             {
                 return Forbid();
             }
-            var result = await _withdrawalService.Create(businessId, amount, cardNumber, recipientName);
+
+            var result = await _withdrawalService.Create(businessId, amount, savedCardId, cardNumber, recipientName, rememberCard);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetSavedCards(Guid businessId)
+        {
+            var (userId, hasAccess) = await CheckOwnerAccessAsync(businessId);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            if (!hasAccess)
+            {
+                return Forbid();
+            }
+
+            var cards = await _withdrawalService.GetSavedCardsAsync(businessId);
+            return Ok(cards);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteSavedCard(Guid businessId, Guid cardId)
+        {
+            var (userId, hasAccess) = await CheckOwnerAccessAsync(businessId);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            if (!hasAccess)
+            {
+                return Forbid();
+            }
+
+            var result = await _withdrawalService.DeleteSavedCardAsync(businessId, cardId);
             if (!result.Succeeded)
             {
                 return BadRequest(result.Message);
@@ -124,6 +173,29 @@ namespace Marketplace.Web.Controllers
             }
 
             return RedirectToAction("Withdrawals");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetScheduledPayoutSettings(Guid businessId, bool enabled, int? dayOfMonth, decimal? amount, Guid? savedCardId)
+        {
+            var (userId, hasAccess) = await CheckOwnerAccessAsync(businessId);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            if (!hasAccess)
+            {
+                return Forbid();
+            }
+
+            var result = await _withdrawalService.SetScheduledPayoutSettingsAsync(businessId, enabled, dayOfMonth, amount, savedCardId);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Message);
+            }
+
+            return Ok();
         }
     }
 }

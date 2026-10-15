@@ -137,10 +137,6 @@ namespace Marketplace.BLL.Services
 
         public async Task<ServiceResult> CreateBusiness(BusinessCreateDto dto)
         {
-            if (await _businessRepo.ExistsAsync(b => b.OwnerId == dto.UserId))
-            {
-                return new ServiceResult { Succeeded = false, Message = "Ви вже маєте бізнес на своєму аккауті" };
-            }
 
             if (await _businessRepo.ExistsAsync(b => b.StoreName == dto.StoreName))
             {

@@ -103,4 +103,16 @@
   <data name="Замовлення успішно отримано." xml:space="preserve">
     <value>Die Bestellung wurde erfolgreich zugestellt.</value>
   </data>
+  <data name="Служба доставки" xml:space="preserve">
+    <value>Versanddienst</value>
+  </data>
+  <data name="Не вказано" xml:space="preserve">
+    <value>Nicht angegeben</value>
+  </data>
+  <data name="Нова пошта" xml:space="preserve">
+    <value>Nova Poshta</value>
+  </data>
+  <data name="Укрпошта" xml:space="preserve">
+    <value>Ukrposhta</value>
+  </data>
 </root>

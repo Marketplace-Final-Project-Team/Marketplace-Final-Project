@@ -1630,3 +1630,137 @@
     padding: 0.25rem 0.5rem;
     border-radius: 6px;
 }
+
+
+.payout-grid {
+    align-items: start;
+}
+
+.payout-card--primary {
+    justify-content: flex-start;
+    gap: 1.25rem;
+}
+
+    .payout-card--primary .payout-card__actions {
+        margin-top: 0;
+    }
+
+/* ---------- Компактна картка балансу з резервом (14 днів) ---------- */
+
+.payout-balances {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.payout-balances__item {
+    flex: 1;
+    min-width: 0;
+}
+
+.payout-balances__divider {
+    width: 1px;
+    align-self: stretch;
+    background: #e9ecef;
+}
+
+.payout-balances__item--muted .payout-card__amount {
+    font-size: 1.35rem;
+}
+
+.payout-card__amount--muted {
+    color: #868e96;
+}
+
+/* ---------- Прокручувана історія заявок ---------- */
+
+.payout-history__scroll {
+    max-height: 18rem;
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+}
+
+    .payout-history__scroll table {
+        margin: 0;
+    }
+
+    .payout-history__scroll thead th {
+        position: sticky;
+        top: 0;
+        background: #f8f9fa;
+        z-index: 1;
+    }
+
+/* ---------- Дропдаун вибору картки (Google Pay-стиль) ---------- */
+
+.card-selector {
+    position: relative;
+}
+
+.card-selector__toggle {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+    .card-selector__toggle:hover {
+        border-color: #3561e7;
+    }
+
+.card-selector__menu {
+    position: absolute;
+    top: calc(100% + 0.35rem);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    box-shadow: 0 0.5rem 1.5rem rgba(23, 32, 51, 0.12);
+    z-index: 20;
+    padding: 0.4rem;
+}
+
+.card-selector__option {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.55rem 0.7rem;
+    border: none;
+    background: transparent;
+    border-radius: 7px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.88rem;
+}
+
+    .card-selector__option:hover {
+        background: #f4f7fe;
+    }
+
+.card-selector__add {
+    width: 100%;
+    margin-top: 0.3rem;
+    padding: 0.55rem 0.7rem;
+    border: none;
+    border-top: 1px dashed #e9ecef;
+    background: transparent;
+    color: #3561e7;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.88rem;
+}
+
+    .card-selector__add:hover {
+        background: #f4f7fe;
+    }

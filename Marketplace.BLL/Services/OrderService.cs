@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Marketplace.BLL.Common;
 using Marketplace.BLL.Configs;
 using Marketplace.BLL.DTOs;
@@ -17,7 +18,6 @@ namespace Marketplace.BLL.Services
     {
         private readonly IGenericRepository<Order> _orerRepository;
         private readonly ICartItemRepository _cartItemRepository;
-        private readonly IGenericRepository<Address> _addressRepository;
         private readonly IGenericRepository<Product> _productRepository;
         private readonly AppDbContext _context;
         private readonly IPaymentService _paymentService;
@@ -29,7 +29,6 @@ namespace Marketplace.BLL.Services
         public OrderService(
             IGenericRepository<Order> orerRepository,
             ICartItemRepository cartItemRepository,
-            IGenericRepository<Address> addressRepository,
             IGenericRepository<Product> productRepository,
             AppDbContext context,
             IPaymentService paymentService,
@@ -40,7 +39,6 @@ namespace Marketplace.BLL.Services
         {
             _orerRepository = orerRepository;
             _cartItemRepository = cartItemRepository;
-            _addressRepository = addressRepository;
             _productRepository = productRepository;
             _paymentService = paymentService;
             _promoCodeService = promoCodeService;
@@ -53,6 +51,14 @@ namespace Marketplace.BLL.Services
         public async Task<OrderResultDto> CreateOrder(string userId, OrderCreateDto dto)
         {
 
+            var errors = new List<ValidationResult>();
+            if (!Validator.TryValidateObject(dto, new ValidationContext(dto), errors, validateAllProperties: true)
+                || (dto.DeliveryCarrier == "NovaPoshta"
+                    && (string.IsNullOrWhiteSpace(dto.NovaPoshtaCityRef) || string.IsNullOrWhiteSpace(dto.NovaPoshtaBranchRef))))
+            {
+                return new OrderResultDto { Succeeded = false, Message = "Перевірте дані отримувача та доставки." };
+            }
+
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
@@ -63,13 +69,6 @@ namespace Marketplace.BLL.Services
                     return new OrderResultDto { Succeeded = false, Message = "Кошик пустий." };
                 }
 
-                var address = await _addressRepository.FirstOrDefaultAsync(a => a.Id == dto.AddressId && a.UserId == userId);
-                if (address == null)
-                {
-                    return new OrderResultDto { Succeeded = false, Message = "Адреса не знайдена." };
-                }
-
-                
                 var orderItems = new List<OrderItem>();
                 var promoCode = !string.IsNullOrWhiteSpace(dto.PromoCode)
                     ? await _promoCodeService.FindActiveAsync(dto.PromoCode)
@@ -94,7 +93,7 @@ namespace Marketplace.BLL.Services
                     }
                     var business = await _businessRepository.FirstOrDefaultAsync(b => b.Id == cartItem.Product.BusinessId);
                     var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == cartItem.Product.CategoryId);
-                    
+
 
                     var now = DateTime.UtcNow;
                     var productDiscount = cartItem.Product.Discounts?
@@ -109,9 +108,6 @@ namespace Marketplace.BLL.Services
                     var userdiscount = await _context.UserDiscounts
                         .FirstOrDefaultAsync(ud => ud.UserId == userId && ud.BusinessId == cartItem.Product.BusinessId && ud.StartDate <= DateTime.UtcNow && ud.EndDate >= DateTime.UtcNow);
 
-                    // A business-wide sale is dominant over the product's own sale — it replaces
-                    // it rather than stacking with it. A matching promo code still stacks on top
-                    // of whichever one of those applies.
                     decimal? bestDiscount = 0;
                     if (userdiscount != null)
                     {
@@ -120,7 +116,8 @@ namespace Marketplace.BLL.Services
                         {
                             alldiscounts.Add(productDiscount.Percent);
                         }
-                        if (categoryDiscount != null) { 
+                        if (categoryDiscount != null)
+                        {
                             alldiscounts.Add(categoryDiscount.Percent);
                         }
                         if (userdiscount != null)
@@ -166,7 +163,7 @@ namespace Marketplace.BLL.Services
                         effectivePercent = 100;
                     }
 
-                    
+
 
 
                     var unitPrice = effectivePercent > 0
@@ -203,9 +200,16 @@ namespace Marketplace.BLL.Services
                     Items = orderItems,
                     TotalAmount = totalAmount,
                     CreatedAt = DateTime.UtcNow,
-                    ShippingCountry = address.Country,
-                    ShippingCity = address.City,
-                    ShippingStreet = address.Street,
+                    RecipientLastName = dto.RecipientLastName.Trim(),
+                    RecipientFirstName = dto.RecipientFirstName.Trim(),
+                    RecipientPhone = dto.RecipientPhone.Trim(),
+                    ShippingCountry = "Україна",
+                    ShippingCity = dto.ShippingCity.Trim(),
+                    ShippingStreet = dto.ShippingStreet.Trim(),
+                    DeliveryCarrier = dto.DeliveryCarrier,
+                    PaymentMethod = dto.PaymentMethod,
+                    NovaPoshtaCityRef = dto.NovaPoshtaCityRef?.Trim(),
+                    NovaPoshtaBranchRef = dto.NovaPoshtaBranchRef?.Trim(),
                     Status = OrderStatus.Pending
                 };
 
@@ -220,7 +224,7 @@ namespace Marketplace.BLL.Services
                 await _context.SaveChangesAsync();
 
 
-                var paymentData = await _paymentService.CreatePaymentAsync(
+                var paymentData = dto.PaymentMethod == "CashOnDelivery" ? null : await _paymentService.CreatePaymentAsync(
                     orderId: order.Id.ToString(),
                     amount: order.TotalAmount,
                     description: $"Оплата замовлення #{order.Id}",
@@ -283,6 +287,8 @@ namespace Marketplace.BLL.Services
                             item.CommissionAmount = commission;
                             business.Balance += netAmount;
                             marketplaceBalance.Balance += commission;
+                            business.HeldBalance += netAmount;
+                            item.HeldAmount = netAmount;
                         }
                     }
                 }
@@ -316,6 +322,12 @@ namespace Marketplace.BLL.Services
 
                                 item.Product.Business.Balance -= netAmount;
                                 marketplaceBalance.Balance -= item.CommissionAmount;
+
+                                if (item.HeldAmount.HasValue && !item.IsBalanceReleased)
+                                {
+                                    item.Product.Business.HeldBalance -= item.HeldAmount.Value;
+                                    item.IsBalanceReleased = true;
+                                }
                             }
                         }
                     }
@@ -378,6 +390,11 @@ namespace Marketplace.BLL.Services
 
                         item.Product.Business.Balance -= netAmount;
                         marketplaceBalance.Balance -= item.CommissionAmount;
+                        if (item.HeldAmount.HasValue && !item.IsBalanceReleased)
+                        {
+                            item.Product.Business.HeldBalance -= item.HeldAmount.Value;
+                            item.IsBalanceReleased = true;
+                        }
                     }
                 }
 
@@ -534,9 +551,12 @@ namespace Marketplace.BLL.Services
                 CreatedAt = order.CreatedAt,
                 Status = order.Status,
                 OrderTotalAmount = order.TotalAmount,
-                BuyerName = order.User.UserName ?? string.Empty,
+                BuyerName = string.IsNullOrWhiteSpace(order.RecipientLastName)
+                    ? order.User.UserName ?? string.Empty
+                    : $"{order.RecipientLastName} {order.RecipientFirstName}",
                 BuyerEmail = order.User.Email ?? string.Empty,
-                BuyerPhone = order.User.PhoneNumber ?? string.Empty,
+                BuyerPhone = string.IsNullOrWhiteSpace(order.RecipientPhone)
+                    ? order.User.PhoneNumber ?? string.Empty : order.RecipientPhone,
                 ShippingCountry = order.ShippingCountry,
                 ShippingCity = order.ShippingCity,
                 ShippingStreet = order.ShippingStreet,

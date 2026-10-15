@@ -27,7 +27,7 @@
                 {
                     <form asp-action="CloseTicket" method="post" class="d-inline">
                         <input type="hidden" name="ticketId" value="@ticketId" />
-                        <button type="submit" class="chat-action chat-action--danger" onclick="return confirm('Закрити це звернення?');">Закрити звернення</button>
+                        <button type="submit" class="chat-action chat-action--danger" data-confirm="Закрити це звернення?" data-confirm-danger="true">Закрити звернення</button>
                     </form>
                     <a asp-controller="Admin" asp-action="Jobs" class="chat-action">← До задач</a>
                 }

@@ -106,4 +106,25 @@
   <data name="Доставка" xml:space="preserve">
     <value>Lieferung</value>
   </data>
+  <data name="Служба доставки" xml:space="preserve">
+    <value>Versanddienst</value>
+  </data>
+  <data name="Адреса" xml:space="preserve">
+    <value>Adresse</value>
+  </data>
+  <data name="Мої замовлення" xml:space="preserve">
+    <value>Meine Bestellungen</value>
+  </data>
+  <data name="Нова пошта" xml:space="preserve">
+    <value>Nova Poshta</value>
+  </data>
+  <data name="Укрпошта" xml:space="preserve">
+    <value>Ukrposhta</value>
+  </data>
+  <data name="Оплата при отриманні" xml:space="preserve">
+    <value>Zahlung bei Lieferung</value>
+  </data>
+  <data name="LiqPay (онлайн)" xml:space="preserve">
+    <value>LiqPay (online)</value>
+  </data>
 </root>
