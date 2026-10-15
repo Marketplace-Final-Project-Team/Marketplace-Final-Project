@@ -23,8 +23,6 @@ namespace Marketplace.Web.Controllers
             }
             catch (Exception)
             {
-                // Nova Poshta's API being slow/unreachable shouldn't crash the checkout page —
-                // the city picker just shows "нічого не знайдено" instead of a 500.
                 return Ok(Array.Empty<object>());
             }
         }

@@ -8,7 +8,6 @@ namespace Marketplace.Domain.Entities
         public string ProductName { get; set; } = string.Empty;
 
         public Guid? ProductVariantId { get; set; }
-        public ProductVariant? ProductVariant { get; set; }
         public string? VariantSize { get; set; }
         public string? VariantSku { get; set; }
 

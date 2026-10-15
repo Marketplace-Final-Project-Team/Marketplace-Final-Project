@@ -1,6 +1,6 @@
-namespace Marketplace.BLL.DTOs.Products
+﻿namespace Marketplace.Domain.Enums
 {
-    public enum CatalogSortOption
+    public enum CatalogueSortOption
     {
         Newest,
         PriceAsc,

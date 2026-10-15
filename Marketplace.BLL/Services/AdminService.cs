@@ -301,6 +301,11 @@ namespace Marketplace.BLL.Services
                 return new ServiceResult { Succeeded = false, Message = "Не вдалося оновити статус користувача" };
             }
 
+            if (userStatus != UserStatus.Active)
+            {
+                await _userManager.UpdateSecurityStampAsync(user);
+            }
+
             return new ServiceResult { Succeeded = true, Message = string.Empty };
         }
 
@@ -612,6 +617,26 @@ namespace Marketplace.BLL.Services
                 BannedProductCount = products.Count(p => p.Status == ProductStatus.Banned)
             };
         }
+
+        public async Task<UserAdminDetailsDto?> GetUserDetailsAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return null;
+            }
+
+            return new UserAdminDetailsDto
+            {
+                Id = user.Id,
+                UserName = user.UserName ?? string.Empty,
+                Email = user.Email ?? string.Empty,
+                AvatarUrl = user.AvatarUrl,
+                Status = user.Status,
+                CreatedAt = user.CreatedAt
+            };
+        }
+
         public async Task<PagedResult<ReviewAdminDto>> GetFilteredReviewsAsync(ReviewAdminQueryDto query)
         {
             var reviewsQuery = _context.Reviews.AsNoTracking().AsQueryable();
@@ -665,7 +690,7 @@ namespace Marketplace.BLL.Services
             };
         }
 
-        public async Task<IReadOnlyList<ReviewAppealAdminDto>> GetPendingAppeals()
+        public async Task<IReadOnlyList<ReviewAppealAdminDto>> GetPendingAppealsAsync()
         {
             return await _context.ReviewAppeals
             .AsNoTracking()

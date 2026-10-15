@@ -6,10 +6,10 @@ namespace Marketplace.BLL.Interfaces
 {
     public interface IProfileService
     {
-        public Task<ProfileDto?> GetProfile(string userId);
-        Task<ServiceResult> UpdateProfile(UpdateProfileDto dto, string userId);
-        Task<ChangeEmailResult> ChangeEmail(ChangeEmailDto dto, string userId);
+        public Task<ProfileDto?> GetProfileAsync(string userId);
+        Task<ServiceResult> UpdateProfileAsync(UpdateProfileDto dto, string userId);
+        Task<ChangeEmailResult> ChangeEmailAsync(ChangeEmailDto dto, string userId);
         Task<ServiceResult> ConfirmChangeEmail(string userId, string newEmail, string token);
-        Task<ServiceResult> ChangePassword(ChangePasswordDto dto, string userId);
+        Task<ServiceResult> ChangePasswordAsync(ChangePasswordDto dto, string userId);
     }
 }

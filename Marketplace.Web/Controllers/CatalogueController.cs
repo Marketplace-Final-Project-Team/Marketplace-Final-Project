@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
 using Marketplace.Domain.Enums;
 using Marketplace.Web.Infrastructure;
@@ -7,8 +6,8 @@ using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-
 namespace Marketplace.Web.Controllers;
+using BLL.DTOs.Products;
 
 [AllowAnonymous]
 [Route("Catalog")]
@@ -46,7 +45,7 @@ public class CatalogueController : Controller
     [HttpGet]
     [Route("")]
     [Route("Index")]
-    public async Task<IActionResult> Index(CatalogFilterViewModel filter)
+    public async Task<IActionResult> Index(CatalogueFilterViewModel filter)
     {
         filter.Page = filter.Page < 1 ? 1 : filter.Page;
         var userId = GetCurrentUserId();
@@ -55,7 +54,7 @@ public class CatalogueController : Controller
 
         bool allowAdultContent = Request.Cookies["AdultConfirmed"] == "true";
 
-        var result = await _productService.GetCatalogPageAsync(new CatalogFilterDto
+        var result = await _productService.GetCataloguePageAsync(new CatalogueFilterDto
         {
             Search = filter.Search,
             CategoryId = filter.CategoryId,
@@ -78,7 +77,7 @@ public class CatalogueController : Controller
             ? categories.FirstOrDefault(category => category.Id == filter.CategoryId.Value)
             : null;
 
-        var model = new CatalogPageViewModel
+        var model = new CataloguePageViewModel
         {
             Filter = filter,
             Categories = categories
@@ -92,7 +91,7 @@ public class CatalogueController : Controller
             SelectedCategoryName = selectedCategory?.Name,
             SelectedCategoryImageUrl = selectedCategory?.ImageUrl,
             CategoryTiles = categories
-                .Select(category => new CatalogCategoryTileViewModel
+                .Select(category => new CatalogueCategoryTileViewModel
                 {
                     Id = category.Id,
                     Name = category.Name,
@@ -102,7 +101,7 @@ public class CatalogueController : Controller
                 .ToList()
         };
 
-        return View("~/Views/Catalog/Index.cshtml", model);
+        return View("~/Views/Catalogue/Index.cshtml", model);
     }
 
     [HttpGet]
@@ -112,21 +111,19 @@ public class CatalogueController : Controller
         bool allowAdultContent = Request.Cookies["AdultConfirmed"] == "true";
         var userId = GetCurrentUserId();
 
-        var product = await _productService.GetCatalogProductAsync(id, allowAdultContent);
+        var product = await _productService.GetCatalogueProductAsync(id, allowAdultContent);
         if (product is null)
         {
-            // Якщо товар 18+, а користувач ще не підтверджував вік
             var rawProduct = await _productService.GetByIdAsync(id);
             if (rawProduct != null && rawProduct.IsAdultOnly)
             {
-                // Перенаправляємо на сторінку підтвердження віку
-                return View("~/Views/Catalog/AgeVerification.cshtml", id);
+                return View("~/Views/Catalogue/AgeVerification.cshtml", id);
             }
 
             return NotFound();
         }
 
-        var model = MapProduct(product,0,0,userId);
+        var model = MapProduct(product, 0, 0, userId);
         model.LowStockThreshold = await _settingsService.GetIntAsync("BusinessRules", "LowStockThreshold", 5);
         var catalog = await _productService.GetCatalogAsync(allowAdultContent: allowAdultContent);
         model.EstimatedDeliveryStart = DateTime.Today.AddDays(2);
@@ -162,7 +159,7 @@ public class CatalogueController : Controller
 
         RecordRecentlyViewed(id);
 
-        return View("~/Views/Catalog/Details.cshtml", model);
+        return View("~/Views/Catalogue/Details.cshtml", model);
     }
 
     [HttpPost]
@@ -316,13 +313,13 @@ public class CatalogueController : Controller
         return distance[rows - 1, cols - 1];
     }
 
-    private static CatalogProductViewModel MapProduct(Marketplace.Domain.Entities.Product product, double averageRating = 0, int reviewCount = 0,string userId = null)
+    private static CatalogueProductViewModel MapProduct(Marketplace.Domain.Entities.Product product, double averageRating = 0, int reviewCount = 0,string userId = null)
     {
         
         var discountPercent = product.GetEffectiveDiscountPercent(userId);
         var hasDiscount = discountPercent > 0;
 
-        return new CatalogProductViewModel
+        return new CatalogueProductViewModel
         {
             Id = product.Id,
             Name = product.Name,
@@ -330,10 +327,6 @@ public class CatalogueController : Controller
             Price = hasDiscount ? product.GetDiscountedPrice(userId) : product.Price,
             Quantity = product.Quantity,
             Sku = product.Sku,
-            Variants = product.Variants
-                .OrderBy(v => v.Size)
-                .Select(v => new CatalogProductVariantViewModel { Id = v.Id, Size = v.Size, Quantity = v.Quantity })
-                .ToList(),
             CreatedAt = product.CreatedAt,
             MainImageUrl = product.MainImageUrl,
             CategoryName = product.Category?.Name ?? "Без категорії",

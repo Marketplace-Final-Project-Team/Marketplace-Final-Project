@@ -90,20 +90,6 @@
                     <span class="small text-break">@Model.Id</span>
                 </div>
             </div>
-
-            @if (Model.Variants.Count > 0)
-            {
-                <div class="product-meta mt-3">
-                    <span class="product-meta__label d-block mb-2">@Localizer["Розміри"]</span>
-                    @foreach (var variant in Model.Variants)
-                    {
-                        <div class="product-meta__row">
-                            <span class="product-meta__label">@variant.Size @(string.IsNullOrWhiteSpace(variant.Sku) ? "" : $"({variant.Sku})")</span>
-                            <strong>@variant.Quantity @Localizer["шт."]</strong>
-                        </div>
-                    }
-                </div>
-            }
         </div>
     </div>
 

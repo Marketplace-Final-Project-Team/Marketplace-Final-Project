@@ -7,7 +7,6 @@ namespace Marketplace.Web.Models.Products
         public decimal Price { get; set; }
         public int Quantity { get; set; }
         public string? Sku { get; set; }
-        public int VariantCount { get; set; }
         public string MainImageUrl { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
         public string CategoryName { get; set; } = string.Empty;

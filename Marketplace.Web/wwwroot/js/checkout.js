@@ -131,10 +131,6 @@
         }
 
         const fields = Array.from(step.querySelectorAll("input, select, textarea")).filter(
-            // el.hidden only reflects the element's own [hidden] attribute, not an
-            // ancestor's — a required field inside a hidden carrier panel (e.g. the
-            // Ukrposhta/Meest address fields while NovaPoshta is selected) would
-            // otherwise still be treated as visible and block validation.
             (el) => !el.disabled && !el.hidden && el.type !== "hidden" && el.offsetParent !== null
         );
 
@@ -150,12 +146,28 @@
 
         if (stepNumber === 2) {
             const carrier = form.querySelector('input[name="DeliveryCarrier"]:checked')?.value;
+            const hint = form.querySelector("[data-address-hint]");
             const branchError = form.querySelector("[data-np-branch-error]");
+
+            if (carrier === "Ukrposhta" || carrier === "Meest") {
+                const city = form.querySelector('input[name="DeliveryCity"]')?.value.trim();
+                const street = form.querySelector('input[name="DeliveryStreet"]')?.value.trim();
+
+                if (!city || !street) {
+                    if (hint) hint.hidden = false;
+                    return false;
+                }
+            }
+            if (hint) hint.hidden = true;
+
             if (carrier === "NovaPoshta" && !form.querySelector("[data-np-branch-ref]")?.value) {
                 if (branchError) branchError.hidden = false;
                 return false;
             }
             if (branchError) branchError.hidden = true;
+        }
+        else {
+            form.querySelector("[data-address-hint]")?.setAttribute("hidden", "");
         }
 
         return true;

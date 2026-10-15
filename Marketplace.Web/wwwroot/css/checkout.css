@@ -328,3 +328,7 @@
 .checkout-review-seller:first-of-type {
     margin-top: 0;
 }
+
+.checkout-saved-address {
+    margin-bottom: 1rem;
+}

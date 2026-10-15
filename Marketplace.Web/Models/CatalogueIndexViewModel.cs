@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Marketplace.Web.Models;
 
-public class CatalogIndexViewModel
+public class CatalogueIndexViewModel
 {
-    public IReadOnlyList<CatalogProductViewModel> Products { get; set; } = new List<CatalogProductViewModel>();
+    public IReadOnlyList<CatalogueProductViewModel> Products { get; set; } = new List<CatalogueProductViewModel>();
     public string? Search { get; set; }
     public Guid? CategoryId { get; set; }
     public IEnumerable<SelectListItem>? Categories { get; set; }

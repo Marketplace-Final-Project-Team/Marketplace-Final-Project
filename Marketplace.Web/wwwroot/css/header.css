@@ -105,6 +105,21 @@
     white-space: nowrap;
 }
 
+
+/* Account Avatar */
+
+.site-header__account-avatar {
+    overflow: hidden;
+}
+
+    .site-header__account-avatar img {
+        border-radius: 50%;
+        display: block;
+        height: 100%;
+        object-fit: cover;
+        width: 100%;
+    }
+
 /* Search */
 
 .site-header__search {

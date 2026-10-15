@@ -312,8 +312,6 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("ProductVariantId");
-
                     b.ToTable("CartItems");
                 });
 
@@ -542,8 +540,6 @@ namespace Marketplace.DAL.Migrations
                     b.HasIndex("OrderId");
 
                     b.HasIndex("ProductId");
-
-                    b.HasIndex("ProductVariantId");
 
                     b.ToTable("OrderItems");
                 });
@@ -791,43 +787,6 @@ namespace Marketplace.DAL.Migrations
                         .IsUnique();
 
                     b.ToTable("ProductTranslations");
-                });
-
-            modelBuilder.Entity("Marketplace.Domain.Entities.ProductVariant", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Size")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Sku")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId", "Size")
-                        .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
-
-                    b.ToTable("ProductVariants");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.PromoCode", b =>
@@ -1697,16 +1656,9 @@ namespace Marketplace.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Marketplace.Domain.Entities.ProductVariant", "ProductVariant")
-                        .WithMany()
-                        .HasForeignKey("ProductVariantId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("Cart");
 
                     b.Navigation("Product");
-
-                    b.Navigation("ProductVariant");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.Discount", b =>
@@ -1757,16 +1709,9 @@ namespace Marketplace.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Marketplace.Domain.Entities.ProductVariant", "ProductVariant")
-                        .WithMany()
-                        .HasForeignKey("ProductVariantId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.Navigation("Order");
 
                     b.Navigation("Product");
-
-                    b.Navigation("ProductVariant");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.PostSaleRequest", b =>
@@ -1850,17 +1795,6 @@ namespace Marketplace.DAL.Migrations
                 {
                     b.HasOne("Marketplace.Domain.Entities.Product", "Product")
                         .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Marketplace.Domain.Entities.ProductVariant", b =>
-                {
-                    b.HasOne("Marketplace.Domain.Entities.Product", "Product")
-                        .WithMany("Variants")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2133,8 +2067,6 @@ namespace Marketplace.DAL.Migrations
                     b.Navigation("OrderItems");
 
                     b.Navigation("Reviews");
-
-                    b.Navigation("Variants");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.User", b =>

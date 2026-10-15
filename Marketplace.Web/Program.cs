@@ -145,6 +145,7 @@ builder.Services.AddScoped<IWishlistCollectionService, WishlistCollectionService
 builder.Services.AddScoped<IPostSaleService, PostSaleService>();
 builder.Services.AddScoped<IPromoCodeService, PromoCodeService>();
 builder.Services.AddScoped<IProductAnalyticsService, ProductAnalyticsService>();
+builder.Services.AddScoped<IAddressService, AddressService>();
 
 builder.Services.AddMemoryCache();
 builder.Services.AddDataProtection();
@@ -180,6 +181,10 @@ builder.Services.AddScoped<IDeliveryProviderService, DeliveryProviderService>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+{
+    options.ValidationInterval = TimeSpan.Zero;
+});
 
 var app = builder.Build();
 
@@ -211,8 +216,8 @@ var localizationOptions = new RequestLocalizationOptions
     SupportedCultures = supportedCultures,
     SupportedUICultures = supportedCultures
 };
-// Cookie (the language switcher) takes priority over the browser's own Accept-Language
-// header, so a visitor's explicit choice always wins over auto-detection.
+
+// Language switcher
 localizationOptions.RequestCultureProviders = new List<IRequestCultureProvider>
 {
     new CookieRequestCultureProvider { CookieName = CookieRequestCultureProvider.DefaultCookieName },

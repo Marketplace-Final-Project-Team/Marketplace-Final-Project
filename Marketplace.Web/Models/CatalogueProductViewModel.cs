@@ -1,6 +1,6 @@
 namespace Marketplace.Web.Models;
 
-public class CatalogProductViewModel
+public class CatalogueProductViewModel
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
