@@ -7,5 +7,6 @@ namespace Marketplace.BLL.Interfaces
     {
         Task<ModerationResult> CheckProductContentAsync(Product product);
         Task<ModerationResult> CheckBusinessAsync(Business business);
+        Task<ReturnModerationResult> CheckReturnRequestAsync(PostSaleRequest request);
     }
 }

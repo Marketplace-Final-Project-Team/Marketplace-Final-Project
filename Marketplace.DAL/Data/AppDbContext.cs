@@ -46,6 +46,7 @@ namespace Marketplace.DAL.Data
         public DbSet<RefundChatMessage> RefundChatMessages { get; set; }
 
         public DbSet<WithdrawalRequest> WithdrawalRequests { get; set; }
+        public DbSet<SavedPayoutCard> SavedPayoutCards { get; set; }
         public DbSet<AIChatMessage> AIChatMessages { get; set; }
 
         public DbSet<ReviewAppeal> ReviewAppeals { get; set; }
@@ -77,6 +78,13 @@ namespace Marketplace.DAL.Data
             builder.Entity<MarketplaceBalance>().HasQueryFilter(mb => !mb.IsDeleted);
             builder.Entity<RefundChatMessage>().HasQueryFilter(m => !m.IsDeleted);
             builder.Entity<AIChatMessage>().HasQueryFilter(d => !d.IsDeleted);
+            builder.Entity<SavedPayoutCard>().HasOne(c => c.Business).WithMany(b => b.SavedPayoutCards).HasForeignKey(c => c.BusinessId).OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Business>()
+            .HasOne(b => b.ScheduledPayoutCard)
+            .WithMany()
+            .HasForeignKey(b => b.ScheduledPayoutCardId)
+            .OnDelete(DeleteBehavior.Restrict);
 
 
             builder.Entity<Business>()

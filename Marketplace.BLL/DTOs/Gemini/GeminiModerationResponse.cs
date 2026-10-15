@@ -7,4 +7,13 @@
         public bool ContainsProhibited { get; set; }
         public string? Reason { get; set; }
     }
+    public class GeminiReturnModerationResponse
+    {
+        public bool ShouldApprove { get; set; }
+        public bool IsConfident { get; set; }
+        public string? Reason { get; set; }
+    }
 }
+
+   
+

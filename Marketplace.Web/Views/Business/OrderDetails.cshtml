@@ -188,12 +188,12 @@
                             <input type="hidden" name="businessId" value="@Model.BusinessId" />
                             <input type="hidden" name="orderId" value="@Model.OrderId" />
                             <input type="hidden" name="requestId" value="@request.Id" />
-                            <button type="submit" class="seller-button seller-button--primary" onclick="return confirm('@Localizer["Підтвердити повернення? Кошти будуть одразу списані з балансу магазину та повернуті покупцю."]');">
+                            <button type="submit" class="seller-button seller-button--primary" data-confirm="@Localizer["Підтвердити повернення? Кошти будуть одразу списані з балансу магазину та повернуті покупцю."]">
                                 @Localizer["Підтвердити повернення"]
                             </button>
                         </form>
 
-                        <button type="button" class="seller-button mt-2" data-bs-toggle="modal" data-bs-target="#disputeModal-@request.Id">
+                        <button type="button" class="seller-button seller-button--secondary mt-2" data-bs-toggle="modal" data-bs-target="#disputeModal-@request.Id">
                             @Localizer["Відхилити з обґрунтуванням"]
                         </button>
                     }
@@ -203,7 +203,7 @@
                         <p class="seller-postsale-item__comment text-muted">
                             @Localizer["Ваше обґрунтування передано адміністратору, очікуйте остаточного рішення."]
                         </p>
-                        <a asp-controller="Support" asp-action="RefundChat" asp-route-requestId="@request.Id" asp-route-isSellerChannel="true" class="seller-button position-relative">
+                        <a asp-controller="Support" asp-action="RefundChat" asp-route-requestId="@request.Id" asp-route-isSellerChannel="true" class="seller-button seller-button--secondary position-relative text-decoration-none mt-2">
                             @Localizer["Повернутися в чат"]
                             @if (request.UnreadFromAdmin > 0)
                             {
@@ -214,7 +214,7 @@
 
                     else if (!string.IsNullOrWhiteSpace(request.SellerResponse))
                     {
-                        <p class="seller-postsale-item__comment">@Localizer["Ваша відповідь:"] «@request.SellerResponse»</p>
+                        <p class="seller-postsale-item__comment">@Localizer["Відповідь:"] «@request.SellerResponse»</p>
                     }
                 </div>
             }

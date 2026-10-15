@@ -93,7 +93,7 @@ namespace Marketplace.BLL.Services
                     }
                     var business = await _businessRepository.FirstOrDefaultAsync(b => b.Id == cartItem.Product.BusinessId);
                     var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == cartItem.Product.CategoryId);
-                    
+
 
                     var now = DateTime.UtcNow;
                     var productDiscount = cartItem.Product.Discounts?
@@ -116,7 +116,8 @@ namespace Marketplace.BLL.Services
                         {
                             alldiscounts.Add(productDiscount.Percent);
                         }
-                        if (categoryDiscount != null) { 
+                        if (categoryDiscount != null)
+                        {
                             alldiscounts.Add(categoryDiscount.Percent);
                         }
                         if (userdiscount != null)
@@ -162,7 +163,7 @@ namespace Marketplace.BLL.Services
                         effectivePercent = 100;
                     }
 
-                    
+
 
 
                     var unitPrice = effectivePercent > 0
@@ -281,6 +282,8 @@ namespace Marketplace.BLL.Services
                             item.CommissionAmount = commission;
                             business.Balance += netAmount;
                             marketplaceBalance.Balance += commission;
+                            business.HeldBalance += netAmount;
+                            item.HeldAmount = netAmount;
                         }
                     }
                 }
@@ -310,6 +313,12 @@ namespace Marketplace.BLL.Services
 
                                 item.Product.Business.Balance -= netAmount;
                                 marketplaceBalance.Balance -= item.CommissionAmount;
+
+                                if (item.HeldAmount.HasValue && !item.IsBalanceReleased)
+                                {
+                                    item.Product.Business.HeldBalance -= item.HeldAmount.Value;
+                                    item.IsBalanceReleased = true;
+                                }
                             }
                         }
                     }
@@ -367,6 +376,11 @@ namespace Marketplace.BLL.Services
 
                         item.Product.Business.Balance -= netAmount;
                         marketplaceBalance.Balance -= item.CommissionAmount;
+                        if (item.HeldAmount.HasValue && !item.IsBalanceReleased)
+                        {
+                            item.Product.Business.HeldBalance -= item.HeldAmount.Value;
+                            item.IsBalanceReleased = true;
+                        }
                     }
                 }
 

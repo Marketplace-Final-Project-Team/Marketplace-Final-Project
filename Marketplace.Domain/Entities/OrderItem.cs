@@ -1,7 +1,7 @@
 using Marketplace.Domain.Common;
 namespace Marketplace.Domain.Entities
 {
-    public class OrderItem: BaseEntity
+    public class OrderItem : BaseEntity
     {
         public Guid ProductId { get; set; }
         public Product Product { get; set; } = null!;
@@ -17,5 +17,7 @@ namespace Marketplace.Domain.Entities
         public bool IsReturned { get; set; } = false;
         public Guid OrderId { get; set; }
         public Order Order { get; set; } = null!;
+        public decimal? HeldAmount { get; set; }
+        public bool IsBalanceReleased { get; set; } = false;
     }
 }

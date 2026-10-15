@@ -125,6 +125,10 @@
             <a class="products-tab @(Model.Filter == "low-stock" ? "is-active" : "")" href="@TabUrl("low-stock")">@Localizer["Закінчуються"] <span>@Model.LowStockCount</span></a>
             <a class="products-tab @(Model.Filter == "out-of-stock" ? "is-active" : "")" href="@TabUrl("out-of-stock")">@Localizer["Немає в наявності"] <span>@Model.OutOfStockCount</span></a>
             <a class="products-tab @(Model.Filter == "hidden" ? "is-active" : "")" href="@TabUrl("hidden")">@Localizer["Приховані"] <span>@Model.HiddenCount</span></a>
+            @if (Model.ArchivedCount > 0 || Model.Filter == "archived")
+            {
+                <a class="products-tab @(Model.Filter == "archived" ? "is-active" : "")" href="@TabUrl("archived")">@Localizer["Архів"] <span>@Model.ArchivedCount</span></a>
+            }
         </nav>
     }
 
@@ -132,7 +136,7 @@
     {
         <section class="product-empty">
             <div class="product-empty__icon" aria-hidden="true">□</div>
-            @if (Model.AllCount > 0)
+            @if (Model.AllCount > 0 || Model.ArchivedCount > 0)
             {
                 <h2>@Localizer["Нічого не знайдено"]</h2>
                 <p>@Localizer["Спробуйте змінити пошуковий запит або оберіть інший фільтр."]</p>
@@ -175,6 +179,7 @@
                             "Active" => Localizer["Активний"].Value,
                             "Pending" => Localizer["На модерації"].Value,
                             "Banned" => Localizer["Заблокований"].Value,
+                            "Archived" => Localizer["Архівований"].Value,
                             _ => item.Status
                         };
 
@@ -248,17 +253,20 @@
                             <td>
                                 <div class="product-actions justify-content-end align-items-center gap-2">
                                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">@Localizer["Переглянути"]</a>
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">@Localizer["Редагувати"]</a>
+                                    @if (item.Status != "Archived")
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">@Localizer["Редагувати"]</a>
 
-                                    <button type="button" class="btn btn-sm btn-outline-warning text-dark"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#discountModal"
-                                            data-product-id="@item.Id"
-                                            title="@Localizer["Встановити знижку"]">
-                                        @Localizer["Знижка"]
-                                    </button>
+                                        <button type="button" class="btn btn-sm btn-outline-warning text-dark"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#discountModal"
+                                                data-product-id="@item.Id"
+                                                title="@Localizer["Встановити знижку"]">
+                                            @Localizer["Знижка"]
+                                        </button>
 
-                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">@Localizer["Видалити"]</a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">@Localizer["Видалити"]</a>
+                                    }
                                 </div>
                             </td>
                         </tr>

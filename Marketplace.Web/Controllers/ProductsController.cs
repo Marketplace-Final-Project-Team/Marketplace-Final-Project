@@ -60,7 +60,12 @@ public class ProductsController : Controller
         }
 
         var lowStockThreshold = await _settingsService.GetIntAsync("BusinessRules", "LowStockThreshold", 5);
-        var products = await _productService.GetByBusinessAsync(selectedBusinessId);
+        var allProducts = await _productService.GetByBusinessAsync(selectedBusinessId);
+
+        // Архівні товари (за ними були замовлення) не змішуємо з основним списком -
+        // вони показуються в окремій вкладці "Архів".
+        var archived = allProducts.Where(p => p.Status == ProductStatus.Archived).ToList();
+        var products = allProducts.Where(p => p.Status != ProductStatus.Archived).ToList();
 
         ViewBag.Businesses = businesses.Select(b => new SelectListItem
         {
@@ -85,7 +90,8 @@ public class ProductsController : Controller
             PendingCount = products.Count(p => p.Status == ProductStatus.Pending),
             LowStockCount = products.Count(IsLowStock),
             OutOfStockCount = products.Count(IsOutOfStock),
-            HiddenCount = products.Count(IsHidden)
+            HiddenCount = products.Count(IsHidden),
+            ArchivedCount = archived.Count
         };
 
         IEnumerable<Product> filtered = model.Filter switch
@@ -94,6 +100,7 @@ public class ProductsController : Controller
             "low-stock" => products.Where(IsLowStock),
             "out-of-stock" => products.Where(IsOutOfStock),
             "hidden" => products.Where(IsHidden),
+            "archived" => archived,
             _ => products
         };
 
@@ -440,7 +447,6 @@ public class ProductsController : Controller
             IsAdultOnly = product.IsAdultOnly,
             CategoryId = product.CategoryId,
             ExistingMainImageUrl = product.MainImageUrl,
-            ExistingAdditionalImageUrls = product.Images.Select(i => i.ImageUrl).ToList(),
             Categories = await BuildCategoryOptionsAsync(product.CategoryId, isAdultApproved)
         });
     }
@@ -468,7 +474,6 @@ public class ProductsController : Controller
             var currentBusiness = businesses.FirstOrDefault(b => b.Id == accessible.Product!.BusinessId);
             bool isAdultApproved = currentBusiness?.AdultStatus == AdultContentStatus.Approved;
 
-            model.ExistingMainImageUrl = accessible.Product!.MainImageUrl;
             model.Categories = await BuildCategoryOptionsAsync(model.CategoryId, isAdultApproved);
             return View(model);
         }
@@ -486,8 +491,7 @@ public class ProductsController : Controller
                 Sku = model.Sku,
                 IsAdultOnly = model.IsAdultOnly,
                 MainImage = model.MainImage,
-                AdditionalImages = model.AdditionalImages,
-                ExistingAdditionalImageUrls = model.ExistingAdditionalImageUrls ?? new List<string>()
+                AdditionalImages = model.AdditionalImages
             });
 
             if (updated is null) return NotFound();
@@ -506,7 +510,6 @@ public class ProductsController : Controller
             bool isAdultApproved = currentBusiness?.AdultStatus == AdultContentStatus.Approved;
 
             model.Categories = await BuildCategoryOptionsAsync(model.CategoryId, isAdultApproved);
-            model.ExistingMainImageUrl = accessible.Product!.MainImageUrl;
             return View(model);
         }
 
@@ -521,6 +524,11 @@ public class ProductsController : Controller
         if (accessible.Result is not null) return accessible.Result;
 
         var product = accessible.Product!;
+        var usage = await _productService.GetOrderUsageAsync(id);
+        ViewBag.OpenOrders = usage.OpenOrders;
+        ViewBag.HasOrders = usage.HasOrders;
+        ViewBag.BusinessId = product.BusinessId;
+
         return View(new ProductDetailsViewModel
         {
             Id = product.Id,
@@ -541,8 +549,10 @@ public class ProductsController : Controller
         var accessible = await GetAccessibleProductAsync(id);
         if (accessible.Result is not null) return accessible.Result;
 
-        await _productService.DeleteAsync(id);
-        TempData["Success"] = "Товар видалено.";
+        var outcome = await _productService.DeleteOrArchiveAsync(id);
+        TempData["Success"] = outcome == ProductDeleteOutcome.Archived
+            ? "Товар має історію замовлень, тому його архівовано й приховано з каталогу."
+            : "Товар видалено.";
         return RedirectToAction(nameof(Index), new { businessId = accessible.Product!.BusinessId });
     }
 
