@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Quartz;
 
-namespace Marketplace.BLL.Services
+namespace Marketplace.BLL.Jobs
 {
     public class PendingOrderExpiryJob : IJob
     {

@@ -3,6 +3,7 @@ using CloudinaryDotNet;
 using Marketplace.BLL.Common;
 using Marketplace.BLL.Configs;
 using Marketplace.BLL.Interfaces;
+using Marketplace.BLL.Jobs;
 using Marketplace.BLL.Services;
 using Marketplace.DAL.Data;
 using Marketplace.DAL.Interfaces;
@@ -61,7 +62,7 @@ builder.Services.AddQuartz(q =>
         .WithSimpleSchedule(x => x.WithIntervalInHours(1).RepeatForever()));
 
     var scheduledPayoutJobKey = new JobKey("scheduled-payout-job", "cleanup");
-    q.AddJob<Marketplace.BLL.Services.ScheduledPayoutJob>(opts => opts.WithIdentity(scheduledPayoutJobKey));
+    q.AddJob<ScheduledPayoutJob>(opts => opts.WithIdentity(scheduledPayoutJobKey));
     q.AddTrigger(opts => opts
         .ForJob(scheduledPayoutJobKey)
         .WithIdentity("scheduled-payout-trigger", "cleanup")
@@ -69,7 +70,7 @@ builder.Services.AddQuartz(q =>
         .WithSimpleSchedule(x => x.WithIntervalInHours(24).RepeatForever()));
 
     var releaseHeldBalanceJobKey = new JobKey("release-held-balance-job", "cleanup");
-    q.AddJob<Marketplace.BLL.Services.ReleaseHeldBalanceJob>(opts => opts.WithIdentity(releaseHeldBalanceJobKey));
+    q.AddJob<ReleaseHeldBalanceJob>(opts => opts.WithIdentity(releaseHeldBalanceJobKey));
     q.AddTrigger(opts => opts
         .ForJob(releaseHeldBalanceJobKey)
         .WithIdentity("release-held-balance-trigger", "cleanup")

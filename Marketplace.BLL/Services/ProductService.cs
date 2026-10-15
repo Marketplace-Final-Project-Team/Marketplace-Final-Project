@@ -2,6 +2,7 @@ using ClosedXML.Excel;
 using Marketplace.BLL.Common;
 using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
+using Marketplace.BLL.Jobs;
 using Marketplace.DAL.Data;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;

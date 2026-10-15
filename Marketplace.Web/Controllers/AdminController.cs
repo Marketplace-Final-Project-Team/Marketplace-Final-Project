@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using Marketplace.BLL.Interfaces;
-using Marketplace.BLL.Services;
 using Marketplace.Domain.Enums;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +8,7 @@ using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Common;
 using Quartz;
 using Quartz.Impl.Matchers;
+using Marketplace.BLL.Jobs;
 
 namespace Marketplace.Web.Controllers
 {

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Quartz;
 
-namespace Marketplace.BLL.Services
+namespace Marketplace.BLL.Jobs
 {
     // Щодня перевіряє всі ще "утримувані" позиції замовлень - якщо товар
     // доставлено і минуло 14+ днів (вікно повернень пройшло), знімає холд
