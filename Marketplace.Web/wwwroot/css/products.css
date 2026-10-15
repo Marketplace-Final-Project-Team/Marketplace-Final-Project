@@ -1082,4 +1082,8 @@
         align-items: stretch;
         flex-direction: column-reverse;
     }
+    .product-status--archived {
+        background: #eef0f4;
+        color: #5b6578;
+    }
 }

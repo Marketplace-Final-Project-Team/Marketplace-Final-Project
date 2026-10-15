@@ -22,7 +22,7 @@
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
         } catch {
-            // localStorage unavailable — saved searches just won't persist across reloads.
+            // localStorage unavailable - saved searches just won't persist across reloads.
         }
     };
 
@@ -31,6 +31,11 @@
         div.textContent = value ?? "";
         return div.innerHTML;
     };
+
+    // Стильне вікно з полем вводу; якщо site-dialog.js не підключено - рідний prompt.
+    const askName = (message, value) => window.siteDialog
+        ? window.siteDialog.prompt(message, value)
+        : Promise.resolve(window.prompt(message, value));
 
     const currentProductIds = () =>
         Array.from(document.querySelectorAll("[data-product-id]")).map((el) => el.dataset.productId);
@@ -121,9 +126,9 @@
         });
     };
 
-    saveButton?.addEventListener("click", () => {
+    saveButton?.addEventListener("click", async () => {
         const defaultName = buildSummary();
-        const name = window.prompt("Назва для збереженого пошуку:", defaultName === "Усі товари" ? "Мій пошук" : defaultName);
+        const name = await askName("Назва для збереженого пошуку:", defaultName === "Усі товари" ? "Мій пошук" : defaultName);
         if (!name || !name.trim()) return;
 
         const saved = readSaved();

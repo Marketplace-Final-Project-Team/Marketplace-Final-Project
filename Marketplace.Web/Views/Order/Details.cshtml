@@ -92,9 +92,12 @@
                         {
                             <div class="postsale-status postsale-status--@item.ReturnRequest.Status.ToString().ToLowerInvariant() my-2 p-3 border rounded">
                                 <strong>@PostSaleStatusLabel(item.ReturnRequest.Status)</strong>
-                                <a asp-controller="Support" asp-action="RefundChatByOrderItem" asp-route-orderItemId="@item.Id" class="btn btn-sm btn-outline-primary mt-2">
-                                    @Localizer["Повернутися в чат"]
-                                </a>
+                                @if (item.ReturnRequest.Status != Marketplace.Domain.Enums.PostSaleRequestStatus.Rejected)
+                                {
+                                    <a asp-controller="Support" asp-action="RefundChatByOrderItem" asp-route-orderItemId="@item.Id" class="btn btn-sm btn-outline-primary mt-2">
+                                        @Localizer["Повернутися в чат"]
+                                    </a>
+                                }
                                 <div class="text-muted small">@item.ReturnRequest.SubmittedAtUtc.ToLocalTime().ToString("dd MMMM yyyy, HH:mm") · @Localizer["Причина:"] @item.ReturnRequest.Reason</div>
 
                                 @if (!string.IsNullOrWhiteSpace(item.ReturnRequest.Comment))
@@ -116,7 +119,7 @@
 
                                 @if (!string.IsNullOrWhiteSpace(item.ReturnRequest.SellerResponse))
                                 {
-                                    <div class="mt-2 text-primary small"><strong>@Localizer["Відповідь продавця:"]</strong> @item.ReturnRequest.SellerResponse</div>
+                                    <div class="mt-2 text-primary small"><strong>@Localizer["Відповідь повернення:"]</strong> @item.ReturnRequest.SellerResponse</div>
                                 }
                             </div>
                         }
@@ -168,13 +171,18 @@
 
     @if (Model.Status is Marketplace.Domain.Enums.OrderStatus.Delivered)
     {
-        <section class="shop-panel postsale-panel mt-4">
-            <h2>@Localizer["Післяпродажний сервіс та безпека"]</h2>
-            <div class="postsale-protection d-flex align-items-start gap-3 mt-3">
-                <span class="postsale-protection__icon fs-3" aria-hidden="true">🛡</span>
-                <div>
+        <section class="shop-panel postsale-panel">
+            <h2 class="postsale-panel__title">@Localizer["Післяпродажний сервіс та безпека"]</h2>
+            <div class="postsale-protection">
+                <span class="postsale-protection__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                        <path d="M12 3 4.5 6v5.5c0 4.6 3.1 8.4 7.5 9.5 4.4-1.1 7.5-4.9 7.5-9.5V6L12 3Z" />
+                        <path d="m9 12 2.2 2.2L15.5 10" />
+                    </svg>
+                </span>
+                <div class="postsale-protection__body">
                     <strong>@Localizer["Захист покупця"]</strong>
-                    <p class="mb-0 text-muted">@Localizer["Кошти продавцю переказуються лише після підтвердження отримання товару. Повернення можливе протягом 14 днів з дати доставки — окремо на кожен товар."]</p>
+                    <p>@Localizer["Кошти продавцю переказуються лише після підтвердження отримання товару. Повернення можливе протягом 14 днів з дати доставки — окремо на кожен товар."]</p>
                 </div>
             </div>
         </section>

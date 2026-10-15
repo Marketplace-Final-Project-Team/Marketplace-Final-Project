@@ -60,6 +60,22 @@ builder.Services.AddQuartz(q =>
         .StartNow()
         .WithSimpleSchedule(x => x.WithIntervalInHours(1).RepeatForever()));
 
+    var scheduledPayoutJobKey = new JobKey("scheduled-payout-job", "cleanup");
+    q.AddJob<Marketplace.BLL.Services.ScheduledPayoutJob>(opts => opts.WithIdentity(scheduledPayoutJobKey));
+    q.AddTrigger(opts => opts
+        .ForJob(scheduledPayoutJobKey)
+        .WithIdentity("scheduled-payout-trigger", "cleanup")
+        .StartNow()
+        .WithSimpleSchedule(x => x.WithIntervalInHours(24).RepeatForever()));
+
+    var releaseHeldBalanceJobKey = new JobKey("release-held-balance-job", "cleanup");
+    q.AddJob<Marketplace.BLL.Services.ReleaseHeldBalanceJob>(opts => opts.WithIdentity(releaseHeldBalanceJobKey));
+    q.AddTrigger(opts => opts
+        .ForJob(releaseHeldBalanceJobKey)
+        .WithIdentity("release-held-balance-trigger", "cleanup")
+        .StartNow()
+        .WithSimpleSchedule(x => x.WithIntervalInHours(24).RepeatForever()));
+
     var cleanupJobKey = new JobKey("cleanup-old-ai-chat-messages-job", "cleanup");
 
     q.AddJob<CleanupOldAIChatMessagesJob>(opts => opts.WithIdentity(cleanupJobKey));
@@ -69,6 +85,7 @@ builder.Services.AddQuartz(q =>
         .WithIdentity("cleanup-old-ai-chat-messages-trigger", "cleanup")
         .WithCronSchedule("0 0 3 * * ?"));
 });
+
 
 builder.Services.AddQuartzHostedService(opt =>
 {

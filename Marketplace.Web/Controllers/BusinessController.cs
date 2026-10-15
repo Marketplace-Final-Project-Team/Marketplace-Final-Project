@@ -122,7 +122,7 @@ namespace Marketplace.Web.Controllers
             return View(new BusinessDashboardViewModel
             {
                 Businesses = businessCards,
-                CanCreateBusiness = businesses.All(business => business.OwnerId != userId)
+                CanCreateBusiness = true
             });
         }
 
@@ -750,7 +750,6 @@ namespace Marketplace.Web.Controllers
             ViewBag.Message = message;
             return View();
         }
-
         [HttpGet]
         public async Task<IActionResult> Finance(Guid businessId)
         {
@@ -771,6 +770,10 @@ namespace Marketplace.Web.Controllers
             var pendingWithdrawalsTotal = withdrawals
                 .Where(w => w.Status == WithdrawalStatus.Pending.ToString())
                 .Sum(w => w.Amount);
+
+            var savedCards = await _withdrawalService.GetSavedCardsAsync(businessId);
+
+            var heldBalance = business.HeldBalance;
 
             return View(new BusinessFinanceViewModel
             {
@@ -799,12 +802,17 @@ namespace Marketplace.Web.Controllers
                         .Select(s => new BusinessDashboardChartPointViewModel { Date = s.Date, Revenue = s.Revenue, OrderCount = s.OrderCount })
                         .ToList()
                     : new List<BusinessDashboardChartPointViewModel>(),
-                AvailableBalance = business.Balance,
+                AvailableBalance = business.Balance - business.HeldBalance,
                 PendingWithdrawalsTotal = pendingWithdrawalsTotal,
-                Withdrawals = withdrawals.ToList()
+                Withdrawals = withdrawals.ToList(),
+                HeldBalance = heldBalance,
+                SavedCards = savedCards,
+                ScheduledPayoutEnabled = business.ScheduledPayoutEnabled,
+                ScheduledPayoutDayOfMonth = business.ScheduledPayoutDayOfMonth,
+                ScheduledPayoutAmount = business.ScheduledPayoutAmount,
+                ScheduledPayoutCardId = business.ScheduledPayoutCardId
             });
         }
-
         [HttpGet]
         public async Task<IActionResult> Performance(Guid businessId)
         {

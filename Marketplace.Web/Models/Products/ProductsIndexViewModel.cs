@@ -14,5 +14,6 @@ namespace Marketplace.Web.Models.Products
         public int LowStockCount { get; set; }
         public int OutOfStockCount { get; set; }
         public int HiddenCount { get; set; }
+        public int ArchivedCount { get; set; }
     }
 }
