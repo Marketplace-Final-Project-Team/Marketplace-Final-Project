@@ -109,6 +109,8 @@
                         var product = categorySection.Products[index];
                         var productName = (await ProductTranslator.GetLocalizedAsync(product.Id, product.Name, product.Description, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)).Name;
                         var colorClass = index % 3 == 0 ? "blue" : index % 3 == 1 ? "violet" : "orange";
+                        var filledStars = Math.Clamp((int)Math.Round(product.AverageRating), 0, 5);
+                        var hasDiscount = product.OriginalPrice.HasValue && product.OriginalPrice.Value > product.Price;
                         <article class="home-product position-relative">
 
                             <!-- ПЛАШКА 18+ -->
@@ -138,30 +140,33 @@
                                         onclick="checkAgeAndAction('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
                                     @productName
                                 </button>
-                                @if (product.ReviewCount > 0)
-                                {
-                                    <div class="home-product__rating">★ @product.AverageRating.ToString("0.0") (@product.ReviewCount)</div>
-                                }
+                                <div class="home-product__rating" aria-label="@Localizer["Рейтинг {0} з 5, {1} відгуків", product.AverageRating.ToString("0.0"), product.ReviewCount]">
+                                    <span class="home-product__stars" aria-hidden="true">
+                                        <span>@(new string('★', filledStars))</span><span class="home-product__stars-empty">@(new string('★', 5 - filledStars))</span>
+                                    </span>
+                                    <span class="home-product__review-count">@(product.ReviewCount > 0 ? $"{product.AverageRating:0.0} · {product.ReviewCount}" : Localizer["Без відгуків"].Value)</span>
+                                </div>
                                 <div class="home-product__bottom">
-                                    <div class="home-product__price d-flex align-items-center gap-1">
-                                        @if (product.OriginalPrice.HasValue && product.OriginalPrice.Value > product.Price)
-                                        {
-                                            <strong class="text-danger">@product.Price.ToString("N2") ₴</strong>
-                                            <span class="text-muted text-decoration-line-through small">@product.OriginalPrice.Value.ToString("N2") ₴</span>
-                                            @if (product.DiscountPercent.HasValue)
+                                    <div class="home-product__price @(hasDiscount ? "home-product__price--discount" : null)">
+                                        <div class="home-product__price-row">
+                                            <strong class="home-product__price-current @(hasDiscount ? "home-product__price-current--discount" : null)">@product.Price.ToString("N2") ₴</strong>
+                                            @if (hasDiscount)
                                             {
-                                                <span class="badge bg-danger small">-@product.DiscountPercent%</span>
+                                                <span class="home-product__price-old">@product.OriginalPrice!.Value.ToString("N2") ₴</span>
                                             }
-                                        }
-                                        else
+                                        </div>
+                                        @if (hasDiscount && product.DiscountPercent.HasValue)
                                         {
-                                            <strong>@product.Price.ToString("N2") ₴</strong>
+                                            <span class="home-product__discount-badge">−@product.DiscountPercent.Value.ToString("0.##")%</span>
                                         }
                                     </div>
-                                    <form asp-controller="Cart" asp-action="Add" method="post">
+                                    <form asp-controller="Cart" asp-action="Add" method="post" class="home-product__cart-form">
                                         <input type="hidden" name="productId" value="@product.Id" />
                                         <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                                        <button type="submit" aria-label="@Localizer["Додати"] @productName @Localizer["до кошика"]">+</button>
+                                        <button type="submit" class="home-product__add" aria-label="@Localizer["Додати"] @productName @Localizer["до кошика"]">
+                                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.2 9.1a2 2 0 0 0 2 1.5h7.8a2 2 0 0 0 1.9-1.4L20.4 8H7"/><circle cx="10" cy="19" r="1.25"/><circle cx="17" cy="19" r="1.25"/></svg>
+                                            <span>@Localizer["До кошика"]</span>
+                                        </button>
                                     </form>
                                 </div>
                             </div>
@@ -176,6 +181,8 @@
                     {
                         var product = categorySection.Products[index];
                         var productName = (await ProductTranslator.GetLocalizedAsync(product.Id, product.Name, product.Description, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)).Name;
+                        var filledStars = Math.Clamp((int)Math.Round(product.AverageRating), 0, 5);
+                        var hasDiscount = product.OriginalPrice.HasValue && product.OriginalPrice.Value > product.Price;
                         <div class="home-product-list__row">
                             <button type="button" class="home-product-list__media border-0"
                                     onclick="checkAgeAndAction('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
@@ -198,26 +205,26 @@
                                         onclick="checkAgeAndAction('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
                                     @productName
                                 </button>
-                                @if (product.ReviewCount > 0)
-                                {
-                                    <div class="home-product__rating">★ @product.AverageRating.ToString("0.0") (@product.ReviewCount)</div>
-                                }
+                                <div class="home-product__rating" aria-label="@Localizer["Рейтинг {0} з 5, {1} відгуків", product.AverageRating.ToString("0.0"), product.ReviewCount]">
+                                    <span class="home-product__stars" aria-hidden="true"><span>@(new string('★', filledStars))</span><span class="home-product__stars-empty">@(new string('★', 5 - filledStars))</span></span>
+                                    <span class="home-product__review-count">@(product.ReviewCount > 0 ? $"{product.AverageRating:0.0} · {product.ReviewCount}" : Localizer["Без відгуків"].Value)</span>
+                                </div>
                             </div>
-                            <div class="home-product-list__price">
-                                @if (product.OriginalPrice.HasValue && product.OriginalPrice.Value > product.Price)
+                            <div class="home-product-list__price @(hasDiscount ? "home-product-list__price--discount" : null)">
+                                <strong class="@(hasDiscount ? "home-product__price-current--discount" : null)">@product.Price.ToString("N2") ₴</strong>
+                                @if (hasDiscount)
                                 {
-                                    <strong class="text-danger">@product.Price.ToString("N2") ₴</strong>
-                                    <span class="text-muted text-decoration-line-through small">@product.OriginalPrice.Value.ToString("N2") ₴</span>
-                                }
-                                else
-                                {
-                                    <strong>@product.Price.ToString("N2") ₴</strong>
+                                    <span class="home-product__price-old">@product.OriginalPrice!.Value.ToString("N2") ₴</span>
+                                    @if (product.DiscountPercent.HasValue)
+                                    {
+                                        <span class="home-product__discount-badge">−@product.DiscountPercent.Value.ToString("0.##")%</span>
+                                    }
                                 }
                             </div>
                             <form asp-controller="Cart" asp-action="Add" method="post">
                                 <input type="hidden" name="productId" value="@product.Id" />
                                 <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                                <button type="submit" class="home-product-list__add" aria-label="@Localizer["Додати"] @productName @Localizer["до кошика"]">+</button>
+                                <button type="submit" class="home-product-list__add" aria-label="@Localizer["Додати"] @productName @Localizer["до кошика"]">@Localizer["До кошика"]</button>
                             </form>
                         </div>
                     }
@@ -232,6 +239,8 @@
                         {
                             var product = categorySection.Products[index];
                             var productName = (await ProductTranslator.GetLocalizedAsync(product.Id, product.Name, product.Description, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)).Name;
+                            var filledStars = Math.Clamp((int)Math.Round(product.AverageRating), 0, 5);
+                            var hasDiscount = product.OriginalPrice.HasValue && product.OriginalPrice.Value > product.Price;
                             <div class="carousel-item @(index == 0 ? "active" : "")">
                                 <div class="home-product-slide">
                                     <button type="button" class="home-product-slide__media border-0"
@@ -255,24 +264,31 @@
                                                 onclick="checkAgeAndAction('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
                                             @productName
                                         </button>
-                                        @if (product.ReviewCount > 0)
-                                        {
-                                            <div class="home-product__rating">★ @product.AverageRating.ToString("0.0") (@product.ReviewCount)</div>
-                                        }
+                                        <div class="home-product__rating" aria-label="@Localizer["Рейтинг {0} з 5, {1} відгуків", product.AverageRating.ToString("0.0"), product.ReviewCount]">
+                                            <span class="home-product__stars" aria-hidden="true"><span>@(new string('★', filledStars))</span><span class="home-product__stars-empty">@(new string('★', 5 - filledStars))</span></span>
+                                            <span class="home-product__review-count">@(product.ReviewCount > 0 ? $"{product.AverageRating:0.0} · {product.ReviewCount}" : Localizer["Без відгуків"].Value)</span>
+                                        </div>
                                         <div class="home-product__bottom">
-                                            @if (product.OriginalPrice.HasValue && product.OriginalPrice.Value > product.Price)
-                                            {
-                                                <strong class="text-danger">@product.Price.ToString("N2") ₴</strong>
-                                                <span class="text-muted text-decoration-line-through small">@product.OriginalPrice.Value.ToString("N2") ₴</span>
-                                            }
-                                            else
-                                            {
-                                                <strong>@product.Price.ToString("N2") ₴</strong>
-                                            }
-                                            <form asp-controller="Cart" asp-action="Add" method="post">
+                                            <div class="home-product__price @(hasDiscount ? "home-product__price--discount" : null)">
+                                                <div class="home-product__price-row">
+                                                    <strong class="home-product__price-current @(hasDiscount ? "home-product__price-current--discount" : null)">@product.Price.ToString("N2") ₴</strong>
+                                                    @if (hasDiscount)
+                                                    {
+                                                        <span class="home-product__price-old">@product.OriginalPrice!.Value.ToString("N2") ₴</span>
+                                                    }
+                                                </div>
+                                                @if (hasDiscount && product.DiscountPercent.HasValue)
+                                                {
+                                                    <span class="home-product__discount-badge">−@product.DiscountPercent.Value.ToString("0.##")%</span>
+                                                }
+                                            </div>
+                                            <form asp-controller="Cart" asp-action="Add" method="post" class="home-product__cart-form">
                                                 <input type="hidden" name="productId" value="@product.Id" />
                                                 <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                                                <button type="submit" aria-label="@Localizer["Додати"] @productName @Localizer["до кошика"]">+</button>
+                                                <button type="submit" class="home-product__add" aria-label="@Localizer["Додати"] @productName @Localizer["до кошика"]">
+                                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.2 9.1a2 2 0 0 0 2 1.5h7.8a2 2 0 0 0 1.9-1.4L20.4 8H7"/><circle cx="10" cy="19" r="1.25"/><circle cx="17" cy="19" r="1.25"/></svg>
+                                                    <span>@Localizer["До кошика"]</span>
+                                                </button>
                                             </form>
                                         </div>
                                     </div>
