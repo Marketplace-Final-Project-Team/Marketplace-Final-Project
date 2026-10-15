@@ -76,6 +76,14 @@ builder.Services.AddQuartz(q =>
         .StartNow()
         .WithSimpleSchedule(x => x.WithIntervalInHours(24).RepeatForever()));
 
+    var cleanupJobKey = new JobKey("cleanup-old-ai-chat-messages-job", "cleanup");
+
+    q.AddJob<CleanupOldAIChatMessagesJob>(opts => opts.WithIdentity(cleanupJobKey));
+
+    q.AddTrigger(opts => opts
+        .ForJob(cleanupJobKey)
+        .WithIdentity("cleanup-old-ai-chat-messages-trigger", "cleanup")
+        .WithCronSchedule("0 0 3 * * ?"));
 });
 
 

@@ -96,6 +96,24 @@
         </div>
     </section>
 
+    @if (Model.CategoryTiles.Count > 0)
+    {
+        <nav class="catalog-tiles" aria-label="@SharedLocalizer["Категорії"]">
+            @foreach (var tile in Model.CategoryTiles)
+            {
+                var hasTileImage = !string.IsNullOrWhiteSpace(tile.ImageUrl);
+                var isActiveTile = filter.CategoryId == tile.Id;
+                <a asp-action="Index" asp-route-categoryId="@(isActiveTile ? null : tile.Id)"
+                   class="catalog-tile @(isActiveTile ? "is-active" : null) @(hasTileImage ? null : "catalog-tile--plain")"
+                   style="@(hasTileImage ? $"background-image:url('{tile.ImageUrl}')" : null)"
+                   aria-current="@(isActiveTile ? "true" : null)">
+                    <strong>@SharedLocalizer[tile.Name]</strong>
+                    <small>@tile.ProductCount</small>
+                </a>
+            }
+        </nav>
+    }
+
     @if (TempData["Success"] is string success)
     {
         <div class="alert alert-success" role="alert">@success</div>

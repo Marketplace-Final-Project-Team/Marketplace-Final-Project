@@ -1,0 +1,206 @@
+@model Marketplace.Web.Models.AdminReviewsPageViewModel
+
+@{
+    ViewData["Title"] = $"{Localizer["Відгуки"].Value} - {SharedLocalizer["Адмін-панель"].Value}";
+    var tab = Model.Filter.Tab;
+    var reviews = Model.Result.Items;
+    var publishedCount = Model.TotalCount - Model.RejectedCount;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+}
+
+@functions {
+    private static string Stars(float rating)
+    {
+        var filled = Math.Clamp((int)Math.Round(rating), 0, 5);
+        return new string('★', filled) + new string('☆', 5 - filled);
+    }
+
+    private string TabUrl(string tabName) =>
+        Url.Action("Reviews", new { Tab = tabName, Search = Model.Filter.Search })!;
+}
+
+<div class="admin-page">
+    <div class="admin-shell">
+        <partial name="_AdminNav" />
+
+        <div class="admin-content">
+            <header class="admin-header">
+                <div>
+                    <div class="admin-kicker">Admin</div>
+                    <h1 class="admin-title">@Localizer["Відгуки"]</h1>
+                    <p class="admin-subtitle">@Localizer["Модерація відгуків покупців: відхиляйте порушення, видаляйте відгуки та розглядайте апеляції."]</p>
+                </div>
+            </header>
+
+            <div class="admin-alert" data-admin-review-alert hidden><span>✓</span><p></p></div>
+
+            <nav class="admin-tabs" aria-label="@Localizer["Фільтр відгуків"]">
+                <a href="@TabUrl("all")" class="admin-tab @(tab == "all" ? "is-active" : null)">@Localizer["Усі"] <span>@Model.TotalCount</span></a>
+                <a href="@TabUrl("published")" class="admin-tab @(tab == "published" ? "is-active" : null)">@Localizer["Опубліковані"] <span>@publishedCount</span></a>
+                <a href="@TabUrl("rejected")" class="admin-tab @(tab == "rejected" ? "is-active" : null)">@Localizer["Відхилені"] <span>@Model.RejectedCount</span></a>
+                <a href="@TabUrl("appeals")" class="admin-tab @(tab == "appeals" ? "is-active" : null)">@Localizer["Апеляції"] <span class="@(Model.Appeals.Count > 0 ? "admin-tab__badge" : null)">@Model.Appeals.Count</span></a>
+            </nav>
+
+            @if (tab != "appeals")
+            {
+                <form method="get" asp-action="Reviews" class="admin-toolbar">
+                    <input type="hidden" name="Tab" value="@tab" />
+                    <div class="admin-search-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" aria-hidden="true">
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.3-4.3" />
+                        </svg>
+                        <input type="search" class="form-control admin-search" name="Search" value="@Model.Filter.Search" placeholder="@Localizer["Текст відгуку, товар або автор..."]" aria-label="@Localizer["Пошук відгуків"]" />
+                    </div>
+                    <button type="submit" class="btn btn-outline-secondary">@Localizer["Застосувати"]</button>
+                </form>
+
+                @if (reviews.Count == 0)
+                {
+                    <div class="admin-panel">
+                        <p class="admin-empty">@Localizer["Відгуків не знайдено."]</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="admin-review-list">
+                        @foreach (var review in reviews)
+                        {
+                            var isRejected = review.Status == Marketplace.Domain.Enums.ReviewStatus.Rejected;
+                            <article class="admin-review @(isRejected ? "admin-review--rejected" : null)">
+                                <div class="admin-review__head">
+                                    <div>
+                                        <a class="admin-review__product" asp-controller="Catalog" asp-action="Details" asp-route-id="@review.ProductId" target="_blank" rel="noopener">@review.ProductName</a>
+                                        <div class="admin-review__meta">
+                                            <span class="admin-review__stars" aria-label="@review.Rating / 5">@Stars(review.Rating)</span>
+                                            <span>@review.UserName</span>
+                                            <span>@review.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                                        </div>
+                                    </div>
+                                    <div class="admin-review__badges">
+                                        @if (review.HasPendingAppeal)
+                                        {
+                                            <span class="admin-status admin-status--pending">@Localizer["Апеляція очікує"]</span>
+                                        }
+                                        <span class="admin-status @(isRejected ? "admin-status--banned" : "admin-status--active")">@(isRejected ? Localizer["Відхилено"] : Localizer["Опубліковано"])</span>
+                                    </div>
+                                </div>
+
+                                <p class="admin-review__body">@review.Body</p>
+
+                                @if (isRejected && !string.IsNullOrWhiteSpace(review.ModerationReason))
+                                {
+                                    <p class="admin-review__reason"><strong>@Localizer["Причина відхилення:"]</strong> @review.ModerationReason</p>
+                                }
+
+                                <div class="admin-review__actions">
+                                    @if (!review.HasPendingAppeal)
+                                    {
+                                        <button type="button" class="btn btn-sm btn-outline-primary" data-toggle-form="edit">@Localizer["Редагувати"]</button>
+                                    }
+                                    @if (!isRejected)
+                                    {
+                                        <button type="button" class="btn btn-sm btn-outline-warning" data-toggle-form="reject">@Localizer["Відхилити"]</button>
+                                    }
+                                    <form asp-action="DeleteReview" method="post" data-admin-review-form data-confirm="@Localizer["Видалити цей відгук назавжди?"]">
+                                        <input type="hidden" name="reviewId" value="@review.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">@Localizer["Видалити"]</button>
+                                    </form>
+                                </div>
+
+                                @if (!review.HasPendingAppeal)
+                                {
+                                    <form asp-action="EditReview" method="post" class="admin-review__reason-form" data-form="edit" data-admin-review-form hidden>
+                                        <input type="hidden" name="reviewId" value="@review.Id" />
+                                        <textarea name="body" rows="3" maxlength="300" required>@review.Body</textarea>
+                                        <button type="submit" class="btn btn-sm btn-primary">@Localizer["Зберегти зміни"]</button>
+                                    </form>
+                                }
+
+                                @if (!isRejected)
+                                {
+                                    <form asp-action="RejectReview" method="post" class="admin-review__reason-form" data-form="reject" data-admin-review-form hidden>
+                                        <input type="hidden" name="reviewId" value="@review.Id" />
+                                        <textarea name="reason" rows="2" maxlength="1000" required placeholder="@Localizer["Причина відхилення (її побачить автор відгуку)"]"></textarea>
+                                        <button type="submit" class="btn btn-sm btn-warning">@Localizer["Підтвердити відхилення"]</button>
+                                    </form>
+                                }
+                            </article>
+                        }
+                    </div>
+
+                    <partial name="_AdminPagination" model="new Marketplace.Web.Models.AdminPaginationViewModel { Page = Model.Result.Page, TotalPages = Model.Result.TotalPages }" />
+                }
+            }
+            else
+            {
+                @if (Model.Appeals.Count == 0)
+                {
+                    <div class="admin-panel">
+                        <p class="admin-empty">@Localizer["Апеляцій на розгляд немає."]</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="admin-review-list">
+                        @foreach (var appeal in Model.Appeals)
+                        {
+                            <article class="admin-review">
+                                <div class="admin-review__head">
+                                    <div>
+                                        <a class="admin-review__product" asp-controller="Catalog" asp-action="Details" asp-route-id="@appeal.ProductId" target="_blank" rel="noopener">@appeal.ProductName</a>
+                                        <div class="admin-review__meta">
+                                            <span>@appeal.UserName</span>
+                                            <span>@appeal.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                                        </div>
+                                    </div>
+                                    <span class="admin-status admin-status--pending">@Localizer["Апеляція очікує"]</span>
+                                </div>
+
+                                <div class="admin-appeal-compare">
+                                    <div class="admin-appeal-compare__col">
+                                        <h4>@Localizer["Відхилений відгук"]</h4>
+                                        <span class="admin-review__stars">@Stars(appeal.OldRating)</span>
+                                        <p>@appeal.OldBody</p>
+                                        @if (!string.IsNullOrWhiteSpace(appeal.RejectionReason))
+                                        {
+                                            <p class="admin-review__reason"><strong>@Localizer["Причина відхилення:"]</strong> @appeal.RejectionReason</p>
+                                        }
+                                    </div>
+                                    <div class="admin-appeal-compare__col admin-appeal-compare__col--new">
+                                        <h4>@Localizer["Виправлений текст автора"]</h4>
+                                        <span class="admin-review__stars">@Stars(appeal.NewRating)</span>
+                                        <p>@appeal.NewBody</p>
+                                    </div>
+                                </div>
+
+                                <div class="admin-review__actions">
+                                    <form asp-action="ProcessAppeal" method="post" data-admin-review-form>
+                                        <input type="hidden" name="appealId" value="@appeal.Id" />
+                                        <input type="hidden" name="approve" value="true" />
+                                        <button type="submit" class="btn btn-sm btn-outline-success">@Localizer["Схвалити й опублікувати"]</button>
+                                    </form>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-toggle-form="reject">@Localizer["Відхилити апеляцію"]</button>
+                                </div>
+
+                                <form asp-action="ProcessAppeal" method="post" class="admin-review__reason-form" data-form="reject" data-admin-review-form hidden>
+                                    <input type="hidden" name="appealId" value="@appeal.Id" />
+                                    <input type="hidden" name="approve" value="false" />
+                                    <textarea name="reason" rows="2" maxlength="1000" required placeholder="@Localizer["Причина відхилення апеляції"]"></textarea>
+                                    <button type="submit" class="btn btn-sm btn-danger">@Localizer["Підтвердити відхилення"]</button>
+                                </form>
+                            </article>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/admin-reviews.js" asp-append-version="true"></script>
+}

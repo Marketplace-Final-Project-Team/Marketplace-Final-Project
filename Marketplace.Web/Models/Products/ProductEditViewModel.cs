@@ -36,6 +36,7 @@ namespace Marketplace.Web.Models.Products
         public string? ExistingMainImageUrl { get; set; }
         public IFormFile? MainImage { get; set; }
         public List<IFormFile>? AdditionalImages { get; set; }
+        public List<string>? ExistingAdditionalImageUrls { get; set; }
 
         public IEnumerable<SelectListItem> Categories { get; set; } = new List<SelectListItem>();
     }

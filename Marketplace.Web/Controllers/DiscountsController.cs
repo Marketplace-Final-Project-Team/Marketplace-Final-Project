@@ -158,8 +158,8 @@ namespace Marketplace.Web.Controllers
             Console.WriteLine($"CategoryId: {categoryId}");
             
             var category = await _categoryService.GetByIdAsync(categoryId);
-            Console.WriteLine($"CategoryId: {categoryId}");
-            Console.WriteLine($"Category: {category?.Id} - {category?.Name}");
+            //Console.WriteLine($"CategoryId: {categoryId}");
+            //Console.WriteLine($"Category: {category?.Id} - {category?.Name}");
             if (category == null) return NotFound();
 
             var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.ProductCrud);

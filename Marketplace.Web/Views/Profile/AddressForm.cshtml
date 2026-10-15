@@ -1,6 +1,7 @@
 @model Marketplace.Web.Models.AddressFormViewModel
 
 @{
+    Layout = "_ProfileLayout";
     var isEdit = Model.Id.HasValue;
     ViewData["Title"] = isEdit ? Localizer["Редагування адреси"] : Localizer["Нова адреса"];
 }

@@ -122,7 +122,7 @@ namespace Marketplace.Web.Controllers
             return View(new BusinessDashboardViewModel
             {
                 Businesses = businessCards,
-                CanCreateBusiness = businesses.All(business => business.OwnerId != userId)
+                CanCreateBusiness = true
             });
         }
 
@@ -157,13 +157,13 @@ namespace Marketplace.Web.Controllers
                 .Select(g => new { Average = g.Average(r => r.Rating), Count = g.Count() })
                 .FirstOrDefaultAsync();
 
-            var periodRevenue = statsResult.Succeeded ? statsResult.Data.TotalRevenue : 0;
-            var periodOrders = statsResult.Succeeded ? statsResult.Data.Stats.Sum(s => s.OrderCount) : 0;
-            var periodAov = statsResult.Succeeded ? (double)statsResult.Data.AOV : 0;
+            var periodRevenue = statsResult.Succeeded ? statsResult.Data!.TotalRevenue : 0;
+            var periodOrders = statsResult.Succeeded ? statsResult.Data!.Stats.Sum(s => s.OrderCount) : 0;
+            var periodAov = statsResult.Succeeded ? (double)statsResult.Data!.AOV : 0;
 
-            var previousRevenue = previousStatsResult.Succeeded ? previousStatsResult.Data.TotalRevenue : 0;
-            var previousOrders = previousStatsResult.Succeeded ? previousStatsResult.Data.Stats.Sum(s => s.OrderCount) : 0;
-            var previousAov = previousStatsResult.Succeeded ? (double)previousStatsResult.Data.AOV : 0;
+            var previousRevenue = previousStatsResult.Succeeded ? previousStatsResult.Data!.TotalRevenue : 0;
+            var previousOrders = previousStatsResult.Succeeded ? previousStatsResult.Data!.Stats.Sum(s => s.OrderCount) : 0;
+            var previousAov = previousStatsResult.Succeeded ? (double)previousStatsResult.Data!.AOV : 0;
 
             static double? PercentDelta(double current, double previous)
             {
@@ -184,7 +184,7 @@ namespace Marketplace.Web.Controllers
                 Filter = new BusinessDashboardFilterViewModel { BusinessId = businessId, StartDate = start, EndDate = end },
 
                 Chart = statsResult.Succeeded
-                    ? statsResult.Data.Stats
+                    ? statsResult.Data!.Stats
                         .OrderBy(s => s.Date)
                         .Select(s => new BusinessDashboardChartPointViewModel { Date = s.Date, Revenue = s.Revenue, OrderCount = s.OrderCount })
                         .ToList()
@@ -220,7 +220,7 @@ namespace Marketplace.Web.Controllers
                 TotalWishlistAdds = traffic.TotalWishlistAdds,
 
                 TopProducts = productsStatsResult.Succeeded
-                    ? productsStatsResult.Data.Stats
+                    ? productsStatsResult.Data!.Stats
                         .OrderByDescending(s => s.Revenue)
                         .Take(5)
                         .Select(s => new BusinessDashboardTopProductViewModel
@@ -235,7 +235,7 @@ namespace Marketplace.Web.Controllers
                     : new List<BusinessDashboardTopProductViewModel>(),
 
                 TopCustomers = customersStatsResult.Succeeded
-                    ? customersStatsResult.Data.Stats
+                    ? customersStatsResult.Data!.Stats
                         .OrderByDescending(s => s.Revenue)
                         .Take(5)
                         .Select(s => new BusinessDashboardTopCustomerViewModel
@@ -248,7 +248,7 @@ namespace Marketplace.Web.Controllers
                     : new List<BusinessDashboardTopCustomerViewModel>(),
 
                 CategoryStats = productsStatsResult.Succeeded
-                    ? productsStatsResult.Data.Stats
+                    ? productsStatsResult.Data!.Stats
                         .GroupBy(s => products.FirstOrDefault(p => p.Id == s.ProductId)?.Category?.Name ?? "Без категорії")
                         .Select(g => new BusinessDashboardCategoryStatViewModel
                         {
@@ -797,7 +797,7 @@ namespace Marketplace.Web.Controllers
                         LineTotal = order.LineTotal
                     }).ToList(),
                 RevenueTrend = trendResult.Succeeded
-                    ? trendResult.Data.Stats
+                    ? trendResult.Data!.Stats
                         .OrderBy(s => s.Date)
                         .Select(s => new BusinessDashboardChartPointViewModel { Date = s.Date, Revenue = s.Revenue, OrderCount = s.OrderCount })
                         .ToList()
@@ -873,7 +873,7 @@ namespace Marketplace.Web.Controllers
             var personalDiscounts = await _userDiscountService.GetActiveDiscountsForBusinessAsync(businessId);
             var customersResult = await _businessService.GetCustomersStatsByPeriodAsync(businessId, business.CreatedAt, DateTime.UtcNow);
             var customers = customersResult.Succeeded
-                ? customersResult.Data.Stats
+                ? customersResult.Data!.Stats
                     .Where(c => personalDiscounts.All(d => d.UserId != c.UserId))
                     .OrderBy(c => c.UserName)
                     .ToList()

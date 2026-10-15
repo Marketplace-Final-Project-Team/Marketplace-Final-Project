@@ -58,6 +58,16 @@
             </span>
             <span>@Localizer["Товари"]</span>
         </a>
+        <a class="admin-sidebar__link @ActiveClass("Reviews")" asp-controller="Admin" asp-action="Reviews">
+            <span class="admin-sidebar__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="19" height="19">
+                    <path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z" />
+                    <path d="M8 9h8" />
+                    <path d="M8 13h5" />
+                </svg>
+            </span>
+            <span>@Localizer["Відгуки"]</span>
+        </a>
         <a class="admin-sidebar__link @ActiveClass("Categories")" asp-controller="Admin" asp-action="Categories">
             <span class="admin-sidebar__icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="19" height="19">
@@ -108,6 +118,14 @@
                 </svg>
             </span>
             <span>@Localizer["Виплати"]</span>
+        </a>
+        <a class="admin-sidebar__link @ActiveClass("AdminRefundsInbox")" asp-controller="Support" asp-action="AdminRefundsInbox">
+            <span class="admin-sidebar__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="19" height="19">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+            </span>
+            <span>@Localizer["Чати повернень"]</span>
         </a>
         <a class="admin-sidebar__link @ActiveClass("BusinessLimits")" asp-controller="Admin" asp-action="BusinessLimits">
             <span class="admin-sidebar__icon" aria-hidden="true">

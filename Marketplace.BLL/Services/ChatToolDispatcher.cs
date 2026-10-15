@@ -3,7 +3,7 @@ using Marketplace.BLL.Interfaces;
 
 namespace Marketplace.BLL.Services
 {
-    public class ChatToolDispatcher
+    public class ChatToolDispatcher: IChatToolDispatcher
     {
         private readonly IChatToolsService _tools;
 
@@ -18,6 +18,7 @@ namespace Marketplace.BLL.Services
 
             return functionName switch
             {
+                // Customer
                 "search_products" => await _tools.SearchProductsAsync(
                     GetString(args, "searchTerm"),
                     GetString(args, "categoryName"),
@@ -62,6 +63,64 @@ namespace Marketplace.BLL.Services
                 "remove_from_cart" => await _tools.RemoveFromCartAsync(
                     GetGuid(args, "productId")
                         ?? throw new ArgumentException("productId is required")),
+
+                // Business
+                "get_my_businesses" => await _tools.GetMyBusinessesAsync(),
+
+                "get_sales_summary" => await _tools.GetSalesSummaryAsync(
+                    GetGuid(args, "businessId")
+                        ?? throw new ArgumentException("businessId is required"),
+                    GetDateTime(args, "startDate"),
+                    GetDateTime(args, "endDate")),
+
+                "get_products_sales_stats" => await _tools.GetProductsSalesStatsAsync(
+                    GetGuid(args, "businessId")
+                        ?? throw new ArgumentException("businessId is required"),
+                    GetDateTime(args, "startDate"),
+                    GetDateTime(args, "endDate"),
+                    GetString(args, "sortBy") ?? "best",
+                    GetInt(args, "limit") ?? 5),
+
+                "get_business_balance" => await _tools.GetBusinessBalanceAsync(
+                    GetGuid(args, "businessId")
+                        ?? throw new ArgumentException("businessId is required")),
+
+                "get_recent_reviews" => await _tools.GetRecentReviewsAsync(
+                    GetGuid(args, "businessId")
+                        ?? throw new ArgumentException("businessId is required"),
+                    GetInt(args, "limit") ?? 5),
+
+                "get_out_of_stock_products" => await _tools.GetOutOfStockProductsAsync(
+                    GetGuid(args, "businessId")
+                        ?? throw new ArgumentException("businessId is required")),
+
+                "get_low_stock_products" => await _tools.GetLowStockProductsAsync(
+                    GetGuid(args, "businessId")
+                        ?? throw new ArgumentException("businessId is required"),
+                    GetInt(args, "threshold") ?? 5),
+
+                "get_average_rating_for_product" => await _tools.GetAverageRatingForProductAsync(
+                    GetGuid(args, "businessId")
+                        ?? throw new ArgumentException("businessId is required"),
+                    GetGuid(args, "productId")
+                        ?? throw new ArgumentException("productId is required")),
+
+                "get_reviews_for_product" => await _tools.GetReviewsForProductAsync(
+                    GetGuid(args, "businessId")
+                        ?? throw new ArgumentException("businessId is required"),
+                    GetGuid(args, "productId")
+                        ?? throw new ArgumentException("productId is required"),
+                    GetInt(args, "limit") ?? 5),
+
+                "get_business_members" => await _tools.GetBusinessMembersAsync(
+                    GetGuid(args, "businessId")
+                        ?? throw new ArgumentException("businessId is required")),
+
+                "get_bulk_import_instructions" => await _tools.GetBulkImportInstructionsAsync(),
+
+                "get_withdrawal_instructions" => await _tools.GetWithdrawalInstructionsAsync(),
+
+                "get_moderation_policy_summary" => await _tools.GetModerationPolicySummaryAsync(),
 
                 _ => throw new ArgumentException($"Unknown function: {functionName}")
             };
@@ -115,6 +174,16 @@ namespace Marketplace.BLL.Services
             }
 
             return Array.Empty<Guid>();
+        }
+
+        private static DateTime? GetDateTime(Dictionary<string, object> args, string key)
+        {
+            var str = GetString(args, key);
+            if (string.IsNullOrWhiteSpace(str)) return null;
+
+            return DateTime.TryParse(str, System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.AdjustToUniversal | System.Globalization.DateTimeStyles.AssumeUniversal,
+                out var dt) ? dt : null;
         }
     }
 }

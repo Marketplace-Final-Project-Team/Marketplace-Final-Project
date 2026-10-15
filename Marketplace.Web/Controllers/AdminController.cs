@@ -834,6 +834,52 @@ namespace Marketplace.Web.Controllers
             return RedirectToAction("Jobs");
         }
         [HttpGet]
+        public async Task<IActionResult> Reviews([FromQuery] AdminReviewFilterViewModel filter)
+        {
+            var tab = filter.Tab?.ToLowerInvariant() switch
+            {
+                "published" => "published",
+                "rejected" => "rejected",
+                "appeals" => "appeals",
+                _ => "all"
+            };
+            filter.Tab = tab;
+
+            ReviewStatus? status = tab switch
+            {
+                "published" => ReviewStatus.Approved,
+                "rejected" => ReviewStatus.Rejected,
+                _ => null
+            };
+
+            var result = await _adminService.GetFilteredReviewsAsync(new ReviewAdminQueryDto
+            {
+                Search = filter.Search,
+                Status = status,
+                Pagination = new PaginationParams { Page = filter.Page, PageSize = filter.PageSize }
+            });
+
+            var totalCount = (await _adminService.GetFilteredReviewsAsync(new ReviewAdminQueryDto
+            {
+                Pagination = new PaginationParams { Page = 1, PageSize = 1 }
+            })).TotalItems;
+            var rejectedCount = (await _adminService.GetFilteredReviewsAsync(new ReviewAdminQueryDto
+            {
+                Status = ReviewStatus.Rejected,
+                Pagination = new PaginationParams { Page = 1, PageSize = 1 }
+            })).TotalItems;
+
+            return View(new AdminReviewsPageViewModel
+            {
+                Filter = filter,
+                Result = result,
+                Appeals = await _adminService.GetPendingAppeals(),
+                TotalCount = totalCount,
+                RejectedCount = rejectedCount
+            });
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetPendingAppeals()
         {
             var appeals = await _adminService.GetPendingAppeals();
@@ -873,6 +919,14 @@ namespace Marketplace.Web.Controllers
         public async Task<IActionResult> RejectReview(Guid reviewId, string reason)
         {
             var result = await _adminService.RejectReview(reviewId, CurrentAdminId ?? string.Empty, reason);
+            return ModerationResult(result);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditReview(Guid reviewId, string body)
+        {
+            var result = await _adminService.EditReview(reviewId, CurrentAdminId ?? string.Empty, body);
             return ModerationResult(result);
         }
 

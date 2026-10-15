@@ -102,6 +102,60 @@
     margin: 0;
 }
 
+.catalog-tiles {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    margin-bottom: 1.25rem;
+}
+
+.catalog-tile {
+    align-items: flex-start;
+    background: linear-gradient(135deg, #3157d7, #6c83e6) center / cover;
+    border: 2px solid transparent;
+    border-radius: 0.9rem;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 6.5rem;
+    overflow: hidden;
+    padding: 0.7rem 0.85rem;
+    position: relative;
+    text-decoration: none;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.catalog-tile::before {
+    background: linear-gradient(0deg, rgba(10, 16, 36, 0.78), rgba(10, 16, 36, 0.1));
+    content: "";
+    inset: 0;
+    position: absolute;
+}
+
+.catalog-tile strong,
+.catalog-tile small {
+    position: relative;
+}
+
+.catalog-tile strong {
+    font-size: 0.9rem;
+    line-height: 1.2;
+}
+
+.catalog-tile small {
+    opacity: 0.85;
+}
+
+.catalog-tile:hover {
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.catalog-tile.is-active {
+    border-color: #f5a623;
+}
+
 .catalog-toolbar {
     align-items: center;
     display: flex;

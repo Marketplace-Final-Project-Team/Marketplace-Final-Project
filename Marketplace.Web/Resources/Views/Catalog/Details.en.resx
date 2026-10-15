@@ -301,4 +301,31 @@
   <data name="Немає в наявності" xml:space="preserve">
     <value>Out of stock</value>
   </data>
+  <data name="Відгуки про {0}" xml:space="preserve">
+    <value>Reviews for {0}</value>
+  </data>
+  <data name="Задати питання" xml:space="preserve">
+    <value>Ask a question</value>
+  </data>
+  <data name="Коментарі" xml:space="preserve">
+    <value>Comments</value>
+  </data>
+  <data name="Питання" xml:space="preserve">
+    <value>Questions</value>
+  </data>
+  <data name="Спочатку нові" xml:space="preserve">
+    <value>Newest first</value>
+  </data>
+  <data name="Спочатку старі" xml:space="preserve">
+    <value>Oldest first</value>
+  </data>
+  <data name="Найвища оцінка" xml:space="preserve">
+    <value>Highest rating</value>
+  </data>
+  <data name="Найнижча оцінка" xml:space="preserve">
+    <value>Lowest rating</value>
+  </data>
+  <data name="Сортування відгуків" xml:space="preserve">
+    <value>Sort reviews</value>
+  </data>
 </root>
