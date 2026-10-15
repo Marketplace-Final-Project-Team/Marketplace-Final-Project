@@ -68,27 +68,6 @@
         </section>
     }
 
-    @if (Model.CategorySections.Count > 0)
-    {
-        <div class="home-view-bar">
-            <span class="home-view-bar__label">@Localizer["Вигляд товарів"]</span>
-            <div class="home-view-toggle" role="group" aria-label="@Localizer["Режим перегляду товарів"]">
-                <button type="button" class="home-view-toggle__btn" data-view-toggle="list" aria-label="@Localizer["Список"]">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M8 6h13" /><path d="M8 12h13" /><path d="M8 18h13" /><path d="M3 6h.01" /><path d="M3 12h.01" /><path d="M3 18h.01" /></svg>
-                    <span>@Localizer["Список"]</span>
-                </button>
-                <button type="button" class="home-view-toggle__btn" data-view-toggle="grid" aria-label="@Localizer["Палітра"]">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="3" y="3" width="7" height="7" rx="1.2" /><rect x="14" y="3" width="7" height="7" rx="1.2" /><rect x="14" y="14" width="7" height="7" rx="1.2" /><rect x="3" y="14" width="7" height="7" rx="1.2" /></svg>
-                    <span>@Localizer["Палітра"]</span>
-                </button>
-                <button type="button" class="home-view-toggle__btn" data-view-toggle="slider" aria-label="@Localizer["Карусель"]">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="7" y="4" width="10" height="16" rx="1.5" /><path d="M2 8v8" /><path d="M22 8v8" /></svg>
-                    <span>@Localizer["Карусель"]</span>
-                </button>
-            </div>
-        </div>
-    }
-
     @foreach (var (categorySection, sectionIndex) in Model.CategorySections.Select((section, i) => (section, i)))
     {
         var carouselId = $"homeCarousel{sectionIndex}";
@@ -98,7 +77,29 @@
                     <span class="home-section__kicker">@Localizer["Обирайте швидше"]</span>
                     <h2>@SharedLocalizer[categorySection.CategoryName]</h2>
                 </div>
-                <a asp-controller="Catalogue" asp-action="Index" asp-route-categoryId="@categorySection.CategoryId">@Localizer["Дивитися більше →"]</a>
+                <div class="home-section__actions">
+                    @if (sectionIndex == 0)
+                    {
+                        <div class="home-view-bar">
+                            <span class="home-view-bar__label">@Localizer["Вигляд товарів"]</span>
+                            <div class="home-view-toggle" role="group" aria-label="@Localizer["Режим перегляду товарів"]">
+                                <button type="button" class="home-view-toggle__btn" data-view-toggle="list" aria-label="@Localizer["Список"]">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M8 6h13" /><path d="M8 12h13" /><path d="M8 18h13" /><path d="M3 6h.01" /><path d="M3 12h.01" /><path d="M3 18h.01" /></svg>
+                                    <span>@Localizer["Список"]</span>
+                                </button>
+                                <button type="button" class="home-view-toggle__btn" data-view-toggle="grid" aria-label="@Localizer["Палітра"]">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="3" y="3" width="7" height="7" rx="1.2" /><rect x="14" y="3" width="7" height="7" rx="1.2" /><rect x="14" y="14" width="7" height="7" rx="1.2" /><rect x="3" y="14" width="7" height="7" rx="1.2" /></svg>
+                                    <span>@Localizer["Палітра"]</span>
+                                </button>
+                                <button type="button" class="home-view-toggle__btn" data-view-toggle="slider" aria-label="@Localizer["Карусель"]">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect x="7" y="4" width="10" height="16" rx="1.5" /><path d="M2 8v8" /><path d="M22 8v8" /></svg>
+                                    <span>@Localizer["Карусель"]</span>
+                                </button>
+                            </div>
+                        </div>
+                    }
+                    <a asp-controller="Catalogue" asp-action="Index" asp-route-categoryId="@categorySection.CategoryId">@Localizer["Дивитися більше →"]</a>
+                </div>
             </div>
 
             <div data-products-view="grid">

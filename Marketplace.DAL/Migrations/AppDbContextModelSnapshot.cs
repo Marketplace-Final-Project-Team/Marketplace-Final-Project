@@ -640,7 +640,9 @@ namespace Marketplace.DAL.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Sku")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -650,9 +652,12 @@ namespace Marketplace.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BusinessId");
-
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("BusinessId", "Sku")
+                        .IsUnique()
+                        .HasDatabaseName("UX_Products_BusinessId_Sku")
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("Products");
                 });

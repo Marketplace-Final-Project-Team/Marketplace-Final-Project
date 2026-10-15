@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = Localizer["Деталі замовлення"];
+    var orderCreatedMessage = TempData["Success"] as string;
+    var showOrderSuccess = !string.IsNullOrWhiteSpace(orderCreatedMessage);
 }
 
 @functions {
@@ -29,9 +31,50 @@
 @section Styles {
     <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/postsale.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/order-success.css" asp-append-version="true" />
 }
 
 <div class="shop-page">
+    @if (showOrderSuccess)
+    {
+        <section class="order-success" aria-labelledby="order-success-title">
+            <div class="order-success__mark" aria-hidden="true">✓</div>
+            <span class="shop-kicker">@Localizer["Оформлення завершено"]</span>
+            <h1 id="order-success-title">@Localizer["Дякуємо за замовлення!"]</h1>
+            <p class="order-success__lead">@orderCreatedMessage</p>
+            <p class="order-success__number">
+                @Localizer["Ваш номер замовлення"]
+                <strong>#@Model.Id.ToString()[..8].ToUpperInvariant()</strong>
+            </p>
+
+            <dl class="order-success__details">
+                <div>
+                    <dt>@Localizer["Сума до сплати"]</dt>
+                    <dd>@Model.TotalAmount.ToString("N2") ₴</dd>
+                </div>
+                <div>
+                    <dt>@Localizer["Оплата"]</dt>
+                    <dd>@(Model.PaymentMethodLabel ?? Localizer["LiqPay (онлайн)"].Value)</dd>
+                </div>
+                <div>
+                    <dt>@Localizer["Доставка"]</dt>
+                    <dd>@(Model.DeliveryMethodLabel ?? Localizer["Кур'єром на вказану адресу"].Value)</dd>
+                </div>
+                <div>
+                    <dt>@Localizer["Адреса"]</dt>
+                    <dd>@Model.ShippingCountry, @Model.ShippingCity, @Model.ShippingStreet</dd>
+                </div>
+            </dl>
+
+            <div class="order-success__actions">
+                <a asp-action="Index" class="btn btn-primary">@Localizer["Перейти до моїх замовлень"]</a>
+                <a asp-controller="Catalog" asp-action="Index" class="btn btn-outline-primary">@Localizer["Продовжити покупки"]</a>
+                <a asp-controller="Home" asp-action="Support" class="order-success__support">@Localizer["Звернутися до підтримки"]</a>
+            </div>
+        </section>
+    }
+    else
+    {
     <a asp-action="Index" class="shop-back">← @Localizer["До всіх замовлень"]</a>
 
     <header class="shop-header">
@@ -43,10 +86,6 @@
         <a asp-action="Delivery" asp-route-id="@Model.Id" class="btn btn-primary">@Localizer["Відстежити доставку"]</a>
     </header>
 
-    @if (TempData["Success"] is string success)
-    {
-        <div class="alert alert-success" role="alert">@success</div>
-    }
     @if (TempData["Error"] is string error)
     {
         <div class="alert alert-warning" role="alert">@error</div>
@@ -165,9 +204,10 @@
             </div>
         </section>
     }
+    }
 </div>
 
-@if (Model.Status is Marketplace.Domain.Enums.OrderStatus.Delivered && Model.Items.Any(i => i.ReturnRequest is null))
+@if (!showOrderSuccess && Model.Status is Marketplace.Domain.Enums.OrderStatus.Delivered && Model.Items.Any(i => i.ReturnRequest is null))
 {
     <div class="postsale-modal" data-postsale-modal="return" hidden>
         <div class="postsale-modal__card">

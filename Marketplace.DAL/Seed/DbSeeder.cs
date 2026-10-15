@@ -127,6 +127,7 @@ public class DbSeeder
                 Description = "Тестовий ноутбук для перевірки активної знижки",
                 Price = 20000m,
                 Quantity = 10,
+                Sku = "SEED-001",
                 Status = ProductStatus.Active,
                 Discounts = new List<Discount>
                 {
@@ -146,6 +147,7 @@ public class DbSeeder
                 Description = "Знижка вже закінчилася",
                 Price = 10000m,
                 Quantity = 5,
+                Sku = "SEED-002",
                 Status = ProductStatus.Active,
                 Discounts = new List<Discount>
                 {
@@ -165,6 +167,7 @@ public class DbSeeder
                 Description = "Має обратися знижка 30% замість 15%",
                 Price = 3000m,
                 Quantity = 15,
+                Sku = "SEED-003",
                 Status = ProductStatus.Active,
                 Discounts = new List<Discount>
                 {

@@ -18,6 +18,8 @@ namespace Marketplace.BLL.Services;
 
 public class ProductService : IProductService
 {
+    private const int MaxAdditionalImageCount = 8;
+
     private readonly IGenericRepository<Product> _productRepository;
     private readonly IImageStorageService _imageStorageService;
     private readonly AppDbContext _context;
@@ -33,6 +35,112 @@ public class ProductService : IProductService
         _imageStorageService = imageStorageService;
         _context = context;
         _schedulerFactory = schedulerFactory;
+    }
+
+    private async Task<string?> UploadImageAsync(Microsoft.AspNetCore.Http.IFormFile? image, string role)
+    {
+        if (image is null)
+        {
+            return null;
+        }
+
+        var imageUrl = await _imageStorageService.UploadImageAsync(image);
+        if (string.IsNullOrWhiteSpace(imageUrl))
+        {
+            throw new InvalidOperationException($"Не вдалося завантажити {role} «{image.FileName}». Перевірте формат і розмір файлу та спробуйте ще раз.");
+        }
+
+        return imageUrl;
+    }
+
+    private async Task<List<string>> UploadAdditionalImagesAsync(
+        IReadOnlyCollection<Microsoft.AspNetCore.Http.IFormFile>? images)
+    {
+        if (images is null || images.Count == 0)
+        {
+            return new List<string>();
+        }
+
+        if (images.Count > MaxAdditionalImageCount)
+        {
+            throw new InvalidOperationException($"Можна додати не більше {MaxAdditionalImageCount} додаткових зображень.");
+        }
+
+        var imageUrls = new List<string>(images.Count);
+        foreach (var image in images)
+        {
+            imageUrls.Add((await UploadImageAsync(image, "додаткове фото"))!);
+        }
+
+        return imageUrls;
+    }
+
+    private async Task<(string Sku, bool WasGenerated)> ResolveSkuAsync(
+        Guid businessId,
+        string? requestedSku,
+        Guid? excludedProductId = null)
+    {
+        var query = _context.Products
+            .AsNoTracking()
+            .Where(product => product.BusinessId == businessId);
+
+        if (excludedProductId.HasValue)
+        {
+            query = query.Where(product => product.Id != excludedProductId.Value);
+        }
+
+        var existingSkus = await query
+            .OrderByDescending(product => product.CreatedAt)
+            .Select(product => product.Sku)
+            .ToListAsync();
+
+        if (!string.IsNullOrWhiteSpace(requestedSku))
+        {
+            var normalizedSku = requestedSku.Trim();
+            if (normalizedSku.Length > ProductSkuGenerator.MaxLength)
+            {
+                throw new InvalidOperationException($"Артикул не може містити більше {ProductSkuGenerator.MaxLength} символів.");
+            }
+
+            if (existingSkus.Contains(normalizedSku, StringComparer.OrdinalIgnoreCase))
+            {
+                throw new DuplicateProductSkuException(normalizedSku);
+            }
+
+            return (normalizedSku, false);
+        }
+
+        return (ProductSkuGenerator.Generate(existingSkus), true);
+    }
+
+    private async Task SaveChangesWithUniqueSkuRetryAsync(Product product, bool skuWasGenerated)
+    {
+        const int maxAttempts = 3;
+
+        for (var attempt = 1; attempt <= maxAttempts; attempt++)
+        {
+            try
+            {
+                await _context.SaveChangesAsync();
+                return;
+            }
+            catch (DbUpdateException exception) when (IsProductSkuUniqueConstraintViolation(exception))
+            {
+                if (!skuWasGenerated || attempt == maxAttempts)
+                {
+                    throw new DuplicateProductSkuException(product.Sku);
+                }
+
+                product.Sku = (await ResolveSkuAsync(product.BusinessId, null, product.Id)).Sku;
+            }
+        }
+    }
+
+    private static bool IsProductSkuUniqueConstraintViolation(DbUpdateException exception)
+    {
+        return exception.InnerException?.Message.Contains(
+            "UX_Products_BusinessId_Sku",
+            StringComparison.OrdinalIgnoreCase) == true;
     }
 
     private async Task ScheduleModerationJobAsync(Guid productId)
@@ -307,6 +415,9 @@ public class ProductService : IProductService
         }
 
         var variants = BuildVariants(dto.Variants);
+        var resolvedSku = await ResolveSkuAsync(dto.BusinessId, dto.Sku);
+        var mainImageUrl = await UploadImageAsync(dto.MainImage, "головне фото");
+        var additionalImageUrls = await UploadAdditionalImagesAsync(dto.AdditionalImages);
 
         var product = new Product
         {
@@ -317,7 +428,8 @@ public class ProductService : IProductService
             Description = dto.Description,
             Price = dto.Price,
             Quantity = variants.Count > 0 ? variants.Sum(v => v.Quantity) : dto.Quantity,
-            Sku = string.IsNullOrWhiteSpace(dto.Sku) ? null : dto.Sku.Trim(),
+            Sku = resolvedSku.Sku,
+            MainImageUrl = mainImageUrl ?? string.Empty,
             IsAdultOnly = dto.IsAdultOnly,
             Status = ProductStatus.Pending,
             ModerationReason = null,
@@ -330,8 +442,17 @@ public class ProductService : IProductService
             product.Variants.Add(variant);
         }
 
+        foreach (var imageUrl in additionalImageUrls)
+        {
+            product.Images.Add(new ProductImage
+            {
+                ProductId = product.Id,
+                ImageUrl = imageUrl
+            });
+        }
+
         await _productRepository.AddAsync(product);
-        await _context.SaveChangesAsync();
+        await SaveChangesWithUniqueSkuRetryAsync(product, resolvedSku.WasGenerated);
 
         await ScheduleModerationJobAsync(product.Id);
         await ScheduleTranslationJobAsync(product.Id);
@@ -348,11 +469,31 @@ public class ProductService : IProductService
         if (product == null)
             return null;
 
+        var resolvedSku = await ResolveSkuAsync(product.BusinessId, dto.Sku, product.Id);
+        var removedImageIds = dto.RemovedAdditionalImageIds.ToHashSet();
+        var imagesToRemove = product.Images
+            .Where(image => removedImageIds.Contains(image.Id))
+            .ToList();
+        var newAdditionalImageCount = dto.AdditionalImages?.Count ?? 0;
+        var resultingAdditionalImageCount = product.Images.Count - imagesToRemove.Count + newAdditionalImageCount;
+
+        if (resultingAdditionalImageCount > MaxAdditionalImageCount)
+        {
+            throw new InvalidOperationException($"У товару може бути не більше {MaxAdditionalImageCount} додаткових зображень. Видаліть зайві фото або виберіть менше нових.");
+        }
+
+        var mainImageUrl = await UploadImageAsync(dto.MainImage, "головне фото");
+        var additionalImageUrls = await UploadAdditionalImagesAsync(dto.AdditionalImages);
+
         product.CategoryId = dto.CategoryId;
         product.Name = dto.Name;
         product.Description = dto.Description;
         product.Price = dto.Price;
-        product.Sku = string.IsNullOrWhiteSpace(dto.Sku) ? null : dto.Sku.Trim();
+        product.Sku = resolvedSku.Sku;
+        if (mainImageUrl is not null)
+        {
+            product.MainImageUrl = mainImageUrl;
+        }
         product.IsAdultOnly = dto.IsAdultOnly;
         product.Status = ProductStatus.Pending;
         product.ModerationReason = null;
@@ -360,7 +501,21 @@ public class ProductService : IProductService
         SyncVariants(product, dto.Variants);
         product.Quantity = product.Variants.Count > 0 ? product.Variants.Sum(v => v.Quantity) : dto.Quantity;
 
-        await _context.SaveChangesAsync();
+        if (imagesToRemove.Count > 0)
+        {
+            _context.ProductImages.RemoveRange(imagesToRemove);
+        }
+
+        foreach (var imageUrl in additionalImageUrls)
+        {
+            product.Images.Add(new ProductImage
+            {
+                ProductId = product.Id,
+                ImageUrl = imageUrl
+            });
+        }
+
+        await SaveChangesWithUniqueSkuRetryAsync(product, resolvedSku.WasGenerated);
 
         await ScheduleModerationJobAsync(product.Id);
         await ScheduleTranslationJobAsync(product.Id);
@@ -545,7 +700,7 @@ public class ProductService : IProductService
         var noteRow = row + 1;
         sheet.Cell(noteRow, 1).Value = "Підказки:";
         sheet.Cell(noteRow, 1).Style.Font.Bold = true;
-        sheet.Cell(noteRow + 1, 1).Value = "- Порожній «Артикул (SKU)» = новий товар буде створено.";
+        sheet.Cell(noteRow + 1, 1).Value = "- Порожній «Артикул (SKU)» = новий товар буде створено з автоматично згенерованим артикулом.";
         sheet.Cell(noteRow + 2, 1).Value = "- Якщо «Артикул (SKU)» збігається з наявним товаром - товар оновиться.";
         sheet.Cell(noteRow + 3, 1).Value = "- «Категорія» має точно збігатися з назвою наявної категорії каталогу.";
         sheet.Cell(noteRow + 4, 1).Value = "- «Статус» не імпортується - будь-який змінений товар повторно йде на модерацію.";
@@ -586,6 +741,17 @@ public class ProductService : IProductService
             if (string.IsNullOrWhiteSpace(name))
             {
                 result.RowErrors.Add(new ProductImportRowError { RowNumber = rowNumber, ProductName = sku, Error = "Не вказано назву товару." });
+                continue;
+            }
+
+            if (sku.Length > ProductSkuGenerator.MaxLength)
+            {
+                result.RowErrors.Add(new ProductImportRowError
+                {
+                    RowNumber = rowNumber,
+                    ProductName = name,
+                    Error = $"Артикул не може містити більше {ProductSkuGenerator.MaxLength} символів."
+                });
                 continue;
             }
 
@@ -650,7 +816,9 @@ public class ProductService : IProductService
                     Description = description,
                     Price = price,
                     Quantity = quantity,
-                    Sku = string.IsNullOrWhiteSpace(sku) ? null : sku,
+                    Sku = string.IsNullOrWhiteSpace(sku)
+                        ? ProductSkuGenerator.Generate(existingProducts.Select(product => product.Sku))
+                        : sku,
                     Status = ProductStatus.Pending,
                     CreatedAt = DateTime.UtcNow
                 };
@@ -663,7 +831,14 @@ public class ProductService : IProductService
             }
         }
 
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException exception) when (IsProductSkuUniqueConstraintViolation(exception))
+        {
+            throw new DuplicateProductSkuException("один з артикулів у файлі");
+        }
 
         foreach (var productId in touchedProductIds)
         {

@@ -1,0 +1,120 @@
+.order-success {
+    background: #fff;
+    border: 1px solid var(--shop-line);
+    border-radius: 1.25rem;
+    box-shadow: 0 1rem 3rem rgba(23, 32, 51, 0.08);
+    margin: 1.25rem auto 0;
+    max-width: 46rem;
+    padding: clamp(2rem, 6vw, 4.5rem);
+    text-align: center;
+}
+
+.order-success__mark {
+    align-items: center;
+    background: #e8f8f0;
+    border: 2px solid #24a36f;
+    border-radius: 50%;
+    color: #16845b;
+    display: flex;
+    font-size: 2rem;
+    font-weight: 800;
+    height: 4.5rem;
+    justify-content: center;
+    margin: 0 auto 1.35rem;
+    width: 4.5rem;
+}
+
+.order-success h1 {
+    color: var(--shop-ink);
+    font-size: clamp(1.8rem, 5vw, 2.65rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    margin: 0;
+}
+
+.order-success__lead {
+    color: var(--shop-muted);
+    font-size: 1.03rem;
+    margin: 0.75rem auto 0;
+    max-width: 35rem;
+}
+
+.order-success__number {
+    color: var(--shop-muted);
+    margin: 1.25rem 0 2rem;
+}
+
+.order-success__number strong {
+    color: var(--shop-ink);
+    display: block;
+    font-size: 1.35rem;
+    margin-top: 0.25rem;
+}
+
+.order-success__details {
+    background: var(--shop-soft);
+    border-radius: 1rem;
+    margin: 0;
+    padding: 0.35rem 1.25rem;
+    text-align: left;
+}
+
+.order-success__details > div {
+    align-items: start;
+    border-bottom: 1px solid var(--shop-line);
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: minmax(8rem, 0.8fr) minmax(0, 1.2fr);
+    padding: 0.9rem 0;
+}
+
+.order-success__details > div:last-child {
+    border-bottom: 0;
+}
+
+.order-success__details dt {
+    color: var(--shop-muted);
+    font-weight: 600;
+}
+
+.order-success__details dd {
+    color: var(--shop-ink);
+    font-weight: 700;
+    margin: 0;
+}
+
+.order-success__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    margin-top: 1.75rem;
+}
+
+.order-success__actions .btn {
+    min-height: 3rem;
+    padding-top: 0.75rem;
+}
+
+.order-success__support {
+    color: var(--shop-muted);
+    font-size: 0.9rem;
+    font-weight: 650;
+    margin-top: 0.25rem;
+    text-decoration: none;
+}
+
+.order-success__support:hover {
+    color: var(--shop-primary);
+}
+
+@media (max-width: 575.98px) {
+    .order-success {
+        border-radius: 1rem;
+        padding: 1.75rem 1rem;
+    }
+
+    .order-success__details > div {
+        gap: 0.25rem;
+        grid-template-columns: 1fr;
+    }
+}
