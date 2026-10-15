@@ -15,7 +15,6 @@ namespace Marketplace.DAL.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<ProductVariant> ProductVariants { get; set; }
         public DbSet<ProductTranslation> ProductTranslations { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
@@ -61,7 +60,6 @@ namespace Marketplace.DAL.Data
             builder.Entity<Category>().HasQueryFilter(c => !c.IsDeleted);
             builder.Entity<Product>().HasQueryFilter(p => !p.IsDeleted);
             builder.Entity<ProductImage>().HasQueryFilter(pi => !pi.IsDeleted);
-            builder.Entity<ProductVariant>().HasQueryFilter(pv => !pv.IsDeleted);
             builder.Entity<Cart>().HasQueryFilter(cart => !cart.IsDeleted);
             builder.Entity<CartItem>().HasQueryFilter(ci => !ci.IsDeleted);
             builder.Entity<Order>().HasQueryFilter(o => !o.IsDeleted);
@@ -117,17 +115,6 @@ namespace Marketplace.DAL.Data
                 .HasForeignKey(pi => pi.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<ProductVariant>()
-                .HasOne(pv => pv.Product)
-                .WithMany(p => p.Variants)
-                .HasForeignKey(pv => pv.ProductId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder.Entity<ProductVariant>()
-                .HasIndex(pv => new { pv.ProductId, pv.Size })
-                .IsUnique()
-                .HasFilter("[IsDeleted] = 0");
-
             builder.Entity<Cart>()
                 .HasOne(c => c.User)
                 .WithMany()
@@ -146,12 +133,6 @@ namespace Marketplace.DAL.Data
                 .HasForeignKey(ci => ci.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Entity<CartItem>()
-                .HasOne(ci => ci.ProductVariant)
-                .WithMany()
-                .HasForeignKey(ci => ci.ProductVariantId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             builder.Entity<Order>()
                 .HasOne(o => o.User)
                 .WithMany()
@@ -168,12 +149,6 @@ namespace Marketplace.DAL.Data
                 .HasOne(oi => oi.Product)
                 .WithMany(p => p.OrderItems)
                 .HasForeignKey(oi => oi.ProductId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<OrderItem>()
-                .HasOne(oi => oi.ProductVariant)
-                .WithMany()
-                .HasForeignKey(oi => oi.ProductVariantId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Address>()
@@ -363,9 +338,6 @@ namespace Marketplace.DAL.Data
             builder.Entity<Product>().Navigation(p => p.Category).AutoInclude();
             builder.Entity<Product>().Navigation(p => p.Images).AutoInclude();
             builder.Entity<Product>().Navigation(p => p.Business).AutoInclude();
-            builder.Entity<Product>().Navigation(p => p.Variants).AutoInclude();
-            builder.Entity<CartItem>().Navigation(ci => ci.ProductVariant).AutoInclude();
-            builder.Entity<OrderItem>().Navigation(oi => oi.ProductVariant).AutoInclude();
             builder.Entity<Wishlist>().Navigation(w => w.WishlistItems).AutoInclude();
             builder.Entity<Review>().Navigation(r => r.User).AutoInclude();
 

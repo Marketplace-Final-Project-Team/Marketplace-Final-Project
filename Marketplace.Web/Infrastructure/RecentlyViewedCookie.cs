@@ -38,7 +38,7 @@ public static class RecentlyViewedCookie
         {
             // Re-fetched on every request so a product deleted, banned, or sold out since
             // the visit just drops out instead of showing stale name/price/stock data.
-            var product = await productService.GetCatalogProductAsync(id);
+            var product = await productService.GetCatalogueProductAsync(id);
             if (product is null)
             {
                 continue;

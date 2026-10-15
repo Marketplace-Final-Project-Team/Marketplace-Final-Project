@@ -1,6 +1,12 @@
 @model Marketplace.Web.Models.OrderCreateViewModel
 
 @{
+    var hasSavedAddresses = Model.SavedAddresses.Count > 0;
+    var currentAddress = Model.SavedAddresses.FirstOrDefault(a => a.City == Model.DeliveryCity && a.Street == Model.DeliveryStreet)
+        ?? Model.SavedAddresses.FirstOrDefault(a => a.IsDefault)
+        ?? Model.SavedAddresses.FirstOrDefault();
+    var defaultLabel = Localizer["основна"].Value;
+
     ViewData["Title"] = Localizer["Оформлення замовлення"];
     var checkoutMessages = new Dictionary<string, string>
     {
@@ -143,27 +149,32 @@
                             </div>
                         </div>
 
-                        <div class="checkout-info-card" data-carrier-panel="Ukrposhta" hidden>
-                            <strong>@Localizer["Укрпошта"]</strong>
-                            <span>@Localizer["Кур'єрська доставка. Орієнтовний термін - 3–5 робочих днів."]</span>
-                        </div>
-
-                        <div class="checkout-info-card" data-carrier-panel="Meest" hidden>
-                            <strong>Meest Express</strong>
-                            <span>@Localizer["Кур'єрська доставка. Орієнтовний термін - 2–4 робочі дні."]</span>
-                        </div>
-
                         <div class="checkout-nova-poshta" data-carrier-panel="Ukrposhta,Meest" hidden>
-                            <div class="checkout-fields">
-                                <div>
-                                    <label class="form-label">@Localizer["Місто доставки"]</label>
-                                    <input type="text" name="DeliveryCity" class="form-control" placeholder="@Localizer["Наприклад, Львів"]" required maxlength="100" value="@Model.DeliveryCity" />
+                            <span class="text-danger small" data-address-hint hidden>@Localizer["Оберіть або додайте адресу доставки"]</span>
+                            @if (hasSavedAddresses)
+                            {
+                                <div class="checkout-saved-address">
+                                    <label class="form-label" for="SavedAddressSelect">@Localizer["Адреса доставки"]</label>
+                                    <select id="SavedAddressSelect" class="form-select" data-saved-address-select>
+                                        @foreach (var address in Model.SavedAddresses)
+                                        {
+                                            <option value="@address.Id"
+                                                    data-city="@address.City"
+                                                    data-street="@address.Street"
+                                                    selected="@(currentAddress?.Id == address.Id)">@address.City, @address.Street@(address.IsDefault ? " (" + defaultLabel + ")" : "")</option>
+                                        }
+                                    </select>
                                 </div>
-                                <div>
-                                    <label class="form-label">@Localizer["Адреса доставки"]</label>
-                                    <input type="text" name="DeliveryStreet" class="form-control" placeholder="@Localizer["вул. Хрещатик, 1, кв. 10"]" required maxlength="250" value="@Model.DeliveryStreet" />
-                                </div>
-                            </div>
+                            }
+                            else
+                            {
+                                <p class="text-secondary">@Localizer["У вас ще немає збережених адрес."]</p>
+                            }
+
+                            <input type="hidden" name="DeliveryCity" value="@currentAddress?.City" />
+                            <input type="hidden" name="DeliveryStreet" value="@currentAddress?.Street" />
+
+                            <a asp-controller="Profile" asp-action="CreateAddress" asp-route-returnUrl="@(Context.Request.Path + Context.Request.QueryString)" class="btn btn-outline-secondary btn-sm mt-2">+ @Localizer["Додати адресу"]</a>
                         </div>
                     </section>
 
@@ -283,4 +294,81 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script src="~/js/checkout.js" asp-append-version="true"></script>
+    <script>
+        document.querySelectorAll('[data-saved-address-select]').forEach((select) => {
+            const panel = select.closest('[data-carrier-panel]');
+            const city = panel.querySelector('input[name="DeliveryCity"]');
+            const street = panel.querySelector('input[name="DeliveryStreet"]');
+
+            const sync = () => {
+                const option = select.selectedOptions[0];
+                city.value = option?.dataset.city ?? '';
+                street.value = option?.dataset.street ?? '';
+            };
+
+            select.addEventListener('change', sync);
+            sync();
+        });
+    </script>
+
+    <script>
+        (() => {
+            const KEY = 'checkoutDraft';
+            const form = document.getElementById('checkout-form');
+            const addAddressLink = document.querySelector('a[href*="CreateAddress"]');
+
+            const currentStep = () => {
+                const visible = [...document.querySelectorAll('.checkout-step')]
+                    .find(s => !s.hasAttribute('hidden'));
+                return visible ? Number(visible.dataset.step) : 1;
+            };
+
+            addAddressLink?.addEventListener('click', () => {
+                const draft = {
+                    path: location.pathname,
+                    step: currentStep(),
+                    lastName: form.querySelector('[name="RecipientLastName"]')?.value ?? '',
+                    firstName: form.querySelector('[name="RecipientFirstName"]')?.value ?? '',
+                    phone: document.getElementById('RecipientPhoneNumber')?.value ?? '',
+                    carrier: form.querySelector('[name="DeliveryCarrier"]:checked')?.value ?? null,
+                    payment: form.querySelector('[name="PaymentMethod"]:checked')?.value ?? null,
+                    promo: form.querySelector('[name="PromoCode"]')?.value ?? ''
+                };
+                sessionStorage.setItem(KEY, JSON.stringify(draft));
+            });
+
+            const raw = sessionStorage.getItem(KEY);
+            if (!raw) return;
+            sessionStorage.removeItem(KEY);
+
+            let draft;
+            try { draft = JSON.parse(raw); } catch { return; }
+            if (draft.path !== location.pathname) return;
+
+            const setValue = (selector, value) => {
+                const el = form.querySelector(selector);
+                if (!el) return;
+                el.value = value;
+                el.dispatchEvent(new Event('input', { bubbles: true }));
+                el.dispatchEvent(new Event('change', { bubbles: true }));
+            };
+
+            setValue('[name="RecipientLastName"]', draft.lastName);
+            setValue('[name="RecipientFirstName"]', draft.firstName);
+            setValue('#RecipientPhoneNumber', draft.phone);  
+            setValue('[name="PromoCode"]', draft.promo);
+
+            if (draft.carrier) {
+                form.querySelector(`[name="DeliveryCarrier"][value="${draft.carrier}"]`)?.click();
+            }
+            if (draft.payment) {
+                form.querySelector(`[name="PaymentMethod"][value="${draft.payment}"]`)?.click();
+            }
+
+            const next = form.querySelector('[data-step-next]');
+            for (let i = 1; i < draft.step; i++) {
+                next?.click();
+            }
+        })();
+    </script>
 }

@@ -21,6 +21,7 @@ namespace Marketplace.BLL.Interfaces
         Task<ServiceResult> ChangeBusinessComission(Guid businessId, decimal commissionPercent);
 
         Task<BusinessAdminDetailsDto?> GetBusinessDetailsAsync(Guid businessId);
+        Task<UserAdminDetailsDto?> GetUserDetailsAsync(string userId);
 
         Task<DataResult<AdminCommissionStatsDto>> GetCommissionStatsByPeriodAsync(DateTime? startDate, DateTime? endDate);
         Task<decimal> GetTotalCommissionAsync();
@@ -28,7 +29,7 @@ namespace Marketplace.BLL.Interfaces
 
 
         Task<PagedResult<ReviewAdminDto>> GetFilteredReviewsAsync(ReviewAdminQueryDto query);
-        Task<IReadOnlyList<ReviewAppealAdminDto>> GetPendingAppeals();
+        Task<IReadOnlyList<ReviewAppealAdminDto>> GetPendingAppealsAsync();
         Task<ServiceResult> ProcessAppeal(Guid appealId, bool approve, string adminUserId, string? reason);
         Task<ServiceResult> DeleteReview(Guid reviewId);
         Task<ServiceResult> RejectReview(Guid reviewId, string adminUserId, string reason);

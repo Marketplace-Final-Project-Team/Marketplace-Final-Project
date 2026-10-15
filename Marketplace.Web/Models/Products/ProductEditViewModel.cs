@@ -25,8 +25,6 @@ namespace Marketplace.Web.Models.Products
         [StringLength(100)]
         public string? Sku { get; set; }
 
-        public List<ProductVariantInputModel> Variants { get; set; } = new();
-
         [Required(ErrorMessage = "Оберіть категорію")]
         public Guid CategoryId { get; set; }
 

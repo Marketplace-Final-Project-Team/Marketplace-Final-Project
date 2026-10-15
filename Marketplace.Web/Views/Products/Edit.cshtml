@@ -70,29 +70,6 @@
                         <span asp-validation-for="Sku" class="text-danger small"></span>
                     </div>
                 </div>
-
-                <div class="product-variants" data-variants-section>
-                    <div class="product-section-heading">
-                        <div>
-                            <p class="product-section-kicker">@Localizer["Розміри"]</p>
-                            <h3>@Localizer["Варіанти товару (необов'язково)"]</h3>
-                        </div>
-                    </div>
-                    <p class="product-help">@Localizer["Якщо товар продається різними розмірами (S, M, L...), додайте кожен окремим рядком - загальна кількість порахується автоматично."]</p>
-                    <div data-variant-rows>
-                        @for (var i = 0; i < Model.Variants.Count; i++)
-                        {
-                            <div class="product-variant-row" data-variant-row>
-                                <input name="Variants[@i].Size" value="@Model.Variants[i].Size" class="form-control" placeholder="@Localizer["Розмір (S, M, L...)"]" />
-                                <input name="Variants[@i].Sku" value="@Model.Variants[i].Sku" class="form-control" placeholder="@Localizer["Артикул розміру"]" />
-                                <input name="Variants[@i].Quantity" value="@Model.Variants[i].Quantity" type="number" min="0" class="form-control" placeholder="@Localizer["К-сть"]" />
-                                <button type="button" class="product-variant-row__remove" data-remove-variant aria-label="@Localizer["Видалити розмір"]">✕</button>
-                            </div>
-                        }
-                    </div>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" data-add-variant>+ @Localizer["Додати розмір"]</button>
-                    <span asp-validation-for="Variants" class="text-danger small d-block mt-2"></span>
-                </div>
             </section>
 
             <section class="product-form-section">
@@ -148,5 +125,4 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script src="~/js/product-variants.js" asp-append-version="true"></script>
 }

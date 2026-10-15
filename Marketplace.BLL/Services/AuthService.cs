@@ -17,7 +17,7 @@ namespace Marketplace.BLL.Services
             _signInManager = signInManager;
         }
 
-        public async Task<SignUpResult> SignUp(SignUpDto dto)
+        public async Task<SignUpResult> SignUpAsync(SignUpDto dto)
         {
             if (await _userManager.FindByEmailAsync(dto.Email) != null)
             {
@@ -37,24 +37,58 @@ namespace Marketplace.BLL.Services
             return new SignUpResult { Succeeded = true, Message = string.Empty, UserId = newUser.Id, Token = token };
         }
 
-        public async Task<ServiceResult> SignIn(SignInDto dto)
+        public async Task<DataResult<string>> SignInAsync(SignInDto dto)
         {
-            var user = await _userManager.FindByEmailAsync(dto.Email);
-
-            if (user != null && user.EmailConfirmed == true)
+            var user = await _userManager.FindByEmailAsync(dto.Email.Trim());
+            if (user == null || !user.EmailConfirmed)
             {
-                var result = await _signInManager.PasswordSignInAsync(user, dto.Password, isPersistent: false, lockoutOnFailure: false);
-
-                if (result.Succeeded)
+                return new DataResult<string>
                 {
-                    return new ServiceResult { Succeeded = true, Message = string.Empty };
-                }
+                    Succeeded = false,
+                    Message = "Неправильна електронна пошта або пароль, або email ще не підтверджено."
+                };
             }
 
-            return new ServiceResult { Succeeded = false, Message = "Невірний емейл або пароль" };
+            var check = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, lockoutOnFailure: true);
+
+            if (check.IsLockedOut)
+            {
+                return new DataResult<string>
+                {
+                    Succeeded = false,
+                    Message = "Забагато невдалих спроб. Спробуйте ще раз через 10 хвилин."
+                };
+            }
+
+            if (!check.Succeeded)
+            {
+                return new DataResult<string>
+                {
+                    Succeeded = false,
+                    Message = "Неправильна електронна пошта або пароль."
+                };
+            }
+
+            if (user.Status != Domain.Enums.UserStatus.Active || user.IsDeleted)
+            {
+                return new DataResult<string>
+                {
+                    Succeeded = false,
+                    Message = "Ваш акаунт заблоковано."
+                };
+            }
+
+            await _signInManager.SignInAsync(user, dto.RememberMe);
+
+            return new DataResult<string>
+            {
+                Succeeded = true,
+                Message = string.Empty,
+                Data = user.Id
+            };
         }
 
-        public async Task<ServiceResult> ConfirmEmail(string userId, string token)
+        public async Task<ServiceResult> ConfirmEmailAsync(string userId, string token)
         {
             var user = await _userManager.FindByIdAsync(userId);
 
@@ -73,7 +107,7 @@ namespace Marketplace.BLL.Services
             return new ServiceResult { Succeeded = false, Message = "Не вдалося підтвердити емейл" };
         }
 
-        public async Task<ForgotPasswordResult> ForgotPassword(string email)
+        public async Task<ForgotPasswordResult> ForgotPasswordAsync(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
 
@@ -99,7 +133,7 @@ namespace Marketplace.BLL.Services
             };
         }
 
-        public async Task<ServiceResult> ResetPassword(ResetPasswordDto dto)
+        public async Task<ServiceResult> ResetPasswordAsync(ResetPasswordDto dto)
         {
             var user = await _userManager.FindByIdAsync(dto.UserId);
 

@@ -6,6 +6,7 @@ using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Marketplace.Domain.Entities;
+using Marketplace.Domain.Enums;
 
 namespace Marketplace.Web.Controllers
 {
@@ -28,11 +29,11 @@ namespace Marketplace.Web.Controllers
                 _userManager = userManager;
             }
 
-        public async Task<IActionResult> Index([FromQuery] CatalogFilterViewModel filter, string? userId)
+        public async Task<IActionResult> Index([FromQuery] CatalogueFilterViewModel filter, string? userId)
         {
             filter.Page = filter.Page <= 0 ? 1 : filter.Page;
 
-            var sort = Request.Query.ContainsKey("Sort") ? filter.Sort : CatalogSortOption.Popularity;
+            var sort = Request.Query.ContainsKey("Sort") ? filter.Sort : CatalogueSortOption.Popularity;
 
             var rawCategories = await _categoryService.GetAllCategories();
 
@@ -58,10 +59,10 @@ namespace Marketplace.Web.Controllers
                          .OrderByDescending(c => c.ActiveProductCount)
                          .Take(maxCategorySections))
             {
-                var categoryPage = await _productService.GetCatalogPageAsync(new CatalogFilterDto
+                var categoryPage = await _productService.GetCataloguePageAsync(new CatalogueFilterDto
                 {
                     CategoryId = category.Id,
-                    Sort = CatalogSortOption.Popularity,
+                    Sort = CatalogueSortOption.Popularity,
                     Page = 1,
                     PageSize = productsPerCategorySection
                 });
@@ -156,12 +157,12 @@ namespace Marketplace.Web.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        private static CatalogProductViewModel MapCatalogProduct(CatalogPageItemDto item, string? userId)
+        private static CatalogueProductViewModel MapCatalogProduct(CataloguePageItemDto item, string? userId)
         {
             var discountPercent = item.Product.GetEffectiveDiscountPercent(userId);
             var hasDiscount = discountPercent > 0;
 
-            return new CatalogProductViewModel
+            return new CatalogueProductViewModel
             {
                 Id = item.Product.Id,
                 Name = item.Product.Name,

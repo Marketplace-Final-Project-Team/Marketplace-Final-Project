@@ -60,7 +60,6 @@ namespace Marketplace.Web.Controllers
             }
             else
             {
-                // Канал покупця — доступ лише адміну або самому покупцю.
                 if (!isAdmin && request.BuyerId != userId)
                 {
                     return Forbid();

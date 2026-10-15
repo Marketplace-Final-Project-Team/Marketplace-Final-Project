@@ -93,7 +93,7 @@ namespace Marketplace.Web.Controllers
             foreach (var business in businesses)
             {
                 var products = await _productService.GetByBusinessAsync(business.Id);
-                var orderSummary = await _orderService.GetBusinessOrderSummary(business.Id);
+                var orderSummary = await _orderService.GetBusinessOrderSummaryAsync(business.Id);
 
                 var currentRole = await _businessAccessService.GetUserRoleAsync(business.Id, userId)
                     ?? BusinessMemberRole.Owner;
@@ -146,7 +146,7 @@ namespace Marketplace.Web.Controllers
             var productsStatsResult = await _businessService.GetProductsStatsByPeriodAsnyc(businessId, start, end);
             var customersStatsResult = await _businessService.GetCustomersStatsByPeriodAsync(businessId, start, end);
             var balance = await _businessService.GetBusinessBalance(businessId);
-            var allTimeSummary = await _orderService.GetBusinessOrderSummary(businessId);
+            var allTimeSummary = await _orderService.GetBusinessOrderSummaryAsync(businessId);
             var products = await _productService.GetByBusinessAsync(businessId);
             var lowStockThreshold = await _settingsService.GetIntAsync("BusinessRules", "LowStockThreshold", 5);
             var traffic = await _productAnalyticsService.GetBusinessTrafficStatsAsync(businessId, start, end);
@@ -285,7 +285,7 @@ namespace Marketplace.Web.Controllers
 
             var userId = _userManager.GetUserId(User);
 
-            var result = await _businessService.CreateBusiness(new BusinessCreateDto
+            var result = await _businessService.CreateBusinessAsync(new BusinessCreateDto
             {
                 StoreName = model.StoreName,
                 Description = model.Description,
@@ -702,7 +702,7 @@ namespace Marketplace.Web.Controllers
                 return View(model);
             }
 
-            var result = await _businessService.AddBusinessMember(new BusinessMemberCreateDto
+            var result = await _businessService.AddBusinessMemberAsync(new BusinessMemberCreateDto
             {
                 BusinessId = model.BusinessId,
                 UserId = model.EmployeeId,
@@ -731,7 +731,7 @@ namespace Marketplace.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> ApproveMembership(Guid businessId, string userId, string token, BusinessMemberRole role)
         {
-            var result = await _businessService.ApproveMembership(userId, businessId, token, role);
+            var result = await _businessService.ApproveMembershipAsync(userId, businessId, token, role);
             return RedirectToAction("MembershipResult", new { message = result.Message });
         }
 
@@ -739,7 +739,7 @@ namespace Marketplace.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> DenyMembership(Guid businessId, string userId, string token, BusinessMemberRole role)
         {
-            var result = await _businessService.DenyMembership(userId, businessId, token, role);
+            var result = await _businessService.DenyMembershipAsync(userId, businessId, token, role);
             return RedirectToAction("MembershipResult", new { message = result.Message });
         }
 
@@ -760,7 +760,7 @@ namespace Marketplace.Web.Controllers
                 return Forbid();
             }
 
-            var summary = await _orderService.GetBusinessOrderSummary(businessId);
+            var summary = await _orderService.GetBusinessOrderSummaryAsync(businessId);
             var orders = await _orderService.GetBusinessOrders(businessId);
 
             var trendEnd = DateTime.UtcNow.Date;
@@ -859,8 +859,8 @@ namespace Marketplace.Web.Controllers
             }
 
             var promoCodes = await _promoCodeService.GetForBusinessAsync(businessId);
-            var businessDiscount = await _discountService.GetBusinessDiscount(businessId);
-            var categoryDiscounts = await _discountService.GetActiveCategoryDiscountsForBusiness(businessId);
+            var businessDiscount = await _discountService.GetBusinessDiscountAsync(businessId);
+            var categoryDiscounts = await _discountService.GetActiveCategoryDiscountsForBusinessAsync(businessId);
             var categories = await _categoryService.GetAllCategories();
             var personalDiscounts = await _userDiscountService.GetActiveDiscountsForBusinessAsync(businessId);
             var customersResult = await _businessService.GetCustomersStatsByPeriodAsync(businessId, business.CreatedAt, DateTime.UtcNow);

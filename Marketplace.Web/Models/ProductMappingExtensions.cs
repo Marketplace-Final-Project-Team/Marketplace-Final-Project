@@ -5,12 +5,12 @@ namespace Marketplace.Web.Models
 {
     public static class ProductMappingExtensions
     {
-        public static CatalogProductViewModel ToCatalogProductViewModel(this Product product, string? userId = null)
+        public static CatalogueProductViewModel ToCatalogProductViewModel(this Product product, string? userId = null)
         {
             var discountPercent = product.GetEffectiveDiscountPercent(userId);
             var hasDiscount = discountPercent > 0;
 
-            return new CatalogProductViewModel
+            return new CatalogueProductViewModel
             {
                 Id = product.Id,
                 Name = product.Name,
@@ -18,10 +18,6 @@ namespace Marketplace.Web.Models
                 Price = hasDiscount ? product.GetDiscountedPrice(userId) : product.Price,
                 Quantity = product.Quantity,
                 Sku = product.Sku,
-                Variants = product.Variants
-                    .OrderBy(v => v.Size)
-                    .Select(v => new CatalogProductVariantViewModel { Id = v.Id, Size = v.Size, Quantity = v.Quantity })
-                    .ToList(),
                 MainImageUrl = product.MainImageUrl,
                 CategoryName = product.Category?.Name ?? "Без категорії",
                 StoreName = product.Business?.StoreName ?? "Marketplace",
@@ -33,9 +29,9 @@ namespace Marketplace.Web.Models
             };
         }
 
-        public static CatalogProductViewModel ToCatalogProductViewModel(this CatalogProductDto dto)
+        public static CatalogueProductViewModel ToCatalogProductViewModel(this CatalogProductDto dto)
         {
-            return new CatalogProductViewModel
+            return new CatalogueProductViewModel
             {
                 Id = dto.Id,
                 Name = dto.Name,

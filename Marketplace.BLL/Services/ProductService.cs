@@ -139,9 +139,9 @@ public class ProductService : IProductService
             .ToListAsync();
     }
 
-    public async Task<CatalogPageResultDto> GetCatalogPageAsync(CatalogFilterDto filter, bool allowAdultContent = false)
+    public async Task<CataloguePageResultDto> GetCataloguePageAsync(CatalogueFilterDto filter, bool allowAdultContent = false)
     {
-        var query = _context.Products
+        var query = _productRepository.GetQueryable()
             .AsNoTracking()
             .Include(p => p.Category)
             .Include(p => p.Business)
@@ -172,7 +172,7 @@ public class ProductService : IProductService
                 || (p.Category != null && p.Category.Name.Contains(normalizedSearch)));
         }
 
-        if (filter.InStockOnly)
+        if (filter.InStockOnly == true)
         {
             query = query.Where(p => p.Quantity > 0);
         }
@@ -191,20 +191,47 @@ public class ProductService : IProductService
         var pageSize = filter.PageSize <= 0 ? 12 : filter.PageSize;
         var page = filter.Page <= 0 ? 1 : filter.Page;
 
-        var products = await query
-            .OrderByDescending(p => p.CreatedAt)
+        IOrderedQueryable<Product> ordered;
+
+        switch (filter.Sort)
+        {
+            case CatalogueSortOption.PriceAsc:
+                ordered = query.OrderBy(p => p.Price);
+                break;
+
+            case CatalogueSortOption.PriceDesc:
+                ordered = query.OrderByDescending(p => p.Price);
+                break;
+
+            case CatalogueSortOption.Rating:
+                ordered = query.OrderByDescending(p => p.Reviews
+                    .Where(r => r.Status == ReviewStatus.Approved && !r.IsDeleted)
+                    .Average(r => (double?)r.Rating) ?? 0);
+                break;
+
+            case CatalogueSortOption.Popularity:
+                ordered = query.OrderByDescending(p => p.OrderItems.Sum(oi => oi.Quantity));
+                break;
+
+            default:
+                ordered = query.OrderByDescending(p => p.CreatedAt);
+                break;
+        }
+
+        var products = await ordered
+            .ThenBy(p => p.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
-        var items = products.Select(p => new CatalogPageItemDto
+        var items = products.Select(p => new CataloguePageItemDto
         {
             Product = p,
             AverageRating = 0,
             ReviewCount = 0
         }).ToList();
 
-        return new CatalogPageResultDto
+        return new CataloguePageResultDto
         {
             Items = items,
             TotalCount = totalCount,
@@ -213,7 +240,7 @@ public class ProductService : IProductService
         };
     }
 
-    public async Task<Product?> GetCatalogProductAsync(Guid id, bool allowAdultContent = false)
+    public async Task<Product?> GetCatalogueProductAsync(Guid id, bool allowAdultContent = false)
     {
         var product = await _context.Products
             .AsNoTracking()
@@ -322,8 +349,6 @@ public class ProductService : IProductService
         if (dto.MainImage == null)
             throw new InvalidOperationException("Головне зображення товару обов'язкове.");
 
-        var variants = BuildVariants(dto.Variants);
-
         var mainImageUrl = await _imageStorageService.UploadImageAsync(dto.MainImage);
         if (mainImageUrl == null)
             throw new InvalidOperationException("Не вдалося завантажити головне зображення.");
@@ -338,7 +363,7 @@ public class ProductService : IProductService
             Name = dto.Name,
             Description = dto.Description,
             Price = dto.Price,
-            Quantity = variants.Count > 0 ? variants.Sum(v => v.Quantity) : dto.Quantity,
+            Quantity = dto.Quantity,
             Sku = string.IsNullOrWhiteSpace(dto.Sku) ? null : dto.Sku.Trim(),
             IsAdultOnly = dto.IsAdultOnly,
             Status = ProductStatus.Pending,
@@ -356,12 +381,6 @@ public class ProductService : IProductService
             });
         }
 
-        foreach (var variant in variants)
-        {
-            variant.ProductId = product.Id;
-            product.Variants.Add(variant);
-        }
-
         await _productRepository.AddAsync(product);
         await _context.SaveChangesAsync();
 
@@ -375,7 +394,6 @@ public class ProductService : IProductService
     {
         var product = await _context.Products
             .Include(p => p.Images)
-            .Include(p => p.Variants)
             .FirstOrDefaultAsync(p => p.Id == dto.Id);
 
         if (product == null) return null;
@@ -418,13 +436,6 @@ public class ProductService : IProductService
             });
         }
 
-        SyncVariants(product, dto.Variants);
-
-        var activeVariants = product.Variants.Where(v => !v.IsDeleted).ToList();
-        product.Quantity = activeVariants.Count > 0
-            ? activeVariants.Sum(v => v.Quantity)
-            : dto.Quantity;
-
         await _context.SaveChangesAsync();
 
         await ScheduleModerationJobAsync(product.Id);
@@ -457,11 +468,6 @@ public class ProductService : IProductService
         if (product is null)
         {
             return new ServiceResult { Succeeded = false, Message = "Товар не знайдено." };
-        }
-
-        if (product.Variants.Count > 0)
-        {
-            return new ServiceResult { Succeeded = false, Message = "Товар має розміри - кількість редагується через сторінку товару." };
         }
 
         product.Quantity = quantity;
@@ -682,17 +688,6 @@ public class ProductService : IProductService
 
             if (existing is not null)
             {
-                if (existing.Variants.Count > 0)
-                {
-                    result.RowErrors.Add(new ProductImportRowError
-                    {
-                        RowNumber = rowNumber,
-                        ProductName = name,
-                        Error = "Товар має розміри - оновлення через імпорт недоступне. Редагуйте його вручну."
-                    });
-                    continue;
-                }
-
                 existing.Name = name;
                 existing.Description = description;
                 existing.CategoryId = category.Id;
@@ -737,55 +732,5 @@ public class ProductService : IProductService
         }
 
         return result;
-    }
-
-    private static List<ProductVariant> BuildVariants(IEnumerable<ProductVariantDto>? variants)
-    {
-        if (variants == null)
-        {
-            return new List<ProductVariant>();
-        }
-
-        return variants
-            .Where(v => !string.IsNullOrWhiteSpace(v.Size))
-            .GroupBy(v => v.Size.Trim(), StringComparer.OrdinalIgnoreCase)
-            .Select(g => g.Last())
-            .Select(v => new ProductVariant
-            {
-                Size = v.Size.Trim(),
-                Sku = v.Sku?.Trim() ?? string.Empty,
-                Quantity = Math.Max(0, v.Quantity)
-            })
-            .ToList();
-    }
-
-    private static void SyncVariants(Product product, IEnumerable<ProductVariantDto>? variants)
-    {
-        var incoming = BuildVariants(variants);
-        var existing = product.Variants.ToList();
-
-        foreach (var variantDto in incoming)
-        {
-            var match = existing.FirstOrDefault(v => v.Size.Equals(variantDto.Size, StringComparison.OrdinalIgnoreCase));
-            if (match != null)
-            {
-                match.Sku = variantDto.Sku;
-                match.Quantity = variantDto.Quantity;
-                existing.Remove(match);
-            }
-            else
-            {
-                variantDto.ProductId = product.Id;
-                product.Variants.Add(variantDto);
-            }
-        }
-
-        // Any size left in `existing` is no longer submitted by the seller — soft-delete it
-        // rather than hard-remove, since it may already be referenced by past order history
-        // (OrderItem -> ProductVariant is a Restrict FK, so a hard delete could fail there).
-        foreach (var stale in existing)
-        {
-            stale.IsDeleted = true;
-        }
     }
 }

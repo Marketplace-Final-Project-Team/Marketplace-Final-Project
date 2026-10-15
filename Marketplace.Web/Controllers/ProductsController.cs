@@ -121,7 +121,6 @@ public class ProductsController : Controller
                 Price = p.Price,
                 Quantity = p.Quantity,
                 Sku = p.Sku,
-                VariantCount = p.Variants.Count,
                 MainImageUrl = p.MainImageUrl,
                 Status = p.Status.ToString(),
                 CategoryName = p.Category?.Name ?? string.Empty,
@@ -256,7 +255,6 @@ public class ProductsController : Controller
                 Sku = p.Sku,
                 MainImageUrl = p.MainImageUrl,
                 Quantity = p.Quantity,
-                VariantCount = p.Variants.Count,
                 Status = p.Status.ToString()
             }).ToList());
     }
@@ -332,10 +330,6 @@ public class ProductsController : Controller
             Price = product.Price,
             Quantity = product.Quantity,
             Sku = product.Sku,
-            Variants = product.Variants
-                .OrderBy(v => v.Size)
-                .Select(v => new ProductVariantInputModel { Size = v.Size, Sku = v.Sku, Quantity = v.Quantity })
-                .ToList(),
             MainImageUrl = product.MainImageUrl,
             Status = product.Status.ToString(),
             CategoryName = product.Category?.Name ?? "Без категорії",
@@ -396,10 +390,6 @@ public class ProductsController : Controller
                 Price = model.Price,
                 Quantity = model.Quantity,
                 Sku = model.Sku,
-                Variants = model.Variants
-                    .Where(v => !string.IsNullOrWhiteSpace(v.Size))
-                    .Select(v => new ProductVariantDto { Size = v.Size, Sku = v.Sku, Quantity = v.Quantity })
-                    .ToList(),
                 IsAdultOnly = model.IsAdultOnly,
                 MainImage = model.MainImage,
                 AdditionalImages = model.AdditionalImages
@@ -447,10 +437,6 @@ public class ProductsController : Controller
             Price = product.Price,
             Quantity = product.Quantity,
             Sku = product.Sku,
-            Variants = product.Variants
-                .OrderBy(v => v.Size)
-                .Select(v => new ProductVariantInputModel { Size = v.Size, Sku = v.Sku, Quantity = v.Quantity })
-                .ToList(),
             IsAdultOnly = product.IsAdultOnly,
             CategoryId = product.CategoryId,
             ExistingMainImageUrl = product.MainImageUrl,
@@ -498,10 +484,6 @@ public class ProductsController : Controller
                 Price = model.Price,
                 Quantity = model.Quantity,
                 Sku = model.Sku,
-                Variants = model.Variants
-                    .Where(v => !string.IsNullOrWhiteSpace(v.Size))
-                    .Select(v => new ProductVariantDto { Size = v.Size, Sku = v.Sku, Quantity = v.Quantity })
-                    .ToList(),
                 IsAdultOnly = model.IsAdultOnly,
                 MainImage = model.MainImage,
                 AdditionalImages = model.AdditionalImages,

@@ -86,7 +86,7 @@ namespace Marketplace.BLL.Services
                         };
                     }
 
-                    var availableStock = cartItem.ProductVariant?.Quantity ?? cartItem.Product.Quantity;
+                    var availableStock = cartItem.Product.Quantity;
                     if (availableStock < cartItem.Quantity)
                     {
                         return new OrderResultDto { Succeeded = false, Message = $"Недостатньо товару «{cartItem.Product.Name}» на складі." };
@@ -108,9 +108,6 @@ namespace Marketplace.BLL.Services
                     var userdiscount = await _context.UserDiscounts
                         .FirstOrDefaultAsync(ud => ud.UserId == userId && ud.BusinessId == cartItem.Product.BusinessId && ud.StartDate <= DateTime.UtcNow && ud.EndDate >= DateTime.UtcNow);
 
-                    // A business-wide sale is dominant over the product's own sale — it replaces
-                    // it rather than stacking with it. A matching promo code still stacks on top
-                    // of whichever one of those applies.
                     decimal? bestDiscount = 0;
                     if (userdiscount != null)
                     {
@@ -177,17 +174,12 @@ namespace Marketplace.BLL.Services
                         ProductId = cartItem.ProductId,
                         ProductName = cartItem.Product.Name,
                         ProductVariantId = cartItem.ProductVariantId,
-                        VariantSize = cartItem.ProductVariant?.Size,
-                        VariantSku = cartItem.ProductVariant?.Sku ?? cartItem.Product.Sku,
+                        VariantSku = cartItem.Product.Sku,
                         UnitPrice = unitPrice,
                         Quantity = cartItem.Quantity,
                         IsReturned = false
                     };
 
-                    if (cartItem.ProductVariant != null)
-                    {
-                        cartItem.ProductVariant.Quantity -= cartItem.Quantity;
-                    }
                     cartItem.Product.Quantity -= cartItem.Quantity;
                     _productRepository.Update(cartItem.Product);
 
@@ -302,10 +294,6 @@ namespace Marketplace.BLL.Services
                         {
                             item.Product.Quantity += item.Quantity;
                         }
-                        if (item.ProductVariant != null)
-                        {
-                            item.ProductVariant.Quantity += item.Quantity;
-                        }
                     }
 
 
@@ -371,11 +359,6 @@ namespace Marketplace.BLL.Services
                 {
                     item.Product.Quantity += item.Quantity;
 
-                    if (item.ProductVariant != null)
-                    {
-                        item.ProductVariant.Quantity += item.Quantity;
-                    }
-
                     if (item.Product.Business != null)
                     {
                         var amount = Math.Round(item.UnitPrice * item.Quantity, 2, MidpointRounding.AwayFromZero);
@@ -418,7 +401,7 @@ namespace Marketplace.BLL.Services
                 .ThenInclude(item => item.Product)
                 .FirstOrDefaultAsync();
 
-        public async Task<BusinessOrderSummaryDto> GetBusinessOrderSummary(Guid businessId)
+        public async Task<BusinessOrderSummaryDto> GetBusinessOrderSummaryAsync(Guid businessId)
         {
             var orderLines = await _context.OrderItems
                 .AsNoTracking()

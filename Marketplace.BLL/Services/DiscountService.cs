@@ -187,7 +187,7 @@ namespace Marketplace.BLL.Services
             };
 
         }
-        public async Task<BusinessDiscountDto> GetBusinessDiscount(Guid businessId)
+        public async Task<BusinessDiscountDto> GetBusinessDiscountAsync(Guid businessId)
         {
             var business = await _businessRepo.GetByIdAsync(businessId);
             var active_discount = await _context.Discounts.FirstOrDefaultAsync(d => d.BusinessId == businessId && d.DiscountType == DiscountType.Business && d.EndDate >= DateTime.UtcNow);
@@ -369,7 +369,7 @@ namespace Marketplace.BLL.Services
 
         }
 
-        public async Task<List<CategoryDiscountDto>> GetActiveCategoryDiscountsForBusiness(Guid businessId)
+        public async Task<List<CategoryDiscountDto>> GetActiveCategoryDiscountsForBusinessAsync(Guid businessId)
         {
             return await _context.Discounts
                 .Where(d => d.BusinessId == businessId && d.DiscountType == DiscountType.Category && d.EndDate >= DateTime.UtcNow && d.CategoryId != null)

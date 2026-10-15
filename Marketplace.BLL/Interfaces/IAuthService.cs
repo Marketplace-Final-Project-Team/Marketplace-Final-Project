@@ -5,10 +5,10 @@ namespace Marketplace.BLL.Interfaces
 {
     public interface IAuthService
     {
-        Task<ServiceResult> SignIn(SignInDto dto);
-        Task<SignUpResult> SignUp(SignUpDto dto);
-        Task<ServiceResult> ConfirmEmail(string userId, string token);
-        Task<ForgotPasswordResult> ForgotPassword(string email);
-        Task<ServiceResult> ResetPassword(ResetPasswordDto dto);
+        Task<DataResult<string>> SignInAsync(SignInDto dto);
+        Task<SignUpResult> SignUpAsync(SignUpDto dto);
+        Task<ServiceResult> ConfirmEmailAsync(string userId, string token);
+        Task<ForgotPasswordResult> ForgotPasswordAsync(string email);
+        Task<ServiceResult> ResetPasswordAsync(ResetPasswordDto dto);
     }
 }

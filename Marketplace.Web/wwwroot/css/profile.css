@@ -244,6 +244,7 @@
     font-weight: 800;
     height: 2.8rem;
     justify-content: center;
+    margin-top: 0;
     width: 2.8rem;
 }
 
@@ -253,11 +254,16 @@
     font-size: 1rem;
 }
 
-.profile-hub-card span {
+.profile-hub-card > div > span {
     color: var(--profile-muted);
     display: block;
     font-size: 0.82rem;
     margin-top: 0.2rem;
+}
+
+.profile-hub-card > div > .profile-hub-card__badge {
+    display: inline-block;
+    margin-top: 0.5rem;
 }
 
 .profile-hub-card__badge {
@@ -526,5 +532,73 @@
     .address-card__actions {
         justify-content: flex-start;
         width: 100%;
+    }
+}
+
+.profile-id-field {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    max-width: 100%;
+    margin-bottom: .5rem;
+    padding: .25rem .25rem .25rem .6rem;
+    border: 1px solid var(--bs-border-color, #dee2e6);
+    border-radius: 10px;
+    background: var(--bs-tertiary-bg, #f8f9fa);
+}
+
+.profile-id-field__label {
+    font-size: .75rem;
+    font-weight: 600;
+    color: var(--bs-secondary-color, #6c757d);
+}
+
+.profile-id-field__input {
+    min-width: 0;
+    width: 280px;
+    max-width: 100%;
+    border: 0;
+    background: transparent;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .8rem;
+    color: inherit;
+    text-overflow: ellipsis;
+}
+
+    .profile-id-field__input:focus {
+        outline: none;
+    }
+
+.profile-id-field__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--bs-secondary-color, #6c757d);
+    cursor: pointer;
+    transition: background .15s, color .15s;
+}
+
+    .profile-id-field__btn:hover {
+        background: rgba(0, 0, 0, .06);
+        color: inherit;
+    }
+
+    .profile-id-field__btn.is-copied {
+        color: #198754;
+    }
+
+@media (max-width: 575px) {
+    .profile-id-field {
+        display: flex;
+    }
+
+    .profile-id-field__input {
+        flex: 1;
+        width: auto;
     }
 }

@@ -145,7 +145,7 @@ namespace Marketplace.Web.Controllers
             if (business == null) return NotFound();
             var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.Statistics);
             if (!hasAccess) return Forbid();
-            var discount = await _discountService.GetBusinessDiscount(businessId);
+            var discount = await _discountService.GetBusinessDiscountAsync(businessId);
             return Json(discount);
         }
 

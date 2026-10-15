@@ -14,7 +14,7 @@ namespace Marketplace.Web.Models
     {
         public Guid CategoryId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
-        public List<CatalogProductViewModel> Products { get; set; } = new();
+        public List<CatalogueProductViewModel> Products { get; set; } = new();
     }
 
     public class HomeViewModel

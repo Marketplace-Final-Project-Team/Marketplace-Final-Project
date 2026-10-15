@@ -112,7 +112,7 @@ namespace Marketplace.BLL.Services
             };
         }
 
-        private async Task<(ServiceResult, BusinessMember?)> VerifyMembershipRequest(string userId, Guid businessId, string token, BusinessMemberRole role)
+        private async Task<(ServiceResult, BusinessMember?)> VerifyMembershipRequestAsync(string userId, Guid businessId, string token, BusinessMemberRole role)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
@@ -135,7 +135,7 @@ namespace Marketplace.BLL.Services
             return (new ServiceResult { Succeeded = true, Message = string.Empty }, businessMember);
         }
 
-        public async Task<ServiceResult> CreateBusiness(BusinessCreateDto dto)
+        public async Task<ServiceResult> CreateBusinessAsync(BusinessCreateDto dto)
         {
             if (await _businessRepo.ExistsAsync(b => b.OwnerId == dto.UserId))
             {
@@ -180,7 +180,7 @@ namespace Marketplace.BLL.Services
             return new ServiceResult { Succeeded = true, Message = string.Empty };
         }
 
-        public async Task<BusinessMemberResult> AddBusinessMember(BusinessMemberCreateDto dto)
+        public async Task<BusinessMemberResult> AddBusinessMemberAsync(BusinessMemberCreateDto dto)
         {
             var user = await _userManager.FindByIdAsync(dto.UserId);
 
@@ -209,9 +209,9 @@ namespace Marketplace.BLL.Services
             return new BusinessMemberResult { Succeeded = true, Message = string.Empty, UserId = user.Id, Email = user.Email, Token = token, Role = dto.Role };
         }
 
-        public async Task<ServiceResult> ApproveMembership(string userId, Guid businessId, string token, BusinessMemberRole role)
+        public async Task<ServiceResult> ApproveMembershipAsync(string userId, Guid businessId, string token, BusinessMemberRole role)
         {
-            var (verificationResult, businessMember) = await VerifyMembershipRequest(userId, businessId, token, role);
+            var (verificationResult, businessMember) = await VerifyMembershipRequestAsync(userId, businessId, token, role);
 
             if (verificationResult.Succeeded == false)
             {
@@ -224,9 +224,9 @@ namespace Marketplace.BLL.Services
             return new ServiceResult { Succeeded = true, Message = "Запит прийнято" };
         }
 
-        public async Task<ServiceResult> DenyMembership(string userId, Guid businessId, string token, BusinessMemberRole role)
+        public async Task<ServiceResult> DenyMembershipAsync(string userId, Guid businessId, string token, BusinessMemberRole role)
         {
-            var (verificationResult, businessMember) = await VerifyMembershipRequest(userId, businessId, token, role);
+            var (verificationResult, businessMember) = await VerifyMembershipRequestAsync(userId, businessId, token, role);
 
             if (verificationResult.Succeeded == false)
             {

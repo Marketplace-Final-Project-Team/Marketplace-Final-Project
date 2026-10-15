@@ -2,16 +2,16 @@ using Marketplace.Domain.Entities;
 
 namespace Marketplace.BLL.DTOs.Products
 {
-    public class CatalogPageItemDto
+    public class CataloguePageItemDto
     {
         public Product Product { get; set; } = null!;
         public double AverageRating { get; set; }
         public int ReviewCount { get; set; }
     }
 
-    public class CatalogPageResultDto
+    public class CataloguePageResultDto
     {
-        public IReadOnlyList<CatalogPageItemDto> Items { get; set; } = Array.Empty<CatalogPageItemDto>();
+        public IReadOnlyList<CataloguePageItemDto> Items { get; set; } = Array.Empty<CataloguePageItemDto>();
         public int TotalCount { get; set; }
         public int Page { get; set; }
         public int PageSize { get; set; }
