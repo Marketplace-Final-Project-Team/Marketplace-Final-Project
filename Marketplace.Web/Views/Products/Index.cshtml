@@ -262,12 +262,12 @@
 
                     <div class="mb-3">
                         <label for="modalStartDate" class="form-label">@Localizer["Дата початку"]</label>
-                        <input type="date" id="modalStartDate" name="startDate" class="form-control" value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                        <input type="datetime-local" data-utc-input id="modalStartDate" name="startDate" class="form-control" data-utc-value="@DateTime.UtcNow.ToString("O")" required />
                     </div>
 
                     <div class="mb-3">
                         <label for="modalEndDate" class="form-label">@Localizer["Дата закінчення"]</label>
-                        <input type="date" id="modalEndDate" name="endDate" class="form-control" value="@DateTime.Today.AddDays(7).ToString("yyyy-MM-dd")" required />
+                        <input type="datetime-local" data-utc-input id="modalEndDate" name="endDate" class="form-control" data-utc-value="@DateTime.UtcNow.AddDays(7).ToString("O")" required />
                     </div>
                 </div>
                 <div class="modal-footer">

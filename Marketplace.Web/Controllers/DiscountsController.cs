@@ -39,8 +39,10 @@ namespace Marketplace.Web.Controllers
         // POST: /Discounts/Set
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Set(Guid productId, decimal percent, DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> Set(Guid productId, decimal percent, DateTimeOffset startDate, DateTimeOffset endDate)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var product = await _productService.GetByIdAsync(productId);
             if (product == null) return NotFound();
 
@@ -49,7 +51,7 @@ namespace Marketplace.Web.Controllers
 
             try
             {
-                await _discountService.SetDiscountAsync(productId, percent, startDate, endDate);
+                await _discountService.SetDiscountAsync(productId, percent, startDate.UtcDateTime, endDate.UtcDateTime);
                 await _activityLog.LogBusinessActionAsync(product.BusinessId, "DiscountSet",
                     $"Встановлено знижку {percent}% на товар «{product.Name}».",
                     actorUserId: CurrentUserId, relatedEntityId: productId);
@@ -85,15 +87,17 @@ namespace Marketplace.Web.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SetBusinessDiscount(Guid businessId, decimal discountPercent, DateTime discountStartDate, DateTime discountEndDate)
+        public async Task<IActionResult> SetBusinessDiscount(Guid businessId, decimal discountPercent, DateTimeOffset discountStartDate, DateTimeOffset discountEndDate)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             
             var business = await _businessService.GetByIdAsync(businessId);
             if (business == null) return NotFound();
 
             var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.ProductCrud);
             if (!hasAccess) return Forbid();
-            var result = await _discountService.SetBusinessDiscount(businessId, discountPercent, discountStartDate, discountEndDate);
+            var result = await _discountService.SetBusinessDiscount(businessId, discountPercent, discountStartDate.UtcDateTime, discountEndDate.UtcDateTime);
             if (result.Succeeded)
             {
                 await _activityLog.LogBusinessActionAsync(businessId, "BusinessDiscountSet",
@@ -152,8 +156,10 @@ namespace Marketplace.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SetCategoryDiscount(Guid categoryId, Guid businessId, decimal discountPercent, DateTime discountStartDate, DateTime discountEndDate)
+        public async Task<IActionResult> SetCategoryDiscount(Guid categoryId, Guid businessId, decimal discountPercent, DateTimeOffset discountStartDate, DateTimeOffset discountEndDate)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             Console.WriteLine($"CategoryId: {categoryId}");
             
             var category = await _categoryService.GetByIdAsync(categoryId);
@@ -163,7 +169,7 @@ namespace Marketplace.Web.Controllers
 
             var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.ProductCrud);
             if (!hasAccess) return Forbid();
-            var result = await _discountService.SetCategoryDiscount(categoryId, businessId, discountPercent, discountStartDate, discountEndDate);
+            var result = await _discountService.SetCategoryDiscount(categoryId, businessId, discountPercent, discountStartDate.UtcDateTime, discountEndDate.UtcDateTime);
             if (result.Succeeded)
             {
                 await _activityLog.LogBusinessActionAsync(businessId, "CategoryDiscountSet",
