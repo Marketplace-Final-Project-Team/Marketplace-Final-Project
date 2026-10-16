@@ -1,0 +1,70 @@
+@model RecentlyViewedPageViewModel
+
+@{
+    Layout = "_ProfileLayout";
+    ViewData["Title"] = SharedLocalizer["Список перегляду"];
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+}
+
+<div class="profile-page">
+    <a asp-action="Index" class="profile-back">← @Localizer["До кабінету"]</a>
+
+    <div class="profile-summary">
+        <h1>@SharedLocalizer["Список перегляду"]</h1>
+        <p>@Localizer["Товари, які ви нещодавно переглядали в цьому браузері."]</p>
+    </div>
+
+    @if (!Model.ConsentAccepted)
+    {
+        <div class="profile-empty">
+            <div class="profile-empty__icon" aria-hidden="true">◔</div>
+            <h2>@Localizer["Історія перегляду вимкнена"]</h2>
+            <p>@Localizer["Щоб ми запам'ятовували переглянуті товари, потрібна ваша згода на функціональні кукі."]</p>
+            <button type="button" class="btn btn-primary" data-reopen-cookie-consent>@Localizer["Змінити налаштування кукі"]</button>
+        </div>
+    }
+    else if (Model.Items.Count == 0)
+    {
+        <div class="profile-empty">
+            <div class="profile-empty__icon" aria-hidden="true">◔</div>
+            <h2>@Localizer["Ви ще нічого не переглядали"]</h2>
+            <p>@Localizer["Відкрийте будь-який товар у каталозі - він з'явиться тут."]</p>
+            <a asp-controller="Catalog" asp-action="Index" class="btn btn-primary">@Localizer["Перейти до каталогу"]</a>
+        </div>
+    }
+    else
+    {
+        <div class="wishlist-grid">
+            @foreach (var item in Model.Items)
+            {
+                var (productName, _) = await ProductTranslator.GetLocalizedAsync(
+                    item.Id, item.Name, string.Empty, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
+                <article class="wishlist-card">
+                    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.Id" class="wishlist-card__media" aria-label="@Localizer["Переглянути"] @productName">
+                        @if (!string.IsNullOrWhiteSpace(item.MainImageUrl))
+                        {
+                            <img src="@item.MainImageUrl" alt="@productName" />
+                        }
+                        else
+                        {
+                            <span aria-hidden="true">@productName[..1].ToUpperInvariant()</span>
+                        }
+                        @if (item.Quantity <= 0)
+                        {
+                            <small class="wishlist-card__stock">@Localizer["Немає в наявності"]</small>
+                        }
+                    </a>
+                    <div class="wishlist-card__body">
+                        <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.Id" class="wishlist-card__title">@productName</a>
+                        <div class="wishlist-card__footer">
+                            <span class="fw-semibold">@item.Price.ToString("N2") ₴</span>
+                        </div>
+                    </div>
+                </article>
+            }
+        </div>
+    }
+</div>

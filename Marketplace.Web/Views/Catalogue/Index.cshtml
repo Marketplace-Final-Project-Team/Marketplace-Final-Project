@@ -1,0 +1,456 @@
+@using Marketplace.Domain.Enums
+@model Marketplace.Web.Models.CataloguePageViewModel
+
+@{
+    ViewData["Title"] = SharedLocalizer["Каталог товарів"].Value;
+    var filter = Model.Filter;
+    bool isAdultConfirmed = Context.Request.Cookies["AdultConfirmed"] == "true";
+    var bannerTitle = Model.SelectedCategoryName is { } categoryName ? SharedLocalizer[categoryName].Value : SharedLocalizer["Каталог товарів"].Value;
+}
+
+@functions {
+    private static Dictionary<string, string> BaseRouteValues(Marketplace.Web.Models.CatalogueFilterViewModel filter)
+    {
+        var values = new Dictionary<string, string>();
+
+        if (!string.IsNullOrWhiteSpace(filter.Search)) values["Search"] = filter.Search;
+        if (filter.CategoryId.HasValue) values["CategoryId"] = filter.CategoryId.Value.ToString();
+        if (filter.MinPrice.HasValue) values["MinPrice"] = filter.MinPrice.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        if (filter.MaxPrice.HasValue) values["MaxPrice"] = filter.MaxPrice.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        if (filter.InStockOnly) values["InStockOnly"] = "true";
+        if (filter.MinRating.HasValue) values["MinRating"] = filter.MinRating.Value.ToString();
+        if (filter.Sort != CatalogueSortOption.Newest) values["Sort"] = filter.Sort.ToString();
+
+        return values;
+    }
+
+    private static Dictionary<string, string> RouteValuesForPage(Marketplace.Web.Models.CatalogueFilterViewModel filter, int page)
+    {
+        var values = BaseRouteValues(filter);
+        values["Page"] = page.ToString();
+        return values;
+    }
+
+    private static Dictionary<string, string> RouteValuesForCategory(Marketplace.Web.Models.CatalogueFilterViewModel filter, Guid? categoryId)
+    {
+        var values = BaseRouteValues(filter);
+        values.Remove("CategoryId");
+        if (categoryId.HasValue) values["CategoryId"] = categoryId.Value.ToString();
+        values["Page"] = "1";
+        return values;
+    }
+
+    private static Dictionary<string, string> RouteValuesForPrice(Marketplace.Web.Models.CatalogueFilterViewModel filter, decimal? min, decimal? max)
+    {
+        var values = BaseRouteValues(filter);
+        values.Remove("MinPrice");
+        values.Remove("MaxPrice");
+        if (min.HasValue) values["MinPrice"] = min.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        if (max.HasValue) values["MaxPrice"] = max.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        values["Page"] = "1";
+        return values;
+    }
+
+    private static Dictionary<string, string> RouteValuesForRating(Marketplace.Web.Models.CatalogueFilterViewModel filter, int? minRating)
+    {
+        var values = BaseRouteValues(filter);
+        values.Remove("MinRating");
+        if (minRating.HasValue) values["MinRating"] = minRating.Value.ToString();
+        values["Page"] = "1";
+        return values;
+    }
+
+    private static Dictionary<string, string> RouteValuesForStock(Marketplace.Web.Models.CatalogueFilterViewModel filter, bool inStockOnly)
+    {
+        var values = BaseRouteValues(filter);
+        values.Remove("InStockOnly");
+        if (inStockOnly) values["InStockOnly"] = "true";
+        values["Page"] = "1";
+        return values;
+    }
+
+    private string SortLabel(CatalogueSortOption sort) => sort switch
+    {
+        CatalogueSortOption.PriceAsc => Localizer["Дешевші спочатку"].Value,
+        CatalogueSortOption.PriceDesc => Localizer["Дорожчі спочатку"].Value,
+        CatalogueSortOption.Rating => Localizer["За рейтингом"].Value,
+        CatalogueSortOption.Popularity => Localizer["За популярністю"].Value,
+        _ => Localizer["Спочатку нові"].Value
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/saved-searches.css" asp-append-version="true" />
+}
+
+<div class="shop-page">
+    <section class="catalog-banner" style="@(!string.IsNullOrWhiteSpace(Model.SelectedCategoryImageUrl) ? $"background-image:url('{Model.SelectedCategoryImageUrl}')" : null)">
+        <div class="catalog-banner__inner">
+            <span class="shop-kicker">MarketPlace</span>
+            <h1>@bannerTitle</h1>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-light btn-sm">@Localizer["Перейти до кошика"]</a>
+            }
+        </div>
+    </section>
+
+    @if (Model.CategoryTiles.Count > 0)
+    {
+        <nav class="catalog-tiles" aria-label="@SharedLocalizer["Категорії"]">
+            @foreach (var tile in Model.CategoryTiles)
+            {
+                var hasTileImage = !string.IsNullOrWhiteSpace(tile.ImageUrl);
+                var isActiveTile = filter.CategoryId == tile.Id;
+                <a asp-action="Index" asp-route-categoryId="@(isActiveTile ? null : tile.Id)"
+                   class="catalog-tile @(isActiveTile ? "is-active" : null) @(hasTileImage ? null : "catalog-tile--plain")"
+                   style="@(hasTileImage ? $"background-image:url('{tile.ImageUrl}')" : null)"
+                   aria-current="@(isActiveTile ? "true" : null)">
+                    <strong>@SharedLocalizer[tile.Name]</strong>
+                    <small>@tile.ProductCount</small>
+                </a>
+            }
+        </nav>
+    }
+
+    @if (TempData["Success"] is string success)
+    {
+        <div class="alert alert-success" role="alert">@success</div>
+    }
+    @if (TempData["Error"] is string error)
+    {
+        <div class="alert alert-warning" role="alert">@error</div>
+    }
+
+    <div class="catalog-toolbar">
+        <form asp-action="Index" method="get" class="catalog-toolbar__form" role="search" aria-label="@Localizer["Пошук у каталозі"]" data-search-wrapper>
+            <div class="catalog-toolbar__search">
+                <span aria-hidden="true">⌕</span>
+                <input id="filter-search" name="Search" value="@filter.Search" class="form-control" placeholder="@Localizer["Назва, опис або категорія"]" data-search-autocomplete autocomplete="off" />
+            </div>
+
+            <select name="Sort" class="form-select catalog-toolbar__sort" aria-label="@Localizer["Сортування"]">
+                @foreach (var option in Enum.GetValues<CatalogueSortOption>())
+                {
+                    <option value="@option" selected="@(filter.Sort == option)">@SortLabel(option)</option>
+                }
+            </select>
+
+            <input type="hidden" name="CategoryId" value="@filter.CategoryId" />
+            <input type="hidden" name="MinPrice" value="@filter.MinPrice" />
+            <input type="hidden" name="MaxPrice" value="@filter.MaxPrice" />
+            <input type="hidden" name="MinRating" value="@filter.MinRating" />
+            <input type="hidden" name="InStockOnly" value="@(filter.InStockOnly ? "true" : "")" />
+
+            <button type="submit" class="btn btn-primary">@Localizer["Застосувати"]</button>
+        </form>
+
+        <div class="catalog-toolbar__actions">
+            @if (!isAdultConfirmed)
+            {
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="showAgeModal(null)">
+                    🔞 @Localizer["Увімкнути контент 18+"]
+                </button>
+            }
+            else
+            {
+                <span class="badge bg-danger p-2">🔞 @Localizer["Контент 18+ увімкнено"]</span>
+            }
+            @if (filter.HasActiveFilters)
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">@Localizer["Скинути фільтри"]</a>
+                <button type="button" class="btn btn-outline-primary btn-sm" data-save-search>☆ @Localizer["Зберегти пошук"]</button>
+            }
+        </div>
+    </div>
+
+    <section class="saved-searches" data-saved-searches hidden>
+        <div class="saved-searches__heading">
+            <span class="saved-searches__kicker">@Localizer["Збережені запити"]</span>
+            <p>@Localizer["Швидко повертайтесь до пошуків, що вас цікавлять - нові товари з часу останнього перегляду позначені міткою «Нове»."]</p>
+        </div>
+        <div class="saved-searches__list" data-saved-searches-list></div>
+    </section>
+
+    <div class="catalog-layout">
+        <aside class="catalog-sidebar" aria-label="@Localizer["Фільтри каталогу"]">
+            <div class="catalog-sidebar__group">
+                <h3>@Localizer["Категорії"]</h3>
+                <ul class="catalog-sidebar__list">
+                    <li>
+                        <a data-category-link data-category-id=""
+                           class="@(!filter.CategoryId.HasValue ? "is-active" : null)"
+                           asp-action="Index" asp-all-route-data="RouteValuesForCategory(filter, null)">
+                            @Localizer["Усі товари"]
+                        </a>
+                    </li>
+                    @foreach (var category in Model.Categories)
+                    {
+                        <li>
+                            <a data-category-link data-category-id="@category.Value"
+                               class="@(filter.CategoryId?.ToString() == category.Value ? "is-active" : null)"
+                               asp-action="Index" asp-all-route-data="RouteValuesForCategory(filter, Guid.Parse(category.Value))">
+                                @SharedLocalizer[category.Text]
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            <div class="catalog-sidebar__group">
+                <h3>@Localizer["Ціна"]</h3>
+                <ul class="catalog-sidebar__list">
+                    @{
+                        var priceBands = new (string Label, decimal? Min, decimal? Max)[]
+                        {
+                            (Localizer["Усі"].Value, null, null),
+                            ("До 500 ₴", null, 500m),
+                            ("500 - 1500 ₴", 500m, 1500m),
+                            ("1500 - 5000 ₴", 1500m, 5000m),
+                            ("Понад 5000 ₴", 5000m, null),
+                        };
+                    }
+                    @foreach (var band in priceBands)
+                    {
+                        var isActive = filter.MinPrice == band.Min && filter.MaxPrice == band.Max;
+                        <li>
+                            <a class="@(isActive ? "is-active" : null)" asp-action="Index" asp-all-route-data="RouteValuesForPrice(filter, band.Min, band.Max)">
+                                @band.Label
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            <div class="catalog-sidebar__group">
+                <h3>@Localizer["Рейтинг"]</h3>
+                <ul class="catalog-sidebar__list">
+                    <li>
+                        <a class="@(!filter.MinRating.HasValue ? "is-active" : null)" asp-action="Index" asp-all-route-data="RouteValuesForRating(filter, null)">
+                            @Localizer["Будь-який"]
+                        </a>
+                    </li>
+                    @for (var stars = 4; stars >= 1; stars--)
+                    {
+                        <li>
+                            <a class="@(filter.MinRating == stars ? "is-active" : null)" asp-action="Index" asp-all-route-data="RouteValuesForRating(filter, stars)">
+                                @Localizer["{0}★ і вище", stars]
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            <div class="catalog-sidebar__group">
+                <h3>@Localizer["Наявність"]</h3>
+                <a class="catalog-sidebar__toggle @(filter.InStockOnly ? "is-active" : null)"
+                   asp-action="Index" asp-all-route-data="RouteValuesForStock(filter, !filter.InStockOnly)">
+                    <span aria-hidden="true">@(filter.InStockOnly ? "☑" : "☐")</span> @Localizer["Тільки в наявності"]
+                </a>
+            </div>
+        </aside>
+
+        <div class="catalog-main">
+            <div class="catalog-meta">@Localizer["Знайдено товарів:"] <strong>@Model.TotalCount</strong></div>
+
+            @if (Model.Products.Count == 0)
+            {
+                <section class="shop-empty">
+                    <div class="shop-empty__icon" aria-hidden="true">⌕</div>
+                    <h2>@Localizer["Товарів не знайдено"]</h2>
+                    <p>@Localizer["Спробуйте змінити фільтри або переглянути весь каталог."]</p>
+                    <a asp-action="Index" class="btn btn-primary">@Localizer["Увесь каталог"]</a>
+                </section>
+            }
+            else
+            {
+                <div class="catalog-grid">
+                    @foreach (var product in Model.Products)
+                    {
+                        var (productName, productDescription) = await ProductTranslator.GetLocalizedAsync(
+                            product.Id, product.Name, product.Description, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
+                        <article class="catalog-card position-relative" data-product-id="@product.Id">
+                            <span class="catalog-card__new-badge" data-new-badge hidden>@Localizer["Нове"]</span>
+
+                            @if (product.IsAgeRestricted)
+                            {
+                                <span class="position-absolute top-0 end-0 bg-danger text-white text-xs fw-bold px-2 py-1 rounded-pill z-1 m-2 shadow">
+                                    18+
+                                </span>
+                            }
+
+                            <button type="button"
+                                    class="catalog-card__media border-0 p-0 text-start bg-transparent w-100 position-relative"
+                                    aria-label="@Localizer["Переглянути {0}", productName]"
+                                    onclick="checkAgeAndNavigate('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
+                                @if (!string.IsNullOrWhiteSpace(product.MainImageUrl))
+                                {
+                                    <img src="@product.MainImageUrl" alt="@productName" />
+                                }
+                                else
+                                {
+                                    <span aria-hidden="true">@productName[..1].ToUpperInvariant()</span>
+                                }
+                            </button>
+
+                            <div class="catalog-card__body">
+                                <div class="catalog-card__category">@SharedLocalizer[product.CategoryName]</div>
+                                @if (product.ReviewCount > 0)
+                                {
+                                    var filledStars = (int)Math.Round(product.AverageRating);
+                                    <div class="catalog-card__rating" aria-label="@Localizer["Рейтинг {0} з 5, {1} відгуків", product.AverageRating, product.ReviewCount]">
+                                        @(new string('★', filledStars))@(new string('☆', 5 - filledStars))
+                                        <span>&nbsp;@product.AverageRating.ToString("0.0") (@product.ReviewCount)</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="catalog-card__rating" data-empty>@Localizer["Ще немає відгуків"]</div>
+                                }
+
+                                <button type="button"
+                                        class="catalog-card__title border-0 p-0 text-start bg-transparent text-primary fw-semibold w-100"
+                                        onclick="checkAgeAndNavigate('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
+                                    @productName
+                                </button>
+
+                                <p class="catalog-card__description">@productDescription</p>
+                                <div class="catalog-card__footer">
+                                    <div class="shop-price-container d-flex align-items-center gap-2">
+                                        @if (product.OriginalPrice.HasValue && product.OriginalPrice.Value > product.Price)
+                                        {
+                                            <span class="shop-price text-danger fw-bold">@product.Price.ToString("N2") ₴</span>
+                                            <span class="text-muted text-decoration-line-through small">@product.OriginalPrice.Value.ToString("N2") ₴</span>
+                                            @if (product.DiscountPercent.HasValue)
+                                            {
+                                                <span class="badge bg-danger small">-@product.DiscountPercent%</span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="shop-price">@product.Price.ToString("N2") ₴</span>
+                                        }
+                                    </div>
+                                    <form asp-controller="Cart" asp-action="Add" method="post">
+                                        <input type="hidden" name="productId" value="@product.Id" />
+                                        <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                                        <button type="submit" class="btn btn-sm btn-primary">@Localizer["До кошика"]</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </article>
+                    }
+                </div>
+
+                @if (Model.TotalPages > 1)
+                {
+                    var windowStart = Math.Max(1, Model.Page - 2);
+                    var windowEnd = Math.Min(Model.TotalPages, Model.Page + 2);
+
+                    <nav class="catalog-pagination" aria-label="@Localizer["Сторінки каталогу"]">
+                        @if (Model.Page > 1)
+                        {
+                            <a asp-action="Index" asp-all-route-data="RouteValuesForPage(filter, Model.Page - 1)" aria-label="@Localizer["Попередня сторінка"]">‹</a>
+                        }
+                        else
+                        {
+                            <span class="is-disabled">‹</span>
+                        }
+
+                        @if (windowStart > 1)
+                        {
+                            <a asp-action="Index" asp-all-route-data="RouteValuesForPage(filter, 1)">1</a>
+                            if (windowStart > 2)
+                            {
+                                <span class="catalog-pagination__ellipsis">…</span>
+                            }
+                        }
+
+                        @for (var pageNumber = windowStart; pageNumber <= windowEnd; pageNumber++)
+                        {
+                            if (pageNumber == Model.Page)
+                            {
+                                <span class="is-current">@pageNumber</span>
+                            }
+                            else
+                            {
+                                <a asp-action="Index" asp-all-route-data="RouteValuesForPage(filter, pageNumber)">@pageNumber</a>
+                            }
+                        }
+
+                        @if (windowEnd < Model.TotalPages)
+                        {
+                            if (windowEnd < Model.TotalPages - 1)
+                            {
+                                <span class="catalog-pagination__ellipsis">…</span>
+                            }
+                            <a asp-action="Index" asp-all-route-data="RouteValuesForPage(filter, Model.TotalPages)">@Model.TotalPages</a>
+                        }
+
+                        @if (Model.Page < Model.TotalPages)
+                        {
+                            <a asp-action="Index" asp-all-route-data="RouteValuesForPage(filter, Model.Page + 1)" aria-label="@Localizer["Наступна сторінка"]">›</a>
+                        }
+                        else
+                        {
+                            <span class="is-disabled">›</span>
+                        }
+                    </nav>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<!-- МОДАЛЬНЕ ВІКНО 18+ З ФОРМОЮ POST ДЛЯ COOKIE -->
+<div id="ageVerificationModal" class="d-none position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-75 d-flex align-items-center justify-content-center p-3" style="backdrop-filter: blur(4px); z-index: 9999;">
+    <div class="bg-white rounded-4 shadow-lg p-4 text-center" style="max-width: 400px; width: 100%;">
+        <div class="mx-auto d-flex align-items-center justify-content-center rounded-circle bg-danger bg-opacity-10 text-danger fs-3 fw-bold mb-3" style="width: 64px; height: 64px;">
+            18+
+        </div>
+        <h3 class="fs-4 fw-bold text-dark mb-2">@Localizer["Підтвердження віку"]</h3>
+        <p class="text-secondary small mb-4">
+            @Localizer["Цей товар має вікове обмеження. Вам вже виповнилося 18 років?"]
+        </p>
+        <div class="d-flex gap-2 justify-content-center">
+            <button type="button" onclick="closeAgeModal()" class="btn btn-light w-100 fw-medium">@Localizer["Ні, мені менше 18"]</button>
+
+            <form asp-action="ConfirmAge" asp-controller="Catalogue" method="post" class="w-100">
+                <input type="hidden" id="modalProductId" name="productId" value="" />
+                <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                <button type="submit" class="btn btn-danger w-100 fw-medium">@Localizer["Так, мені є 18"]</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/saved-searches.js" asp-append-version="true"></script>
+    <script>
+        const isAdultConfirmedServer = @(isAdultConfirmed.ToString().ToLower());
+        const ageModal = document.getElementById('ageVerificationModal');
+        const modalProductIdInput = document.getElementById('modalProductId');
+
+        function checkAgeAndNavigate(productId, isRestricted) {
+            if (isRestricted && !isAdultConfirmedServer) {
+                showAgeModal(productId);
+            } else {
+                window.location.href = `/Catalogue/Details/${productId}`;
+            }
+        }
+
+        function showAgeModal(productId) {
+            if (productId) {
+                modalProductIdInput.value = productId;
+            } else {
+                modalProductIdInput.value = '';
+            }
+            ageModal.classList.remove('d-none');
+        }
+
+        function closeAgeModal() {
+            ageModal.classList.add('d-none');
+        }
+    </script>
+}

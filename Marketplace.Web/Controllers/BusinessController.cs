@@ -93,7 +93,7 @@ namespace Marketplace.Web.Controllers
             foreach (var business in businesses)
             {
                 var products = await _productService.GetByBusinessAsync(business.Id);
-                var orderSummary = await _orderService.GetBusinessOrderSummary(business.Id);
+                var orderSummary = await _orderService.GetBusinessOrderSummaryAsync(business.Id);
 
                 var currentRole = await _businessAccessService.GetUserRoleAsync(business.Id, userId)
                     ?? BusinessMemberRole.Owner;
@@ -122,7 +122,7 @@ namespace Marketplace.Web.Controllers
             return View(new BusinessDashboardViewModel
             {
                 Businesses = businessCards,
-                CanCreateBusiness = businesses.All(business => business.OwnerId != userId)
+                CanCreateBusiness = true
             });
         }
 
@@ -146,7 +146,7 @@ namespace Marketplace.Web.Controllers
             var productsStatsResult = await _businessService.GetProductsStatsByPeriodAsnyc(businessId, start, end);
             var customersStatsResult = await _businessService.GetCustomersStatsByPeriodAsync(businessId, start, end);
             var balance = await _businessService.GetBusinessBalance(businessId);
-            var allTimeSummary = await _orderService.GetBusinessOrderSummary(businessId);
+            var allTimeSummary = await _orderService.GetBusinessOrderSummaryAsync(businessId);
             var products = await _productService.GetByBusinessAsync(businessId);
             var lowStockThreshold = await _settingsService.GetIntAsync("BusinessRules", "LowStockThreshold", 5);
             var traffic = await _productAnalyticsService.GetBusinessTrafficStatsAsync(businessId, start, end);
@@ -157,13 +157,13 @@ namespace Marketplace.Web.Controllers
                 .Select(g => new { Average = g.Average(r => r.Rating), Count = g.Count() })
                 .FirstOrDefaultAsync();
 
-            var periodRevenue = statsResult.Succeeded ? statsResult.Data.TotalRevenue : 0;
-            var periodOrders = statsResult.Succeeded ? statsResult.Data.Stats.Sum(s => s.OrderCount) : 0;
-            var periodAov = statsResult.Succeeded ? (double)statsResult.Data.AOV : 0;
+            var periodRevenue = statsResult.Succeeded ? statsResult.Data!.TotalRevenue : 0;
+            var periodOrders = statsResult.Succeeded ? statsResult.Data!.Stats.Sum(s => s.OrderCount) : 0;
+            var periodAov = statsResult.Succeeded ? (double)statsResult.Data!.AOV : 0;
 
-            var previousRevenue = previousStatsResult.Succeeded ? previousStatsResult.Data.TotalRevenue : 0;
-            var previousOrders = previousStatsResult.Succeeded ? previousStatsResult.Data.Stats.Sum(s => s.OrderCount) : 0;
-            var previousAov = previousStatsResult.Succeeded ? (double)previousStatsResult.Data.AOV : 0;
+            var previousRevenue = previousStatsResult.Succeeded ? previousStatsResult.Data!.TotalRevenue : 0;
+            var previousOrders = previousStatsResult.Succeeded ? previousStatsResult.Data!.Stats.Sum(s => s.OrderCount) : 0;
+            var previousAov = previousStatsResult.Succeeded ? (double)previousStatsResult.Data!.AOV : 0;
 
             static double? PercentDelta(double current, double previous)
             {
@@ -184,7 +184,7 @@ namespace Marketplace.Web.Controllers
                 Filter = new BusinessDashboardFilterViewModel { BusinessId = businessId, StartDate = start, EndDate = end },
 
                 Chart = statsResult.Succeeded
-                    ? statsResult.Data.Stats
+                    ? statsResult.Data!.Stats
                         .OrderBy(s => s.Date)
                         .Select(s => new BusinessDashboardChartPointViewModel { Date = s.Date, Revenue = s.Revenue, OrderCount = s.OrderCount })
                         .ToList()
@@ -220,7 +220,7 @@ namespace Marketplace.Web.Controllers
                 TotalWishlistAdds = traffic.TotalWishlistAdds,
 
                 TopProducts = productsStatsResult.Succeeded
-                    ? productsStatsResult.Data.Stats
+                    ? productsStatsResult.Data!.Stats
                         .OrderByDescending(s => s.Revenue)
                         .Take(5)
                         .Select(s => new BusinessDashboardTopProductViewModel
@@ -235,7 +235,7 @@ namespace Marketplace.Web.Controllers
                     : new List<BusinessDashboardTopProductViewModel>(),
 
                 TopCustomers = customersStatsResult.Succeeded
-                    ? customersStatsResult.Data.Stats
+                    ? customersStatsResult.Data!.Stats
                         .OrderByDescending(s => s.Revenue)
                         .Take(5)
                         .Select(s => new BusinessDashboardTopCustomerViewModel
@@ -248,7 +248,7 @@ namespace Marketplace.Web.Controllers
                     : new List<BusinessDashboardTopCustomerViewModel>(),
 
                 CategoryStats = productsStatsResult.Succeeded
-                    ? productsStatsResult.Data.Stats
+                    ? productsStatsResult.Data!.Stats
                         .GroupBy(s => products.FirstOrDefault(p => p.Id == s.ProductId)?.Category?.Name ?? "Без категорії")
                         .Select(g => new BusinessDashboardCategoryStatViewModel
                         {
@@ -285,7 +285,7 @@ namespace Marketplace.Web.Controllers
 
             var userId = _userManager.GetUserId(User);
 
-            var result = await _businessService.CreateBusiness(new BusinessCreateDto
+            var result = await _businessService.CreateBusinessAsync(new BusinessCreateDto
             {
                 StoreName = model.StoreName,
                 Description = model.Description,
@@ -702,7 +702,7 @@ namespace Marketplace.Web.Controllers
                 return View(model);
             }
 
-            var result = await _businessService.AddBusinessMember(new BusinessMemberCreateDto
+            var result = await _businessService.AddBusinessMemberAsync(new BusinessMemberCreateDto
             {
                 BusinessId = model.BusinessId,
                 UserId = model.EmployeeId,
@@ -731,7 +731,7 @@ namespace Marketplace.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> ApproveMembership(Guid businessId, string userId, string token, BusinessMemberRole role)
         {
-            var result = await _businessService.ApproveMembership(userId, businessId, token, role);
+            var result = await _businessService.ApproveMembershipAsync(userId, businessId, token, role);
             return RedirectToAction("MembershipResult", new { message = result.Message });
         }
 
@@ -739,7 +739,7 @@ namespace Marketplace.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> DenyMembership(Guid businessId, string userId, string token, BusinessMemberRole role)
         {
-            var result = await _businessService.DenyMembership(userId, businessId, token, role);
+            var result = await _businessService.DenyMembershipAsync(userId, businessId, token, role);
             return RedirectToAction("MembershipResult", new { message = result.Message });
         }
 
@@ -750,7 +750,6 @@ namespace Marketplace.Web.Controllers
             ViewBag.Message = message;
             return View();
         }
-
         [HttpGet]
         public async Task<IActionResult> Finance(Guid businessId)
         {
@@ -760,7 +759,7 @@ namespace Marketplace.Web.Controllers
                 return Forbid();
             }
 
-            var summary = await _orderService.GetBusinessOrderSummary(businessId);
+            var summary = await _orderService.GetBusinessOrderSummaryAsync(businessId);
             var orders = await _orderService.GetBusinessOrders(businessId);
 
             var trendEnd = DateTime.UtcNow.Date;
@@ -771,6 +770,10 @@ namespace Marketplace.Web.Controllers
             var pendingWithdrawalsTotal = withdrawals
                 .Where(w => w.Status == WithdrawalStatus.Pending.ToString())
                 .Sum(w => w.Amount);
+
+            var savedCards = await _withdrawalService.GetSavedCardsAsync(businessId);
+
+            var heldBalance = business.HeldBalance;
 
             return View(new BusinessFinanceViewModel
             {
@@ -794,17 +797,22 @@ namespace Marketplace.Web.Controllers
                         LineTotal = order.LineTotal
                     }).ToList(),
                 RevenueTrend = trendResult.Succeeded
-                    ? trendResult.Data.Stats
+                    ? trendResult.Data!.Stats
                         .OrderBy(s => s.Date)
                         .Select(s => new BusinessDashboardChartPointViewModel { Date = s.Date, Revenue = s.Revenue, OrderCount = s.OrderCount })
                         .ToList()
                     : new List<BusinessDashboardChartPointViewModel>(),
-                AvailableBalance = business.Balance,
+                AvailableBalance = business.Balance - business.HeldBalance,
                 PendingWithdrawalsTotal = pendingWithdrawalsTotal,
-                Withdrawals = withdrawals.ToList()
+                Withdrawals = withdrawals.ToList(),
+                HeldBalance = heldBalance,
+                SavedCards = savedCards,
+                ScheduledPayoutEnabled = business.ScheduledPayoutEnabled,
+                ScheduledPayoutDayOfMonth = business.ScheduledPayoutDayOfMonth,
+                ScheduledPayoutAmount = business.ScheduledPayoutAmount,
+                ScheduledPayoutCardId = business.ScheduledPayoutCardId
             });
         }
-
         [HttpGet]
         public async Task<IActionResult> Performance(Guid businessId)
         {
@@ -859,13 +867,13 @@ namespace Marketplace.Web.Controllers
             }
 
             var promoCodes = await _promoCodeService.GetForBusinessAsync(businessId);
-            var businessDiscount = await _discountService.GetBusinessDiscount(businessId);
-            var categoryDiscounts = await _discountService.GetActiveCategoryDiscountsForBusiness(businessId);
+            var businessDiscount = await _discountService.GetBusinessDiscountAsync(businessId);
+            var categoryDiscounts = await _discountService.GetActiveCategoryDiscountsForBusinessAsync(businessId);
             var categories = await _categoryService.GetAllCategories();
             var personalDiscounts = await _userDiscountService.GetActiveDiscountsForBusinessAsync(businessId);
             var customersResult = await _businessService.GetCustomersStatsByPeriodAsync(businessId, business.CreatedAt, DateTime.UtcNow);
             var customers = customersResult.Succeeded
-                ? customersResult.Data.Stats
+                ? customersResult.Data!.Stats
                     .Where(c => personalDiscounts.All(d => d.UserId != c.UserId))
                     .OrderBy(c => c.UserName)
                     .ToList()

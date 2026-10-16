@@ -1,5 +1,30 @@
 /* ---------- Step indicator ---------- */
 
+.checkout-form .validation-summary-valid {
+    display: none;
+}
+
+.checkout-phone {
+    display: flex;
+    align-items: stretch;
+}
+
+.checkout-phone__prefix {
+    display: flex;
+    align-items: center;
+    padding: 0 0.75rem;
+    border: 1px solid var(--shop-line);
+    border-right: 0;
+    border-radius: 12px 0 0 12px;
+    background: var(--bs-tertiary-bg, #f8f9fa);
+    font-weight: 600;
+}
+
+.checkout-phone .form-control {
+    min-width: 0;
+    border-radius: 0 12px 12px 0;
+}
+
 .checkout-stepper {
     display: flex;
     margin-bottom: 1.5rem;
@@ -302,4 +327,8 @@
 
 .checkout-review-seller:first-of-type {
     margin-top: 0;
+}
+
+.checkout-saved-address {
+    margin-bottom: 1rem;
 }

@@ -274,4 +274,13 @@
   <data name="Доступ обмежено для осіб молодше 18 років." xml:space="preserve">
     <value>Access is restricted for individuals under 18 years of age.</value>
   </data>
+  <data name="Палітра" xml:space="preserve">
+    <value>Grid</value>
+  </data>
+  <data name="Карусель" xml:space="preserve">
+    <value>Carousel</value>
+  </data>
+  <data name="Вигляд товарів" xml:space="preserve">
+    <value>View</value>
+  </data>
 </root>

@@ -60,7 +60,6 @@ namespace Marketplace.Web.Controllers
             }
             else
             {
-                // Канал покупця — доступ лише адміну або самому покупцю.
                 if (!isAdmin && request.BuyerId != userId)
                 {
                     return Forbid();
@@ -76,7 +75,29 @@ namespace Marketplace.Web.Controllers
             ViewBag.IsSellerChannel = isSellerChannel;
             ViewBag.ItemName = request.OrderItem?.ProductName ?? "Товар";
             ViewBag.OrderNumber = request.OrderId.ToString()[..8].ToUpperInvariant();
+            var backBusinessId = request.OrderItem?.Product?.BusinessId;
+            string backUrl;
+            string backLabel;
 
+            if (isAdmin)
+            {
+                backUrl = Url.Action("Jobs", "Admin")!;
+                backLabel = "← До задач";
+            }
+            else if (isSellerChannel && backBusinessId.HasValue)
+            {
+                backUrl = Url.Action("OrderDetails", "Business",
+                    new { businessId = backBusinessId.Value, orderId = request.OrderId })!;
+                backLabel = "← До замовлення";
+            }
+            else
+            {
+                backUrl = Url.Action("Index", "Order")!;
+                backLabel = "← До моїх замовлень";
+            }
+
+            ViewBag.BackUrl = backUrl;
+            ViewBag.BackLabel = backLabel;
             return View(messages);
         }
 

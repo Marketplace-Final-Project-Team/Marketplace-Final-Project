@@ -3,6 +3,7 @@ using CloudinaryDotNet;
 using Marketplace.BLL.Common;
 using Marketplace.BLL.Configs;
 using Marketplace.BLL.Interfaces;
+using Marketplace.BLL.Jobs;
 using Marketplace.BLL.Services;
 using Marketplace.DAL.Data;
 using Marketplace.DAL.Interfaces;
@@ -59,7 +60,33 @@ builder.Services.AddQuartz(q =>
         .WithIdentity("pending-order-expiry-trigger", "cleanup")
         .StartNow()
         .WithSimpleSchedule(x => x.WithIntervalInHours(1).RepeatForever()));
+
+    var scheduledPayoutJobKey = new JobKey("scheduled-payout-job", "cleanup");
+    q.AddJob<ScheduledPayoutJob>(opts => opts.WithIdentity(scheduledPayoutJobKey));
+    q.AddTrigger(opts => opts
+        .ForJob(scheduledPayoutJobKey)
+        .WithIdentity("scheduled-payout-trigger", "cleanup")
+        .StartNow()
+        .WithSimpleSchedule(x => x.WithIntervalInHours(24).RepeatForever()));
+
+    var releaseHeldBalanceJobKey = new JobKey("release-held-balance-job", "cleanup");
+    q.AddJob<ReleaseHeldBalanceJob>(opts => opts.WithIdentity(releaseHeldBalanceJobKey));
+    q.AddTrigger(opts => opts
+        .ForJob(releaseHeldBalanceJobKey)
+        .WithIdentity("release-held-balance-trigger", "cleanup")
+        .StartNow()
+        .WithSimpleSchedule(x => x.WithIntervalInHours(24).RepeatForever()));
+
+    var cleanupJobKey = new JobKey("cleanup-old-ai-chat-messages-job", "cleanup");
+
+    q.AddJob<CleanupOldAIChatMessagesJob>(opts => opts.WithIdentity(cleanupJobKey));
+
+    q.AddTrigger(opts => opts
+        .ForJob(cleanupJobKey)
+        .WithIdentity("cleanup-old-ai-chat-messages-trigger", "cleanup")
+        .WithCronSchedule("0 0 3 * * ?"));
 });
+
 
 builder.Services.AddQuartzHostedService(opt =>
 {
@@ -119,6 +146,7 @@ builder.Services.AddScoped<IWishlistCollectionService, WishlistCollectionService
 builder.Services.AddScoped<IPostSaleService, PostSaleService>();
 builder.Services.AddScoped<IPromoCodeService, PromoCodeService>();
 builder.Services.AddScoped<IProductAnalyticsService, ProductAnalyticsService>();
+builder.Services.AddScoped<IAddressService, AddressService>();
 
 builder.Services.AddMemoryCache();
 builder.Services.AddDataProtection();
@@ -135,6 +163,13 @@ builder.Services.AddScoped<ISupportTicketService, SupportTicketService>();
 builder.Services.AddScoped<IWithdrawalService, WithdrawalService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddSignalR();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<Marketplace.BLL.Interfaces.INotificationPusher, Marketplace.Web.Infrastructure.SignalRNotificationPusher>();
+
+builder.Services.AddScoped<IGeminiChatApiClient, GeminiChatApiClient>();
+builder.Services.AddScoped<ChatToolDispatcher>();
+builder.Services.AddScoped<IChatToolsService, ChatToolsService>();
+builder.Services.AddScoped<IGeminiChatService, GeminiChatService>();
 
 // LiqPay configuration
 builder.Services.Configure<LiqPayOptions>(builder.Configuration.GetSection("LiqPay"));
@@ -147,6 +182,10 @@ builder.Services.AddScoped<IDeliveryProviderService, DeliveryProviderService>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+{
+    options.ValidationInterval = TimeSpan.Zero;
+});
 
 var app = builder.Build();
 
@@ -178,8 +217,8 @@ var localizationOptions = new RequestLocalizationOptions
     SupportedCultures = supportedCultures,
     SupportedUICultures = supportedCultures
 };
-// Cookie (the language switcher) takes priority over the browser's own Accept-Language
-// header, so a visitor's explicit choice always wins over auto-detection.
+
+// Language switcher
 localizationOptions.RequestCultureProviders = new List<IRequestCultureProvider>
 {
     new CookieRequestCultureProvider { CookieName = CookieRequestCultureProvider.DefaultCookieName },
@@ -203,6 +242,7 @@ app.MapStaticAssets();
 app.MapControllers();
 app.MapHub<Marketplace.Web.Hubs.RefundChatHub>("/refundChatHub");
 app.MapHub<Marketplace.Web.Hubs.SupportTicketChatHub>("/supportTicketChatHub");
+app.MapHub<Marketplace.Web.Hubs.NotificationHub>("/notificationHub");
 app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}")

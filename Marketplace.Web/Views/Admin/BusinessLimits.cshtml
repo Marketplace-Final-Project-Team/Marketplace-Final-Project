@@ -30,10 +30,12 @@
                 <div class="admin-alert admin-alert--error"><span>!</span><p>@error</p></div>
             }
 
+            @*
             <div class="admin-note">
                 <strong>@Localizer["Значення зберігаються реально"]</strong>
                 @Localizer["Ліміти зберігаються в таблиці"] <code>SystemSettings</code> @Localizer["і застосовуються одразу: обмежують знижки на товар і за промокодом, кількість товарів та активних промокодів на бізнес, а також автоматично скасовують прострочені замовлення «Очікує»."]
             </div>
+            *@
 
             <div class="admin-panel">
                 <form asp-action="BusinessLimits" method="post" class="admin-limits-form">

@@ -10,11 +10,15 @@ public class OrderListItemViewModel
     public decimal TotalAmount { get; set; }
     public int ItemsCount { get; set; }
     public string ShippingAddress { get; set; } = string.Empty;
+    public string? DeliveryCarrierLabel { get; set; }
     public string? DeliveryMethodLabel { get; set; }
 }
 
 public class OrderDetailsViewModel
 {
+    public string RecipientLastName { get; set; } = string.Empty;
+    public string RecipientFirstName { get; set; } = string.Empty;
+    public string RecipientPhone { get; set; } = string.Empty;
     public Guid Id { get; set; }
     public DateTime CreatedAt { get; set; }
     public OrderStatus Status { get; set; }
@@ -22,6 +26,7 @@ public class OrderDetailsViewModel
     public string ShippingCountry { get; set; } = string.Empty;
     public string ShippingCity { get; set; } = string.Empty;
     public string ShippingStreet { get; set; } = string.Empty;
+    public string? DeliveryCarrierLabel { get; set; }
     public string? DeliveryMethodLabel { get; set; }
     public string? PaymentMethodLabel { get; set; }
     public List<OrderLineViewModel> Items { get; set; } = new();

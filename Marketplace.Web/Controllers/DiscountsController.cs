@@ -48,7 +48,6 @@ namespace Marketplace.Web.Controllers
 
             var hasAccess = await _businessAccessService.HasAccessAsync(product.BusinessId, CurrentUserId, BusinessPermissions.ProductCrud);
             if (!hasAccess) return Forbid();
-
             try
             {
                 await _discountService.SetDiscountAsync(productId, percent, startDate.UtcDateTime, endDate.UtcDateTime);
@@ -149,7 +148,7 @@ namespace Marketplace.Web.Controllers
             if (business == null) return NotFound();
             var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.Statistics);
             if (!hasAccess) return Forbid();
-            var discount = await _discountService.GetBusinessDiscount(businessId);
+            var discount = await _discountService.GetBusinessDiscountAsync(businessId);
             return Json(discount);
         }
 
@@ -163,8 +162,8 @@ namespace Marketplace.Web.Controllers
             Console.WriteLine($"CategoryId: {categoryId}");
             
             var category = await _categoryService.GetByIdAsync(categoryId);
-            Console.WriteLine($"CategoryId: {categoryId}");
-            Console.WriteLine($"Category: {category?.Id} - {category?.Name}");
+            //Console.WriteLine($"CategoryId: {categoryId}");
+            //Console.WriteLine($"Category: {category?.Id} - {category?.Name}");
             if (category == null) return NotFound();
 
             var hasAccess = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.ProductCrud);

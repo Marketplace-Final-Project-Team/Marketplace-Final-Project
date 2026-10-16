@@ -39,8 +39,6 @@ namespace Marketplace.Web.Models.Products
         [StringLength(100)]
         public string? Sku { get; set; }
 
-        public List<ProductVariantInputModel> Variants { get; set; } = new();
-
         [Required(ErrorMessage = "Оберіть категорію")]
         public Guid CategoryId { get; set; }
 
@@ -56,21 +54,6 @@ namespace Marketplace.Web.Models.Products
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            var activeVariants = Variants.Where(v => !string.IsNullOrWhiteSpace(v.Size)).ToList();
-
-            if (activeVariants.Count == 0 && Quantity <= 0)
-            {
-                yield return new ValidationResult("Вкажіть кількість товару або додайте хоча б один розмір.", new[] { nameof(Quantity) });
-            }
-
-            var duplicateSize = activeVariants
-                .GroupBy(v => v.Size.Trim(), StringComparer.OrdinalIgnoreCase)
-                .FirstOrDefault(g => g.Count() > 1);
-            if (duplicateSize is not null)
-            {
-                yield return new ValidationResult($"Розмір «{duplicateSize.Key}» вказано декілька разів.", new[] { nameof(Variants) });
-            }
-
             if (MainImage is not null)
             {
                 var mainImageError = ValidateImage(MainImage);

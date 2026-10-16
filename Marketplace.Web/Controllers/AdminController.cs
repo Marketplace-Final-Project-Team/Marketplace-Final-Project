@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using Marketplace.BLL.Interfaces;
-using Marketplace.BLL.Services;
 using Marketplace.Domain.Enums;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +8,7 @@ using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Common;
 using Quartz;
 using Quartz.Impl.Matchers;
+using Marketplace.BLL.Jobs;
 
 namespace Marketplace.Web.Controllers
 {
@@ -322,9 +322,9 @@ namespace Marketplace.Web.Controllers
                 return NotFound();
             }
 
-            var orderSummary = await _orderService.GetBusinessOrderSummary(businessId);
-            var businessDiscount = await _discountService.GetBusinessDiscount(businessId);
-            var categoryDiscounts = await _discountService.GetActiveCategoryDiscountsForBusiness(businessId);
+            var orderSummary = await _orderService.GetBusinessOrderSummaryAsync(businessId);
+            var businessDiscount = await _discountService.GetBusinessDiscountAsync(businessId);
+            var categoryDiscounts = await _discountService.GetActiveCategoryDiscountsForBusinessAsync(businessId);
 
             return View(new AdminBusinessDetailsViewModel
             {
@@ -351,7 +351,27 @@ namespace Marketplace.Web.Controllers
             });
         }
 
+        [HttpGet]
+        public async Task<IActionResult> UserDetails(string userId)
+        {
+            var dto = await _adminService.GetUserDetailsAsync(userId);
+            if (dto == null)
+            {
+                return NotFound();
+            }
 
+            var model = new UserAdminDetailsViewModel
+            {
+                Id = dto.Id,
+                UserName = dto.UserName,
+                Email = dto.Email,
+                AvatarUrl = dto.AvatarUrl,
+                Status = dto.Status,
+                CreatedAt = dto.CreatedAt
+            };
+
+            return View(model);
+        }
 
         [HttpGet]
         public async Task<IActionResult> Jobs()
@@ -466,6 +486,16 @@ namespace Marketplace.Web.Controllers
 
             var openTickets = await _supportTicketService.GetOpenTicketsForAdminAsync();
 
+            var adultRequests = (await _adminService.GetPendingAdultRequestsAsync())
+                .Select(b => new AdultRequestViewModel
+                {
+                    Id = b.Id,
+                    Name = b.Name,
+                    Owner = b.Owner,
+                    LogoUrl = b.LogoUrl
+                })
+                .ToList();
+
             return View(new JobsPageViewModel
             {
                 IsSchedulerRunning = scheduler.IsStarted && !scheduler.InStandbyMode && !scheduler.IsShutdown,
@@ -475,7 +505,8 @@ namespace Marketplace.Web.Controllers
                 HasCustomApiKey = !string.IsNullOrEmpty(await _settingsService.GetAsync("GoogleAI", "ApiKey")),
                 ModerationModel = await _settingsService.GetAsync("GoogleAI", "Model"),
                 OpenReturnRequests = openReturnRequests,
-                OpenTickets = openTickets
+                OpenTickets = openTickets,
+                AdultRequests = adultRequests
             });
         }
 
@@ -796,8 +827,9 @@ namespace Marketplace.Web.Controllers
         {
             var returnCount = (await _postSaleService.GetAllOpenRequestsAsync()).Count;
             var ticketCount = (await _supportTicketService.GetOpenTicketsForAdminAsync()).Count;
+            var adultCount = (await _adminService.GetPendingAdultRequestsAsync()).Count;
 
-            return Json(new { returnCount, ticketCount });
+            return Json(new { returnCount, ticketCount, adultCount });
         }
 
         [HttpPost]
@@ -822,9 +854,55 @@ namespace Marketplace.Web.Controllers
             return RedirectToAction("Jobs");
         }
         [HttpGet]
+        public async Task<IActionResult> Reviews([FromQuery] AdminReviewFilterViewModel filter)
+        {
+            var tab = filter.Tab?.ToLowerInvariant() switch
+            {
+                "published" => "published",
+                "rejected" => "rejected",
+                "appeals" => "appeals",
+                _ => "all"
+            };
+            filter.Tab = tab;
+
+            ReviewStatus? status = tab switch
+            {
+                "published" => ReviewStatus.Approved,
+                "rejected" => ReviewStatus.Rejected,
+                _ => null
+            };
+
+            var result = await _adminService.GetFilteredReviewsAsync(new ReviewAdminQueryDto
+            {
+                Search = filter.Search,
+                Status = status,
+                Pagination = new PaginationParams { Page = filter.Page, PageSize = filter.PageSize }
+            });
+
+            var totalCount = (await _adminService.GetFilteredReviewsAsync(new ReviewAdminQueryDto
+            {
+                Pagination = new PaginationParams { Page = 1, PageSize = 1 }
+            })).TotalItems;
+            var rejectedCount = (await _adminService.GetFilteredReviewsAsync(new ReviewAdminQueryDto
+            {
+                Status = ReviewStatus.Rejected,
+                Pagination = new PaginationParams { Page = 1, PageSize = 1 }
+            })).TotalItems;
+
+            return View(new AdminReviewsPageViewModel
+            {
+                Filter = filter,
+                Result = result,
+                Appeals = await _adminService.GetPendingAppealsAsync(),
+                TotalCount = totalCount,
+                RejectedCount = rejectedCount
+            });
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetPendingAppeals()
         {
-            var appeals = await _adminService.GetPendingAppeals();
+            var appeals = await _adminService.GetPendingAppealsAsync();
             var appealViewModels = appeals.Select(a => new ReviewAppealAdminDto
             {
                 Id = a.Id,
@@ -861,6 +939,14 @@ namespace Marketplace.Web.Controllers
         public async Task<IActionResult> RejectReview(Guid reviewId, string reason)
         {
             var result = await _adminService.RejectReview(reviewId, CurrentAdminId ?? string.Empty, reason);
+            return ModerationResult(result);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditReview(Guid reviewId, string body)
+        {
+            var result = await _adminService.EditReview(reviewId, CurrentAdminId ?? string.Empty, body);
             return ModerationResult(result);
         }
 

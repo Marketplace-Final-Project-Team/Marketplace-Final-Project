@@ -8,6 +8,7 @@ namespace Marketplace.Domain.Enums
     {
         Active,
         Pending,
-        Banned
+        Banned,
+        Archived
     }
 }

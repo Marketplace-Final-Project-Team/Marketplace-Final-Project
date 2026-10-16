@@ -11,9 +11,9 @@ namespace Marketplace.BLL.DTOs.Products
         public decimal Price { get; set; }
         public int Quantity { get; set; }
         public string? Sku { get; set; }
-        public List<ProductVariantDto> Variants { get; set; } = new();
         public IFormFile? MainImage { get; set; }
         public List<IFormFile>? AdditionalImages { get; set; }
+        public List<string>? ExistingAdditionalImageUrls { get; set; }
         public bool IsAdultOnly { get; set; }
     }
 }

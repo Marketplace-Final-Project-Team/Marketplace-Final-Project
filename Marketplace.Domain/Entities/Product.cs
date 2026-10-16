@@ -21,7 +21,6 @@ namespace Marketplace.Domain.Entities
         public string? ModerationReason { get; set; }
         public ICollection<Discount> Discounts { get; set; } = new List<Discount>();
         public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
-        public ICollection<ProductVariant> Variants { get; set; } = new List<ProductVariant>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
         public bool IsAdultOnly { get; set; }

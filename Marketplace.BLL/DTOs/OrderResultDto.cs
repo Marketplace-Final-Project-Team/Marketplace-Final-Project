@@ -9,6 +9,6 @@ namespace Marketplace.BLL.DTOs
     {
         
         public string OrderId { get; set; }
-        public PaymentDataDto PaymentData { get; set; }
+        public PaymentDataDto? PaymentData { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 @model Marketplace.Web.Models.AddressFormViewModel
 
 @{
+    Layout = "_ProfileLayout";
     var isEdit = Model.Id.HasValue;
     ViewData["Title"] = isEdit ? Localizer["Редагування адреси"] : Localizer["Нова адреса"];
 }
@@ -16,6 +17,8 @@
         <h1>@(isEdit ? Localizer["Редагування адреси"] : Localizer["Нова адреса"])</h1>
 
         <form asp-action="@(isEdit ? "EditAddress" : "CreateAddress")" method="post">
+            <input type="hidden" asp-for="ReturnUrl" />
+
             <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
             <input type="hidden" asp-for="Id" />
 

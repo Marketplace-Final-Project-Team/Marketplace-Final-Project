@@ -1,0 +1,67 @@
+﻿@model Marketplace.Web.Models.UserAdminDetailsViewModel
+
+@{
+    ViewData["Title"] = $"{Model.UserName} - {SharedLocalizer["Адмін-панель"].Value}";
+    var statusClass = Model.Status.ToString().ToLowerInvariant();
+    var displayName = string.IsNullOrWhiteSpace(Model.UserName) ? Model.Email : Model.UserName;
+    var initial = string.IsNullOrWhiteSpace(displayName) ? "?" : displayName[..1].ToUpperInvariant();
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+}
+
+<div class="admin-page">
+    <div class="admin-shell">
+        <partial name="_AdminNav" />
+
+        <div class="admin-content">
+            <a asp-action="Users" class="btn btn-sm btn-outline-secondary user-details-back">← @Localizer["До списку користувачів"]</a>
+
+            @if (TempData["Success"] is string success)
+            {
+                <div class="admin-alert"><span>✓</span><p>@success</p></div>
+            }
+            @if (TempData["Error"] is string error)
+            {
+                <div class="admin-alert admin-alert--error"><span>!</span><p>@error</p></div>
+            }
+
+            <section class="user-profile-card">
+                <div class="user-profile-card__cover" aria-hidden="true"></div>
+                <div class="user-profile-card__body">
+                    @if (!string.IsNullOrWhiteSpace(Model.AvatarUrl))
+                    {
+                        <img class="user-profile-card__avatar" src="@Model.AvatarUrl" alt="@displayName" />
+                    }
+                    else
+                    {
+                        <div class="user-profile-card__avatar user-profile-card__avatar--placeholder" aria-hidden="true">@initial</div>
+                    }
+
+                    <div class="user-profile-card__main">
+                        <h1 class="user-profile-card__name">@displayName</h1>
+                        <span class="user-profile-card__email">@Model.Email</span>
+                    </div>
+
+                    <span class="admin-status admin-status--@statusClass user-profile-card__status">@Model.Status</span>
+                </div>
+            </section>
+
+            <div class="user-info-grid">
+                <div class="user-info-tile">
+                    <span class="user-info-tile__label">@Localizer["Ім'я користувача:"]</span>
+                    <span class="user-info-tile__value">@Model.UserName</span>
+                </div>
+                <div class="user-info-tile">
+                    <span class="user-info-tile__label">@Localizer["Email:"]</span>
+                    <span class="user-info-tile__value">@Model.Email</span>
+                </div>
+                <div class="user-info-tile">
+                    <span class="user-info-tile__label">@Localizer["Дата реєстрації:"]</span>
+                    <span class="user-info-tile__value">@Model.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

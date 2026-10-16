@@ -193,4 +193,25 @@
   <data name="Надіслати заявку" xml:space="preserve">
     <value>Submit request</value>
   </data>
+  <data name="Отримувач" xml:space="preserve">
+    <value>Recipient</value>
+  </data>
+  <data name="Телефон" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="Служба доставки" xml:space="preserve">
+    <value>Delivery service</value>
+  </data>
+  <data name="Розмір:" xml:space="preserve">
+    <value>Size:</value>
+  </data>
+  <data name="Нова пошта" xml:space="preserve">
+    <value>Nova Poshta</value>
+  </data>
+  <data name="Укрпошта" xml:space="preserve">
+    <value>Ukrposhta</value>
+  </data>
+  <data name="Оплата при отриманні" xml:space="preserve">
+    <value>Payment on delivery</value>
+  </data>
 </root>

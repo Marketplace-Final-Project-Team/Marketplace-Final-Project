@@ -1,0 +1,451 @@
+@model Marketplace.Web.Models.CatalogueProductViewModel
+
+@{
+    var (localizedName, localizedDescription) = await ProductTranslator.GetLocalizedAsync(
+        Model.Id, Model.Name, Model.Description, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
+    ViewData["Title"] = localizedName;
+    var gallery = Model.GalleryImageUrls;
+    var mainImage = gallery.FirstOrDefault();
+    const int minGallerySlots = 4;
+    var productInitial = string.IsNullOrWhiteSpace(Model.Name) ? "M" : Model.Name[..1].ToUpperInvariant();
+    var storeInitial = string.IsNullOrWhiteSpace(Model.StoreName) ? "M" : Model.StoreName[..1].ToUpperInvariant();
+    var productCode = Model.Id.ToString()[..8].ToUpperInvariant();
+    var isLowStock = Model.Quantity <= Model.LowStockThreshold;
+    var isNew = Model.CreatedAt >= DateTime.UtcNow.AddDays(-14);
+    var maxSelectableQuantity = Math.Max(1, Math.Min(Model.Quantity, 10));
+    var averageStars = Math.Clamp((int)Math.Round(Model.AverageRating), 0, 5);
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/product-details.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/reviews.css" asp-append-version="true" />
+}
+
+<div class="product-page">
+    <nav class="product-breadcrumbs" aria-label="@Localizer["Навігаційний шлях"]">
+        <a asp-controller="Home" asp-action="Index">@SharedLocalizer["Головна"]</a>
+        <span aria-hidden="true">/</span>
+        <a asp-action="Index">@Localizer["Каталог"]</a>
+        <span aria-hidden="true">/</span>
+        <a asp-action="Index" asp-route-search="@Model.CategoryName">@SharedLocalizer[Model.CategoryName]</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">@localizedName</span>
+    </nav>
+
+    @if (TempData["Success"] is string success)
+    {
+        <div class="product-alert product-alert--success" role="status">
+            <span aria-hidden="true">✓</span><p><strong>@Localizer["Товар у кошику"]</strong>@success</p>
+            <a asp-controller="Cart" asp-action="Index">@Localizer["Відкрити кошик →"]</a>
+        </div>
+    }
+    @if (TempData["Error"] is string error)
+    {
+        <div class="product-alert product-alert--warning" role="alert">
+            <span aria-hidden="true">!</span><p><strong>@Localizer["Не вдалося виконати дію"]</strong>@error</p>
+        </div>
+    }
+    @if (TempData["WishlistSuccess"] is string wishlistSuccess)
+    {
+        <div class="product-alert product-alert--success" role="status">
+            <span aria-hidden="true">♥</span><p><strong>@Localizer["Список бажань"]</strong>@wishlistSuccess</p>
+            <a asp-controller="Profile" asp-action="Wishlist">@Localizer["Відкрити список бажань →"]</a>
+        </div>
+    }
+    @if (TempData["WishlistError"] is string wishlistError)
+    {
+        <div class="product-alert product-alert--warning" role="alert">
+            <span aria-hidden="true">!</span><p><strong>@Localizer["Не вдалося виконати дію"]</strong>@wishlistError</p>
+        </div>
+    }
+
+    <article class="product-hero">
+        <section class="product-gallery" aria-label="@Localizer["Галерея товару {0}", Model.Name]">
+            <div class="product-gallery__stage @(!string.IsNullOrWhiteSpace(mainImage) ? "has-backdrop" : null)"
+                 style="@(!string.IsNullOrWhiteSpace(mainImage) ? $"--gallery-bg:url('{mainImage!.Replace("'", "%27")}')" : null)">
+                @if (!string.IsNullOrWhiteSpace(mainImage))
+                {
+                    <img src="@mainImage" alt="@Localizer["{0} - основне зображення", Model.Name]" data-gallery-main />
+                }
+                else
+                {
+                    <div class="product-gallery__placeholder" role="img" aria-label="@Localizer["Зображення товару {0} відсутнє", Model.Name]">
+                        <span aria-hidden="true">@productInitial</span>
+                        <small>@Localizer["Зображення готується"]</small>
+                    </div>
+                }
+                @if (gallery.Count > 1)
+                {
+                    <span class="product-gallery__counter" aria-live="polite" data-gallery-counter>1 / @gallery.Count</span>
+                }
+            </div>
+
+            @* Always show at least four slots under the main photo: real thumbnails first, empty placeholders for the rest. *@
+            <div class="product-gallery__thumbs" role="group" aria-label="@Localizer["Оберіть зображення"]">
+                @for (var index = 0; index < gallery.Count; index++)
+                {
+                    var imageUrl = gallery[index];
+                    <button type="button"
+                            class="product-gallery__thumb @(index == 0 ? "is-active" : null)"
+                            data-gallery-thumb
+                            data-image-url="@imageUrl"
+                            data-image-alt="@Localizer["{0} - зображення {1}", Model.Name, index + 1]"
+                            data-image-index="@(index + 1)"
+                            aria-label="@Localizer["Показати зображення {0}", index + 1]"
+                            aria-pressed="@(index == 0 ? "true" : "false")">
+                        <img src="@imageUrl" alt="" loading="lazy" />
+                    </button>
+                }
+                @for (var slot = gallery.Count; slot < minGallerySlots; slot++)
+                {
+                    <span class="product-gallery__thumb product-gallery__thumb--empty" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5" /><circle cx="9" cy="10" r="1.6" /><path d="m21 16-5-5-8 8" /></svg>
+                    </span>
+                }
+            </div>
+
+
+            <div class="product-gallery__hint">
+                <span aria-hidden="true">⌕</span>
+                <p><strong>@Localizer["Фото товару"]</strong>@(gallery.Count > 1 ? Localizer["Доступно {0} зображення", gallery.Count] : Localizer["Перегляньте товар перед покупкою"])</p>
+            </div>
+        </section>
+
+        <section class="product-summary" aria-labelledby="product-title">
+            @if (isNew)
+            {
+                <span class="product-tag">@Localizer["Новинка"]</span>
+            }
+
+            <h1 id="product-title">@localizedName</h1>
+            <p class="product-summary__lead">@localizedDescription</p>
+
+            <a href="#reviews" class="product-summary__rating">
+                @if (Model.ReviewCount > 0)
+                {
+                    <span class="star-display" aria-label="@Localizer["Оцінка {0} з 5", Model.AverageRating.ToString("0.0")]">@(new string('★', averageStars))@(new string('☆', 5 - averageStars))</span>
+                    <span>@Localizer["Відгуки ({0})", Model.ReviewCount]</span>
+                }
+                else
+                {
+                    <span>@Localizer["поки без відгуків"]</span>
+                }
+            </a>
+
+            <p class="product-code">@Localizer["Код:"] @(string.IsNullOrWhiteSpace(Model.Sku) ? productCode : Model.Sku)</p>
+
+            <div class="product-price-block">
+                @if (Model.HasDiscount)
+                {
+                    <div class="product-price-block__discount product-discount">
+                        <del>@Model.OriginalPrice!.Value.ToString("N2") ₴</del>
+                        <span class="badge bg-danger">−@Model.DiscountPercent!.Value.ToString("0.##")%</span>
+                    </div>
+                }
+                <strong>@Model.Price.ToString("N2") ₴</strong>
+                <small>@Localizer["Ціна вказана з урахуванням усіх податків"]</small>
+            </div>
+
+            @if (Model.Quantity > 0)
+            {
+                <div class="product-quantity-selector">
+                    <label for="productQuantity" class="product-quantity-selector__label">@Localizer["Кількість"]</label>
+                    <select id="productQuantity" class="product-quantity-selector__select" data-quantity-select>
+                        @for (var qty = 1; qty <= maxSelectableQuantity; qty++)
+                        {
+                            <option value="@qty">@qty</option>
+                        }
+                    </select>
+                </div>
+            }
+
+            <div class="product-buybox">
+                @if (isAuthenticated)
+                {
+                    <form asp-controller="Cart" asp-action="Add" method="post">
+                        <input type="hidden" name="productId" value="@Model.Id" />
+                        <input type="hidden" name="quantity" value="1" data-quantity-input />
+                        <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                        <button type="submit" class="product-button product-button--primary">
+                            <span aria-hidden="true">＋</span> @Localizer["Додати до кошика"]
+                        </button>
+                    </form>
+                    <form asp-controller="Cart" asp-action="BuyNow" method="post">
+                        <input type="hidden" name="productId" value="@Model.Id" />
+                        <input type="hidden" name="quantity" value="1" data-quantity-input />
+                        <button type="submit" class="product-button product-button--outline">
+                            <span aria-hidden="true">⚡</span> @Localizer["Купити в 1 клік"]
+                        </button>
+                    </form>
+                    <div class="product-buybox__secondary">
+                        <a asp-controller="Cart" asp-action="Index" class="product-button product-button--secondary">@Localizer["Відкрити кошик"]</a>
+                        @if (Model.IsInWishlist)
+                        {
+                            <form asp-controller="Profile" asp-action="RemoveFromWishlist" method="post">
+                                <input type="hidden" name="productId" value="@Model.Id" />
+                                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                <button type="submit" class="product-button product-button--secondary">
+                                    <span aria-hidden="true">♥</span> @Localizer["У списку бажань"]
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-controller="Profile" asp-action="AddToWishlist" method="post">
+                                <input type="hidden" name="productId" value="@Model.Id" />
+                                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                <button type="submit" class="product-button product-button--secondary">
+                                    <span aria-hidden="true">♡</span> @Localizer["У список бажань"]
+                                </button>
+                            </form>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <a asp-controller="Auth"
+                       asp-action="SignIn"
+                       asp-route-returnUrl="@Context.Request.Path"
+                       class="product-button product-button--primary">
+                        @Localizer["Увійти та додати до кошика"] <span aria-hidden="true">→</span>
+                    </a>
+                }
+                <p class="product-buybox__note"><span aria-hidden="true">✓</span> @Localizer["Безпечне оформлення замовлення"]</p>
+            </div>
+
+            <div class="product-stock @(isLowStock ? "product-stock--low" : null)">
+                <span class="product-stock__mark" aria-hidden="true">@(isLowStock ? "!" : "✓")</span>
+                <p>
+                    <strong>@(isLowStock ? Localizer["Залишилося лише {0} шт.", Model.Quantity] : Localizer["Є в наявності"])</strong>
+                    <small>@(isLowStock ? Localizer["Рекомендуємо не відкладати замовлення"] : Localizer["Доступно до замовлення: {0} шт.", Model.Quantity])</small>
+                </p>
+            </div>
+
+            <div class="product-fulfilment">
+                <div>
+                    <span class="product-fulfilment__icon product-fulfilment__icon--delivery" aria-hidden="true">→</span>
+                    <p><strong>@Localizer["Орієнтовна доставка"]</strong><small>@Model.EstimatedDeliveryStart.ToString("dd.MM")–@Model.EstimatedDeliveryEnd.ToString("dd.MM") · @Localizer["2–4 робочі дні"]</small></p>
+                </div>
+                <div>
+                    <span class="product-fulfilment__icon product-fulfilment__icon--return" aria-hidden="true">↺</span>
+                    <p><strong>@Localizer["Просте повернення"]</strong><small>@Localizer["Повернення протягом 14 днів після отримання"]</small></p>
+                </div>
+                <div>
+                    <span class="product-fulfilment__icon product-fulfilment__icon--secure" aria-hidden="true">✓</span>
+                    <p><strong>@Localizer["Захищена покупка"]</strong><small>@Localizer["Статус замовлення та доставки завжди під рукою"]</small></p>
+                </div>
+            </div>
+
+            <section class="product-seller" aria-labelledby="seller-title">
+                @if (!string.IsNullOrWhiteSpace(Model.StoreLogoUrl))
+                {
+                    <img src="@Model.StoreLogoUrl" alt="@Localizer["Логотип продавця {0}", Model.StoreName]" />
+                }
+                else
+                {
+                    <span class="product-seller__logo" aria-hidden="true">@storeInitial</span>
+                }
+                <div>
+                    <span>@Localizer["Продавець"]</span>
+                    <h2 id="seller-title">@Model.StoreName</h2>
+                    <p>@(string.IsNullOrWhiteSpace(Model.StoreDescription) ? Localizer["Перевірений продавець Marketplace"] : Model.StoreDescription)</p>
+                </div>
+                <span class="product-seller__verified" title="@Localizer["Перевірений продавець"]" aria-label="@Localizer["Перевірений продавець"]">✓</span>
+            </section>
+        </section>
+
+        <section class="product-specs product-specifications" aria-labelledby="specs-title">
+            <h2 id="specs-title" class="product-section-label">@Localizer["Характеристики"]</h2>
+            <dl>
+                <div><dt>@Localizer["Категорія"]</dt><dd>@SharedLocalizer[Model.CategoryName]</dd></div>
+                <div><dt>@Localizer["Продавець"]</dt><dd>@Model.StoreName</dd></div>
+                <div><dt>@Localizer["Наявність"]</dt><dd>@Model.Quantity @Localizer["шт."]</dd></div>
+                <div><dt>@Localizer["Код товару"]</dt><dd>@productCode</dd></div>
+                <div><dt>@Localizer["Стан"]</dt><dd>@Localizer["Новий товар"]</dd></div>
+            </dl>
+        </section>
+
+        <section class="product-about" aria-labelledby="about-title">
+            <h2 id="about-title" class="product-section-label">@Localizer["Про товар"]</h2>
+            <p>@localizedDescription</p>
+            <div class="product-benefits">
+                <div><span aria-hidden="true">✓</span><p><strong>@Localizer["Перевірена наявність"]</strong>@Localizer["Актуальний залишок синхронізований із каталогом."]</p></div>
+                <div><span aria-hidden="true">↺</span><p><strong>@Localizer["Зручне повернення"]</strong>@Localizer["Зрозумілий процес повернення після покупки."]</p></div>
+                <div><span aria-hidden="true">→</span><p><strong>@Localizer["Контроль доставки"]</strong>@Localizer["Відстежуйте шлях замовлення в особистому кабінеті."]</p></div>
+            </div>
+        </section>
+    </article>
+
+    @if (Model.RelatedProducts.Count > 0)
+    {
+        <section class="related-products" aria-labelledby="related-title">
+            <h2 id="related-title">@Localizer["Схожі товари"]</h2>
+
+            <div class="related-products__grid">
+                @foreach (var related in Model.RelatedProducts)
+                {
+                    var relatedInitial = string.IsNullOrWhiteSpace(related.Name) ? "M" : related.Name[..1].ToUpperInvariant();
+                    var relatedName = (await ProductTranslator.GetLocalizedAsync(related.Id, related.Name, string.Empty, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)).Name;
+                    <article class="related-card">
+                        <div class="related-card__media-wrap">
+                            <a asp-action="Details" asp-route-id="@related.Id" class="related-card__media" aria-label="@Localizer["Переглянути {0}", relatedName]">
+                                @if (!string.IsNullOrWhiteSpace(related.MainImageUrl))
+                                {
+                                    <img src="@related.MainImageUrl" alt="@relatedName" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <span aria-hidden="true">@relatedInitial</span>
+                                }
+                            </a>
+                            @if (isAuthenticated)
+                            {
+                                <form asp-controller="Profile" asp-action="AddToWishlist" method="post" class="related-card__wish">
+                                    <input type="hidden" name="productId" value="@related.Id" />
+                                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                    <button type="submit" title="@Localizer["У список бажань"]" aria-label="@Localizer["У список бажань"]">
+                                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.7a4.3 4.3 0 0 1 7.5 2.6c0 5.6-7.5 10.2-7.5 10.2Z" /></svg>
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <a asp-controller="Auth" asp-action="SignIn" asp-route-returnUrl="@Context.Request.Path" class="related-card__wish" title="@Localizer["У список бажань"]" aria-label="@Localizer["У список бажань"]">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.7a4.3 4.3 0 0 1 7.5 2.6c0 5.6-7.5 10.2-7.5 10.2Z" /></svg>
+                                </a>
+                            }
+                        </div>
+                        <div class="related-card__body">
+                            <span>@SharedLocalizer[related.CategoryName]</span>
+                            <a asp-action="Details" asp-route-id="@related.Id">@relatedName</a>
+                            <strong>@related.Price.ToString("N2") ₴</strong>
+                            @if (related.OriginalPrice.HasValue)
+                            {
+                                <div class="product-discount">
+                                    <del>@related.OriginalPrice.Value.ToString("N2") ₴</del>
+                                    <span class="badge bg-danger">−@related.DiscountPercent.ToString("0.##")%</span>
+                                </div>
+                            }
+                            <small class="@(related.Quantity > 0 ? "is-available" : "is-unavailable")">@(related.Quantity > 0 ? Localizer["В наявності"] : Localizer["Немає в наявності"])</small>
+                        </div>
+                    </article>
+                }
+            </div>
+
+            <a asp-action="Index" class="related-products__more">@Localizer["Переглянути каталог"] <span aria-hidden="true">→</span></a>
+        </section>
+    }
+
+    <section class="product-reviews" id="reviews" aria-labelledby="reviews-title">
+        <h2 id="reviews-title">@Localizer["Відгуки про {0}", localizedName]</h2>
+
+        <div class="product-reviews__summary">
+            <div class="product-reviews__score">
+                <strong>@(Model.ReviewCount > 0 ? Model.AverageRating.ToString("0.0") : "-")</strong>
+                @if (Model.ReviewCount > 0)
+                {
+                    <span class="star-display" aria-hidden="true">@(new string('★', averageStars))@(new string('☆', 5 - averageStars))</span>
+                }
+                <span>@(Model.ReviewCount > 0 ? Localizer["на основі {0} відгуків", Model.ReviewCount] : Localizer["поки без відгуків"])</span>
+            </div>
+
+            <div class="product-reviews__cta">
+                @if (isAuthenticated)
+                {
+                    if (Model.CurrentUserReview is { } myReview)
+                    {
+                        <a asp-controller="Reviews" asp-action="UpdateReview" asp-route-productId="@Model.Id" asp-route-reviewId="@myReview.Id" class="product-reviews__cta-main">@Localizer["Редагувати мій відгук"]</a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Reviews" asp-action="CreateReview" asp-route-productId="@Model.Id" class="product-reviews__cta-main">@Localizer["Написати відгук"]</a>
+                    }
+                }
+                else
+                {
+                    <a asp-controller="Auth" asp-action="SignIn" asp-route-returnUrl="@Context.Request.Path" class="product-reviews__cta-main">@Localizer["Увійти, щоб залишити відгук"]</a>
+                }
+            </div>
+        </div>
+
+        <div class="product-tabs product-tabs--line" data-tabs>
+            <div class="product-tabs__list" role="tablist">
+                <button type="button" role="tab" class="product-tabs__tab is-active" id="tab-comments" aria-controls="panel-comments" aria-selected="true" data-tab="comments">@Localizer["Коментарі"] (@Model.Reviews.Count)</button>
+
+                @if (Model.Reviews.Count > 1)
+                {
+                    <label class="product-tabs__sort" data-visible-for="comments">
+                        <span class="visually-hidden">@Localizer["Сортування відгуків"]</span>
+                        <select data-review-sort aria-label="@Localizer["Сортування відгуків"]">
+                            <option value="newest">@Localizer["Спочатку нові"]</option>
+                            <option value="oldest">@Localizer["Спочатку старі"]</option>
+                            <option value="highest">@Localizer["Найвища оцінка"]</option>
+                            <option value="lowest">@Localizer["Найнижча оцінка"]</option>
+                        </select>
+                    </label>
+                }
+            </div>
+
+            <div class="product-tabs__panel" role="tabpanel" id="panel-comments" aria-labelledby="tab-comments" data-tab-panel="comments">
+                @if (Model.Reviews.Count == 0)
+                {
+                    <p class="product-reviews__empty">@Localizer["Ще немає відгуків про цей товар. Будьте першим!"]</p>
+                }
+                else
+                {
+                    <div class="review-list" data-review-list>
+                        @foreach (var review in Model.Reviews)
+                        {
+                            var isMine = review.UserId == Model.CurrentUserId;
+                            var reviewInitial = string.IsNullOrWhiteSpace(review.UserName) ? "?" : review.UserName[..1].ToUpperInvariant();
+                            var filledStars = Math.Clamp((int)Math.Round(review.Rating), 0, 5);
+
+                            <article class="review-item"
+                                     data-review-date="@review.PublicationDate.ToString("o", System.Globalization.CultureInfo.InvariantCulture)"
+                                     data-review-rating="@review.Rating.ToString(System.Globalization.CultureInfo.InvariantCulture)">
+                                <div class="review-item__author">
+                                    <span class="review-item__avatar" aria-hidden="true">
+                                        @if (!string.IsNullOrWhiteSpace(review.AvatarUrl))
+                                        {
+                                            <img src="@review.AvatarUrl" alt="" />
+                                        }
+                                        else
+                                        {
+                                            @reviewInitial
+                                        }
+                                    </span>
+                                    <div class="review-item__name">@review.UserName</div>
+                                </div>
+                                <div class="review-item__main">
+                                    <div class="review-item__meta">
+                                        <span class="star-display" aria-label="@Localizer["Оцінка {0} з 5", review.Rating]">@(new string('★', filledStars))@(new string('☆', 5 - filledStars))</span>
+                                        <span class="review-item__date">@review.PublicationDate.ToLocalTime().ToString("dd.MM.yyyy")</span>
+                                    </div>
+                                    <p class="review-item__body">@review.Body</p>
+                                    @if (isMine)
+                                    {
+                                        <div class="review-item__actions">
+                                            <a asp-controller="Reviews" asp-action="UpdateReview" asp-route-productId="@Model.Id" asp-route-reviewId="@review.Id">@Localizer["Редагувати"]</a>
+                                            <form asp-controller="Reviews" asp-action="DeleteReview" method="post" onsubmit="return confirm('@Localizer["Видалити цей відгук?"]');">
+                                                <input type="hidden" name="productId" value="@Model.Id" />
+                                                <input type="hidden" name="reviewId" value="@review.Id" />
+                                                <button type="submit" class="is-danger">@Localizer["Видалити"]</button>
+                                            </form>
+                                        </div>
+                                    }
+                                </div>
+                            </article>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script src="~/js/product-details.js" asp-append-version="true"></script>
+    <script src="~/js/product-quantity-selector.js" asp-append-version="true"></script>
+}

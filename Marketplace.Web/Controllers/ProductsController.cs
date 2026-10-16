@@ -40,7 +40,7 @@ public class ProductsController : Controller
         _sharedLocalizer = sharedLocalizer;
     }
 
-    public async Task<IActionResult> Index(Guid? businessId, string? search, string filter = "all")
+    public async Task<IActionResult> Index(Guid? businessId, string? search, string filter = "all", Guid? categoryId = null)
     {
         var userId = GetCurrentUserId();
         if (userId is null) return Challenge();
@@ -60,7 +60,12 @@ public class ProductsController : Controller
         }
 
         var lowStockThreshold = await _settingsService.GetIntAsync("BusinessRules", "LowStockThreshold", 5);
-        var products = await _productService.GetByBusinessAsync(selectedBusinessId);
+        var allProducts = await _productService.GetByBusinessAsync(selectedBusinessId);
+
+        // Архівні товари (за ними були замовлення) не змішуємо з основним списком -
+        // вони показуються в окремій вкладці "Архів".
+        var archived = allProducts.Where(p => p.Status == ProductStatus.Archived).ToList();
+        var products = allProducts.Where(p => p.Status != ProductStatus.Archived).ToList();
 
         ViewBag.Businesses = businesses.Select(b => new SelectListItem
         {
@@ -78,12 +83,15 @@ public class ProductsController : Controller
         {
             Search = search,
             Filter = string.IsNullOrWhiteSpace(filter) ? "all" : filter,
+            CategoryId = categoryId,
+            CategoryName = categoryId.HasValue ? products.FirstOrDefault(p => p.CategoryId == categoryId.Value)?.Category?.Name : null,
             AllCount = products.Count,
             ActiveCount = products.Count(p => p.Status == ProductStatus.Active),
             PendingCount = products.Count(p => p.Status == ProductStatus.Pending),
             LowStockCount = products.Count(IsLowStock),
             OutOfStockCount = products.Count(IsOutOfStock),
-            HiddenCount = products.Count(IsHidden)
+            HiddenCount = products.Count(IsHidden),
+            ArchivedCount = archived.Count
         };
 
         IEnumerable<Product> filtered = model.Filter switch
@@ -92,8 +100,14 @@ public class ProductsController : Controller
             "low-stock" => products.Where(IsLowStock),
             "out-of-stock" => products.Where(IsOutOfStock),
             "hidden" => products.Where(IsHidden),
+            "archived" => archived,
             _ => products
         };
+
+        if (categoryId.HasValue)
+        {
+            filtered = filtered.Where(p => p.CategoryId == categoryId.Value);
+        }
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -114,7 +128,6 @@ public class ProductsController : Controller
                 Price = p.Price,
                 Quantity = p.Quantity,
                 Sku = p.Sku,
-                VariantCount = p.Variants.Count,
                 MainImageUrl = p.MainImageUrl,
                 Status = p.Status.ToString(),
                 CategoryName = p.Category?.Name ?? string.Empty,
@@ -125,6 +138,45 @@ public class ProductsController : Controller
         }).ToList();
 
         return View(model);
+    }
+
+    public async Task<IActionResult> Categories(Guid? businessId)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Challenge();
+
+        var businesses = await _businessAccessService.GetAccessibleBusinessesAsync(userId, BusinessPermissions.ProductCrud);
+        if (businesses.Count == 0)
+        {
+            TempData["Error"] = "У вас поки немає бізнесу з доступом до керування товарами.";
+            return View(new List<ProductCategorySummaryViewModel>());
+        }
+
+        var selectedBusinessId = businessId ?? businesses[0].Id;
+        if (!await _businessAccessService.HasAccessAsync(selectedBusinessId, userId, BusinessPermissions.ProductCrud))
+        {
+            return Forbid();
+        }
+
+        ViewBag.SelectedBusinessId = selectedBusinessId;
+
+        var products = await _productService.GetByBusinessAsync(selectedBusinessId);
+        var allCategories = await _categoryRepository.GetAllAsync();
+
+        var summaries = allCategories
+            .Select(c => new ProductCategorySummaryViewModel
+            {
+                CategoryId = c.Id,
+                CategoryName = c.Name,
+                ProductCount = products.Count(p => p.CategoryId == c.Id),
+                ActiveProductCount = products.Count(p => p.CategoryId == c.Id && p.Status == ProductStatus.Active)
+            })
+            .Where(c => c.ProductCount > 0)
+            .OrderByDescending(c => c.ProductCount)
+            .ThenBy(c => c.CategoryName)
+            .ToList();
+
+        return View(summaries);
     }
 
     [HttpGet]
@@ -141,6 +193,13 @@ public class ProductsController : Controller
         var fileBytes = await _productService.ExportToExcelAsync(businessId);
         var fileName = $"products-{DateTime.UtcNow:yyyyMMdd-HHmm}.xlsx";
         return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> ExportExample()
+    {
+        var fileBytes = await _productService.GetImportExampleAsync();
+        return File(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "приклад-імпорту-товарів.xlsx");
     }
 
     [HttpPost]
@@ -203,7 +262,6 @@ public class ProductsController : Controller
                 Sku = p.Sku,
                 MainImageUrl = p.MainImageUrl,
                 Quantity = p.Quantity,
-                VariantCount = p.Variants.Count,
                 Status = p.Status.ToString()
             }).ToList());
     }
@@ -279,10 +337,6 @@ public class ProductsController : Controller
             Price = product.Price,
             Quantity = product.Quantity,
             Sku = product.Sku,
-            Variants = product.Variants
-                .OrderBy(v => v.Size)
-                .Select(v => new ProductVariantInputModel { Size = v.Size, Sku = v.Sku, Quantity = v.Quantity })
-                .ToList(),
             MainImageUrl = product.MainImageUrl,
             Status = product.Status.ToString(),
             CategoryName = product.Category?.Name ?? "Без категорії",
@@ -343,10 +397,6 @@ public class ProductsController : Controller
                 Price = model.Price,
                 Quantity = model.Quantity,
                 Sku = model.Sku,
-                Variants = model.Variants
-                    .Where(v => !string.IsNullOrWhiteSpace(v.Size))
-                    .Select(v => new ProductVariantDto { Size = v.Size, Sku = v.Sku, Quantity = v.Quantity })
-                    .ToList(),
                 IsAdultOnly = model.IsAdultOnly,
                 MainImage = model.MainImage,
                 AdditionalImages = model.AdditionalImages
@@ -394,10 +444,6 @@ public class ProductsController : Controller
             Price = product.Price,
             Quantity = product.Quantity,
             Sku = product.Sku,
-            Variants = product.Variants
-                .OrderBy(v => v.Size)
-                .Select(v => new ProductVariantInputModel { Size = v.Size, Sku = v.Sku, Quantity = v.Quantity })
-                .ToList(),
             IsAdultOnly = product.IsAdultOnly,
             CategoryId = product.CategoryId,
             ExistingMainImageUrl = product.MainImageUrl,
@@ -443,10 +489,6 @@ public class ProductsController : Controller
                 Price = model.Price,
                 Quantity = model.Quantity,
                 Sku = model.Sku,
-                Variants = model.Variants
-                    .Where(v => !string.IsNullOrWhiteSpace(v.Size))
-                    .Select(v => new ProductVariantDto { Size = v.Size, Sku = v.Sku, Quantity = v.Quantity })
-                    .ToList(),
                 IsAdultOnly = model.IsAdultOnly,
                 MainImage = model.MainImage,
                 AdditionalImages = model.AdditionalImages
@@ -482,6 +524,11 @@ public class ProductsController : Controller
         if (accessible.Result is not null) return accessible.Result;
 
         var product = accessible.Product!;
+        var usage = await _productService.GetOrderUsageAsync(id);
+        ViewBag.OpenOrders = usage.OpenOrders;
+        ViewBag.HasOrders = usage.HasOrders;
+        ViewBag.BusinessId = product.BusinessId;
+
         return View(new ProductDetailsViewModel
         {
             Id = product.Id,
@@ -502,8 +549,10 @@ public class ProductsController : Controller
         var accessible = await GetAccessibleProductAsync(id);
         if (accessible.Result is not null) return accessible.Result;
 
-        await _productService.DeleteAsync(id);
-        TempData["Success"] = "Товар видалено.";
+        var outcome = await _productService.DeleteOrArchiveAsync(id);
+        TempData["Success"] = outcome == ProductDeleteOutcome.Archived
+            ? "Товар має історію замовлень, тому його архівовано й приховано з каталогу."
+            : "Товар видалено.";
         return RedirectToAction(nameof(Index), new { businessId = accessible.Product!.BusinessId });
     }
 

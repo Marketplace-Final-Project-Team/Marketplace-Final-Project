@@ -111,6 +111,68 @@
     margin-top: 0.25rem;
 }
 
+.products-category-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.products-category-card {
+    background: var(--products-surface);
+    border: 1px solid var(--products-line);
+    border-radius: 1rem;
+    box-shadow: 0 0.35rem 1.3rem rgba(23, 32, 51, 0.055);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1.25rem;
+}
+
+.products-category-card h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.products-category-card__count {
+    color: var(--products-ink);
+    font-size: 1.3rem;
+    font-weight: 750;
+}
+
+.products-category-card__active {
+    color: var(--products-muted);
+    font-size: 0.8rem;
+    margin-bottom: 0.4rem;
+}
+
+.products-category-card .btn {
+    align-self: flex-start;
+    margin-top: 0.4rem;
+}
+
+.products-filter-pill {
+    align-items: center;
+    background: var(--products-soft);
+    border-radius: 999px;
+    color: var(--products-ink);
+    display: inline-flex;
+    font-size: 0.82rem;
+    font-weight: 650;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 0.45rem 0.9rem;
+}
+
+.products-filter-pill a {
+    color: var(--products-muted);
+    text-decoration: none;
+}
+
+.products-filter-pill a:hover {
+    color: var(--products-primary);
+}
+
 .stock-planning-row--urgent td {
     background: #fdecea;
 }
@@ -174,6 +236,26 @@
 
 .products-import-form {
     display: inline-flex;
+}
+
+.products-price-menu {
+    padding: 0.4rem;
+    width: 20rem;
+}
+
+.products-price-menu .dropdown-item {
+    border-radius: 0.6rem;
+    cursor: pointer;
+    padding: 0.5rem 0.75rem;
+}
+
+.products-price-menu__hint {
+    color: var(--products-muted);
+    font-size: 0.76rem;
+    line-height: 1.45;
+    margin: 0;
+    padding: 0.25rem 0.75rem 0.1rem;
+    white-space: normal;
 }
 
 .products-search-form {
@@ -937,6 +1019,10 @@
     .products-table {
         min-width: 58rem;
     }
+
+    .products-category-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 @media (max-width: 575.98px) {
@@ -953,6 +1039,10 @@
     }
 
     .products-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .products-category-grid {
         grid-template-columns: 1fr;
     }
 
@@ -991,5 +1081,9 @@
     .product-delete-card__actions {
         align-items: stretch;
         flex-direction: column-reverse;
+    }
+    .product-status--archived {
+        background: #eef0f4;
+        color: #5b6578;
     }
 }

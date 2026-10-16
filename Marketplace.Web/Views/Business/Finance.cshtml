@@ -18,6 +18,25 @@
         revenue = c.Revenue,
         orders = c.OrderCount
     }));
+
+    var savedCardsJson = System.Text.Json.JsonSerializer.Serialize(Model.SavedCards.Select(c => new
+    {
+        id = c.Id,
+        masked = c.MaskedCardNumber,
+        recipient = c.RecipientName,
+        isDefault = c.IsDefault
+    }));
+
+    // Для календарика розкладу - найближча дата, що відповідає вже збереженому дню місяця.
+    var today = DateTime.UtcNow.Date;
+    var scheduledPreviewDate = Model.ScheduledPayoutDayOfMonth.HasValue
+        ? new DateTime(today.Year, today.Month, Math.Min(Model.ScheduledPayoutDayOfMonth.Value, DateTime.DaysInMonth(today.Year, today.Month)))
+        : today;
+    if (scheduledPreviewDate < today)
+    {
+        var nextMonth = today.AddMonths(1);
+        scheduledPreviewDate = new DateTime(nextMonth.Year, nextMonth.Month, Math.Min(Model.ScheduledPayoutDayOfMonth ?? 1, DateTime.DaysInMonth(nextMonth.Year, nextMonth.Month)));
+    }
 }
 
 @functions {
@@ -40,10 +59,6 @@
         "Failed" => Localizer["Помилка виплати"].Value,
         _ => status
     };
-
-    private static string MaskCard(string cardNumber) => cardNumber.Length >= 4
-        ? $"•••• {cardNumber[^4..]}"
-        : cardNumber;
 }
 
 @section Styles {
@@ -87,7 +102,8 @@
         }
     </section>
 
-    <section class="business-panel">
+    <section class="business-panel" data-collapsible>
+        <partial name="_CollapseToggle" />
         <h2>@Localizer["Історія продажів"]</h2>
         <p class="business-panel__lead">@Localizer["Останні замовлення, що містять товари цього магазину."]</p>
 
@@ -119,51 +135,183 @@
         }
     </section>
 
-    <section class="business-panel" data-collapsible>
+    <section class="business-panel payout-section" data-collapsible>
         <partial name="_CollapseToggle" />
-        <h2>@Localizer["Виплати"]</h2>
-        <p class="business-panel__lead">@Localizer["Доступний баланс:"] <strong>@Model.AvailableBalance.ToString("N2") ₴</strong>@(Model.PendingWithdrawalsTotal > 0 ? $" ({Localizer["з них"].Value} {Model.PendingWithdrawalsTotal:N2} ₴ {Localizer["вже в заявках на розгляді"].Value})" : "")</p>
-        @if (BusinessRoleContext.CanRequestPayout(currentRole))
-        {
-            <button type="button" class="seller-button seller-button--secondary mt-2" data-open-payout-request>@Localizer["Запросити виплату"]</button>
-        }
-        else
-        {
-            <p class="business-empty">@Localizer["Запит на виплату може подати лише власник магазину."]</p>
-        }
+        <h2 class="mb-3">@Localizer["Виплати"]</h2>
 
-        @if (Model.Withdrawals.Count == 0)
-        {
-            <p class="business-empty mt-3">@Localizer["Заявок на виплату ще не було."]</p>
-        }
-        else
-        {
-            <div class="table-responsive mt-3">
-                <table class="business-table">
-                    <thead>
-                        <tr><th>@Localizer["Дата"]</th><th>@Localizer["Сума"]</th><th>@Localizer["Картка"]</th><th>@Localizer["Отримувач"]</th><th>@Localizer["Статус"]</th></tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var withdrawal in Model.Withdrawals)
-                        {
-                            <tr>
-                                <td>@withdrawal.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
-                                <td>@withdrawal.Amount.ToString("N2") ₴</td>
-                                <td>@MaskCard(withdrawal.CardNumber)</td>
-                                <td>@withdrawal.RecipientName</td>
-                                <td>
-                                    @WithdrawalStatusLabel(withdrawal.Status)
-                                    @if (!string.IsNullOrWhiteSpace(withdrawal.Message))
-                                    {
-                                        <div class="business-panel__lead" style="margin:0;">@withdrawal.Message</div>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+        <div class="payout-grid mt-3">
+            <!-- Компактна картка балансу з розбивкою "доступно / заброньовано" -->
+            <div class="payout-card payout-card--primary">
+                <div class="payout-balances">
+                    <div class="payout-balances__item">
+                        <span class="payout-card__label">@Localizer["Доступний баланс"]</span>
+                        <div class="payout-card__amount">@Model.AvailableBalance.ToString("N2") ₴</div>
+                    </div>
+                    <div class="payout-balances__divider"></div>
+                    <div class="payout-balances__item payout-balances__item--muted">
+                        <span class="payout-card__label">
+                            @Localizer["Заброньовано (14 днів)"]
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="ms-1" style="vertical-align: -2px;">
+                                <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+                            </svg>
+                        </span>
+                        <div class="payout-card__amount payout-card__amount--muted">@Model.HeldBalance.ToString("N2") ₴</div>
+                    </div>
+                </div>
+
+                @if (Model.PendingWithdrawalsTotal > 0)
+                {
+                    <span class="payout-badge payout-badge--warning">
+                        @Localizer["В обробці:"] @Model.PendingWithdrawalsTotal.ToString("N2") ₴
+                    </span>
+                }
+
+                <div class="payout-card__actions">
+                    @if (BusinessRoleContext.CanRequestPayout(currentRole))
+                    {
+                        <button type="button"
+                                class="seller-button seller-button--primary btn-payout-action"
+                                data-open-payout-request
+                                @(Model.AvailableBalance <= 0 ? "disabled" : "")>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+                                <path d="M12 5v14M5 12h14"/>
+                            </svg>
+                            @Localizer["Запросити виплату"]
+                        </button>
+                    }
+                    else
+                    {
+                        <p class="business-empty mb-0">@Localizer["Запит на виплату може подати лише власник магазину."]</p>
+                    }
+                </div>
             </div>
-        }
+
+            <!-- Умови + запланована автовиплата -->
+            <div class="payout-card payout-card--info">
+                <h4 class="payout-card__sub-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+                    </svg>
+                    @Localizer["Умови та регламент"]
+                </h4>
+                <ul class="payout-info-list">
+                    <li><span>@Localizer["Мінімальна сума:"]</span> <strong>0.01 ₴</strong></li>
+                    <li><span>@Localizer["Термін обробки:"]</span> <strong>1–3 робочі дні</strong></li>
+                    <li><span>@Localizer["Комісія:"]</span> <strong>0%</strong></li>
+                </ul>
+
+                @if (BusinessRoleContext.CanRequestPayout(currentRole))
+                {
+                    <hr class="my-3" />
+                    <h4 class="payout-card__sub-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+                            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        @Localizer["Запланована автовиплата"]
+                    </h4>
+                    <p class="small text-muted mb-2">
+                        @Localizer["Раз на місяць система сама виведе фіксовану суму на обрану картку, якщо вільного балансу вистачає."]
+                    </p>
+
+                    @if (Model.SavedCards.Count == 0)
+                    {
+                        <p class="small text-muted mb-0">@Localizer["Спочатку подайте звичайну заявку на виплату зі збереженням картки."]</p>
+                    }
+                    else
+                    {
+                        <div data-scheduled-payout-form data-business-id="@Model.BusinessId">
+                            <div class="form-check form-switch mb-2">
+                                <input type="checkbox" class="form-check-input" id="scheduledPayoutEnabled"
+                                       data-scheduled-enabled @(Model.ScheduledPayoutEnabled ? "checked" : "") />
+                                <label class="form-check-label" for="scheduledPayoutEnabled">
+                                    @Localizer["Увімкнути заплановану автовиплату"]
+                                </label>
+                            </div>
+
+                            <div data-scheduled-fields @(Model.ScheduledPayoutEnabled ? "" : "hidden")>
+                                <label class="form-label small mb-1">@Localizer["Дата виплати"]</label>
+                                <input type="date" class="form-control form-control-sm mb-2"
+                                       data-scheduled-date
+                                       value="@scheduledPreviewDate.ToString("yyyy-MM-dd")" />
+                                <div class="form-text small mb-2">@Localizer["Повторюється щомісяця в це саме число."]</div>
+
+                                <label class="form-label small mb-1">@Localizer["Сума, ₴"]</label>
+                                <input type="number" class="form-control form-control-sm mb-2" min="0.01" step="0.01"
+                                       data-scheduled-amount
+                                       value="@(Model.ScheduledPayoutAmount?.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))" />
+
+                                <label class="form-label small mb-1">@Localizer["Картка для виплати"]</label>
+                                <select class="form-select form-select-sm mb-2" data-scheduled-card>
+                                    @foreach (var card in Model.SavedCards)
+                                    {
+                                        <option value="@card.Id" selected="@(Model.ScheduledPayoutCardId == card.Id)">
+                                            @card.MaskedCardNumber — @card.RecipientName
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+
+                            <p class="small text-danger mb-2" data-scheduled-error hidden></p>
+                            <p class="small text-success mb-2" data-scheduled-success hidden></p>
+
+                            <button type="button" class="btn btn-sm btn-outline-primary w-100" data-save-scheduled-payout>
+                                @Localizer["Зберегти"]
+                            </button>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+
+        <!-- Історія заявок - прокручується, не розтягує сторінку -->
+        <div class="payout-history mt-4">
+            <h3 class="h6 text-muted mb-3">@Localizer["Історія заявок"]</h3>
+
+            @if (Model.Withdrawals.Count == 0)
+            {
+                <div class="payout-empty-state">
+                    <div class="payout-empty-state__icon">💳</div>
+                    <div>
+                        <h5 class="mb-1">@Localizer["Заявок на виплату ще не було"]</h5>
+                        <p class="text-muted mb-0 small">@Localizer["Після оформлення першого запиту тут з'явиться детальний статус та історія транзакцій."]</p>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="payout-history__scroll">
+                    <table class="business-table">
+                        <thead>
+                            <tr>
+                                <th>@Localizer["Дата"]</th>
+                                <th>@Localizer["Сума"]</th>
+                                <th>@Localizer["Картка"]</th>
+                                <th>@Localizer["Отримувач"]</th>
+                                <th>@Localizer["Статус"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var withdrawal in Model.Withdrawals)
+                            {
+                                <tr>
+                                    <td>@withdrawal.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                                    <td><strong>@withdrawal.Amount.ToString("N2") ₴</strong></td>
+                                    <td>@(withdrawal.CardNumber.Length >= 4 ? $"•••• {withdrawal.CardNumber[^4..]}" : withdrawal.CardNumber)</td>
+                                    <td>@withdrawal.RecipientName</td>
+                                    <td>
+                                        @WithdrawalStatusLabel(withdrawal.Status)
+                                        @if (!string.IsNullOrWhiteSpace(withdrawal.Message))
+                                        {
+                                            <div class="business-panel__lead" style="margin:0;">@withdrawal.Message</div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
     </section>
 
     <section class="business-panel">
@@ -175,6 +323,7 @@
 
 <form id="antiforgeryForm">@Html.AntiForgeryToken()</form>
 
+<!-- Модалка запиту виплати - дропдаун збережених карток у стилі Google Pay -->
 <div class="postsale-modal" data-payout-modal hidden>
     <div class="postsale-modal__card">
         <button type="button" class="postsale-modal__close" aria-label="@Localizer["Закрити"]" data-close-payout>×</button>
@@ -186,11 +335,33 @@
             <label class="form-label mt-2">@Localizer["Сума до виплати, ₴"]</label>
             <input type="number" class="form-control" data-payout-amount min="0.01" max="@Model.AvailableBalance.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)" step="0.01" value="@Model.AvailableBalance.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)" />
 
-            <label class="form-label mt-2">@Localizer["Номер картки"]</label>
-            <input type="text" class="form-control" data-payout-card placeholder="0000 0000 0000 0000" maxlength="19" />
+            <label class="form-label mt-3">@Localizer["Картка для виплати"]</label>
+            <div class="card-selector" data-card-selector>
+                <button type="button" class="card-selector__toggle" data-card-selector-toggle>
+                    <span data-card-selector-current>@Localizer["Оберіть картку"]</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="card-selector__menu" data-card-selector-menu hidden>
+                    <div data-card-options></div>
+                    <button type="button" class="card-selector__add" data-card-selector-add>
+                        + @Localizer["Додати нову картку"]
+                    </button>
+                </div>
+            </div>
+            <input type="hidden" data-selected-card-id value="" />
 
-            <label class="form-label mt-2">@Localizer["Отримувач"]</label>
-            <input type="text" class="form-control" data-payout-recipient placeholder="@Localizer["Прізвище Ім'я"]" />
+            <div class="mt-3" data-new-card-fields hidden>
+                <label class="form-label">@Localizer["Номер картки"]</label>
+                <input type="text" class="form-control" data-payout-card placeholder="0000 0000 0000 0000" maxlength="19" />
+
+                <label class="form-label mt-2">@Localizer["Отримувач"]</label>
+                <input type="text" class="form-control" data-payout-recipient placeholder="@Localizer["Прізвище Ім'я"]" />
+
+                <div class="form-check mt-2">
+                    <input type="checkbox" class="form-check-input" id="rememberCardCheck" data-remember-card checked />
+                    <label class="form-check-label" for="rememberCardCheck">@Localizer["Запам'ятати цю картку для майбутніх виплат"]</label>
+                </div>
+            </div>
 
             <button type="button" class="btn btn-primary mt-3 w-100" data-submit-payout>@Localizer["Надіслати запит"]</button>
         </div>
@@ -210,6 +381,7 @@
     <script src="~/js/business-panel-collapse.js" asp-append-version="true"></script>
     <script>
         window.__withdrawalBusinessId = "@Model.BusinessId";
+        window.__savedCards = @Html.Raw(savedCardsJson);
     </script>
     <script src="~/js/business-finance.js" asp-append-version="true"></script>
 }

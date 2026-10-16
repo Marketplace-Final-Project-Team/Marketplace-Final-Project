@@ -1,6 +1,7 @@
 @model IEnumerable<Marketplace.BLL.DTOs.WishlistCollectionDto>
 
 @{
+    Layout = "_ProfileLayout";
     ViewData["Title"] = Localizer["Колекції бажань"];
     var collections = Model.ToList();
 }

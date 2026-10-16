@@ -14,22 +14,17 @@ namespace Marketplace.Web.Models
     {
         public Guid CategoryId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
-        public List<CatalogProductViewModel> Products { get; set; } = new();
+        public List<CatalogueProductViewModel> Products { get; set; } = new();
     }
 
     public class HomeViewModel
     {
-        public List<CatalogProductViewModel> FeaturedProducts { get; set; } = new();
         public List<HomeCategoryViewModel> Categories { get; set; } = new();
         public List<HomeCategoryProductsViewModel> CategorySections { get; set; } = new();
         public List<CatalogRelatedProductViewModel> RecentlyViewed { get; set; } = new();
-        public double? AverageRating { get; set; }
-        public int ReviewCount { get; set; }
 
         public string? Search { get; set; }
         public Guid? CategoryId { get; set; }
         public string? SortBy { get; set; }
-
-        public CatalogProductViewModel? TopProduct => FeaturedProducts.FirstOrDefault();
     }
 }

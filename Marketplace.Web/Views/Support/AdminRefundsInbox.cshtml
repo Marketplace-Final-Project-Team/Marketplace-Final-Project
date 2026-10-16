@@ -1,0 +1,70 @@
+@model List<Marketplace.BLL.DTOs.RefundChatThreadDto>
+
+@{
+    ViewData["Title"] = $"{Localizer["Чати повернень"].Value} - {SharedLocalizer["Адмін-панель"].Value}";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+}
+
+<div class="admin-page">
+    <div class="admin-shell">
+        <partial name="~/Views/Admin/_AdminNav.cshtml" />
+
+        <div class="admin-content">
+            <header class="admin-header">
+                <div>
+                    <div class="admin-kicker">Admin</div>
+                    <h1 class="admin-title">@Localizer["Чати повернень"]</h1>
+                    <p class="admin-subtitle">@Localizer["Відкриті заявки на повернення та листування з покупцями."]</p>
+                </div>
+            </header>
+
+            @if (Model.Count == 0)
+            {
+                <div class="admin-panel">
+                    <p class="admin-empty">@Localizer["Поки що немає відкритих чатів щодо повернень."]</p>
+                </div>
+            }
+            else
+            {
+                <div class="admin-panel table-responsive">
+                    <table class="table admin-table">
+                        <thead>
+                            <tr>
+                                <th>@Localizer["Покупець"]</th>
+                                <th>@Localizer["Замовлення"]</th>
+                                <th>@Localizer["Причина"]</th>
+                                <th>@Localizer["Останнє повідомлення"]</th>
+                                <th>@Localizer["Час"]</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var thread in Model)
+                            {
+                                <tr>
+                                    <td class="admin-entity-name">@thread.BuyerName</td>
+                                    <td>#@thread.OrderNumber</td>
+                                    <td class="admin-entity-meta">@thread.Reason</td>
+                                    <td class="admin-entity-meta">
+                                        @thread.LastMessageText
+                                        @if (thread.UnreadCount > 0)
+                                        {
+                                            <span class="admin-status admin-status--pending">@thread.UnreadCount @Localizer["нових"]</span>
+                                        }
+                                    </td>
+                                    <td>@thread.LastMessageAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
+                                    <td>
+                                        <a class="btn btn-sm btn-outline-primary" asp-controller="Support" asp-action="RefundChat" asp-route-requestId="@thread.PostSaleRequestId" asp-route-isSellerChannel="false">@Localizer["Відкрити чат"]</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

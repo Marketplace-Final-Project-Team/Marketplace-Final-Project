@@ -25,8 +25,6 @@ namespace Marketplace.Web.Models.Products
         [StringLength(100)]
         public string? Sku { get; set; }
 
-        public List<ProductVariantInputModel> Variants { get; set; } = new();
-
         [Required(ErrorMessage = "Оберіть категорію")]
         public Guid CategoryId { get; set; }
 
@@ -36,6 +34,7 @@ namespace Marketplace.Web.Models.Products
         public string? ExistingMainImageUrl { get; set; }
         public IFormFile? MainImage { get; set; }
         public List<IFormFile>? AdditionalImages { get; set; }
+        public List<string>? ExistingAdditionalImageUrls { get; set; }
 
         public IEnumerable<SelectListItem> Categories { get; set; } = new List<SelectListItem>();
     }

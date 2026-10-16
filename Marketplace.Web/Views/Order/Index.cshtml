@@ -1,6 +1,7 @@
 @model IReadOnlyList<Marketplace.Web.Models.OrderListItemViewModel>
 
 @{
+    Layout = "_ProfileLayout";
     ViewData["Title"] = SharedLocalizer["Мої замовлення"];
 }
 
@@ -54,11 +55,11 @@
                     </div>
                     <div class="order-card__bottom">
                         <div>
-                            <div class="order-card__address">@Localizer["Доставка:"] @order.ShippingAddress</div>
-                            @if (!string.IsNullOrWhiteSpace(order.DeliveryMethodLabel))
+                            @if (!string.IsNullOrWhiteSpace(order.DeliveryCarrierLabel))
                             {
-                                <div class="order-card__address">@order.DeliveryMethodLabel</div>
+                                <div class="order-card__address"><strong>@Localizer["Служба доставки"]:</strong> @Localizer[order.DeliveryCarrierLabel].Value</div>
                             }
+                            <div class="order-card__address"><strong>@Localizer["Адреса"]:</strong> @order.ShippingAddress</div>
                             <div class="order-card__total">@order.TotalAmount.ToString("N2") ₴</div>
                         </div>
                         <div class="d-flex gap-2">

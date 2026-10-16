@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Marketplace.BLL.Common;
 using Marketplace.BLL.Configs;
 using Marketplace.BLL.DTOs;
@@ -18,7 +19,6 @@ namespace Marketplace.BLL.Services
     {
         private readonly IGenericRepository<Order> _orerRepository;
         private readonly ICartItemRepository _cartItemRepository;
-        private readonly IGenericRepository<Address> _addressRepository;
         private readonly IGenericRepository<Product> _productRepository;
         private readonly AppDbContext _context;
         private readonly IPaymentService _paymentService;
@@ -30,7 +30,6 @@ namespace Marketplace.BLL.Services
         public OrderService(
             IGenericRepository<Order> orerRepository,
             ICartItemRepository cartItemRepository,
-            IGenericRepository<Address> addressRepository,
             IGenericRepository<Product> productRepository,
             AppDbContext context,
             IPaymentService paymentService,
@@ -41,7 +40,6 @@ namespace Marketplace.BLL.Services
         {
             _orerRepository = orerRepository;
             _cartItemRepository = cartItemRepository;
-            _addressRepository = addressRepository;
             _productRepository = productRepository;
             _paymentService = paymentService;
             _promoCodeService = promoCodeService;
@@ -54,6 +52,14 @@ namespace Marketplace.BLL.Services
         public async Task<OrderResultDto> CreateOrder(string userId, OrderCreateDto dto)
         {
 
+            var errors = new List<ValidationResult>();
+            if (!Validator.TryValidateObject(dto, new ValidationContext(dto), errors, validateAllProperties: true)
+                || (dto.DeliveryCarrier == "NovaPoshta"
+                    && (string.IsNullOrWhiteSpace(dto.NovaPoshtaCityRef) || string.IsNullOrWhiteSpace(dto.NovaPoshtaBranchRef))))
+            {
+                return new OrderResultDto { Succeeded = false, Message = "Перевірте дані отримувача та доставки." };
+            }
+
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
@@ -64,13 +70,6 @@ namespace Marketplace.BLL.Services
                     return new OrderResultDto { Succeeded = false, Message = "Кошик пустий." };
                 }
 
-                var address = await _addressRepository.FirstOrDefaultAsync(a => a.Id == dto.AddressId && a.UserId == userId);
-                if (address == null)
-                {
-                    return new OrderResultDto { Succeeded = false, Message = "Адреса не знайдена." };
-                }
-
-                
                 var orderItems = new List<OrderItem>();
                 var promoCode = !string.IsNullOrWhiteSpace(dto.PromoCode)
                     ? await _promoCodeService.FindActiveAsync(dto.PromoCode)
@@ -89,7 +88,7 @@ namespace Marketplace.BLL.Services
                         };
                     }
 
-                    var availableStock = cartItem.ProductVariant?.Quantity ?? cartItem.Product.Quantity;
+                    var availableStock = cartItem.Product.Quantity;
                     if (availableStock < cartItem.Quantity)
                     {
                         return new OrderResultDto { Succeeded = false, Message = $"Недостатньо товару «{cartItem.Product.Name}» на складі." };
@@ -109,17 +108,12 @@ namespace Marketplace.BLL.Services
                         ProductId = cartItem.ProductId,
                         ProductName = cartItem.Product.Name,
                         ProductVariantId = cartItem.ProductVariantId,
-                        VariantSize = cartItem.ProductVariant?.Size,
-                        VariantSku = cartItem.ProductVariant?.Sku ?? cartItem.Product.Sku,
+                        VariantSku = cartItem.Product.Sku,
                         UnitPrice = unitPrice,
                         Quantity = cartItem.Quantity,
                         IsReturned = false
                     };
 
-                    if (cartItem.ProductVariant != null)
-                    {
-                        cartItem.ProductVariant.Quantity -= cartItem.Quantity;
-                    }
                     cartItem.Product.Quantity -= cartItem.Quantity;
                     _productRepository.Update(cartItem.Product);
 
@@ -134,9 +128,16 @@ namespace Marketplace.BLL.Services
                     Items = orderItems,
                     TotalAmount = totalAmount,
                     CreatedAt = DateTime.UtcNow,
-                    ShippingCountry = address.Country,
-                    ShippingCity = address.City,
-                    ShippingStreet = address.Street,
+                    RecipientLastName = dto.RecipientLastName.Trim(),
+                    RecipientFirstName = dto.RecipientFirstName.Trim(),
+                    RecipientPhone = dto.RecipientPhone.Trim(),
+                    ShippingCountry = "Україна",
+                    ShippingCity = dto.ShippingCity.Trim(),
+                    ShippingStreet = dto.ShippingStreet.Trim(),
+                    DeliveryCarrier = dto.DeliveryCarrier,
+                    PaymentMethod = dto.PaymentMethod,
+                    NovaPoshtaCityRef = dto.NovaPoshtaCityRef?.Trim(),
+                    NovaPoshtaBranchRef = dto.NovaPoshtaBranchRef?.Trim(),
                     Status = OrderStatus.Pending
                 };
 
@@ -151,7 +152,7 @@ namespace Marketplace.BLL.Services
                 await _context.SaveChangesAsync();
 
 
-                var paymentData = await _paymentService.CreatePaymentAsync(
+                var paymentData = dto.PaymentMethod == "CashOnDelivery" ? null : await _paymentService.CreatePaymentAsync(
                     orderId: order.Id.ToString(),
                     amount: order.TotalAmount,
                     description: $"Оплата замовлення #{order.Id}",
@@ -214,6 +215,8 @@ namespace Marketplace.BLL.Services
                             item.CommissionAmount = commission;
                             business.Balance += netAmount;
                             marketplaceBalance.Balance += commission;
+                            business.HeldBalance += netAmount;
+                            item.HeldAmount = netAmount;
                         }
                     }
                 }
@@ -226,10 +229,6 @@ namespace Marketplace.BLL.Services
                         if (item.Product != null)
                         {
                             item.Product.Quantity += item.Quantity;
-                        }
-                        if (item.ProductVariant != null)
-                        {
-                            item.ProductVariant.Quantity += item.Quantity;
                         }
                     }
 
@@ -247,6 +246,12 @@ namespace Marketplace.BLL.Services
 
                                 item.Product.Business.Balance -= netAmount;
                                 marketplaceBalance.Balance -= item.CommissionAmount;
+
+                                if (item.HeldAmount.HasValue && !item.IsBalanceReleased)
+                                {
+                                    item.Product.Business.HeldBalance -= item.HeldAmount.Value;
+                                    item.IsBalanceReleased = true;
+                                }
                             }
                         }
                     }
@@ -296,11 +301,6 @@ namespace Marketplace.BLL.Services
                 {
                     item.Product.Quantity += item.Quantity;
 
-                    if (item.ProductVariant != null)
-                    {
-                        item.ProductVariant.Quantity += item.Quantity;
-                    }
-
                     if (item.Product.Business != null)
                     {
                         var amount = Math.Round(item.UnitPrice * item.Quantity, 2, MidpointRounding.AwayFromZero);
@@ -309,6 +309,11 @@ namespace Marketplace.BLL.Services
 
                         item.Product.Business.Balance -= netAmount;
                         marketplaceBalance.Balance -= item.CommissionAmount;
+                        if (item.HeldAmount.HasValue && !item.IsBalanceReleased)
+                        {
+                            item.Product.Business.HeldBalance -= item.HeldAmount.Value;
+                            item.IsBalanceReleased = true;
+                        }
                     }
                 }
 
@@ -343,7 +348,7 @@ namespace Marketplace.BLL.Services
                 .ThenInclude(item => item.Product)
                 .FirstOrDefaultAsync();
 
-        public async Task<BusinessOrderSummaryDto> GetBusinessOrderSummary(Guid businessId)
+        public async Task<BusinessOrderSummaryDto> GetBusinessOrderSummaryAsync(Guid businessId)
         {
             var orderLines = await _context.OrderItems
                 .AsNoTracking()
@@ -465,9 +470,12 @@ namespace Marketplace.BLL.Services
                 CreatedAt = order.CreatedAt,
                 Status = order.Status,
                 OrderTotalAmount = order.TotalAmount,
-                BuyerName = order.User.UserName ?? string.Empty,
+                BuyerName = string.IsNullOrWhiteSpace(order.RecipientLastName)
+                    ? order.User.UserName ?? string.Empty
+                    : $"{order.RecipientLastName} {order.RecipientFirstName}",
                 BuyerEmail = order.User.Email ?? string.Empty,
-                BuyerPhone = order.User.PhoneNumber ?? string.Empty,
+                BuyerPhone = string.IsNullOrWhiteSpace(order.RecipientPhone)
+                    ? order.User.PhoneNumber ?? string.Empty : order.RecipientPhone,
                 ShippingCountry = order.ShippingCountry,
                 ShippingCity = order.ShippingCity,
                 ShippingStreet = order.ShippingStreet,

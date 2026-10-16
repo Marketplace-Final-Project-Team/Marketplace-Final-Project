@@ -3,11 +3,13 @@
 @{
     ViewData["Title"] = Model.Name;
     var statusClass = Model.Status.ToLowerInvariant();
+    var isArchived = Model.Status == "Archived";
     var statusLabel = Model.Status switch
     {
         "Active" => Localizer["Активний"].Value,
         "Pending" => Localizer["На модерації"].Value,
         "Banned" => Localizer["Заблокований"].Value,
+        "Archived" => Localizer["Архівований"].Value,
         _ => Model.Status
     };
 }
@@ -17,17 +19,28 @@
 }
 
 <div class="products-page">
-    <a asp-action="Index" class="products-back">← @Localizer["Назад до товарів"]</a>
+    <a asp-action="Index" asp-route-filter="@(isArchived ? "archived" : null)" class="products-back">← @Localizer["Назад до товарів"]</a>
     <header class="products-heading">
         <div>
             <div class="products-eyebrow">@Localizer["Картка товару"]</div>
             <h1 class="products-title">@Model.Name</h1>
         </div>
-        <div class="d-flex gap-2">
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">@Localizer["Редагувати"]</a>
-            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">@Localizer["Видалити"]</a>
-        </div>
+        @if (!isArchived)
+        {
+            <div class="d-flex gap-2">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">@Localizer["Редагувати"]</a>
+                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">@Localizer["Видалити"]</a>
+            </div>
+        }
     </header>
+
+    @if (isArchived)
+    {
+        <div class="alert alert-secondary" role="alert">
+            <strong>@Localizer["Товар архівовано."]</strong>
+            @Localizer["Він прихований з каталогу, але історія замовлень і фінанси збережені."]
+        </div>
+    }
 
     @if (Model.Status == "Banned" && !string.IsNullOrWhiteSpace(Model.ModerationReason))
     {
@@ -77,20 +90,6 @@
                     <span class="small text-break">@Model.Id</span>
                 </div>
             </div>
-
-            @if (Model.Variants.Count > 0)
-            {
-                <div class="product-meta mt-3">
-                    <span class="product-meta__label d-block mb-2">@Localizer["Розміри"]</span>
-                    @foreach (var variant in Model.Variants)
-                    {
-                        <div class="product-meta__row">
-                            <span class="product-meta__label">@variant.Size @(string.IsNullOrWhiteSpace(variant.Sku) ? "" : $"({variant.Sku})")</span>
-                            <strong>@variant.Quantity @Localizer["шт."]</strong>
-                        </div>
-                    }
-                </div>
-            }
         </div>
     </div>
 

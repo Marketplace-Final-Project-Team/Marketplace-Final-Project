@@ -27,6 +27,8 @@ namespace Marketplace.Web.Models
         [StringLength(250)]
         public string Street { get; set; } = string.Empty;
 
+        public string? ReturnUrl { get; set; }
+
         public bool IsDefault { get; set; }
     }
 }

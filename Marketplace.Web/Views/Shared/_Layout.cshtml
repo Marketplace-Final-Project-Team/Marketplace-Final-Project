@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 @inject Marketplace.BLL.Interfaces.ICategoryService CategoryService
+@inject Microsoft.AspNetCore.Identity.UserManager<Marketplace.Domain.Entities.User> UserManager
 @{
     var fullUserName = User.Identity?.Name ?? string.Empty;
     var compactUserName = fullUserName.Contains('@')
@@ -12,6 +13,8 @@
         ? "U"
         : compactUserName[..1].ToUpperInvariant();
     var isAuthenticated = User.Identity?.IsAuthenticated == true;
+    var currentUser = isAuthenticated ? await UserManager.GetUserAsync(User) : null;
+    var avatarUrl = currentUser?.AvatarUrl;
     var headerCategories = await CategoryService.GetAllCategories();
 }
 <html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
@@ -26,10 +29,18 @@
     <link rel="stylesheet" href="~/css/footer.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/search-autocomplete.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/cookie-consent.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/ai-chat.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/notifications.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site-dialog.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Marketplace.Web.styles.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
+    @if (isAuthenticated)
+    {
+        <partial name="_AIChatWidget" />
+    }
+
     <header class="site-header">
         <div class="site-header__top">
             <div class="site-header__inner">
@@ -83,7 +94,16 @@
                     {
                         <div class="site-header__account dropdown">
                             <button class="site-header__account-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="@fullUserName">
-                                <span class="site-header__account-avatar" aria-hidden="true">@userInitial</span>
+                                <span class="site-header__account-avatar" aria-hidden="true">
+                                    @if (!string.IsNullOrWhiteSpace(avatarUrl))
+                                    {
+                                        <img src="@avatarUrl" alt="" />
+                                    }
+                                    else
+                                    {
+                                        @userInitial
+                                    }
+                                </span>
                                 <span class="site-header__account-text">
                                     <small>@SharedLocalizer["Вітаємо,"]</small>
                                     <strong>@compactUserName</strong>
@@ -134,6 +154,25 @@
                                 <li><a class="dropdown-item" asp-controller="Auth" asp-action="SignIn">@SharedLocalizer["Увійти"]</a></li>
                                 <li><a class="dropdown-item" asp-controller="Auth" asp-action="SignUp">@SharedLocalizer["Створити акаунт"]</a></li>
                             </ul>
+                        </div>
+                    }
+
+                    @if (isAuthenticated)
+                    {
+                        <div class="dropdown" style="position: relative;">
+                            <button type="button" class="notif-bell" data-notif-bell aria-label="Сповіщення">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" aria-hidden="true">
+                                    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                                </svg>
+                                <span class="notif-bell__badge" data-notif-badge hidden>0</span>
+                            </button>
+                            <div class="notif-dropdown" data-notif-dropdown hidden>
+                                <div class="notif-dropdown__header">Сповіщення</div>
+                                <div data-notif-list>
+                                    <div class="notif-dropdown__empty">Завантаження...</div>
+                                </div>
+                            </div>
                         </div>
                     }
 
@@ -303,8 +342,15 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/discount-time.js" asp-append-version="true"></script>
+    <script src="~/js/site-dialog.js" asp-append-version="true"></script>
     <script src="~/js/cookie-consent.js" asp-append-version="true"></script>
     <script src="~/js/search-autocomplete.js" asp-append-version="true"></script>
+    @if (isAuthenticated)
+    {
+        <script src="~/js/ai-chat.js" asp-append-version="true"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+        <script src="~/js/notifications.js" asp-append-version="true"></script>
+    }
     @await RenderSectionAsync("Scripts", required: false)
 
 

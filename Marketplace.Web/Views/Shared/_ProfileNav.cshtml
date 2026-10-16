@@ -1,0 +1,70 @@
+@using Marketplace.BLL.Interfaces
+@using Marketplace.Domain.Entities
+@using Microsoft.AspNetCore.Identity
+@inject IProfileService ProfileService
+@inject UserManager<User> UserManager
+
+@{
+    var controller = (ViewContext.RouteData.Values["controller"] as string ?? string.Empty).ToLowerInvariant();
+    var action = (ViewContext.RouteData.Values["action"] as string ?? string.Empty).ToLowerInvariant();
+
+    bool Is(string c, params string[] actions) =>
+        controller == c && (actions.Length == 0 || actions.Contains(action));
+
+    string Active(bool isActive) => isActive ? "is-active" : string.Empty;
+
+    var userName = User.Identity?.Name ?? string.Empty;
+    var displayName = userName.Contains('@') ? userName.Split('@', 2)[0] : userName;
+    var initial = string.IsNullOrWhiteSpace(displayName) ? "U" : displayName[..1].ToUpperInvariant();
+
+    string? avatarUrl = null;
+    var currentUserId = UserManager.GetUserId(User);
+    if (!string.IsNullOrEmpty(currentUserId))
+    {
+        avatarUrl = (await ProfileService.GetProfileAsync(currentUserId))?.Avatar;
+    }
+}
+
+<aside class="profile-nav" aria-label="@SharedLocalizer["Особистий кабінет"]">
+    <a asp-controller="Profile" asp-action="Index" class="profile-nav__user">
+        @if (!string.IsNullOrEmpty(avatarUrl))
+        {
+            <img src="@avatarUrl" class="profile-nav__avatar profile-nav__avatar--img" alt="" />
+        }
+        else
+        {
+            <span class="profile-nav__avatar" aria-hidden="true">@initial</span>
+        }
+        <span class="profile-nav__user-text">
+            <small>@SharedLocalizer["Особистий кабінет"]</small>
+            <strong>@displayName</strong>
+        </span>
+    </a>
+
+    <div class="profile-nav__group">
+        <h3>@SharedLocalizer["Покупки"]</h3>
+        <a asp-controller="Order" asp-action="Index" class="@Active(Is("order", "index"))">@SharedLocalizer["Мої замовлення"]</a>
+        <a asp-controller="Profile" asp-action="RecentlyViewed" class="@Active(Is("profile", "recentlyviewed"))">@SharedLocalizer["Список перегляду"]</a>
+        <a asp-controller="Profile" asp-action="Activity" class="@Active(Is("profile", "activity"))">@SharedLocalizer["Сповіщення"]</a>
+    </div>
+
+    <div class="profile-nav__group">
+        <h3>@SharedLocalizer["Мої списки"]</h3>
+        <a asp-controller="Profile" asp-action="Wishlist" class="@Active(Is("profile", "wishlist"))">@SharedLocalizer["Список бажань"]</a>
+        <a asp-controller="WishlistCollection" asp-action="Index" class="@Active(controller == "wishlistcollection" && action != "create")">@SharedLocalizer["Колекції бажань"]</a>
+        <a asp-controller="WishlistCollection" asp-action="Create" class="@Active(Is("wishlistcollection", "create"))">@SharedLocalizer["Створити список"]</a>
+    </div>
+
+    <div class="profile-nav__group">
+        <h3>@SharedLocalizer["Налаштування покупок"]</h3>
+        <a asp-controller="Profile" asp-action="Addresses" class="@Active(Is("profile", "addresses", "createaddress", "editaddress"))">@SharedLocalizer["Адреси доставки"]</a>
+        <a asp-controller="Profile" asp-action="Discounts" class="@Active(Is("profile", "discounts"))">@SharedLocalizer["Мої знижки"]</a>
+    </div>
+
+    <div class="profile-nav__group">
+        <h3>@SharedLocalizer["Акаунт"]</h3>
+        <a asp-controller="Profile" asp-action="UpdateProfile" class="@Active(Is("profile", "updateprofile"))">@SharedLocalizer["Профіль"]</a>
+        <a asp-controller="Profile" asp-action="ChangePassword" class="@Active(Is("profile", "changepassword"))">@SharedLocalizer["Зміна пароля"]</a>
+        <a asp-controller="Profile" asp-action="ChangeEmail" class="@Active(Is("profile", "changeemail"))">@SharedLocalizer["Змінити Email"]</a>
+    </div>
+</aside>

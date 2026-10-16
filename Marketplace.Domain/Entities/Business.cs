@@ -14,12 +14,21 @@ namespace Marketplace.Domain.Entities
         public string BannerUrl { get; set; } = string.Empty;
 
         public decimal Balance { get; set; } = 0;
-        public decimal CommissionPercent {  get; set; } = 20;
+        public decimal CommissionPercent { get; set; } = 20;
+
+        public decimal HeldBalance { get; set; } = 0;
 
         public BusinessStatus Status { get; set; } = BusinessStatus.Pending;
 
         public AdultContentStatus AdultStatus { get; set; } = AdultContentStatus.None;
         public string? AdultRejectionReason { get; set; }
+        public ICollection<SavedPayoutCard> SavedPayoutCards { get; set; } = new List<SavedPayoutCard>();
+        public bool ScheduledPayoutEnabled { get; set; } = false;
+        public int? ScheduledPayoutDayOfMonth { get; set; }
+        public decimal? ScheduledPayoutAmount { get; set; }
+        public Guid? ScheduledPayoutCardId { get; set; }
+        public SavedPayoutCard? ScheduledPayoutCard { get; set; }
+        public DateTime? LastScheduledPayoutAt { get; set; }
 
         public ICollection<BusinessMember> Members { get; set; } = new List<BusinessMember>();
         public ICollection<Product> Products { get; set; } = new List<Product>();
@@ -31,9 +40,9 @@ namespace Marketplace.Domain.Entities
 
     public enum AdultContentStatus
     {
-        None = 0,       
-        Pending = 1,    
-        Approved = 2,   
-        Rejected = 3    
+        None = 0,
+        Pending = 1,
+        Approved = 2,
+        Rejected = 3
     }
 }

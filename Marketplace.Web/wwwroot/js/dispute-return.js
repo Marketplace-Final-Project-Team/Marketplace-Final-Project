@@ -1,13 +1,8 @@
 (() => {
-    console.log('[dispute-return.js] завантажено, шукаю кнопки...');
-
     const buttons = document.querySelectorAll('[data-dispute-submit]');
-    console.log('[dispute-return.js] знайдено кнопок:', buttons.length);
 
     buttons.forEach((button) => {
         button.addEventListener('click', async () => {
-            console.log('[dispute-return.js] клік по кнопці', button.dataset.requestId);
-
             const requestId = button.dataset.requestId;
             const businessId = button.dataset.businessId;
             const orderId = button.dataset.orderId;
@@ -16,7 +11,19 @@
             const successWrap = document.querySelector(`[data-dispute-success="${requestId}"]`);
             const reasonField = formWrap.querySelector('[data-dispute-reason]');
             const photosField = formWrap.querySelector('[data-dispute-photos]');
+            const errorField = formWrap.querySelector('[data-dispute-error]');
             const reason = reasonField.value.trim();
+
+            const showError = (message) => {
+                if (errorField) {
+                    errorField.textContent = message;
+                    errorField.hidden = false;
+                }
+            };
+
+            if (errorField) {
+                errorField.hidden = true;
+            }
 
             if (reason.length < 10) {
                 reasonField.setCustomValidity('Мінімум 10 символів.');
@@ -44,8 +51,6 @@
                 const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
                 if (tokenInput) {
                     formData.append('__RequestVerificationToken', tokenInput.value);
-                } else {
-                    console.warn('[dispute-return.js] antiforgery токен не знайдено на сторінці!');
                 }
 
                 const response = await fetch('/Business/DisputeReturn', {
@@ -53,17 +58,14 @@
                     body: formData
                 });
 
-                console.log('[dispute-return.js] статус відповіді:', response.status);
-
                 if (!response.ok) {
-                    alert('Сервер повернув помилку (' + response.status + '). Перевірте консоль.');
+                    showError('Не вдалося надіслати заявку. Спробуйте ще раз.');
                     button.disabled = false;
                     button.textContent = 'Надіслати на розгляд адміну';
                     return;
                 }
 
                 const result = await response.json();
-                console.log('[dispute-return.js] результат:', result);
 
                 if (result.success) {
                     formWrap.hidden = true;
@@ -73,13 +75,13 @@
                         window.location.href = `/Support/RefundChat?requestId=${result.requestId}&isSellerChannel=true`;
                     }, 2000);
                 } else {
-                    alert('Помилка: ' + (result.message || 'Не вдалося надіслати заявку.'));
+                    showError(result.message || 'Не вдалося надіслати заявку.');
                     button.disabled = false;
                     button.textContent = 'Надіслати на розгляд адміну';
                 }
             } catch (error) {
-                console.error('[dispute-return.js] помилка відправки:', error);
-                alert("Сталася помилка з'єднання із сервером. Дивіться консоль (F12).");
+                console.error('Помилка відправки заявки:', error);
+                showError('Сталася помилка з’єднання із сервером.');
                 button.disabled = false;
                 button.textContent = 'Надіслати на розгляд адміну';
             }

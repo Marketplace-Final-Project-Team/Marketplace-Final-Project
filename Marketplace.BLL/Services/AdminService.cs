@@ -301,6 +301,11 @@ namespace Marketplace.BLL.Services
                 return new ServiceResult { Succeeded = false, Message = "Не вдалося оновити статус користувача" };
             }
 
+            if (userStatus != UserStatus.Active)
+            {
+                await _userManager.UpdateSecurityStampAsync(user);
+            }
+
             return new ServiceResult { Succeeded = true, Message = string.Empty };
         }
 
@@ -612,7 +617,80 @@ namespace Marketplace.BLL.Services
                 BannedProductCount = products.Count(p => p.Status == ProductStatus.Banned)
             };
         }
-        public async Task<IReadOnlyList<ReviewAppealAdminDto>> GetPendingAppeals()
+
+        public async Task<UserAdminDetailsDto?> GetUserDetailsAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return null;
+            }
+
+            return new UserAdminDetailsDto
+            {
+                Id = user.Id,
+                UserName = user.UserName ?? string.Empty,
+                Email = user.Email ?? string.Empty,
+                AvatarUrl = user.AvatarUrl,
+                Status = user.Status,
+                CreatedAt = user.CreatedAt
+            };
+        }
+
+        public async Task<PagedResult<ReviewAdminDto>> GetFilteredReviewsAsync(ReviewAdminQueryDto query)
+        {
+            var reviewsQuery = _context.Reviews.AsNoTracking().AsQueryable();
+
+            if (query.Status != null)
+            {
+                reviewsQuery = reviewsQuery.Where(r => r.Status == query.Status);
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim();
+                reviewsQuery = reviewsQuery.Where(r =>
+                    r.Body.Contains(search)
+                    || r.Product.Name.Contains(search)
+                    || (r.User.UserName != null && r.User.UserName.Contains(search))
+                    || (r.User.Email != null && r.User.Email.Contains(search)));
+            }
+
+            var pageSize = query.Pagination.PageSize <= 0 ? 20 : query.Pagination.PageSize;
+            var page = Math.Max(1, query.Pagination.Page);
+            var totalCount = await reviewsQuery.CountAsync();
+
+            var items = await reviewsQuery
+                .OrderByDescending(r => r.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(r => new ReviewAdminDto
+                {
+                    Id = r.Id,
+                    ProductId = r.ProductId,
+                    ProductName = r.Product.Name,
+                    UserId = r.UserId,
+                    UserName = r.User.UserName ?? r.User.Email ?? string.Empty,
+                    Body = r.Body,
+                    Rating = r.Rating,
+                    Status = r.Status,
+                    ModerationReason = r.ModerationReason,
+                    ModeratedAt = r.ModeratedAt,
+                    HasPendingAppeal = _context.ReviewAppeals.Any(a => a.ReviewId == r.Id && a.Status == ReviewAppealStatus.Pending),
+                    CreatedAt = r.CreatedAt
+                })
+                .ToListAsync();
+
+            return new PagedResult<ReviewAdminDto>
+            {
+                Items = items,
+                Page = page,
+                TotalItems = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
+            };
+        }
+
+        public async Task<IReadOnlyList<ReviewAppealAdminDto>> GetPendingAppealsAsync()
         {
             return await _context.ReviewAppeals
             .AsNoTracking()
@@ -743,6 +821,42 @@ namespace Marketplace.BLL.Services
             review.ModerationReason = reason.Trim();
             await _context.SaveChangesAsync();
             return new ServiceResult { Succeeded = true, Message = "Відгук відхилено" };
+        }
+
+        public async Task<ServiceResult> EditReview(Guid reviewId, string adminUserId, string body)
+        {
+            if (string.IsNullOrWhiteSpace(adminUserId))
+            {
+                return new ServiceResult { Succeeded = false, Message = "Не вдалося визначити адміністратора" };
+            }
+
+            var normalizedBody = body?.Trim() ?? string.Empty;
+            if (normalizedBody.Length == 0)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Текст відгуку не може бути порожнім" };
+            }
+
+            if (normalizedBody.Length > 300)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Текст відгуку не може перевищувати 300 символів" };
+            }
+
+            var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == reviewId && !r.IsDeleted);
+            if (review == null)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Відгук не знайдено" };
+            }
+
+            if (await _context.ReviewAppeals.AnyAsync(a => a.ReviewId == reviewId && a.Status == ReviewAppealStatus.Pending))
+            {
+                return new ServiceResult { Succeeded = false, Message = "Відгук не можна редагувати, поки апеляція очікує розгляду" };
+            }
+
+            review.Body = normalizedBody;
+            review.ModeratedByAdminId = adminUserId;
+            review.ModeratedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return new ServiceResult { Succeeded = true, Message = "Відгук оновлено" };
         }
 
     }

@@ -1,16 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using ClosedXML.Excel;
-using Microsoft.EntityFrameworkCore;
 using Marketplace.BLL.Common;
 using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
+using Marketplace.BLL.Jobs;
 using Marketplace.DAL.Data;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
 using Marketplace.Domain.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Quartz;
 using AdultContentStatus = Marketplace.Domain.Entities.AdultContentStatus;
 
@@ -19,17 +17,20 @@ namespace Marketplace.BLL.Services;
 public class ProductService : IProductService
 {
     private readonly IGenericRepository<Product> _productRepository;
+    private readonly IGenericRepository<ProductImage> _productImageRepository;
     private readonly IImageStorageService _imageStorageService;
     private readonly AppDbContext _context;
     private readonly ISchedulerFactory _schedulerFactory;
 
     public ProductService(
         IGenericRepository<Product> productRepository,
+        IGenericRepository<ProductImage> productImageRepository,
         IImageStorageService imageStorageService,
         AppDbContext context,
         ISchedulerFactory schedulerFactory)
     {
         _productRepository = productRepository;
+        _productImageRepository = productImageRepository;   
         _imageStorageService = imageStorageService;
         _context = context;
         _schedulerFactory = schedulerFactory;
@@ -93,11 +94,25 @@ public class ProductService : IProductService
         await scheduler.ScheduleJob(job, trigger);
     }
 
+    private async Task<List<string>> UploadManyAsync(IEnumerable<IFormFile>? files)
+    {
+        if (files == null) return new List<string>();
+
+        var list = files.ToList();
+        var urls = await Task.WhenAll(list.Select(f => _imageStorageService.UploadImageAsync(f)));
+
+        var failed = list.Where((_, i) => urls[i] == null).Select(f => f.FileName).ToList();
+        if (failed.Count > 0) throw new InvalidOperationException($"Не вдалося завантажити зображення: {string.Join(", ", failed)}.");
+       
+        return urls.Select(u => u!).ToList();
+    }
+
     public async Task<IReadOnlyList<Product>> GetCatalogAsync(string? search = null, bool allowAdultContent = false)
     {
         var query = _context.Products
             .AsNoTracking()
             .Include(p => p.Category)
+            .Include(p => p.Discounts)
             .Include(p => p.Business)
                 .ThenInclude(b => b.Discounts)  
             .Include(p => p.Category)
@@ -126,9 +141,9 @@ public class ProductService : IProductService
             .ToListAsync();
     }
 
-    public async Task<CatalogPageResultDto> GetCatalogPageAsync(CatalogFilterDto filter, bool allowAdultContent = false)
+    public async Task<CataloguePageResultDto> GetCataloguePageAsync(CatalogueFilterDto filter, bool allowAdultContent = false)
     {
-        var query = _context.Products
+        var query = _productRepository.GetQueryable()
             .AsNoTracking()
             .Include(p => p.Category)
             .Include(p => p.Business)
@@ -159,7 +174,7 @@ public class ProductService : IProductService
                 || (p.Category != null && p.Category.Name.Contains(normalizedSearch)));
         }
 
-        if (filter.InStockOnly)
+        if (filter.InStockOnly == true)
         {
             query = query.Where(p => p.Quantity > 0);
         }
@@ -178,20 +193,47 @@ public class ProductService : IProductService
         var pageSize = filter.PageSize <= 0 ? 12 : filter.PageSize;
         var page = filter.Page <= 0 ? 1 : filter.Page;
 
-        var products = await query
-            .OrderByDescending(p => p.CreatedAt)
+        IOrderedQueryable<Product> ordered;
+
+        switch (filter.Sort)
+        {
+            case CatalogueSortOption.PriceAsc:
+                ordered = query.OrderBy(p => p.Price);
+                break;
+
+            case CatalogueSortOption.PriceDesc:
+                ordered = query.OrderByDescending(p => p.Price);
+                break;
+
+            case CatalogueSortOption.Rating:
+                ordered = query.OrderByDescending(p => p.Reviews
+                    .Where(r => r.Status == ReviewStatus.Approved && !r.IsDeleted)
+                    .Average(r => (double?)r.Rating) ?? 0);
+                break;
+
+            case CatalogueSortOption.Popularity:
+                ordered = query.OrderByDescending(p => p.OrderItems.Sum(oi => oi.Quantity));
+                break;
+
+            default:
+                ordered = query.OrderByDescending(p => p.CreatedAt);
+                break;
+        }
+
+        var products = await ordered
+            .ThenBy(p => p.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
-        var items = products.Select(p => new CatalogPageItemDto
+        var items = products.Select(p => new CataloguePageItemDto
         {
             Product = p,
             AverageRating = 0,
             ReviewCount = 0
         }).ToList();
 
-        return new CatalogPageResultDto
+        return new CataloguePageResultDto
         {
             Items = items,
             TotalCount = totalCount,
@@ -200,7 +242,7 @@ public class ProductService : IProductService
         };
     }
 
-    public async Task<Product?> GetCatalogProductAsync(Guid id, bool allowAdultContent = false)
+    public async Task<Product?> GetCatalogueProductAsync(Guid id, bool allowAdultContent = false)
     {
         var product = await _context.Products
             .AsNoTracking()
@@ -306,7 +348,14 @@ public class ProductService : IProductService
             }
         }
 
-        var variants = BuildVariants(dto.Variants);
+        if (dto.MainImage == null)
+            throw new InvalidOperationException("Головне зображення товару обов'язкове.");
+
+        var mainImageUrl = await _imageStorageService.UploadImageAsync(dto.MainImage);
+        if (mainImageUrl == null)
+            throw new InvalidOperationException("Не вдалося завантажити головне зображення.");
+
+        var additionalImageUrls = await UploadManyAsync(dto.AdditionalImages);
 
         var product = new Product
         {
@@ -316,18 +365,22 @@ public class ProductService : IProductService
             Name = dto.Name,
             Description = dto.Description,
             Price = dto.Price,
-            Quantity = variants.Count > 0 ? variants.Sum(v => v.Quantity) : dto.Quantity,
+            Quantity = dto.Quantity,
             Sku = string.IsNullOrWhiteSpace(dto.Sku) ? null : dto.Sku.Trim(),
             IsAdultOnly = dto.IsAdultOnly,
             Status = ProductStatus.Pending,
             ModerationReason = null,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            MainImageUrl = mainImageUrl!,
         };
 
-        foreach (var variant in variants)
+        foreach (var url in additionalImageUrls)
         {
-            variant.ProductId = product.Id;
-            product.Variants.Add(variant);
+            product.Images.Add(new ProductImage
+            {
+                ProductId = product.Id,
+                ImageUrl = url
+            });
         }
 
         await _productRepository.AddAsync(product);
@@ -345,8 +398,25 @@ public class ProductService : IProductService
             .Include(p => p.Images)
             .FirstOrDefaultAsync(p => p.Id == dto.Id);
 
-        if (product == null)
-            return null;
+        if (product == null) return null;
+
+        string? newMainUrl = null;
+        if (dto.MainImage != null)
+        {
+            newMainUrl = await _imageStorageService.UploadImageAsync(dto.MainImage);
+            if (newMainUrl == null) throw new InvalidOperationException("Не вдалося завантажити головне зображення.");
+        }
+
+        var newAdditionalUrls = await UploadManyAsync(dto.AdditionalImages);
+
+        var keepUrls = (dto.ExistingAdditionalImageUrls ?? new List<string>())
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var toRemove = product.Images
+            .Where(img => !keepUrls.Contains(img.ImageUrl))
+            .ToList();
+
+        _context.RemoveRange(toRemove);
 
         product.CategoryId = dto.CategoryId;
         product.Name = dto.Name;
@@ -357,8 +427,16 @@ public class ProductService : IProductService
         product.Status = ProductStatus.Pending;
         product.ModerationReason = null;
 
-        SyncVariants(product, dto.Variants);
-        product.Quantity = product.Variants.Count > 0 ? product.Variants.Sum(v => v.Quantity) : dto.Quantity;
+        if (newMainUrl != null) product.MainImageUrl = newMainUrl;
+
+        foreach (var url in newAdditionalUrls)
+        {
+            product.Images.Add(new ProductImage
+            {
+                ProductId = product.Id,
+                ImageUrl = url
+            });
+        }
 
         await _context.SaveChangesAsync();
 
@@ -369,17 +447,56 @@ public class ProductService : IProductService
     }
 
     public async Task<bool> DeleteAsync(Guid id)
+        => await DeleteOrArchiveAsync(id) != ProductDeleteOutcome.NotFound;
+
+    public async Task<ProductDeleteOutcome> DeleteOrArchiveAsync(Guid id)
     {
         var product = await _context.Products
             .FirstOrDefaultAsync(p => p.Id == id);
 
         if (product == null)
-            return false;
+            return ProductDeleteOutcome.NotFound;
+
+        var hasOrders = await _context.OrderItems
+            .IgnoreQueryFilters()
+            .AnyAsync(oi => oi.ProductId == id);
+
+        if (hasOrders)
+        {
+            if (product.Status != ProductStatus.Archived)
+            {
+                product.Status = ProductStatus.Archived;
+                product.ModerationReason = null;
+                await _context.SaveChangesAsync();
+            }
+
+            return ProductDeleteOutcome.Archived;
+        }
 
         _context.Products.Remove(product);
         await _context.SaveChangesAsync();
-        return true;
+        return ProductDeleteOutcome.Deleted;
     }
+
+    public async Task<(int OpenOrders, bool HasOrders)> GetOrderUsageAsync(Guid productId)
+    {
+        var hasOrders = await _context.OrderItems
+            .IgnoreQueryFilters()
+            .AnyAsync(oi => oi.ProductId == productId);
+
+        var openOrders = await _context.OrderItems
+            .Where(oi => oi.ProductId == productId
+                && !oi.IsReturned
+                && (oi.Order.Status == OrderStatus.Pending
+                    || oi.Order.Status == OrderStatus.Confirmed
+                    || oi.Order.Status == OrderStatus.Shipped))
+            .Select(oi => oi.OrderId)
+            .Distinct()
+            .CountAsync();
+
+        return (openOrders, hasOrders);
+    }
+
 
     public async Task<ServiceResult> UpdateQuantityAsync(Guid productId, int quantity)
     {
@@ -392,11 +509,6 @@ public class ProductService : IProductService
         if (product is null)
         {
             return new ServiceResult { Succeeded = false, Message = "Товар не знайдено." };
-        }
-
-        if (product.Variants.Count > 0)
-        {
-            return new ServiceResult { Succeeded = false, Message = "Товар має розміри - кількість редагується через сторінку товару." };
         }
 
         product.Quantity = quantity;
@@ -502,6 +614,62 @@ public class ProductService : IProductService
         return stream.ToArray();
     }
 
+    public async Task<byte[]> GetImportExampleAsync()
+    {
+        var sampleCategories = await _context.Categories
+            .AsNoTracking()
+            .OrderBy(c => c.Name)
+            .Select(c => c.Name)
+            .Take(2)
+            .ToListAsync();
+
+        var categoryA = sampleCategories.ElementAtOrDefault(0) ?? "Електроніка";
+        var categoryB = sampleCategories.ElementAtOrDefault(1) ?? "Одяг";
+
+        using var workbook = new XLWorkbook();
+        var sheet = workbook.Worksheets.Add("Товари");
+
+        for (var col = 0; col < ExcelHeaders.Length; col++)
+        {
+            sheet.Cell(1, col + 1).Value = ExcelHeaders[col];
+            sheet.Cell(1, col + 1).Style.Font.Bold = true;
+        }
+
+        var exampleRows = new (string Sku, string Name, string Description, string Category, decimal Price, int Quantity)[]
+        {
+            ("", "Бездротові навушники Sound Pro", "Навушники з активним шумозаглушенням і зарядом до 30 годин.", categoryA, 1499.00m, 25),
+            ("SKU-00231", "Джинсова куртка", "Класична джинсова куртка унісекс, розмір вказується під час створення товару.", categoryB, 1450.00m, 12)
+        };
+
+        var row = 2;
+        foreach (var example in exampleRows)
+        {
+            sheet.Cell(row, 1).Value = example.Sku;
+            sheet.Cell(row, 2).Value = example.Name;
+            sheet.Cell(row, 3).Value = example.Description;
+            sheet.Cell(row, 4).Value = example.Category;
+            sheet.Cell(row, 5).Value = example.Price;
+            sheet.Cell(row, 6).Value = example.Quantity;
+            sheet.Cell(row, 7).Value = string.Empty;
+            row++;
+        }
+
+        var noteRow = row + 1;
+        sheet.Cell(noteRow, 1).Value = "Підказки:";
+        sheet.Cell(noteRow, 1).Style.Font.Bold = true;
+        sheet.Cell(noteRow + 1, 1).Value = "- Порожній «Артикул (SKU)» = новий товар буде створено.";
+        sheet.Cell(noteRow + 2, 1).Value = "- Якщо «Артикул (SKU)» збігається з наявним товаром - товар оновиться.";
+        sheet.Cell(noteRow + 3, 1).Value = "- «Категорія» має точно збігатися з назвою наявної категорії каталогу.";
+        sheet.Cell(noteRow + 4, 1).Value = "- «Статус» не імпортується - будь-який змінений товар повторно йде на модерацію.";
+        sheet.Cell(noteRow + 5, 1).Value = "- Товари з розмірами (одяг/взуття) через імпорт не оновлюються - редагуйте їх вручну.";
+
+        sheet.Columns().AdjustToContents();
+
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        return stream.ToArray();
+    }
+
     public async Task<ProductImportResultDto> ImportFromExcelAsync(Guid businessId, Stream fileStream)
     {
         var result = new ProductImportResultDto();
@@ -561,17 +729,6 @@ public class ProductService : IProductService
 
             if (existing is not null)
             {
-                if (existing.Variants.Count > 0)
-                {
-                    result.RowErrors.Add(new ProductImportRowError
-                    {
-                        RowNumber = rowNumber,
-                        ProductName = name,
-                        Error = "Товар має розміри - оновлення через імпорт недоступне. Редагуйте його вручну."
-                    });
-                    continue;
-                }
-
                 existing.Name = name;
                 existing.Description = description;
                 existing.CategoryId = category.Id;
@@ -616,55 +773,5 @@ public class ProductService : IProductService
         }
 
         return result;
-    }
-
-    private static List<ProductVariant> BuildVariants(IEnumerable<ProductVariantDto>? variants)
-    {
-        if (variants == null)
-        {
-            return new List<ProductVariant>();
-        }
-
-        return variants
-            .Where(v => !string.IsNullOrWhiteSpace(v.Size))
-            .GroupBy(v => v.Size.Trim(), StringComparer.OrdinalIgnoreCase)
-            .Select(g => g.Last())
-            .Select(v => new ProductVariant
-            {
-                Size = v.Size.Trim(),
-                Sku = v.Sku?.Trim() ?? string.Empty,
-                Quantity = Math.Max(0, v.Quantity)
-            })
-            .ToList();
-    }
-
-    private static void SyncVariants(Product product, IEnumerable<ProductVariantDto>? variants)
-    {
-        var incoming = BuildVariants(variants);
-        var existing = product.Variants.ToList();
-
-        foreach (var variantDto in incoming)
-        {
-            var match = existing.FirstOrDefault(v => v.Size.Equals(variantDto.Size, StringComparison.OrdinalIgnoreCase));
-            if (match != null)
-            {
-                match.Sku = variantDto.Sku;
-                match.Quantity = variantDto.Quantity;
-                existing.Remove(match);
-            }
-            else
-            {
-                variantDto.ProductId = product.Id;
-                product.Variants.Add(variantDto);
-            }
-        }
-
-        // Any size left in `existing` is no longer submitted by the seller — soft-delete it
-        // rather than hard-remove, since it may already be referenced by past order history
-        // (OrderItem -> ProductVariant is a Restrict FK, so a hard delete could fail there).
-        foreach (var stale in existing)
-        {
-            stale.IsDeleted = true;
-        }
     }
 }

@@ -8,5 +8,6 @@
         CreatedAtDesc,
         PopularityAsc,
         PopularityDesc,
+        RatingDesc,
     }
 }
