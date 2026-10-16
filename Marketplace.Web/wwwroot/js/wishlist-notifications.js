@@ -47,7 +47,9 @@
                     alertEl.classList.add("wishlist-card__alert--price");
                 }
                 if (priceEl) {
-                    priceEl.innerHTML = `<s class="wishlist-card__old-price">${formatCurrency(previous.price)}</s> ${formatCurrency(price)}`;
+                    if (!card.querySelector("[data-wishlist-original-price]")) {
+                        priceEl.innerHTML = `<s class="wishlist-card__old-price">${formatCurrency(previous.price)}</s> ${formatCurrency(price)}`;
+                    }
                 }
                 alertCount += 1;
             } else if (previous.inStock === false && inStock) {

@@ -1,5 +1,5 @@
-@using Marketplace.BLL.DTOs.Products
-@model Marketplace.Web.Models.CatalogPageViewModel
+@using Marketplace.Domain.Enums
+@model Marketplace.Web.Models.CataloguePageViewModel
 
 @{
     ViewData["Title"] = SharedLocalizer["Каталог товарів"].Value;
@@ -9,7 +9,7 @@
 }
 
 @functions {
-    private static Dictionary<string, string> BaseRouteValues(Marketplace.Web.Models.CatalogFilterViewModel filter)
+    private static Dictionary<string, string> BaseRouteValues(Marketplace.Web.Models.CatalogueFilterViewModel filter)
     {
         var values = new Dictionary<string, string>();
 
@@ -19,19 +19,19 @@
         if (filter.MaxPrice.HasValue) values["MaxPrice"] = filter.MaxPrice.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
         if (filter.InStockOnly) values["InStockOnly"] = "true";
         if (filter.MinRating.HasValue) values["MinRating"] = filter.MinRating.Value.ToString();
-        if (filter.Sort != CatalogSortOption.Newest) values["Sort"] = filter.Sort.ToString();
+        if (filter.Sort != CatalogueSortOption.Newest) values["Sort"] = filter.Sort.ToString();
 
         return values;
     }
 
-    private static Dictionary<string, string> RouteValuesForPage(Marketplace.Web.Models.CatalogFilterViewModel filter, int page)
+    private static Dictionary<string, string> RouteValuesForPage(Marketplace.Web.Models.CatalogueFilterViewModel filter, int page)
     {
         var values = BaseRouteValues(filter);
         values["Page"] = page.ToString();
         return values;
     }
 
-    private static Dictionary<string, string> RouteValuesForCategory(Marketplace.Web.Models.CatalogFilterViewModel filter, Guid? categoryId)
+    private static Dictionary<string, string> RouteValuesForCategory(Marketplace.Web.Models.CatalogueFilterViewModel filter, Guid? categoryId)
     {
         var values = BaseRouteValues(filter);
         values.Remove("CategoryId");
@@ -40,7 +40,7 @@
         return values;
     }
 
-    private static Dictionary<string, string> RouteValuesForPrice(Marketplace.Web.Models.CatalogFilterViewModel filter, decimal? min, decimal? max)
+    private static Dictionary<string, string> RouteValuesForPrice(Marketplace.Web.Models.CatalogueFilterViewModel filter, decimal? min, decimal? max)
     {
         var values = BaseRouteValues(filter);
         values.Remove("MinPrice");
@@ -51,7 +51,7 @@
         return values;
     }
 
-    private static Dictionary<string, string> RouteValuesForRating(Marketplace.Web.Models.CatalogFilterViewModel filter, int? minRating)
+    private static Dictionary<string, string> RouteValuesForRating(Marketplace.Web.Models.CatalogueFilterViewModel filter, int? minRating)
     {
         var values = BaseRouteValues(filter);
         values.Remove("MinRating");
@@ -60,7 +60,7 @@
         return values;
     }
 
-    private static Dictionary<string, string> RouteValuesForStock(Marketplace.Web.Models.CatalogFilterViewModel filter, bool inStockOnly)
+    private static Dictionary<string, string> RouteValuesForStock(Marketplace.Web.Models.CatalogueFilterViewModel filter, bool inStockOnly)
     {
         var values = BaseRouteValues(filter);
         values.Remove("InStockOnly");
@@ -69,12 +69,12 @@
         return values;
     }
 
-    private string SortLabel(CatalogSortOption sort) => sort switch
+    private string SortLabel(CatalogueSortOption sort) => sort switch
     {
-        CatalogSortOption.PriceAsc => Localizer["Дешевші спочатку"].Value,
-        CatalogSortOption.PriceDesc => Localizer["Дорожчі спочатку"].Value,
-        CatalogSortOption.Rating => Localizer["За рейтингом"].Value,
-        CatalogSortOption.Popularity => Localizer["За популярністю"].Value,
+        CatalogueSortOption.PriceAsc => Localizer["Дешевші спочатку"].Value,
+        CatalogueSortOption.PriceDesc => Localizer["Дорожчі спочатку"].Value,
+        CatalogueSortOption.Rating => Localizer["За рейтингом"].Value,
+        CatalogueSortOption.Popularity => Localizer["За популярністю"].Value,
         _ => Localizer["Спочатку нові"].Value
     };
 }
@@ -139,7 +139,7 @@
             </div>
 
             <select name="Sort" class="form-select catalog-toolbar__sort" aria-label="@Localizer["Сортування"]">
-                @foreach (var option in Enum.GetValues<CatalogSortOption>())
+                @foreach (var option in Enum.GetValues<CatalogueSortOption>())
                 {
                     <option value="@option" selected="@(filter.Sort == option)">@SortLabel(option)</option>
                 }

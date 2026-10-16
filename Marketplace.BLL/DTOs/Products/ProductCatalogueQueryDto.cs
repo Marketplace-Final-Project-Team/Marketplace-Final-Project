@@ -1,6 +1,6 @@
 namespace Marketplace.BLL.DTOs.Products
 {
-    public class ProductCatalogQueryDto
+    public class ProductCatalogueQueryDto
     {
         public string? Search { get; set; }
         public Guid? CategoryId { get; set; }

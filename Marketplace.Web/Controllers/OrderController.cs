@@ -1,6 +1,6 @@
-using System.Security.Claims;
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
+using Marketplace.BLL.Services;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
 using Marketplace.Web.Infrastructure;
@@ -8,6 +8,7 @@ using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Marketplace.Web.Controllers;
 
@@ -21,6 +22,7 @@ public class OrderController : Controller
     private readonly IPromoCodeService _promoCodeService;
     private readonly IActivityLogService _activityLog;
     private readonly INotificationService _notificationService;
+    private readonly IAddressService _addressService;
 
     public OrderController(
         IOrderService orderService,
@@ -29,7 +31,8 @@ public class OrderController : Controller
         IPostSaleService postSaleService,
         IPromoCodeService promoCodeService,
         IActivityLogService activityLog,
-        INotificationService notificationService)
+        INotificationService notificationService,
+        IAddressService addressService)
     {
         _orderService = orderService;
         _cartService = cartService;
@@ -38,6 +41,7 @@ public class OrderController : Controller
         _promoCodeService = promoCodeService;
         _activityLog = activityLog;
         _notificationService = notificationService;
+        _addressService = addressService;
     }
 
     [HttpGet]
@@ -83,11 +87,19 @@ public class OrderController : Controller
     {
         var model = new OrderCreateViewModel();
         await PopulateCart(model);
+        await PopulateAddresses(model);
 
         if (model.Items.Count == 0)
         {
             TempData["Error"] = "Додайте товари до кошика перед оформленням.";
             return RedirectToAction("Index", "Cart");
+        }
+
+        var defaultAddress = model.SavedAddresses.FirstOrDefault(a => a.IsDefault);
+        if (defaultAddress != null)
+        {
+            model.DeliveryCity = defaultAddress.City;
+            model.DeliveryStreet = defaultAddress.Street;
         }
 
         return View(model);
@@ -98,6 +110,8 @@ public class OrderController : Controller
     public async Task<IActionResult> Create(OrderCreateViewModel model)
     {
         await PopulateCart(model);
+        await PopulateAddresses(model);
+
         if (model.Items.Count == 0)
         {
             ModelState.AddModelError(string.Empty, "Кошик порожній.");
@@ -174,7 +188,6 @@ public class OrderController : Controller
 
         await _activityLog.LogUserActionAsync(GetUserId(), "ReturnRequested", $"Подано заявку на повернення товару в замовленні (причина: {reason?.Trim()}).", relatedEntityId: orderItemId);
 
-        // Витягуємо справжній ID створеної заявки з результату (залежно від того, як названо властивість у репорт-об'єкті сервісу: Id, RequestId або Data)
         var requestId = result.EntityId;
 
         return Json(new { success = true, requestId = requestId });
@@ -330,5 +343,18 @@ public class OrderController : Controller
                 ReturnRequest = ToViewModel(postSaleRequests.FirstOrDefault(r => r.OrderItemId == item.Id))
             }).ToList()
         };
+    }
+
+    private async Task PopulateAddresses(OrderCreateViewModel model)
+    {
+        var addresses = await _addressService.GetUserAddressesAsync(GetUserId());
+        model.SavedAddresses = addresses.Select(a => new AddressViewModel
+        {
+            Id = a.Id,
+            Country = a.Country,
+            City = a.City,
+            Street = a.Street,
+            IsDefault = a.IsDefault
+        }).ToList();
     }
 }

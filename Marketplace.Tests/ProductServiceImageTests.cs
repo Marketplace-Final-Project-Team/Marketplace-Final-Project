@@ -17,6 +17,48 @@ namespace Marketplace.Tests;
 public sealed class ProductServiceImageTests
 {
     [Fact]
+    public async Task CreateAsync_PreservesMainImageAdditionalImagesQuantityAndGeneratedSku()
+    {
+        await using var fixture = await ProductFixture.CreateAsync();
+
+        var created = await fixture.Service.CreateAsync(new ProductCreateDto
+        {
+            BusinessId = fixture.BusinessId,
+            CategoryId = fixture.CategoryId,
+            Name = "New product",
+            Description = "New product description",
+            Price = 150,
+            Quantity = 7,
+            Sku = "",
+            MainImage = Image("new-main.png"),
+            AdditionalImages = [Image("new-extra.png")]
+        });
+
+        fixture.Context.ChangeTracker.Clear();
+        var saved = await fixture.Context.Products.IgnoreAutoIncludes()
+            .Include(product => product.Images)
+            .SingleAsync(product => product.Id == created.Id);
+
+        Assert.Equal(7, saved.Quantity);
+        Assert.EndsWith("new-main.png", saved.MainImageUrl);
+        Assert.EndsWith("new-extra.png", Assert.Single(saved.Images).ImageUrl);
+        Assert.False(string.IsNullOrWhiteSpace(saved.Sku));
+        Assert.NotEqual(ProductFixture.InitialSku, saved.Sku);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_UsesSubmittedQuantityWithoutVariants()
+    {
+        await using var fixture = await ProductFixture.CreateAsync();
+        var edit = fixture.Edit();
+        edit.Quantity = 17;
+
+        await fixture.Service.UpdateAsync(edit);
+
+        Assert.Equal(17, (await fixture.ReloadAsync()).Quantity);
+    }
+
+    [Fact]
     public async Task UpdateAsync_AddsAdditionalImage_AfterAccessCheckRead()
     {
         await using var fixture = await ProductFixture.CreateAsync();

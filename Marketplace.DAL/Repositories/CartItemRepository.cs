@@ -22,6 +22,9 @@ namespace Marketplace.DAL.Repositories
                     .ThenInclude(p => p.Business)
                         .ThenInclude(b => b.Discounts)
                 .Include(ci => ci.Product)
+                    .ThenInclude(p => p.Business)
+                        .ThenInclude(b => b.UserDiscounts.Where(d => d.UserId == userId))
+                .Include(ci => ci.Product)
                     .ThenInclude(p => p.Category)
                         .ThenInclude(c => c.Discounts)
                 

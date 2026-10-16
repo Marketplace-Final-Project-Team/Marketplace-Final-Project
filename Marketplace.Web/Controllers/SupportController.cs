@@ -60,7 +60,6 @@ namespace Marketplace.Web.Controllers
             }
             else
             {
-                
                 if (!isAdmin && request.BuyerId != userId)
                 {
                     return Forbid();

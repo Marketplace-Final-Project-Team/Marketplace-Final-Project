@@ -1,8 +1,10 @@
 @model Marketplace.Web.Models.AdminUsersPageViewModel
+@using System.Security.Claims
 
 @{
     ViewData["Title"] = $"{Localizer["Користувачі"].Value} - {SharedLocalizer["Адмін-панель"].Value}";
     var users = Model.Result.Items;
+    var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 }
 
 @section Styles {
@@ -65,7 +67,7 @@
                             <tr>
                                 <th>Email</th>
                                 <th>@Localizer["Статус"]</th>
-                                <th class="text-end">@Localizer["Дії"]</th>
+                                <th class="admin-col-center">@Localizer["Дії"]</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -74,11 +76,17 @@
                                 var statusClass = user.Status.ToString().ToLowerInvariant();
 
                                 <tr>
-                                    <td class="admin-entity-name">@user.Email</td>
-                                    <td><span class="admin-status admin-status--@statusClass">@StatusLabel(user.Status)</span></td>
                                     <td>
-                                        <div class="admin-row-actions">
-                                            @if (user.Status == Marketplace.Domain.Enums.UserStatus.Active)
+                                        <a asp-action="UserDetails" asp-route-userId="@user.Id">@user.Email</a>
+                                    </td>
+                                    <td><span class="admin-status admin-status--@statusClass">@StatusLabel(user.Status)</span></td>
+                                    <td class="admin-col-center">
+                                        <div class="admin-row-actions admin-row-actions--center">
+                                            @if (user.Id == currentUserId)
+                                            {
+                                                <span class="admin-entity-meta">—</span>
+                                            }
+                                            else if (user.Status == Marketplace.Domain.Enums.UserStatus.Active)
                                             {
                                                 <form asp-action="ChangeUserStatus" method="post">
                                                     <input type="hidden" name="userId" value="@user.Id" />

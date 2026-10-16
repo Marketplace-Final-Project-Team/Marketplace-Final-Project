@@ -70,6 +70,8 @@ public class OrderCreateViewModel : IValidatableObject
             }
         }
     }
+
+    public List<AddressViewModel> SavedAddresses { get; set; } = new();
 }
 
 public static class DeliveryCarriers

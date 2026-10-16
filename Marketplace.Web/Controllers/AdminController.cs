@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using Marketplace.BLL.Interfaces;
-using Marketplace.BLL.Services;
 using Marketplace.Domain.Enums;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +8,7 @@ using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Common;
 using Quartz;
 using Quartz.Impl.Matchers;
+using Marketplace.BLL.Jobs;
 
 namespace Marketplace.Web.Controllers
 {
@@ -322,9 +322,9 @@ namespace Marketplace.Web.Controllers
                 return NotFound();
             }
 
-            var orderSummary = await _orderService.GetBusinessOrderSummary(businessId);
-            var businessDiscount = await _discountService.GetBusinessDiscount(businessId);
-            var categoryDiscounts = await _discountService.GetActiveCategoryDiscountsForBusiness(businessId);
+            var orderSummary = await _orderService.GetBusinessOrderSummaryAsync(businessId);
+            var businessDiscount = await _discountService.GetBusinessDiscountAsync(businessId);
+            var categoryDiscounts = await _discountService.GetActiveCategoryDiscountsForBusinessAsync(businessId);
 
             return View(new AdminBusinessDetailsViewModel
             {
@@ -351,7 +351,27 @@ namespace Marketplace.Web.Controllers
             });
         }
 
+        [HttpGet]
+        public async Task<IActionResult> UserDetails(string userId)
+        {
+            var dto = await _adminService.GetUserDetailsAsync(userId);
+            if (dto == null)
+            {
+                return NotFound();
+            }
 
+            var model = new UserAdminDetailsViewModel
+            {
+                Id = dto.Id,
+                UserName = dto.UserName,
+                Email = dto.Email,
+                AvatarUrl = dto.AvatarUrl,
+                Status = dto.Status,
+                CreatedAt = dto.CreatedAt
+            };
+
+            return View(model);
+        }
 
         [HttpGet]
         public async Task<IActionResult> Jobs()
@@ -873,7 +893,7 @@ namespace Marketplace.Web.Controllers
             {
                 Filter = filter,
                 Result = result,
-                Appeals = await _adminService.GetPendingAppeals(),
+                Appeals = await _adminService.GetPendingAppealsAsync(),
                 TotalCount = totalCount,
                 RejectedCount = rejectedCount
             });
@@ -882,7 +902,7 @@ namespace Marketplace.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetPendingAppeals()
         {
-            var appeals = await _adminService.GetPendingAppeals();
+            var appeals = await _adminService.GetPendingAppealsAsync();
             var appealViewModels = appeals.Select(a => new ReviewAppealAdminDto
             {
                 Id = a.Id,

@@ -1621,3 +1621,7 @@ body {
 .home-view-bar .home-view-toggle {
     margin-bottom: 0;
 }
+
+.home-page > .home-view-bar:first-child {
+    margin-top: 2rem;
+}

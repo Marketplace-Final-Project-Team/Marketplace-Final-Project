@@ -1,8 +1,9 @@
-﻿using Marketplace.BLL.DTOs;
+using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
+using Marketplace.Domain.Pricing;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -133,14 +134,6 @@ namespace Marketplace.BLL.Services
                          d.CategoryId.HasValue &&
                          categoryIds.Contains(d.CategoryId.Value))
                     ))
-                .Select(d => new
-                {
-                    d.ProductId,
-                    d.BusinessId,
-                    d.CategoryId,
-                    d.Percent,
-                    d.DiscountType
-                })
                 .ToListAsync();
 
             
@@ -151,11 +144,6 @@ namespace Marketplace.BLL.Services
                     ud.StartDate <= now &&
                     ud.EndDate >= now &&
                     businessIds.Contains(ud.BusinessId))
-                .Select(ud => new
-                {
-                    ud.BusinessId,
-                    ud.Percent
-                })
                 .ToListAsync();
 
             var productsById = products.ToDictionary(p => p.Id);
@@ -169,105 +157,9 @@ namespace Marketplace.BLL.Services
                     continue;
                 }
 
-                var productDiscount = discounts
-                    .Where(d =>
-                        d.DiscountType == DiscountType.Product &&
-                        d.ProductId == product.Id)
-                    .OrderByDescending(d => d.Percent)
-                    .FirstOrDefault();
-
-                var categoryDiscount = discounts
-                    .Where(d =>
-                        d.DiscountType == DiscountType.Category &&
-                        d.CategoryId == product.CategoryId &&
-                        d.BusinessId == product.BusinessId)
-                    .OrderByDescending(d => d.Percent)
-                    .FirstOrDefault();
-
-                var businessDiscount = discounts
-                    .Where(d =>
-                        d.DiscountType == DiscountType.Business &&
-                        d.BusinessId == product.BusinessId)
-                    .OrderByDescending(d => d.Percent)
-                    .FirstOrDefault();
-
-                var userDiscount = userDiscounts
-                    .Where(d => d.BusinessId == product.BusinessId)
-                    .OrderByDescending(d => d.Percent)
-                    .FirstOrDefault();
-
-                decimal bestDiscount = 0;
-                DiscountType? bestDiscountType = null;
-
-                
-                if (userDiscount != null)
-                {
-                    var possibleDiscounts = new List<(decimal Percent, DiscountType Type)>();
-
-                    if (productDiscount != null)
-                    {
-                        possibleDiscounts.Add(
-                            (productDiscount.Percent, DiscountType.Product));
-                    }
-
-                    if (categoryDiscount != null)
-                    {
-                        possibleDiscounts.Add(
-                            (categoryDiscount.Percent, DiscountType.Category));
-                    }
-
-                    if (businessDiscount != null)
-                    {
-                        possibleDiscounts.Add(
-                            (businessDiscount.Percent, DiscountType.Business));
-                    }
-
-                    if (userDiscount != null)
-                    {
-                        possibleDiscounts.Add(
-                            (userDiscount.Percent, DiscountType.Product));
-                    }
-
-                    var best = possibleDiscounts
-                        .OrderByDescending(x => x.Percent)
-                        .FirstOrDefault();
-
-                    bestDiscount = best.Percent;
-                    bestDiscountType = best.Type;
-                }
-                else
-                {
-                    if (productDiscount != null)
-                    {
-                        bestDiscount = productDiscount.Percent;
-                        bestDiscountType = DiscountType.Product;
-                    }
-                    else if (categoryDiscount != null)
-                    {
-                        bestDiscount = categoryDiscount.Percent;
-                        bestDiscountType = DiscountType.Category;
-                    }
-                    else if (businessDiscount != null)
-                    {
-                        bestDiscount = businessDiscount.Percent;
-                        bestDiscountType = DiscountType.Business;
-                    }
-                }
-
-                if (bestDiscount > 100)
-                {
-                    bestDiscount = 100;
-                }
-
-                var finalPrice = bestDiscount > 0
-                    ? Math.Round(
-                        product.Price * (1m - bestDiscount / 100m),
-                        2,
-                        MidpointRounding.AwayFromZero)
-                    : Math.Round(
-                        product.Price,
-                        2,
-                        MidpointRounding.AwayFromZero);
+                var bestDiscount = DiscountCalculator.GetEffectiveDiscountPercent(
+                    product.Id, product.BusinessId, product.CategoryId, discounts, userDiscounts, userId, now);
+                var finalPrice = DiscountCalculator.CalculatePrice(product.Price, bestDiscount);
 
                 recommendations.Add(new RecommendationDto
                 {

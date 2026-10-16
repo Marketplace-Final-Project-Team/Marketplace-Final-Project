@@ -60,33 +60,21 @@ public class AuthController : Controller
             return View(model);
         }
 
-        var user = await _userManager.FindByEmailAsync(model.Email.Trim());
-        if (user is null || !user.EmailConfirmed)
+        var result = await _authService.SignInAsync(new SignInDto
         {
-            ModelState.AddModelError(string.Empty, "Неправильна електронна пошта або пароль, або email ще не підтверджено.");
+            Email = model.Email,
+            Password = model.Password,
+            RememberMe = model.RememberMe
+        });
+
+        if (!result.Succeeded)
+        {
+            ModelState.AddModelError(string.Empty, result.Message);
             return View(model);
         }
 
-        var result = await _signInManager.PasswordSignInAsync(
-            user,
-            model.Password,
-            model.RememberMe,
-            lockoutOnFailure: true);
-
-        if (result.Succeeded)
-        {
-            await _activityLog.LogUserActionAsync(user.Id, "LoggedIn", "Успішний вхід у систему.");
-            return LocalRedirect(model.ReturnUrl!);
-        }
-
-        if (result.IsLockedOut)
-        {
-            ModelState.AddModelError(string.Empty, "Забагато невдалих спроб. Спробуйте ще раз через 10 хвилин.");
-            return View(model);
-        }
-
-        ModelState.AddModelError(string.Empty, "Неправильна електронна пошта або пароль.");
-        return View(model);
+        await _activityLog.LogUserActionAsync(result.Data!, "LoggedIn", "Успішний вхід у систему.");
+        return LocalRedirect(model.ReturnUrl!);
     }
 
     [AllowAnonymous]
@@ -114,7 +102,7 @@ public class AuthController : Controller
             return View(model);
         }
 
-        var result = await _authService.SignUp(new SignUpDto
+        var result = await _authService.SignUpAsync(new SignUpDto
         {
             Username = model.Username.Trim(),
             Email = model.Email.Trim(),
@@ -156,7 +144,7 @@ public class AuthController : Controller
             return BadRequest();
         }
 
-        var result = await _authService.ConfirmEmail(userId, token);
+        var result = await _authService.ConfirmEmailAsync(userId, token);
         ViewBag.Succeeded = result.Succeeded;
         ViewBag.Message = result.Succeeded
             ? "Email успішно підтверджено! Тепер можна увійти."
@@ -179,7 +167,8 @@ public class AuthController : Controller
             return View();
         }
 
-        var result = await _authService.ForgotPassword(email.Trim());
+        var result = await _authService.ForgotPasswordAsync(email.Trim());
+        
         if (result.AccountExists)
         {
             var resetLink = Url.Action(
@@ -223,7 +212,7 @@ public class AuthController : Controller
             return View(model);
         }
 
-        var result = await _authService.ResetPassword(new ResetPasswordDto
+        var result = await _authService.ResetPasswordAsync(new ResetPasswordDto
         {
             UserId = model.UserId,
             Token = model.Token,
@@ -248,8 +237,6 @@ public class AuthController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
-        // The NameIdentifier claim disappears once SignOutAsync runs, so it must be
-        // captured before signing out if we want to log who logged out.
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         await _signInManager.SignOutAsync();

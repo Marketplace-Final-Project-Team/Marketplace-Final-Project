@@ -4,7 +4,7 @@ using Marketplace.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 using Quartz;
 
-namespace Marketplace.BLL.Services
+namespace Marketplace.BLL.Jobs
 {
     public class ProductTranslationJob : IJob
     {

@@ -1,4 +1,4 @@
-@model Marketplace.Web.Models.CatalogProductViewModel
+@model Marketplace.Web.Models.CatalogueProductViewModel
 
 @{
     var (localizedName, localizedDescription) = await ProductTranslator.GetLocalizedAsync(
@@ -21,7 +21,6 @@
     <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/product-details.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/reviews.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/product-extras.css" asp-append-version="true" />
 }
 
 <div class="product-page">
@@ -46,6 +45,19 @@
     {
         <div class="product-alert product-alert--warning" role="alert">
             <span aria-hidden="true">!</span><p><strong>@Localizer["Не вдалося виконати дію"]</strong>@error</p>
+        </div>
+    }
+    @if (TempData["WishlistSuccess"] is string wishlistSuccess)
+    {
+        <div class="product-alert product-alert--success" role="status">
+            <span aria-hidden="true">♥</span><p><strong>@Localizer["Список бажань"]</strong>@wishlistSuccess</p>
+            <a asp-controller="Profile" asp-action="Wishlist">@Localizer["Відкрити список бажань →"]</a>
+        </div>
+    }
+    @if (TempData["WishlistError"] is string wishlistError)
+    {
+        <div class="product-alert product-alert--warning" role="alert">
+            <span aria-hidden="true">!</span><p><strong>@Localizer["Не вдалося виконати дію"]</strong>@wishlistError</p>
         </div>
     }
 
@@ -125,30 +137,16 @@
             <p class="product-code">@Localizer["Код:"] @(string.IsNullOrWhiteSpace(Model.Sku) ? productCode : Model.Sku)</p>
 
             <div class="product-price-block">
+                @if (Model.HasDiscount)
+                {
+                    <div class="product-price-block__discount product-discount">
+                        <del>@Model.OriginalPrice!.Value.ToString("N2") ₴</del>
+                        <span class="badge bg-danger">−@Model.DiscountPercent!.Value.ToString("0.##")%</span>
+                    </div>
+                }
                 <strong>@Model.Price.ToString("N2") ₴</strong>
                 <small>@Localizer["Ціна вказана з урахуванням усіх податків"]</small>
             </div>
-
-            @if (Model.Variants.Count > 0)
-            {
-                <div class="product-variant-selector" data-variant-selector>
-                    <span class="product-variant-selector__label">@Localizer["Розмір"]</span>
-                    <div class="product-variant-selector__options">
-                        @foreach (var variant in Model.Variants)
-                        {
-                            <button type="button"
-                                    class="product-variant-option"
-                                    data-variant-option
-                                    data-variant-id="@variant.Id"
-                                    data-variant-stock="@variant.Quantity"
-                                    disabled="@(variant.Quantity <= 0)">
-                                @variant.Size
-                            </button>
-                        }
-                    </div>
-                    <p class="product-variant-selector__hint" data-variant-hint>@Localizer["Оберіть розмір"]</p>
-                </div>
-            }
 
             @if (Model.Quantity > 0)
             {
@@ -168,18 +166,16 @@
                 {
                     <form asp-controller="Cart" asp-action="Add" method="post">
                         <input type="hidden" name="productId" value="@Model.Id" />
-                        <input type="hidden" name="variantId" value="" data-variant-input />
                         <input type="hidden" name="quantity" value="1" data-quantity-input />
                         <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                        <button type="submit" class="product-button product-button--primary" data-requires-variant="@(Model.Variants.Count > 0 ? "true" : "false")">
+                        <button type="submit" class="product-button product-button--primary">
                             <span aria-hidden="true">＋</span> @Localizer["Додати до кошика"]
                         </button>
                     </form>
                     <form asp-controller="Cart" asp-action="BuyNow" method="post">
                         <input type="hidden" name="productId" value="@Model.Id" />
-                        <input type="hidden" name="variantId" value="" data-variant-input />
                         <input type="hidden" name="quantity" value="1" data-quantity-input />
-                        <button type="submit" class="product-button product-button--outline" data-requires-variant="@(Model.Variants.Count > 0 ? "true" : "false")">
+                        <button type="submit" class="product-button product-button--outline">
                             <span aria-hidden="true">⚡</span> @Localizer["Купити в 1 клік"]
                         </button>
                     </form>
@@ -316,7 +312,7 @@
                             }
                             else
                             {
-                                <a asp-controller="Auth" asp-action="SignIn" asp-route-returnUrl="@Context.Request.Path" class="related-card__wish" title="@Localizer["Увійти, щоб поставити запитання"]" aria-label="@Localizer["У список бажань"]">
+                                <a asp-controller="Auth" asp-action="SignIn" asp-route-returnUrl="@Context.Request.Path" class="related-card__wish" title="@Localizer["У список бажань"]" aria-label="@Localizer["У список бажань"]">
                                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.7a4.3 4.3 0 0 1 7.5 2.6c0 5.6-7.5 10.2-7.5 10.2Z" /></svg>
                                 </a>
                             }
@@ -325,6 +321,13 @@
                             <span>@SharedLocalizer[related.CategoryName]</span>
                             <a asp-action="Details" asp-route-id="@related.Id">@relatedName</a>
                             <strong>@related.Price.ToString("N2") ₴</strong>
+                            @if (related.OriginalPrice.HasValue)
+                            {
+                                <div class="product-discount">
+                                    <del>@related.OriginalPrice.Value.ToString("N2") ₴</del>
+                                    <span class="badge bg-danger">−@related.DiscountPercent.ToString("0.##")%</span>
+                                </div>
+                            }
                             <small class="@(related.Quantity > 0 ? "is-available" : "is-unavailable")">@(related.Quantity > 0 ? Localizer["В наявності"] : Localizer["Немає в наявності"])</small>
                         </div>
                     </article>
@@ -364,14 +367,12 @@
                 {
                     <a asp-controller="Auth" asp-action="SignIn" asp-route-returnUrl="@Context.Request.Path" class="product-reviews__cta-main">@Localizer["Увійти, щоб залишити відгук"]</a>
                 }
-                <button type="button" class="product-reviews__cta-ask" data-open-tab="questions">@Localizer["Задати питання"]</button>
             </div>
         </div>
 
         <div class="product-tabs product-tabs--line" data-tabs>
             <div class="product-tabs__list" role="tablist">
                 <button type="button" role="tab" class="product-tabs__tab is-active" id="tab-comments" aria-controls="panel-comments" aria-selected="true" data-tab="comments">@Localizer["Коментарі"] (@Model.Reviews.Count)</button>
-                <button type="button" role="tab" class="product-tabs__tab" id="tab-questions" aria-controls="panel-questions" aria-selected="false" tabindex="-1" data-tab="questions">@Localizer["Питання"]</button>
 
                 @if (Model.Reviews.Count > 1)
                 {
@@ -440,35 +441,11 @@
                     </div>
                 }
             </div>
-
-            <div class="product-tabs__panel product-qa" role="tabpanel" id="panel-questions" aria-labelledby="tab-questions" data-tab-panel="questions" data-qa-section data-product-id="@Model.Id" hidden>
-                <div class="product-qa__summary">
-                    <p class="product-qa__hint">@Localizer["Продавець «{0}» відповідає на запитання протягом 1–2 робочих днів.", Model.StoreName]</p>
-                    @if (!isAuthenticated)
-                    {
-                        <a asp-controller="Auth" asp-action="SignIn" asp-route-returnUrl="@Context.Request.Path" class="product-button product-button--secondary">@Localizer["Увійти, щоб поставити запитання"]</a>
-                    }
-                </div>
-
-                @if (isAuthenticated)
-                {
-                    <div class="product-qa__form">
-                        <textarea rows="2" placeholder="@Localizer["Наприклад: чи підходить цей товар для..."]" data-qa-input maxlength="500"></textarea>
-                        <button type="button" class="product-button product-button--secondary" data-qa-submit>@Localizer["Надіслати запитання"]</button>
-                    </div>
-                }
-
-                <div class="product-qa__list" data-qa-list>
-                    <p class="product-qa__empty" data-qa-empty>@Localizer["Ще немає запитань про цей товар. Будьте першим!"]</p>
-                </div>
-            </div>
         </div>
     </section>
 </div>
 
 @section Scripts {
     <script src="~/js/product-details.js" asp-append-version="true"></script>
-    <script src="~/js/product-extras.js" asp-append-version="true"></script>
-    <script src="~/js/product-variant-selector.js" asp-append-version="true"></script>
     <script src="~/js/product-quantity-selector.js" asp-append-version="true"></script>
 }

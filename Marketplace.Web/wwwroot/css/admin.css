@@ -709,6 +709,15 @@
     margin: 0;
 }
 
+.admin-row-actions--center {
+    justify-content: center;
+}
+
+.admin-table th.admin-col-center,
+.admin-table td.admin-col-center {
+    text-align: center;
+}
+
 .admin-empty {
     color: var(--admin-muted);
     padding: 3rem 1rem;
@@ -780,6 +789,7 @@
 /* ---------- Limits / config forms ---------- */
 
 .admin-limits-form {
+    align-items: start;
     display: grid;
     gap: 1.1rem;
     grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
@@ -787,11 +797,13 @@
 }
 
 .admin-limits-form__field {
+    align-content: start;
     display: grid;
     gap: 0.4rem;
 }
 
 .admin-limits-form__field label {
+    align-self: end;
     color: var(--admin-ink);
     font-size: 0.85rem;
     font-weight: 650;
@@ -800,6 +812,8 @@
 .admin-limits-form__field input {
     border: 1px solid var(--admin-line);
     border-radius: 0.65rem;
+    box-sizing: border-box;
+    height: 2.75rem;            
     padding: 0.55rem 0.75rem;
     width: 100%;
 }
@@ -1503,9 +1517,139 @@
     }
 }
 
+/* ---------- User Details ---------- */
 
+.user-details-back {
+    align-self: flex-start;
+}
 
-/* ---------- Withdrawal-specific status pills ---------- */
+.user-profile-card {
+    background: #fff;
+    border: 1px solid var(--admin-line, #e4e8f2);
+    border-radius: 1.25rem;
+    box-shadow: 0 10px 30px rgba(27, 34, 56, 0.06);
+    margin-top: 1rem;
+    overflow: hidden;
+}
+
+.user-profile-card__cover {
+    background: radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.25), transparent 45%), linear-gradient(120deg, #3157d7 0%, #5b8def 55%, #42a98b 100%);
+    height: 7.5rem;
+}
+
+.user-profile-card__body {
+    align-items: flex-end;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    padding: 0 1.75rem 1.5rem;
+}
+
+.user-profile-card__avatar {
+    background: #fff;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 6px 18px rgba(27, 34, 56, 0.18);
+    flex-shrink: 0;
+    height: 6.5rem;
+    margin-top: -3.25rem;
+    object-fit: cover;
+    width: 6.5rem;
+}
+
+.user-profile-card__avatar--placeholder {
+    align-items: center;
+    background: linear-gradient(135deg, #eef2ff, #dfe7ff);
+    color: #3157d7;
+    display: flex;
+    font-size: 2.4rem;
+    font-weight: 700;
+    justify-content: center;
+}
+
+.user-profile-card__main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+    padding-top: 0.75rem;
+}
+
+.user-profile-card__name {
+    color: var(--admin-ink, #1b2238);
+    font-size: 1.7rem;
+    font-weight: 750;
+    line-height: 1.2;
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.user-profile-card__email {
+    color: var(--admin-muted, #6b7390);
+    font-size: 0.95rem;
+    overflow-wrap: anywhere;
+}
+
+.user-profile-card__status {
+    align-self: center;
+    margin-bottom: 0.4rem;
+}
+
+.user-info-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    margin-top: 1rem;
+}
+
+.user-info-tile {
+    background: #fff;
+    border: 1px solid var(--admin-line, #e4e8f2);
+    border-radius: 1rem;
+    padding: 1rem 1.25rem;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+    .user-info-tile:hover {
+        border-color: #c9d4f7;
+        box-shadow: 0 8px 22px rgba(49, 87, 215, 0.1);
+        transform: translateY(-2px);
+    }
+
+.user-info-tile__label {
+    color: var(--admin-muted, #6b7390);
+    display: block;
+    font-size: 0.74rem;
+    font-weight: 650;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.35rem;
+    text-transform: uppercase;
+}
+
+.user-info-tile__value {
+    color: var(--admin-ink, #1b2238);
+    font-size: 1.05rem;
+    font-weight: 650;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 560px) {
+    .user-profile-card__body {
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .user-profile-card__main {
+        align-items: center;
+    }
+
+    .user-profile-card__status {
+        align-self: center;
+    }
+}
+
 
 .admin-status--processing {
     background: #e8f1ff;

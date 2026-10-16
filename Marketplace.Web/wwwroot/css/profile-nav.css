@@ -107,6 +107,12 @@
     color: #fff;
 }
 
+.profile-nav__avatar--img {
+    object-fit: cover;
+    display: block;
+    flex-shrink: 0;
+}
+
 @media (max-width: 991.98px) {
     .profile-shell {
         grid-template-columns: 1fr;

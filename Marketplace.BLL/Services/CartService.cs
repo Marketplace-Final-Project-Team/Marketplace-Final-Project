@@ -5,6 +5,7 @@ using Marketplace.DAL.Data;
 using Marketplace.DAL.Interfaces;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
+using Marketplace.Domain.Pricing;
 using Marketplace.Domain.Interfaces;
 
 namespace Marketplace.BLL.Services
@@ -38,63 +39,8 @@ namespace Marketplace.BLL.Services
 
             return cartItems.Select(ci =>
             {
-                var productDiscount = ci.Product.Discounts?
-                .FirstOrDefault(d => d.StartDate <= now && d.EndDate >= now && d.DiscountType == DiscountType.Product);
-
-
-                var businessDiscount = ci.Product.Business?.Discounts?
-                    .FirstOrDefault(d => d.BusinessId == ci.Product.BusinessId && d.DiscountType == DiscountType.Business && d.StartDate <= now && d.EndDate >= now);
-
-
-                var categoryDiscount = ci.Product.Category?.Discounts?
-                    .FirstOrDefault(d => d.BusinessId == ci.Product.BusinessId && d.CategoryId == ci.Product.CategoryId && d.DiscountType == DiscountType.Category && d.StartDate <= now && d.EndDate >= now);
-                var userDiscount = _context.UserDiscounts
-                    .FirstOrDefault(ud => ud.UserId == userId && ud.BusinessId == ci.Product.BusinessId && ud.StartDate <= now && ud.EndDate >= now);
-
-                decimal discountPercent = 0;
-
-                if (userDiscount != null)
-                {
-                    var alldiscounts = new List<decimal>();
-                    if (productDiscount != null)
-                    {
-                        alldiscounts.Add(productDiscount.Percent);
-                    }
-                    if (categoryDiscount != null)
-                    {
-                        alldiscounts.Add(categoryDiscount.Percent);
-                    }
-                    if (userDiscount != null)
-                    {
-                        alldiscounts.Add(userDiscount.Percent);
-                    }
-                    if (businessDiscount != null)
-                    {
-                        alldiscounts.Add(businessDiscount.Percent);
-                    }
-                    discountPercent = alldiscounts.Any() ? alldiscounts.Max() : 0;
-                }
-                else
-                {
-                    if (productDiscount != null)
-                    {
-                        discountPercent = productDiscount.Percent;
-                    }
-                    else if (categoryDiscount != null)
-                    {
-                        discountPercent = categoryDiscount.Percent;
-
-                    }
-
-                    else if (businessDiscount != null)
-                    {
-                        discountPercent = businessDiscount.Percent;
-                    }
-                }
-
-                decimal finalPrice = discountPercent > 0
-                    ? ci.Product.Price * (1 - discountPercent / 100m)
-                    : ci.Product.Price;
+                var discountPercent = DiscountCalculator.GetEffectiveDiscountPercent(ci.Product, userId, now);
+                var finalPrice = DiscountCalculator.CalculatePrice(ci.Product.Price, discountPercent);
 
                 return new CartItemDto
                 {
@@ -103,9 +49,8 @@ namespace Marketplace.BLL.Services
                     ImageUrl = ci.Product.MainImageUrl,
                     Price = finalPrice,
                     Quantity = ci.Quantity,
-                    StockQuantity = ci.ProductVariant?.Quantity ?? ci.Product.Quantity,
+                    StockQuantity = ci.Product.Quantity,
                     ProductVariantId = ci.ProductVariantId,
-                    VariantSize = ci.ProductVariant?.Size
                 };
             }).ToList();
         }
@@ -124,13 +69,7 @@ namespace Marketplace.BLL.Services
                 return new ServiceResult { Succeeded = false, Message = "Товар не знайдено." };
             }
 
-            var variantResult = ResolveVariant(product, variantId);
-            if (!variantResult.Succeeded)
-            {
-                return variantResult.Error!;
-            }
-            var variant = variantResult.Variant;
-            var availableStock = variant?.Quantity ?? product.Quantity;
+            var availableStock = product.Quantity;
 
             if (availableStock <= 0)
             {
@@ -203,12 +142,7 @@ namespace Marketplace.BLL.Services
                 return new ServiceResult { Succeeded = false, Message = "Товар не знайдено." };
             }
 
-            var variantResult = ResolveVariant(product, variantId);
-            if (!variantResult.Succeeded)
-            {
-                return variantResult.Error!;
-            }
-            var availableStock = variantResult.Variant?.Quantity ?? product.Quantity;
+            var availableStock = product.Quantity;
 
             var item = await _cartItemRepository.FirstOrDefaultAsync(ci => ci.Cart.UserId == userId && ci.ProductId == productId && ci.ProductVariantId == variantId);
 
@@ -257,27 +191,6 @@ namespace Marketplace.BLL.Services
             }
 
             return new ServiceResult { Succeeded = true, Message = string.Empty };
-        }
-
-        private static (bool Succeeded, ProductVariant? Variant, ServiceResult? Error) ResolveVariant(Product product, Guid? variantId)
-        {
-            if (product.Variants.Count == 0)
-            {
-                return (true, null, null);
-            }
-
-            if (variantId is null)
-            {
-                return (false, null, new ServiceResult { Succeeded = false, Message = "Оберіть розмір товару." });
-            }
-
-            var variant = product.Variants.FirstOrDefault(v => v.Id == variantId);
-            if (variant is null)
-            {
-                return (false, null, new ServiceResult { Succeeded = false, Message = "Обраний варіант товару не знайдено." });
-            }
-
-            return (true, variant, null);
         }
 
         private async Task ChangeQuantity(CartItem item, int temp)

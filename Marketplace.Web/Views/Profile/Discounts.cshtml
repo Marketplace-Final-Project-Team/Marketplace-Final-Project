@@ -59,9 +59,18 @@
                         <div class="discount-card__dates">
                             @if (discount.StartDate.HasValue)
                             {
-                                <span><small>@Localizer["Початок"]</small><strong>@discount.StartDate.Value.ToLocalTime().ToString("dd.MM.yyyy")</strong></span>
+                                <span><small>@Localizer["Початок"]</small><strong><time utc-value="@discount.StartDate" date-only="true"></time></strong></span>
                             }
-                            <span><small>@Localizer["Діє до"]</small><strong>@(discount.EndDate?.ToLocalTime().ToString("dd.MM.yyyy") ?? Localizer["Безстроково"].Value)</strong></span>
+                            <span><small>@Localizer["Діє до"]</small><strong>
+                                @if (discount.EndDate.HasValue)
+                                {
+                                    <time utc-value="@discount.EndDate" date-only="true"></time>
+                                }
+                                else
+                                {
+                                    @Localizer["Безстроково"]
+                                }
+                            </strong></span>
                         </div>
                     </div>
                     <a asp-controller="Catalog" asp-action="Index" asp-route-BusinessId="@discount.BusinessId" class="discount-card__action">

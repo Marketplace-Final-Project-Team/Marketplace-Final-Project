@@ -1,3 +1,9 @@
+@using Marketplace.BLL.Interfaces
+@using Marketplace.Domain.Entities
+@using Microsoft.AspNetCore.Identity
+@inject IProfileService ProfileService
+@inject UserManager<User> UserManager
+
 @{
     var controller = (ViewContext.RouteData.Values["controller"] as string ?? string.Empty).ToLowerInvariant();
     var action = (ViewContext.RouteData.Values["action"] as string ?? string.Empty).ToLowerInvariant();
@@ -10,11 +16,25 @@
     var userName = User.Identity?.Name ?? string.Empty;
     var displayName = userName.Contains('@') ? userName.Split('@', 2)[0] : userName;
     var initial = string.IsNullOrWhiteSpace(displayName) ? "U" : displayName[..1].ToUpperInvariant();
+
+    string? avatarUrl = null;
+    var currentUserId = UserManager.GetUserId(User);
+    if (!string.IsNullOrEmpty(currentUserId))
+    {
+        avatarUrl = (await ProfileService.GetProfileAsync(currentUserId))?.Avatar;
+    }
 }
 
 <aside class="profile-nav" aria-label="@SharedLocalizer["Особистий кабінет"]">
     <a asp-controller="Profile" asp-action="Index" class="profile-nav__user">
-        <span class="profile-nav__avatar" aria-hidden="true">@initial</span>
+        @if (!string.IsNullOrEmpty(avatarUrl))
+        {
+            <img src="@avatarUrl" class="profile-nav__avatar profile-nav__avatar--img" alt="" />
+        }
+        else
+        {
+            <span class="profile-nav__avatar" aria-hidden="true">@initial</span>
+        }
         <span class="profile-nav__user-text">
             <small>@SharedLocalizer["Особистий кабінет"]</small>
             <strong>@displayName</strong>

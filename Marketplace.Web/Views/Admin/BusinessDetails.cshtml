@@ -115,7 +115,7 @@
 
                 @if (Model.BusinessDiscount?.IsActive == true)
                 {
-                    <p><span class="admin-status admin-status--active">@Localizer["Весь магазин −"]@Model.BusinessDiscount.DiscountPercent.ToString("0.##")%</span> @Localizer["до"] @Model.BusinessDiscount.EndDate?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
+                    <p><span class="admin-status admin-status--active">@Localizer["Весь магазин −"]@Model.BusinessDiscount.DiscountPercent.ToString("0.##")%</span> @Localizer["до"] <time utc-value="@Model.BusinessDiscount.EndDate"></time></p>
                 }
                 else
                 {
@@ -127,7 +127,7 @@
                     <ul style="margin: 0.5rem 0 0; padding-left: 1.1rem;">
                         @foreach (var cd in Model.CategoryDiscounts)
                         {
-                            <li>@SharedLocalizer[cd.CategoryName]: −@cd.DiscountPercent.ToString("0.##")% @Localizer["до"] @cd.EndDate?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</li>
+                            <li>@SharedLocalizer[cd.CategoryName]: −@cd.DiscountPercent.ToString("0.##")% @Localizer["до"] <time utc-value="@cd.EndDate"></time></li>
                         }
                     </ul>
                 }

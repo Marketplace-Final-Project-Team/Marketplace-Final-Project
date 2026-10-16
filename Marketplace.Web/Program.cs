@@ -3,6 +3,7 @@ using CloudinaryDotNet;
 using Marketplace.BLL.Common;
 using Marketplace.BLL.Configs;
 using Marketplace.BLL.Interfaces;
+using Marketplace.BLL.Jobs;
 using Marketplace.BLL.Services;
 using Marketplace.DAL.Data;
 using Marketplace.DAL.Interfaces;
@@ -61,7 +62,7 @@ builder.Services.AddQuartz(q =>
         .WithSimpleSchedule(x => x.WithIntervalInHours(1).RepeatForever()));
 
     var scheduledPayoutJobKey = new JobKey("scheduled-payout-job", "cleanup");
-    q.AddJob<Marketplace.BLL.Services.ScheduledPayoutJob>(opts => opts.WithIdentity(scheduledPayoutJobKey));
+    q.AddJob<ScheduledPayoutJob>(opts => opts.WithIdentity(scheduledPayoutJobKey));
     q.AddTrigger(opts => opts
         .ForJob(scheduledPayoutJobKey)
         .WithIdentity("scheduled-payout-trigger", "cleanup")
@@ -69,7 +70,7 @@ builder.Services.AddQuartz(q =>
         .WithSimpleSchedule(x => x.WithIntervalInHours(24).RepeatForever()));
 
     var releaseHeldBalanceJobKey = new JobKey("release-held-balance-job", "cleanup");
-    q.AddJob<Marketplace.BLL.Services.ReleaseHeldBalanceJob>(opts => opts.WithIdentity(releaseHeldBalanceJobKey));
+    q.AddJob<ReleaseHeldBalanceJob>(opts => opts.WithIdentity(releaseHeldBalanceJobKey));
     q.AddTrigger(opts => opts
         .ForJob(releaseHeldBalanceJobKey)
         .WithIdentity("release-held-balance-trigger", "cleanup")
@@ -145,6 +146,7 @@ builder.Services.AddScoped<IWishlistCollectionService, WishlistCollectionService
 builder.Services.AddScoped<IPostSaleService, PostSaleService>();
 builder.Services.AddScoped<IPromoCodeService, PromoCodeService>();
 builder.Services.AddScoped<IProductAnalyticsService, ProductAnalyticsService>();
+builder.Services.AddScoped<IAddressService, AddressService>();
 
 builder.Services.AddMemoryCache();
 builder.Services.AddDataProtection();
@@ -180,6 +182,10 @@ builder.Services.AddScoped<IDeliveryProviderService, DeliveryProviderService>();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+{
+    options.ValidationInterval = TimeSpan.Zero;
+});
 
 var app = builder.Build();
 
@@ -211,8 +217,8 @@ var localizationOptions = new RequestLocalizationOptions
     SupportedCultures = supportedCultures,
     SupportedUICultures = supportedCultures
 };
-// Cookie (the language switcher) takes priority over the browser's own Accept-Language
-// header, so a visitor's explicit choice always wins over auto-detection.
+
+// Language switcher
 localizationOptions.RequestCultureProviders = new List<IRequestCultureProvider>
 {
     new CookieRequestCultureProvider { CookieName = CookieRequestCultureProvider.DefaultCookieName },

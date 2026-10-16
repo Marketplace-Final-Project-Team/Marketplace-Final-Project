@@ -18,11 +18,11 @@
         <p>@Localizer["Товари, які ви зберегли на потім"] (@Model.TotalItems).</p>
     </div>
 
-    @if (TempData["Success"] is string success)
+    @if (TempData["WishlistSuccess"] is string success)
     {
         <div class="alert alert-success" role="alert">@success</div>
     }
-    @if (TempData["Error"] is string error)
+    @if (TempData["WishlistError"] is string error)
     {
         <div class="alert alert-warning" role="alert">@error</div>
     }
@@ -65,7 +65,16 @@
                     <div class="wishlist-card__body">
                         <a asp-controller="Catalog" asp-action="Details" asp-route-id="@item.ProductId" class="wishlist-card__title">@item.ProductName</a>
                         <div class="wishlist-card__footer">
-                            <span class="fw-semibold" data-wishlist-price>@item.Price.ToString("N2") ₴</span>
+                            <div class="d-flex flex-column align-items-start gap-1">
+                                <span class="fw-semibold" data-wishlist-price>@item.Price.ToString("N2") ₴</span>
+                                @if (item.OriginalPrice.HasValue)
+                                {
+                                    <div class="d-flex flex-wrap align-items-center gap-1">
+                                        <del class="text-muted small text-nowrap" data-wishlist-original-price>@item.OriginalPrice.Value.ToString("N2") ₴</del>
+                                        <span class="badge bg-danger">−@item.DiscountPercent.ToString("0.##")%</span>
+                                    </div>
+                                }
+                            </div>
                             <form asp-action="RemoveFromWishlist" method="post">
                                 <input type="hidden" name="productId" value="@item.ProductId" />
                                 <button type="submit" class="wishlist-remove">@Localizer["Видалити"]</button>

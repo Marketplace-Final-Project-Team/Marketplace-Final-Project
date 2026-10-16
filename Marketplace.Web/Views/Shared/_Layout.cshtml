@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 @inject Marketplace.BLL.Interfaces.ICategoryService CategoryService
+@inject Microsoft.AspNetCore.Identity.UserManager<Marketplace.Domain.Entities.User> UserManager
 @{
     var fullUserName = User.Identity?.Name ?? string.Empty;
     var compactUserName = fullUserName.Contains('@')
@@ -12,6 +13,8 @@
         ? "U"
         : compactUserName[..1].ToUpperInvariant();
     var isAuthenticated = User.Identity?.IsAuthenticated == true;
+    var currentUser = isAuthenticated ? await UserManager.GetUserAsync(User) : null;
+    var avatarUrl = currentUser?.AvatarUrl;
     var headerCategories = await CategoryService.GetAllCategories();
 }
 <html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
@@ -91,7 +94,16 @@
                     {
                         <div class="site-header__account dropdown">
                             <button class="site-header__account-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="@fullUserName">
-                                <span class="site-header__account-avatar" aria-hidden="true">@userInitial</span>
+                                <span class="site-header__account-avatar" aria-hidden="true">
+                                    @if (!string.IsNullOrWhiteSpace(avatarUrl))
+                                    {
+                                        <img src="@avatarUrl" alt="" />
+                                    }
+                                    else
+                                    {
+                                        @userInitial
+                                    }
+                                </span>
                                 <span class="site-header__account-text">
                                     <small>@SharedLocalizer["Вітаємо,"]</small>
                                     <strong>@compactUserName</strong>
@@ -329,6 +341,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/discount-time.js" asp-append-version="true"></script>
     <script src="~/js/site-dialog.js" asp-append-version="true"></script>
     <script src="~/js/cookie-consent.js" asp-append-version="true"></script>
     <script src="~/js/search-autocomplete.js" asp-append-version="true"></script>

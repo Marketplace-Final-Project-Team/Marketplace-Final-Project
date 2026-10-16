@@ -342,6 +342,11 @@
                             <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="home-product__name">@productName</a>
                             <div class="home-product__bottom">
                                 <strong>@product.Price.ToString("N2") ₴</strong>
+                                @if (product.OriginalPrice.HasValue)
+                                {
+                                    <del class="text-muted small">@product.OriginalPrice.Value.ToString("N2") ₴</del>
+                                    <span class="badge bg-danger">−@product.DiscountPercent.ToString("0.##")%</span>
+                                }
                             </div>
                         </div>
                     </article>

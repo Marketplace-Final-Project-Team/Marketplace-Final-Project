@@ -21,7 +21,7 @@ namespace Marketplace.BLL.Services
             _imageService = imageService;
         }
 
-        public async Task<ProfileDto?> GetProfile(string userId)
+        public async Task<ProfileDto?> GetProfileAsync(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
 
@@ -38,7 +38,7 @@ namespace Marketplace.BLL.Services
             };
         }
 
-        public async Task<ServiceResult> UpdateProfile(UpdateProfileDto dto, string userId)
+        public async Task<ServiceResult> UpdateProfileAsync(UpdateProfileDto dto, string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
 
@@ -70,7 +70,7 @@ namespace Marketplace.BLL.Services
             return new ServiceResult { Succeeded = true, Message = string.Empty };
         }
 
-        public async Task<ChangeEmailResult> ChangeEmail(ChangeEmailDto dto, string userId)
+        public async Task<ChangeEmailResult> ChangeEmailAsync(ChangeEmailDto dto, string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
 
@@ -126,7 +126,7 @@ namespace Marketplace.BLL.Services
             return new ServiceResult { Succeeded = true, Message = string.Empty };
         }
 
-        public async Task<ServiceResult> ChangePassword(ChangePasswordDto dto, string userId)
+        public async Task<ServiceResult> ChangePasswordAsync(ChangePasswordDto dto, string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
 

@@ -1,8 +1,9 @@
 using Marketplace.BLL.DTOs.Products;
+using Marketplace.Domain.Enums;
 
 namespace Marketplace.Web.Models
 {
-    public class CatalogFilterViewModel
+    public class CatalogueFilterViewModel
     {
         public string? Search { get; set; }
         public Guid? CategoryId { get; set; }
@@ -10,7 +11,7 @@ namespace Marketplace.Web.Models
         public decimal? MaxPrice { get; set; }
         public bool InStockOnly { get; set; }
         public int? MinRating { get; set; }
-        public CatalogSortOption Sort { get; set; } = CatalogSortOption.Newest;
+        public CatalogueSortOption Sort { get; set; } = CatalogueSortOption.Newest;
         public int Page { get; set; } = 1;
 
         public bool HasActiveFilters =>
@@ -20,6 +21,6 @@ namespace Marketplace.Web.Models
             || MaxPrice.HasValue
             || InStockOnly
             || MinRating.HasValue
-            || Sort != CatalogSortOption.Newest;
+            || Sort != CatalogueSortOption.Newest;
     }
 }

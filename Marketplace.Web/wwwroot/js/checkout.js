@@ -131,10 +131,6 @@
         }
 
         const fields = Array.from(step.querySelectorAll("input, select, textarea")).filter(
-            // el.hidden only reflects the element's own [hidden] attribute, not an
-            // ancestor's — a required field inside a hidden carrier panel (e.g. the
-            // Ukrposhta/Meest address fields while NovaPoshta is selected) would
-            // otherwise still be treated as visible and block validation.
             (el) => !el.disabled && !el.hidden && el.type !== "hidden" && el.offsetParent !== null
         );
 
@@ -150,12 +146,28 @@
 
         if (stepNumber === 2) {
             const carrier = form.querySelector('input[name="DeliveryCarrier"]:checked')?.value;
+            const hint = form.querySelector("[data-address-hint]");
             const branchError = form.querySelector("[data-np-branch-error]");
+
+            if (carrier === "Ukrposhta" || carrier === "Meest") {
+                const city = form.querySelector('input[name="DeliveryCity"]')?.value.trim();
+                const street = form.querySelector('input[name="DeliveryStreet"]')?.value.trim();
+
+                if (!city || !street) {
+                    if (hint) hint.hidden = false;
+                    return false;
+                }
+            }
+            if (hint) hint.hidden = true;
+
             if (carrier === "NovaPoshta" && !form.querySelector("[data-np-branch-ref]")?.value) {
                 if (branchError) branchError.hidden = false;
                 return false;
             }
             if (branchError) branchError.hidden = true;
+        }
+        else {
+            form.querySelector("[data-address-hint]")?.setAttribute("hidden", "");
         }
 
         return true;
@@ -398,9 +410,20 @@
             promoMessage.classList.toggle("checkout-promo__message--error", !!isError);
         };
 
+        let promoRevision = 0;
+        const resetPromoPreview = () => {
+            promoRevision += 1;
+            if (promoSummaryRow) promoSummaryRow.hidden = true;
+            if (promoMessage) promoMessage.hidden = true;
+            totalEl.textContent = `${formatCurrency(baseTotal)} ₴`;
+        };
+        promoInput.addEventListener("input", resetPromoPreview);
+
         promoApply.addEventListener("click", async () => {
             const code = promoInput.value.trim().toUpperCase();
             promoInput.value = code;
+            resetPromoPreview();
+            const requestRevision = promoRevision;
 
             if (!code) {
                 showMessage(t("Введіть промокод."), true);
@@ -413,6 +436,7 @@
                     headers: { "X-Requested-With": "XMLHttpRequest" }
                 });
                 const result = await response.json();
+                if (requestRevision !== promoRevision) return;
 
                 if (!result.succeeded) {
                     showMessage(messages[result.message] || t("Такий промокод не знайдено або він вже не діє."), true);
@@ -430,7 +454,9 @@
                 }
                 totalEl.textContent = `${formatCurrency(newTotal)} ₴`;
             } catch {
-                showMessage(t("Не вдалося перевірити промокод. Спробуйте ще раз."), true);
+                if (requestRevision === promoRevision) {
+                    showMessage(t("Не вдалося перевірити промокод. Спробуйте ще раз."), true);
+                }
             } finally {
                 promoApply.disabled = false;
             }

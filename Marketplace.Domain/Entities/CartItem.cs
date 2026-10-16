@@ -11,7 +11,6 @@ namespace Marketplace.Domain.Entities
         public Product Product { get; set; } = null!;
 
         public Guid? ProductVariantId { get; set; }
-        public ProductVariant? ProductVariant { get; set; }
 
         public int Quantity { get; set; }
     }

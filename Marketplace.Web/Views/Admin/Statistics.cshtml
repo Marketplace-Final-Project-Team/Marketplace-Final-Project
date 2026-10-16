@@ -39,7 +39,7 @@
                 <div>
                     <div class="admin-kicker">Admin</div>
                     <h1 class="admin-title">@Localizer["Статистика"]</h1>
-                    <p class="admin-subtitle">@Localizer["Товарооборот і дохід маркетплейсу за період - по магазинах і в часі. Враховує лише замовлення, що дійшли принаймні до статусу «Підтверджено»."]</p>
+                    <p class="admin-subtitle">@Localizer["Товарообіг і дохід маркетплейсу за період - по магазинах і в часі. Враховує лише замовлення, що дійшли принаймні до статусу «Підтверджено»."]</p>
                 </div>
             </header>
 
@@ -80,7 +80,7 @@
                         </svg>
                     </span>
                     <div class="admin-stat-card__body">
-                        <span class="admin-stat-card__label">@Localizer["Товарооборот"]</span>
+                        <span class="admin-stat-card__label">@Localizer["Товарообіг"]</span>
                         <strong class="admin-stat-card__value">@overview.TotalTurnover.ToString("N2") ₴</strong>
                         <span class="admin-stat-card__hint">@Localizer["Сума всіх позицій продажів"]</span>
                     </div>
@@ -130,7 +130,7 @@
 
             <div class="admin-two-col">
                 <div class="admin-panel admin-chart-card">
-                    <h2 class="admin-section-heading admin-section-heading--tight">@Localizer["Товарооборот у часі"]</h2>
+                    <h2 class="admin-section-heading admin-section-heading--tight">@Localizer["Товарообіг у часі"]</h2>
                     @if (overview.ByPeriod.Count == 0)
                     {
                         <p class="admin-empty">@Localizer["За обраний період продажів немає."]</p>
@@ -143,7 +143,7 @@
                     }
                 </div>
                 <div class="admin-panel admin-chart-card">
-                    <h2 class="admin-section-heading admin-section-heading--tight">@Localizer["Оборот за магазинами"]</h2>
+                    <h2 class="admin-section-heading admin-section-heading--tight">@Localizer["Товарообіг за магазинами"]</h2>
                     @if (overview.Businesses.Count == 0)
                     {
                         <p class="admin-empty">@Localizer["За обраний період продажів немає."]</p>
@@ -187,7 +187,7 @@
                                 <th>@Localizer["Товарів"]</th>
                                 <th>@Localizer["Продажів"]</th>
                                 <th>@Localizer["Одиниць"]</th>
-                                <th>@Localizer["Оборот"]</th>
+                                <th>@Localizer["Товарообіг"]</th>
                                 <th>@Localizer["Дохід маркетплейсу"]</th>
                                 <th>@Localizer["Середній чек"]</th>
                             </tr>
@@ -241,7 +241,7 @@
                                 <th>@Localizer["Категорія"]</th>
                                 <th>@Localizer["Продажів"]</th>
                                 <th>@Localizer["Одиниць"]</th>
-                                <th>@Localizer["Оборот"]</th>
+                                <th>@Localizer["Товарообіг"]</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -274,7 +274,7 @@
                             <tr>
                                 <th>@Localizer["Період"]</th>
                                 <th>@Localizer["Продажів"]</th>
-                                <th>@Localizer["Оборот"]</th>
+                                <th>@Localizer["Товарообіг"]</th>
                                 <th>@Localizer["Дохід маркетплейсу"]</th>
                             </tr>
                         </thead>
