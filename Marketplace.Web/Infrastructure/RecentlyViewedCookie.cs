@@ -1,3 +1,5 @@
+using Marketplace.Web.Models;
+
 namespace Marketplace.Web.Infrastructure;
 
 // Recently-viewed products are tracked with a plain cookie holding just product ids
@@ -29,7 +31,7 @@ public static class RecentlyViewedCookie
 
     public static async Task<List<Marketplace.Web.Models.CatalogRelatedProductViewModel>> LoadAsync(
         Marketplace.BLL.Interfaces.IProductService productService,
-        IRequestCookieCollection cookies)
+        IRequestCookieCollection cookies, string? userId = null)
     {
         cookies.TryGetValue(Name, out var raw);
 
@@ -50,7 +52,9 @@ public static class RecentlyViewedCookie
                 Name = product.Name,
                 CategoryName = product.Category?.Name ?? "Без категорії",
                 MainImageUrl = product.MainImageUrl,
-                Price = product.Price,
+                Price = product.GetDiscountedPrice(userId),
+                OriginalPrice = product.GetEffectiveDiscountPercent(userId) > 0 ? product.Price : null,
+                DiscountPercent = product.GetEffectiveDiscountPercent(userId),
                 Quantity = product.Quantity
             });
         }

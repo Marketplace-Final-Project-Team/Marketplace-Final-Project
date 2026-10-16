@@ -1,4 +1,4 @@
-﻿using Marketplace.BLL.Common;
+using Marketplace.BLL.Common;
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
@@ -894,15 +894,17 @@ namespace Marketplace.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SetBusinessDiscount(Guid businessId, decimal discountPercent, DateTime discountStartDate, DateTime discountEndDate)
+        public async Task<IActionResult> SetBusinessDiscount(Guid businessId, decimal discountPercent, DateTimeOffset discountStartDate, DateTimeOffset discountEndDate)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.PromoCodes);
             if (business is null)
             {
                 return Forbid();
             }
 
-            var result = await _discountService.SetBusinessDiscount(businessId, discountPercent, discountStartDate, discountEndDate);
+            var result = await _discountService.SetBusinessDiscount(businessId, discountPercent, discountStartDate.UtcDateTime, discountEndDate.UtcDateTime);
             if (result.Succeeded)
             {
                 await _activityLog.LogBusinessActionAsync(businessId, "BusinessDiscountSet",
@@ -938,15 +940,17 @@ namespace Marketplace.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreatePromoCode(Guid businessId, string code, int percent, DateTime startDate, DateTime endDate, bool isSingleUse = false)
+        public async Task<IActionResult> CreatePromoCode(Guid businessId, string code, int percent, DateTimeOffset startDate, DateTimeOffset endDate, bool isSingleUse = false)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var business = await GetAccessibleBusinessOrNullAsync(businessId, BusinessPermissions.PromoCodes);
             if (business is null)
             {
                 return Forbid();
             }
 
-            var result = await _promoCodeService.CreateAsync(businessId, code, percent, startDate, endDate, isSingleUse);
+            var result = await _promoCodeService.CreateAsync(businessId, code, percent, startDate.UtcDateTime, endDate.UtcDateTime, isSingleUse);
             if (result.Succeeded)
             {
                 var usageNote = isSingleUse ? "одноразовий" : "багаторазовий";

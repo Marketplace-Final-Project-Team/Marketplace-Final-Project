@@ -37,7 +37,7 @@
                     <div class="address-card__lines">
                         <span class="address-card__badge">−@discount.Percent.ToString("0.##")%</span>
                         <strong>@discount.StoreName</strong>
-                        <p>@Localizer["Діє до"] @discount.EndDate?.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
+                        <p>@Localizer["Діє до"] <time utc-value="@discount.EndDate"></time></p>
                     </div>
                 </div>
             }

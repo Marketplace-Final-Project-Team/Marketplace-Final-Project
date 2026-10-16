@@ -58,7 +58,7 @@
                         {
                             store = d.StoreName,
                             percent = d.Percent,
-                            until = d.EndDate.ToLocalTime().ToString("dd.MM.yyyy")
+                            until = DateTime.SpecifyKind(d.EndDate, DateTimeKind.Utc).ToString("O")
                         }));
 
                     <div class="profile-discount-widget" data-discounts='@Html.Raw(discountsJson)'>
@@ -80,7 +80,7 @@
                                 <div class="profile-discount-widget__tooltip-item">
                                     <div>
                                         <span class="profile-discount-widget__tooltip-store">@discount.StoreName</span>
-                                        <span class="profile-discount-widget__tooltip-date">@Localizer["до"] @discount.EndDate.ToLocalTime().ToString("dd.MM.yyyy")</span>
+                                        <span class="profile-discount-widget__tooltip-date">@Localizer["до"] <time utc-value="@discount.EndDate" date-only="true"></time></span>
                                     </div>
                                     <strong>-@discount.Percent.ToString("0.##")%</strong>
                                 </div>

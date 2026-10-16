@@ -12,6 +12,8 @@ public class WishlistItemViewModel
     public Guid ProductId { get; set; }
     public string ProductName { get; set; } = string.Empty;
     public decimal Price { get; set; }
+    public decimal? OriginalPrice { get; set; }
+    public decimal DiscountPercent { get; set; }
     public string MainImageUrl { get; set; } = string.Empty;
     public bool InStock { get; set; }
 }
