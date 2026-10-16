@@ -13,7 +13,7 @@ namespace Marketplace.BLL.DTOs.Products
         public string? Sku { get; set; }
         public IFormFile? MainImage { get; set; }
         public List<IFormFile>? AdditionalImages { get; set; }
-        public List<string>? ExistingAdditionalImageUrls { get; set; }
+        public List<Guid> RemovedAdditionalImageIds { get; set; } = new();
         public bool IsAdultOnly { get; set; }
     }
 }

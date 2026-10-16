@@ -117,6 +117,17 @@ namespace Marketplace.DAL.Data
                 .HasForeignKey(p => p.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<Product>()
+                .Property(p => p.Sku)
+                .HasMaxLength(100)
+                .IsRequired();
+
+            builder.Entity<Product>()
+                .HasIndex(p => new { p.BusinessId, p.Sku })
+                .IsUnique()
+                .HasDatabaseName("UX_Products_BusinessId_Sku")
+                .HasFilter("[IsDeleted] = 0");
+
             builder.Entity<ProductImage>()
                 .HasOne(pi => pi.Product)
                 .WithMany(p => p.Images)

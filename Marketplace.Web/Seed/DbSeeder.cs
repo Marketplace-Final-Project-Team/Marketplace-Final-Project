@@ -80,6 +80,7 @@ namespace Marketplace.Web.Seed
                     Description = "Легкі навушники з активним шумозаглушенням, чистим звуком і зарядом до 30 годин.",
                     Price = 2499,
                     Quantity = 12,
+                    Sku = "DEMO-001",
                     Status = ProductStatus.Active
                 },
                 new Product
@@ -91,6 +92,7 @@ namespace Marketplace.Web.Seed
                     Description = "Компактна клавіатура з підсвічуванням, тихими перемикачами та підключенням через USB-C.",
                     Price = 3199,
                     Quantity = 8,
+                    Sku = "DEMO-002",
                     Status = ProductStatus.Active
                 },
                 new Product
@@ -102,6 +104,7 @@ namespace Marketplace.Web.Seed
                     Description = "Регульована лампа для роботи й навчання з трьома режимами кольору та сенсорним керуванням.",
                     Price = 1199,
                     Quantity = 20,
+                    Sku = "DEMO-003",
                     Status = ProductStatus.Active
                 }
             };

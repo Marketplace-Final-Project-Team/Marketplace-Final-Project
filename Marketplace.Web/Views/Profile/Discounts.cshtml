@@ -7,16 +7,27 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/profile-discounts.css" asp-append-version="true" />
 }
 
 <div class="profile-page">
     <a asp-action="Index" class="profile-back">← @Localizer["До кабінету"]</a>
 
-    <div class="profile-summary">
+    <div class="profile-summary discount-summary">
         <div>
+            <span class="discount-summary__kicker">@Localizer["Гаманець переваг"]</span>
             <h1>@Localizer["Мої знижки"]</h1>
-            <p>@Localizer["Персональні знижки, які магазини надали саме вам - діють на всі товари магазину, поки не мине термін."]</p>
+            <p>@Localizer["Персональні знижки від магазинів зібрані в одному місці й автоматично враховуються у доступних пропозиціях."]</p>
         </div>
+        <div class="discount-summary__count" aria-label="@Localizer["Кількість активних знижок"]">
+            <strong>@Model.Count(discount => discount.IsActive)</strong>
+            <span>@Localizer["активних"]</span>
+        </div>
+    </div>
+
+    <div class="discount-info" role="note">
+        <span aria-hidden="true">i</span>
+        <p><strong>@Localizer["Як це працює?"]</strong> @Localizer["Персональна знижка прив'язана до магазину. Промокод, якщо він у вас є, можна додатково ввести під час оформлення замовлення."]</p>
     </div>
 
     @if (Model.Count == 0)
@@ -30,16 +41,42 @@
     }
     else
     {
-        <div class="address-list">
+        <div class="discount-wallet">
             @foreach (var discount in Model)
             {
-                <div class="address-card">
-                    <div class="address-card__lines">
-                        <span class="address-card__badge">−@discount.Percent.ToString("0.##")%</span>
-                        <strong>@discount.StoreName</strong>
-                        <p>@Localizer["Діє до"] <time utc-value="@discount.EndDate"></time></p>
+                <article class="discount-card @(discount.IsActive ? "is-active" : "is-inactive")">
+                    <div class="discount-card__accent" aria-hidden="true"></div>
+                    <div class="discount-card__head">
+                        <span class="discount-card__percent">−@discount.Percent.ToString("0.##")%</span>
+                        <span class="discount-card__status">
+                            <i aria-hidden="true"></i>
+                            @(discount.IsActive ? Localizer["Активна"] : Localizer["Неактивна"])
+                        </span>
                     </div>
-                </div>
+                    <div class="discount-card__body">
+                        <small>@Localizer["Персональна знижка магазину"]</small>
+                        <h2>@discount.StoreName</h2>
+                        <div class="discount-card__dates">
+                            @if (discount.StartDate.HasValue)
+                            {
+                                <span><small>@Localizer["Початок"]</small><strong><time utc-value="@discount.StartDate" date-only="true"></time></strong></span>
+                            }
+                            <span><small>@Localizer["Діє до"]</small><strong>
+                                @if (discount.EndDate.HasValue)
+                                {
+                                    <time utc-value="@discount.EndDate" date-only="true"></time>
+                                }
+                                else
+                                {
+                                    @Localizer["Безстроково"]
+                                }
+                            </strong></span>
+                        </div>
+                    </div>
+                    <a asp-controller="Catalog" asp-action="Index" asp-route-BusinessId="@discount.BusinessId" class="discount-card__action">
+                        @Localizer["Перейти до товарів"] <span aria-hidden="true">→</span>
+                    </a>
+                </article>
             }
         </div>
     }

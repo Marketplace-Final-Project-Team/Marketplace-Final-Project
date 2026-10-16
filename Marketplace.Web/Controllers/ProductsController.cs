@@ -221,7 +221,16 @@ public class ProductsController : Controller
         }
 
         await using var stream = file.OpenReadStream();
-        var result = await _productService.ImportFromExcelAsync(businessId, stream);
+        ProductImportResultDto result;
+        try
+        {
+            result = await _productService.ImportFromExcelAsync(businessId, stream);
+        }
+        catch (DuplicateProductSkuException ex)
+        {
+            TempData["Error"] = ex.Message;
+            return RedirectToAction(nameof(Index), new { businessId });
+        }
 
         await _activityLog.LogBusinessActionAsync(businessId, "ProductsImported",
             $"Імпорт товарів: створено {result.CreatedCount}, оновлено {result.UpdatedCount}, помилок {result.RowErrors.Count}.", actorUserId: userId);
@@ -404,9 +413,15 @@ public class ProductsController : Controller
 
             await _productService.CreateAsync(createdProductDto);
         }
+        catch (DuplicateProductSkuException ex)
+        {
+            ModelState.AddModelError(nameof(model.Sku), ex.Message);
+            await PopulateCreateOptionsAsync(model);
+            return View(model);
+        }
         catch (InvalidOperationException ex)
         {
-            ModelState.AddModelError(nameof(model.IsAdultOnly), ex.Message);
+            ModelState.AddModelError(string.Empty, ex.Message);
             await PopulateCreateOptionsAsync(model);
             return View(model);
         }
@@ -436,7 +451,7 @@ public class ProductsController : Controller
         var currentBusiness = businesses.FirstOrDefault(b => b.Id == product.BusinessId);
         bool isAdultApproved = currentBusiness?.AdultStatus == AdultContentStatus.Approved;
 
-        return View(new ProductEditViewModel
+        var model = new ProductEditViewModel
         {
             Id = product.Id,
             Name = product.Name,
@@ -446,9 +461,11 @@ public class ProductsController : Controller
             Sku = product.Sku,
             IsAdultOnly = product.IsAdultOnly,
             CategoryId = product.CategoryId,
-            ExistingMainImageUrl = product.MainImageUrl,
             Categories = await BuildCategoryOptionsAsync(product.CategoryId, isAdultApproved)
-        });
+        };
+        PopulateEditImageState(model, product);
+
+        return View(model);
     }
 
     [HttpPost]
@@ -459,6 +476,7 @@ public class ProductsController : Controller
 
         var accessible = await GetAccessibleProductAsync(id);
         if (accessible.Result is not null) return accessible.Result;
+        PopulateEditImageState(model, accessible.Product!);
 
         if (!await _categoryRepository.ExistsAsync(category => category.Id == model.CategoryId))
         {
@@ -491,7 +509,8 @@ public class ProductsController : Controller
                 Sku = model.Sku,
                 IsAdultOnly = model.IsAdultOnly,
                 MainImage = model.MainImage,
-                AdditionalImages = model.AdditionalImages
+                AdditionalImages = model.AdditionalImages,
+                RemovedAdditionalImageIds = model.RemovedAdditionalImageIds
             });
 
             if (updated is null) return NotFound();
@@ -499,9 +518,22 @@ public class ProductsController : Controller
             await _activityLog.LogBusinessActionAsync(updated.BusinessId, "ProductEdited",
                 $"Товар «{updated.Name}» відредаговано.", actorUserId: GetCurrentUserId(), relatedEntityId: updated.Id);
         }
+        catch (DuplicateProductSkuException ex)
+        {
+            ModelState.AddModelError(nameof(model.Sku), ex.Message);
+            var userId = GetCurrentUserId();
+            var businesses = userId is null
+                ? Array.Empty<Business>()
+                : await _businessAccessService.GetAccessibleBusinessesAsync(userId, BusinessPermissions.ProductCrud);
+            var currentBusiness = businesses.FirstOrDefault(b => b.Id == accessible.Product!.BusinessId);
+            bool isAdultApproved = currentBusiness?.AdultStatus == AdultContentStatus.Approved;
+
+            model.Categories = await BuildCategoryOptionsAsync(model.CategoryId, isAdultApproved);
+            return View(model);
+        }
         catch (InvalidOperationException ex)
         {
-            ModelState.AddModelError(nameof(model.IsAdultOnly), ex.Message);
+            ModelState.AddModelError(string.Empty, ex.Message);
             var userId = GetCurrentUserId();
             var businesses = userId is null
                 ? Array.Empty<Business>()
@@ -557,6 +589,20 @@ public class ProductsController : Controller
     }
 
     private string? GetCurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+    private static void PopulateEditImageState(ProductEditViewModel model, Product product)
+    {
+        model.ExistingMainImageUrl = product.MainImageUrl;
+        model.ExistingAdditionalImages = product.Images
+            .OrderBy(image => image.CreatedAt)
+            .ThenBy(image => image.Id)
+            .Select(image => new ProductExistingImageViewModel
+            {
+                Id = image.Id,
+                ImageUrl = image.ImageUrl
+            })
+            .ToList();
+    }
 
     private async Task PopulateCreateOptionsAsync(ProductCreateViewModel model)
     {

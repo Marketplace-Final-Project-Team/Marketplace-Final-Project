@@ -84,34 +84,37 @@
                 }
                 <div class="mb-3">
                     <label asp-for="MainImage" class="form-label">@Localizer["Замінити головне фото"]</label>
-                    <input asp-for="MainImage" type="file" class="form-control" accept="image/*" />
+                    <input asp-for="MainImage" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
+                    <span asp-validation-for="MainImage" class="text-danger small"></span>
                 </div>
-
-                @if (Model.ExistingAdditionalImageUrls is { Count: > 0 })
+                @if (Model.ExistingAdditionalImages.Count > 0)
                 {
                     <div class="mb-3">
                         <div class="form-label">@Localizer["Поточні додаткові фото"]</div>
-                        <div class="d-flex flex-wrap gap-3">
-                            @foreach (var img in Model.ExistingAdditionalImageUrls)
+                        <p class="product-help">@Localizer["Позначте фото, які потрібно видалити, і збережіть зміни."]</p>
+                        <div class="product-existing-gallery">
+                            @foreach (var image in Model.ExistingAdditionalImages)
                             {
-                                <div class="position-relative" data-existing-image>
-                                    <img src="@img" alt="" width="120" class="rounded" />
-                                    <input type="hidden" name="ExistingAdditionalImageUrls" value="@img" />
-                                    <button type="button"
-                                            class="btn btn-sm btn-danger position-absolute top-0 end-0"
-                                            onclick="this.closest('[data-existing-image]').remove()"
-                                            aria-label="@Localizer["Видалити фото"]">
-                                        ✕
-                                    </button>
-                                </div>
+                                var markedForRemoval = Model.RemovedAdditionalImageIds.Contains(image.Id);
+                                <label class="product-existing-image @(markedForRemoval ? "is-marked-for-removal" : null)">
+                                    <img src="@image.ImageUrl" alt="@Localizer["Додаткове фото товару"] @Model.Name" />
+                                    <span>
+                                        <input type="checkbox"
+                                               name="RemovedAdditionalImageIds"
+                                               value="@image.Id"
+                                               checked="@markedForRemoval" />
+                                        @Localizer["Видалити"]
+                                    </span>
+                                </label>
                             }
                         </div>
                     </div>
                 }
-
                 <div>
                     <label asp-for="AdditionalImages" class="form-label">@Localizer["Додати ще фото"]</label>
-                    <input asp-for="AdditionalImages" type="file" class="form-control" accept="image/*" multiple />
+                    <input asp-for="AdditionalImages" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" multiple />
+                    <p class="product-help">@Localizer["До 8 додаткових фото загалом. JPG, PNG або WEBP, до 5 МБ кожне."]</p>
+                    <span asp-validation-for="AdditionalImages" class="text-danger small"></span>
                 </div>
             </section>
 
@@ -125,4 +128,11 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.querySelectorAll('.product-existing-image input[type="checkbox"]').forEach((checkbox) => {
+            checkbox.addEventListener('change', () => {
+                checkbox.closest('.product-existing-image')?.classList.toggle('is-marked-for-removal', checkbox.checked);
+            });
+        });
+    </script>
 }
