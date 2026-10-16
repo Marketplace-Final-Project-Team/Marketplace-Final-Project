@@ -1,0 +1,207 @@
+.discount-summary {
+    align-items: center;
+    display: flex;
+    gap: 1.5rem;
+    justify-content: space-between;
+}
+
+.discount-summary__kicker {
+    color: var(--profile-primary);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.discount-summary__count {
+    align-items: center;
+    background: #edf2ff;
+    border: 1px solid #dce5ff;
+    border-radius: 1.1rem;
+    color: var(--profile-primary);
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    min-width: 6.5rem;
+    padding: 0.75rem 1rem;
+}
+
+.discount-summary__count strong {
+    font-size: 1.65rem;
+    line-height: 1;
+}
+
+.discount-summary__count span {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.discount-info {
+    align-items: flex-start;
+    background: #f5f7fc;
+    border: 1px solid var(--profile-line);
+    border-radius: 1rem;
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    padding: 0.9rem 1rem;
+}
+
+.discount-info > span {
+    align-items: center;
+    background: var(--profile-primary);
+    border-radius: 50%;
+    color: #fff;
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: 0.75rem;
+    font-weight: 800;
+    height: 1.5rem;
+    justify-content: center;
+    width: 1.5rem;
+}
+
+.discount-info p {
+    color: var(--profile-muted);
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.discount-info strong {
+    color: var(--profile-text);
+}
+
+.discount-wallet {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.discount-card {
+    background: #fff;
+    border: 1px solid var(--profile-line);
+    border-radius: 1.15rem;
+    box-shadow: 0 0.65rem 1.8rem rgba(23, 32, 51, 0.06);
+    display: flex;
+    flex-direction: column;
+    min-height: 270px;
+    overflow: hidden;
+    position: relative;
+}
+
+.discount-card__accent {
+    background: linear-gradient(90deg, #3357de, #7690f5);
+    height: 0.35rem;
+    width: 100%;
+}
+
+.discount-card__head {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 1.1rem 0;
+}
+
+.discount-card__percent {
+    color: var(--profile-primary);
+    font-size: 1.75rem;
+    font-weight: 850;
+}
+
+.discount-card__status {
+    align-items: center;
+    background: #eaf7ef;
+    border-radius: 999px;
+    color: #14864a;
+    display: inline-flex;
+    font-size: 0.72rem;
+    font-weight: 750;
+    gap: 0.35rem;
+    padding: 0.35rem 0.65rem;
+}
+
+.discount-card__status i {
+    background: currentColor;
+    border-radius: 50%;
+    height: 0.4rem;
+    width: 0.4rem;
+}
+
+.discount-card.is-inactive {
+    opacity: 0.68;
+}
+
+.discount-card.is-inactive .discount-card__status {
+    background: #f1f2f5;
+    color: #6f7888;
+}
+
+.discount-card__body {
+    flex: 1;
+    padding: 1rem 1.1rem;
+}
+
+.discount-card__body > small {
+    color: var(--profile-muted);
+    font-size: 0.73rem;
+    text-transform: uppercase;
+}
+
+.discount-card__body h2 {
+    font-size: 1.2rem;
+    margin: 0.25rem 0 1rem;
+}
+
+.discount-card__dates {
+    border-top: 1px dashed var(--profile-line);
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-top: 0.85rem;
+}
+
+.discount-card__dates span {
+    display: flex;
+    flex-direction: column;
+}
+
+.discount-card__dates small {
+    color: var(--profile-muted);
+    font-size: 0.7rem;
+}
+
+.discount-card__dates strong {
+    font-size: 0.86rem;
+}
+
+.discount-card__action {
+    align-items: center;
+    border-top: 1px solid var(--profile-line);
+    color: var(--profile-primary);
+    display: flex;
+    font-size: 0.85rem;
+    font-weight: 750;
+    justify-content: space-between;
+    padding: 0.85rem 1.1rem;
+    text-decoration: none;
+}
+
+.discount-card__action:hover {
+    background: #f7f9ff;
+    color: var(--profile-primary);
+}
+
+@media (max-width: 640px) {
+    .discount-summary {
+        align-items: flex-start;
+    }
+
+    .discount-summary__count {
+        min-width: 5.4rem;
+        padding-inline: 0.7rem;
+    }
+
+    .discount-wallet {
+        grid-template-columns: 1fr;
+    }
+}

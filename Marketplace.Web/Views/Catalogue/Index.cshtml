@@ -124,6 +124,14 @@
     }
 
     <div class="catalog-toolbar">
+        <button type="button"
+                class="catalog-filter-toggle"
+                data-catalog-filter-open
+                aria-controls="catalogFilters"
+                aria-expanded="false">
+            <span aria-hidden="true">☰</span> @Localizer["Фільтри"]
+        </button>
+
         <form asp-action="Index" method="get" class="catalog-toolbar__form" role="search" aria-label="@Localizer["Пошук у каталозі"]" data-search-wrapper>
             <div class="catalog-toolbar__search">
                 <span aria-hidden="true">⌕</span>
@@ -136,6 +144,17 @@
                     <option value="@option" selected="@(filter.Sort == option)">@SortLabel(option)</option>
                 }
             </select>
+
+            <nav class="catalog-price-shortcuts" aria-label="@Localizer["Швидкий вибір ціни"]">
+                <a class="@(!filter.MinPrice.HasValue && filter.MaxPrice == 500m ? "is-active" : null)"
+                   asp-action="Index" asp-all-route-data="RouteValuesForPrice(filter, null, 500m)">@Localizer["До 500 ₴"]</a>
+                <a class="@(filter.MinPrice == 500m && filter.MaxPrice == 1500m ? "is-active" : null)"
+                   asp-action="Index" asp-all-route-data="RouteValuesForPrice(filter, 500m, 1500m)">500–1500 ₴</a>
+                <a class="@(filter.MinPrice == 1500m && filter.MaxPrice == 5000m ? "is-active" : null)"
+                   asp-action="Index" asp-all-route-data="RouteValuesForPrice(filter, 1500m, 5000m)">1500–5000 ₴</a>
+                <a class="@(filter.MinPrice == 5000m && !filter.MaxPrice.HasValue ? "is-active" : null)"
+                   asp-action="Index" asp-all-route-data="RouteValuesForPrice(filter, 5000m, null)">5000+ ₴</a>
+            </nav>
 
             <input type="hidden" name="CategoryId" value="@filter.CategoryId" />
             <input type="hidden" name="MinPrice" value="@filter.MinPrice" />
@@ -178,7 +197,14 @@
     </section>
 
     <div class="catalog-layout">
-        <aside class="catalog-sidebar" aria-label="@Localizer["Фільтри каталогу"]">
+        <div class="catalog-filter-backdrop" data-catalog-filter-backdrop hidden></div>
+
+        <aside class="catalog-sidebar" id="catalogFilters" aria-label="@Localizer["Фільтри каталогу"]">
+            <div class="catalog-sidebar__header">
+                <strong>@Localizer["Фільтри"]</strong>
+                <button type="button" data-catalog-filter-close aria-label="@Localizer["Закрити фільтри"]">×</button>
+            </div>
+
             <div class="catalog-sidebar__group">
                 <h3>@Localizer["Категорії"]</h3>
                 <ul class="catalog-sidebar__list">
@@ -279,9 +305,35 @@
 
                             @if (product.IsAgeRestricted)
                             {
-                                <span class="position-absolute top-0 end-0 bg-danger text-white text-xs fw-bold px-2 py-1 rounded-pill z-1 m-2 shadow">
-                                    18+
-                                </span>
+                                <span class="catalog-card__adult-badge">18+</span>
+                            }
+
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <form asp-controller="Profile"
+                                      asp-action="@(product.IsInWishlist ? "RemoveFromWishlist" : "AddToWishlist")"
+                                      method="post"
+                                      class="catalog-card__wish">
+                                    <input type="hidden" name="productId" value="@product.Id" />
+                                    <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                                    <button type="submit"
+                                            class="@(product.IsInWishlist ? "is-active" : null)"
+                                            aria-label="@(product.IsInWishlist ? Localizer["Прибрати зі списку бажань"] : Localizer["Додати у список бажань"])"
+                                            title="@(product.IsInWishlist ? Localizer["Прибрати зі списку бажань"] : Localizer["Додати у список бажань"])">
+                                        <span aria-hidden="true">@(product.IsInWishlist ? "♥" : "♡")</span>
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <a asp-controller="Auth"
+                                   asp-action="SignIn"
+                                   asp-route-returnUrl="@Context.Request.Path@Context.Request.QueryString"
+                                   class="catalog-card__wish catalog-card__wish-link"
+                                   aria-label="@Localizer["Увійти, щоб додати у список бажань"]"
+                                   title="@Localizer["Увійти, щоб додати у список бажань"]">
+                                    <span aria-hidden="true">♡</span>
+                                </a>
                             }
 
                             <button type="button"
@@ -342,10 +394,10 @@
                                             <span class="shop-price">@product.Price.ToString("N2") ₴</span>
                                         }
                                     </div>
-                                    <form asp-controller="Cart" asp-action="Add" method="post">
+                                    <form asp-controller="Cart" asp-action="Add" method="post" class="catalog-card__cart-form">
                                         <input type="hidden" name="productId" value="@product.Id" />
                                         <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
-                                        <button type="submit" class="btn btn-sm btn-primary">@Localizer["До кошика"]</button>
+                                        <button type="submit" class="btn btn-primary">@Localizer["До кошика"]</button>
                                     </form>
                                 </div>
                             </div>
@@ -437,4 +489,5 @@
 @section Scripts {
     <script src="~/js/saved-searches.js" asp-append-version="true"></script>
     <script src="~/js/catalogue-age-gate.js" asp-append-version="true"></script>
+    <script src="~/js/catalogue-filters.js" asp-append-version="true"></script>
 }

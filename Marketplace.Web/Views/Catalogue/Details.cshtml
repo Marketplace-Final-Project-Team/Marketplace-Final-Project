@@ -137,6 +137,13 @@
             <p class="product-code">@Localizer["Код:"] @(string.IsNullOrWhiteSpace(Model.Sku) ? productCode : Model.Sku)</p>
 
             <div class="product-price-block">
+                @if (Model.HasDiscount)
+                {
+                    <div class="product-price-block__discount product-discount">
+                        <del>@Model.OriginalPrice!.Value.ToString("N2") ₴</del>
+                        <span class="badge bg-danger">−@Model.DiscountPercent!.Value.ToString("0.##")%</span>
+                    </div>
+                }
                 <strong>@Model.Price.ToString("N2") ₴</strong>
                 <small>@Localizer["Ціна вказана з урахуванням усіх податків"]</small>
             </div>
@@ -314,6 +321,13 @@
                             <span>@SharedLocalizer[related.CategoryName]</span>
                             <a asp-action="Details" asp-route-id="@related.Id">@relatedName</a>
                             <strong>@related.Price.ToString("N2") ₴</strong>
+                            @if (related.OriginalPrice.HasValue)
+                            {
+                                <div class="product-discount">
+                                    <del>@related.OriginalPrice.Value.ToString("N2") ₴</del>
+                                    <span class="badge bg-danger">−@related.DiscountPercent.ToString("0.##")%</span>
+                                </div>
+                            }
                             <small class="@(related.Quantity > 0 ? "is-available" : "is-unavailable")">@(related.Quantity > 0 ? Localizer["В наявності"] : Localizer["Немає в наявності"])</small>
                         </div>
                     </article>

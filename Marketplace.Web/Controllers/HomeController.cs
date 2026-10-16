@@ -29,8 +29,9 @@ namespace Marketplace.Web.Controllers
                 _userManager = userManager;
             }
 
-        public async Task<IActionResult> Index([FromQuery] CatalogueFilterViewModel filter, string? userId)
+        public async Task<IActionResult> Index([FromQuery] CatalogueFilterViewModel filter)
         {
+            var userId = _userManager.GetUserId(User);
             filter.Page = filter.Page <= 0 ? 1 : filter.Page;
 
             var sort = Request.Query.ContainsKey("Sort") ? filter.Sort : CatalogueSortOption.Popularity;
@@ -87,7 +88,7 @@ namespace Marketplace.Web.Controllers
                 Search = filter.Search,
                 CategoryId = filter.CategoryId,
                 SortBy = sort.ToString(),
-                RecentlyViewed = (await RecentlyViewedCookie.LoadAsync(_productService, Request.Cookies)).Take(3).ToList()
+                RecentlyViewed = (await RecentlyViewedCookie.LoadAsync(_productService, Request.Cookies, userId)).Take(3).ToList()
             };
 
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")

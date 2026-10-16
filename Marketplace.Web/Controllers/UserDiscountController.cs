@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Marketplace.BLL.Common;
 using Marketplace.BLL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -22,14 +22,16 @@ namespace Marketplace.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SetUserDiscount(string userId, Guid businessId, decimal percent, DateTime startDate, DateTime endDate, string? returnUrl = null)
+        public async Task<IActionResult> SetUserDiscount(string userId, Guid businessId, decimal percent, DateTimeOffset startDate, DateTimeOffset endDate, string? returnUrl = null)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
             var hasAcces = await _businessAccessService.HasAccessAsync(businessId, CurrentUserId, BusinessPermissions.ProductCrud);
             if (!hasAcces)
             {
                 return Forbid();
             }
-            var result = await _userDiscountService.SetUserDiscount(userId, businessId, percent, startDate, endDate);
+            var result = await _userDiscountService.SetUserDiscount(userId, businessId, percent, startDate.UtcDateTime, endDate.UtcDateTime);
             TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
 
             if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))

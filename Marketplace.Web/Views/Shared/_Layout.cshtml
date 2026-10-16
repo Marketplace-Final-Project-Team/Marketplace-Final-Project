@@ -12,7 +12,7 @@
     var userInitial = string.IsNullOrWhiteSpace(compactUserName)
         ? "U"
         : compactUserName[..1].ToUpperInvariant();
-    var isAuthenticated = User.Identity?.IsAuthenticated == true; 
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
     var currentUser = isAuthenticated ? await UserManager.GetUserAsync(User) : null;
     var avatarUrl = currentUser?.AvatarUrl;
     var headerCategories = await CategoryService.GetAllCategories();
@@ -341,6 +341,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/discount-time.js" asp-append-version="true"></script>
     <script src="~/js/site-dialog.js" asp-append-version="true"></script>
     <script src="~/js/cookie-consent.js" asp-append-version="true"></script>
     <script src="~/js/search-autocomplete.js" asp-append-version="true"></script>

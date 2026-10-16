@@ -7,6 +7,7 @@
 @section Styles {
     <link rel="stylesheet" href="~/css/shop.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/cart-sellers.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/cart-recommendations.css" asp-append-version="true" />
 }
 
 <div class="shop-page">
@@ -130,4 +131,26 @@
             </aside>
         </div>
     }
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <section class="cart-recommendations"
+                 data-cart-recommendations
+                 data-endpoint="@Url.Action("GetRecomendation", "Recommendation", new { count = 4 })"
+                 hidden>
+            <div class="cart-recommendations__heading">
+                <div>
+                    <span class="shop-kicker">@Localizer["Для вас"]</span>
+                    <h2>@Localizer["Рекомендовані товари"]</h2>
+                    <p>@Localizer["Добірка на основі ваших переглядів, оцінок і покупок."]</p>
+                </div>
+                <a asp-controller="Catalog" asp-action="Index">@Localizer["Переглянути каталог"] →</a>
+            </div>
+            <div class="cart-recommendations__grid" data-cart-recommendations-grid></div>
+        </section>
+    }
 </div>
+
+@section Scripts {
+    <script src="~/js/cart-recommendations.js" asp-append-version="true"></script>
+}

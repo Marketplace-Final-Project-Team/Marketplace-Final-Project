@@ -20,6 +20,7 @@
     {
         Marketplace.Domain.Enums.OrderStatus.Delivered => "✓",
         Marketplace.Domain.Enums.OrderStatus.Canceled => "✕",
+        Marketplace.Domain.Enums.OrderStatus.Shipped => "→",
         _ => "•"
     };
 }
@@ -35,139 +36,154 @@
 
     <div class="profile-summary">
         <h1>@Localizer["Сповіщення"]</h1>
-        <p>@Localizer["Статус замовлень, нові товари та підбірки для вас - в одному місці."]</p>
+        <p>@Localizer["Замовлення, повідомлення підтримки та персональні пропозиції - в одній стрічці."]</p>
     </div>
 
     <div class="notif-tabs" role="tablist" aria-label="@Localizer["Категорії сповіщень"]">
-        <button type="button" class="notif-tabs__btn is-active" data-notif-tab="orders" role="tab" aria-selected="true">
-            @Localizer["Про замовлення"]
+        <button type="button" class="notif-tabs__btn is-active" data-notif-tab="all" role="tab" aria-selected="true">@Localizer["Всі"]</button>
+        <button type="button" class="notif-tabs__btn" data-notif-tab="orders" role="tab" aria-selected="false">
+            @Localizer["Замовлення"]
             @if (Model.OrderActivity.Count > 0)
             {
                 <span class="notif-tabs__badge">@Model.OrderActivity.Count</span>
             }
         </button>
-        <button type="button" class="notif-tabs__btn" data-notif-tab="new" role="tab" aria-selected="false">
-            @Localizer["Нові товари"]
+        <button type="button" class="notif-tabs__btn" data-notif-tab="messages" role="tab" aria-selected="false">
+            @Localizer["Повідомлення"] <span class="notif-tabs__badge" data-message-count hidden></span>
         </button>
-        <button type="button" class="notif-tabs__btn" data-notif-tab="offers" role="tab" aria-selected="false">
-            @Localizer["Акційні пропозиції"]
-        </button>
+        <button type="button" class="notif-tabs__btn" data-notif-tab="offers" role="tab" aria-selected="false">@Localizer["Акції"]</button>
     </div>
 
-    <section class="notif-panel" data-notif-panel="orders">
-        <p class="activity-note">
-            @Localizer["Це стрічка поточних статусів ваших замовлень - історія проміжних змін статусу не зберігається."]
-        </p>
+    <section class="notif-panel" data-notif-panel="all">
+        <p class="activity-note">@Localizer["Останні важливі події, упорядковані за датою."]</p>
+        <div class="notif-feed" data-notif-all-feed>
+            @foreach (var item in Model.OrderActivity)
+            {
+                <a asp-controller="Order" asp-action="Details" asp-route-id="@item.OrderId"
+                   class="notif-feed-item notif-feed-item--order" data-notif-feed-entry
+                   data-time="@item.Timestamp.ToUniversalTime().ToString("O")">
+                    <span class="notif-feed-item__icon" aria-hidden="true">@StatusIcon(item.Status)</span>
+                    <span class="notif-feed-item__content">
+                        <span class="notif-feed-item__type">@Localizer["Замовлення"]</span>
+                        <strong>@Localizer["Замовлення #"]@item.OrderId.ToString()[..8].ToUpperInvariant() — @StatusLabel(item.Status)</strong>
+                        <small>@item.TotalAmount.ToString("N2") ₴</small>
+                    </span>
+                    <time>@item.Timestamp.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</time>
+                </a>
+            }
 
+            @if (Model.NewProducts.Count > 0 || Model.RecommendedProducts.Count > 0)
+            {
+                <button type="button" class="notif-feed-item notif-feed-item--offer"
+                        data-open-notif-tab="offers" data-notif-feed-entry data-time="">
+                    <span class="notif-feed-item__icon" aria-hidden="true">%</span>
+                    <span class="notif-feed-item__content">
+                        <span class="notif-feed-item__type">@Localizer["Акції"]</span>
+                        <strong>@Localizer["Для вас готова персональна добірка"]</strong>
+                        <small>@Localizer["Новинки та рекомендовані товари"]</small>
+                    </span>
+                    <span class="notif-feed-item__arrow" aria-hidden="true">→</span>
+                </button>
+            }
+        </div>
+        <div class="profile-empty" data-notif-all-empty hidden>
+            <div class="profile-empty__icon" aria-hidden="true">🔔</div>
+            <h2>@Localizer["Подій ще немає"]</h2>
+            <p>@Localizer["Оновлення з'являться тут після першого замовлення або звернення."]</p>
+        </div>
+    </section>
+
+    <section class="notif-panel" data-notif-panel="orders" hidden>
+        <p class="activity-note">@Localizer["Поточний стан ваших замовлень."]</p>
         @if (Model.OrderActivity.Count == 0)
         {
             <div class="profile-empty">
-                <div class="profile-empty__icon" aria-hidden="true">🔔</div>
-                <h2>@Localizer["Подій ще немає"]</h2>
-                <p>@Localizer["Тут з'являться оновлення статусів після першого замовлення."]</p>
+                <div class="profile-empty__icon" aria-hidden="true">□</div>
+                <h2>@Localizer["Замовлень ще немає"]</h2>
+                <p>@Localizer["Після оформлення покупки її статус з'явиться тут."]</p>
                 <a asp-controller="Catalog" asp-action="Index" class="btn btn-primary">@Localizer["Перейти до каталогу"]</a>
             </div>
         }
         else
         {
-            <div class="activity-card">
-                <div class="delivery-timeline">
-                    @foreach (var item in Model.OrderActivity)
+            <div class="notif-feed">
+                @foreach (var item in Model.OrderActivity)
+                {
+                    <a asp-controller="Order" asp-action="Details" asp-route-id="@item.OrderId" class="notif-feed-item notif-feed-item--order">
+                        <span class="notif-feed-item__icon" aria-hidden="true">@StatusIcon(item.Status)</span>
+                        <span class="notif-feed-item__content">
+                            <span class="notif-feed-item__type">@Localizer["Замовлення"]</span>
+                            <strong>@Localizer["Замовлення #"]@item.OrderId.ToString()[..8].ToUpperInvariant() — @StatusLabel(item.Status)</strong>
+                            <small>@item.TotalAmount.ToString("N2") ₴</small>
+                        </span>
+                        <time>@item.Timestamp.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</time>
+                    </a>
+                }
+            </div>
+        }
+    </section>
+
+    <section class="notif-panel" data-notif-panel="messages" hidden>
+        <p class="activity-note">@Localizer["Відповіді підтримки та повідомлення щодо повернень."]</p>
+        <div class="notif-feed" data-notif-message-feed>
+            <div class="notif-feed__loading">@Localizer["Завантаження повідомлень..."]</div>
+        </div>
+        <div class="profile-empty" data-notif-message-empty hidden>
+            <div class="profile-empty__icon" aria-hidden="true">💬</div>
+            <h2>@Localizer["Нових повідомлень немає"]</h2>
+            <p>@Localizer["Відповіді підтримки та оновлення чатів з'являться тут."]</p>
+        </div>
+    </section>
+
+    <section class="notif-panel" data-notif-panel="offers" hidden>
+        @if (Model.NewProducts.Count > 0)
+        {
+            <div class="notif-offer-section">
+                <div class="notif-offer-section__heading"><div><span class="shop-kicker">@Localizer["Нове"]</span><h2>@Localizer["Щойно в каталозі"]</h2></div></div>
+                <div class="notif-product-grid">
+                    @foreach (var product in Model.NewProducts)
                     {
-                        <div class="delivery-step @(item.Status is Marketplace.Domain.Enums.OrderStatus.Delivered ? "is-complete" : "is-current")">
-                            <div class="delivery-step__dot">@StatusIcon(item.Status)</div>
-                            <div class="delivery-step__body">
-                                <strong>
-                                    <a asp-controller="Order" asp-action="Details" asp-route-id="@item.OrderId">
-                                        @Localizer["Замовлення #"]@item.OrderId.ToString()[..8].ToUpperInvariant()
-                                    </a>
-                                    - @StatusLabel(item.Status)
-                                </strong>
-                                <span>@item.Timestamp.ToLocalTime().ToString("dd.MM.yyyy HH:mm") · @item.TotalAmount.ToString("N2") ₴</span>
-                            </div>
-                        </div>
+                        var productName = (await ProductTranslator.GetLocalizedAsync(product.Id, product.Name, string.Empty, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)).Name;
+                        <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="notif-product-card">
+                            <span class="notif-product-card__media">
+                                @if (!string.IsNullOrWhiteSpace(product.ImageUrl)) { <img src="@product.ImageUrl" alt="@productName" /> }
+                                else { <span aria-hidden="true">@productName[..1].ToUpperInvariant()</span> }
+                                <small>@Localizer["Новинка"]</small>
+                            </span>
+                            <span class="notif-product-card__body"><span class="notif-product-card__category">@SharedLocalizer[product.CategoryName]</span><span class="notif-product-card__name">@productName</span><strong>@product.Price.ToString("N2") ₴</strong></span>
+                        </a>
                     }
                 </div>
             </div>
         }
-    </section>
 
-    <section class="notif-panel" data-notif-panel="new" hidden>
-        <p class="activity-note">@Localizer["Щойно з'явилися в каталозі - можливо, саме те, що ви шукали."]</p>
+        @if (Model.RecommendedProducts.Count > 0)
+        {
+            <div class="notif-offer-section">
+                <div class="notif-offer-section__heading"><div><span class="shop-kicker">@Localizer["Для вас"]</span><h2>@Localizer["Персональна добірка"]</h2></div></div>
+                <div class="notif-product-grid">
+                    @foreach (var product in Model.RecommendedProducts)
+                    {
+                        var productName = (await ProductTranslator.GetLocalizedAsync(product.Id, product.Name, string.Empty, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)).Name;
+                        <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="notif-product-card">
+                            <span class="notif-product-card__media">
+                                @if (!string.IsNullOrWhiteSpace(product.ImageUrl)) { <img src="@product.ImageUrl" alt="@productName" /> }
+                                else { <span aria-hidden="true">@productName[..1].ToUpperInvariant()</span> }
+                                <small>@Localizer["Рекомендуємо"]</small>
+                            </span>
+                            <span class="notif-product-card__body"><span class="notif-product-card__category">@SharedLocalizer[product.CategoryName]</span><span class="notif-product-card__name">@productName</span><strong>@product.Price.ToString("N2") ₴</strong></span>
+                        </a>
+                    }
+                </div>
+            </div>
+        }
 
-        @if (Model.NewProducts.Count == 0)
+        @if (Model.NewProducts.Count == 0 && Model.RecommendedProducts.Count == 0)
         {
             <div class="profile-empty">
-                <div class="profile-empty__icon" aria-hidden="true">🆕</div>
-                <h2>@Localizer["Поки нічого нового"]</h2>
-                <p>@Localizer["Нові товари з'являться тут одразу після додавання в каталог."]</p>
-            </div>
-        }
-        else
-        {
-            <div class="notif-product-grid">
-                @foreach (var product in Model.NewProducts)
-                {
-                    var productName = (await ProductTranslator.GetLocalizedAsync(product.Id, product.Name, string.Empty, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)).Name;
-                    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="notif-product-card">
-                        <span class="notif-product-card__media">
-                            @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
-                            {
-                                <img src="@product.ImageUrl" alt="@productName" />
-                            }
-                            else
-                            {
-                                <span aria-hidden="true">@productName[..1].ToUpperInvariant()</span>
-                            }
-                            <small>@Localizer["Новинка"]</small>
-                        </span>
-                        <span class="notif-product-card__body">
-                            <span class="notif-product-card__category">@SharedLocalizer[product.CategoryName]</span>
-                            <span class="notif-product-card__name">@productName</span>
-                            <strong>@product.Price.ToString("N2") ₴</strong>
-                        </span>
-                    </a>
-                }
-            </div>
-        }
-    </section>
-
-    <section class="notif-panel" data-notif-panel="offers" hidden>
-        <p class="activity-note">@Localizer["Персональна підбірка популярних товарів на платформі."]</p>
-
-        @if (Model.RecommendedProducts.Count == 0)
-        {
-            <div class="profile-empty">
-                <div class="profile-empty__icon" aria-hidden="true">✦</div>
-                <h2>@Localizer["Підбірок поки немає"]</h2>
-                <p>@Localizer["Рекомендації з'являться тут, щойно в каталозі буде більше товарів з відгуками."]</p>
-            </div>
-        }
-        else
-        {
-            <div class="notif-product-grid">
-                @foreach (var product in Model.RecommendedProducts)
-                {
-                    var productName = (await ProductTranslator.GetLocalizedAsync(product.Id, product.Name, string.Empty, System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)).Name;
-                    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@product.Id" class="notif-product-card">
-                        <span class="notif-product-card__media">
-                            @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
-                            {
-                                <img src="@product.ImageUrl" alt="@productName" />
-                            }
-                            else
-                            {
-                                <span aria-hidden="true">@productName[..1].ToUpperInvariant()</span>
-                            }
-                            <small>@Localizer["Рекомендуємо"]</small>
-                        </span>
-                        <span class="notif-product-card__body">
-                            <span class="notif-product-card__category">@SharedLocalizer[product.CategoryName]</span>
-                            <span class="notif-product-card__name">@productName</span>
-                            <strong>@product.Price.ToString("N2") ₴</strong>
-                        </span>
-                    </a>
-                }
+                <div class="profile-empty__icon" aria-hidden="true">%</div>
+                <h2>@Localizer["Пропозицій поки немає"]</h2>
+                <p>@Localizer["Новинки та персональні добірки з'являться тут пізніше."]</p>
             </div>
         }
     </section>

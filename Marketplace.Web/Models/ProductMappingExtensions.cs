@@ -41,9 +41,7 @@ namespace Marketplace.Web.Models
                 MainImageUrl = dto.MainImageUrl,
                 CategoryName = dto.CategoryName ?? "Без категорії",
                 OriginalPrice = dto.HasActiveDiscount ? dto.Price : null,
-                DiscountPercent = dto.DiscountPercentage.HasValue
-                    ? (int)dto.DiscountPercentage.Value
-                    : null
+                DiscountPercent = dto.DiscountPercentage
             };
         }
     }

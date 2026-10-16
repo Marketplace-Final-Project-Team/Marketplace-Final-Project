@@ -3,6 +3,7 @@ using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
 using Marketplace.Domain.Entities;
+using Marketplace.Domain.Pricing;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marketplace.BLL.Services
@@ -134,13 +135,26 @@ namespace Marketplace.BLL.Services
             var cart = await _context.Carts
                 .Include(c => c.Items)
                     .ThenInclude(i => i.Product)
+                        .ThenInclude(p => p.Discounts)
+                .Include(c => c.Items)
+                    .ThenInclude(i => i.Product)
+                        .ThenInclude(p => p.Business)
+                            .ThenInclude(b => b.Discounts)
+                .Include(c => c.Items)
+                    .ThenInclude(i => i.Product)
+                        .ThenInclude(p => p.Business)
+                            .ThenInclude(b => b.UserDiscounts.Where(d => d.UserId == userId))
+                .Include(c => c.Items)
+                    .ThenInclude(i => i.Product)
+                        .ThenInclude(p => p.Category)
+                            .ThenInclude(c => c.Discounts)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
 
-            var matchingSubtotal = cart?.Items
+            var matchingItems = cart?.Items
                 .Where(i => i.Product.BusinessId == promoCode.BusinessId)
-                .Sum(i => i.Product.Price * i.Quantity) ?? 0m;
+                .ToList() ?? new List<CartItem>();
 
-            if (matchingSubtotal <= 0)
+            if (!matchingItems.Any(i => i.Product.Price * i.Quantity > 0))
             {
                 return new PromoCodeApplicationDto
                 {
@@ -148,6 +162,15 @@ namespace Marketplace.BLL.Services
                     Message = $"У кошику немає товарів магазину «{promoCode.Business.StoreName}», для яких діє цей код."
                 };
             }
+
+            var now = DateTime.UtcNow;
+            var discountAmount = matchingItems.Sum(i =>
+            {
+                var salePercent = DiscountCalculator.GetEffectiveDiscountPercent(i.Product, userId, now);
+                var priceBeforePromo = DiscountCalculator.CalculatePrice(i.Product.Price, salePercent);
+                var priceAfterPromo = DiscountCalculator.CalculatePrice(i.Product.Price, salePercent + promoCode.Percent);
+                return (priceBeforePromo - priceAfterPromo) * i.Quantity;
+            });
 
             return new PromoCodeApplicationDto
             {
@@ -157,7 +180,7 @@ namespace Marketplace.BLL.Services
                 Percent = promoCode.Percent,
                 BusinessId = promoCode.BusinessId,
                 StoreName = promoCode.Business.StoreName,
-                DiscountAmount = Math.Round(matchingSubtotal * promoCode.Percent / 100m, 2)
+                DiscountAmount = discountAmount
             };
         }
     }

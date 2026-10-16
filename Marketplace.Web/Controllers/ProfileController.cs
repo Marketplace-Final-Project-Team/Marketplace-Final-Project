@@ -1,4 +1,4 @@
-﻿using Marketplace.BLL.DTOs;
+using Marketplace.BLL.DTOs;
 using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
@@ -64,7 +64,7 @@ namespace Marketplace.Web.Controllers
             var wishlist = await _wishlistService.GetWishlistAsync(userId!);
             var discounts = await _userDiscountService.GetActiveDiscountsForUserAsync(userId!);
 
-            
+
             var now = DateTime.UtcNow;
             var personalDiscounts = await _context.UserDiscounts
                 .Where(ud => ud.UserId == userId && ud.StartDate <= now && ud.EndDate > now)
@@ -135,19 +135,19 @@ namespace Marketplace.Web.Controllers
             var model = new NotificationsViewModel
             {
                 OrderActivity = orderActivity,
-                NewProducts = newProducts.Items.Select(MapNotificationProduct).ToList(),
-                RecommendedProducts = recommended.Items.Select(MapNotificationProduct).ToList()
+                NewProducts = newProducts.Items.Select(item => MapNotificationProduct(item, userId)).ToList(),
+                RecommendedProducts = recommended.Items.Select(item => MapNotificationProduct(item, userId)).ToList()
             };
 
             return View(model);
         }
 
-        private static NotificationProductViewModel MapNotificationProduct(CataloguePageItemDto item) => new()
+        private static NotificationProductViewModel MapNotificationProduct(CataloguePageItemDto item, string userId) => new()
         {
             Id = item.Product.Id,
             Name = item.Product.Name,
             ImageUrl = item.Product.MainImageUrl,
-            Price = item.Product.Price,
+            Price = item.Product.GetDiscountedPrice(userId),
             CategoryName = item.Product.Category?.Name ?? "Без категорії"
         };
 
@@ -165,7 +165,9 @@ namespace Marketplace.Web.Controllers
                 {
                     ProductId = item.ProductId,
                     ProductName = item.ProductName,
-                    Price = item.Price,
+                    Price = product?.GetDiscountedPrice(userId) ?? item.Price,
+                    OriginalPrice = product?.GetEffectiveDiscountPercent(userId) > 0 ? product.Price : null,
+                    DiscountPercent = product?.GetEffectiveDiscountPercent(userId) ?? 0m,
                     MainImageUrl = item.MainImageUrl,
                     InStock = product is not null && product.Quantity > 0
                 });
@@ -180,7 +182,7 @@ namespace Marketplace.Web.Controllers
             return View(new RecentlyViewedPageViewModel
             {
                 ConsentAccepted = Marketplace.Web.Infrastructure.CookieConsent.IsAccepted(Request.Cookies),
-                Items = await Marketplace.Web.Infrastructure.RecentlyViewedCookie.LoadAsync(_productService, Request.Cookies)
+                Items = await Marketplace.Web.Infrastructure.RecentlyViewedCookie.LoadAsync(_productService, Request.Cookies, _userManager.GetUserId(User))
             });
         }
 
@@ -520,14 +522,14 @@ namespace Marketplace.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetUserId() 
+        public async Task<IActionResult> GetUserId()
         {
             var userId = _userManager.GetUserId(User);
             if (userId is null)
             {
                 return NotFound();
             }
-            return Ok(new { UserId = userId }); 
+            return Ok(new { UserId = userId });
         }
     }
 }
