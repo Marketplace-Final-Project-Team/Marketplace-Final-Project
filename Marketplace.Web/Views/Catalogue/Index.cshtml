@@ -149,13 +149,17 @@
         <div class="catalog-toolbar__actions">
             @if (!isAdultConfirmed)
             {
-                <button type="button" class="btn btn-outline-danger btn-sm" onclick="showAgeModal(null)">
+                <button type="button" class="btn btn-outline-danger btn-sm" data-age-open>
                     🔞 @Localizer["Увімкнути контент 18+"]
                 </button>
             }
             else
             {
-                <span class="badge bg-danger p-2">🔞 @Localizer["Контент 18+ увімкнено"]</span>
+                <form asp-action="DisableAdultContent" asp-controller="Catalogue" method="post" class="d-inline-flex align-items-center gap-2">
+                    <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                    <span class="badge bg-danger p-2">🔞 @Localizer["Контент 18+ увімкнено"]</span>
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">@Localizer["Вимкнути"]</button>
+                </form>
             }
             @if (filter.HasActiveFilters)
             {
@@ -283,7 +287,10 @@
                             <button type="button"
                                     class="catalog-card__media border-0 p-0 text-start bg-transparent w-100 position-relative"
                                     aria-label="@Localizer["Переглянути {0}", productName]"
-                                    onclick="checkAgeAndNavigate('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
+                                    data-age-navigate
+                                    data-product-id="@product.Id"
+                                    data-restricted="@(product.IsAgeRestricted ? "true" : "false")"
+                                    data-details-url="@Url.Action("Details", new { id = product.Id })">
                                 @if (!string.IsNullOrWhiteSpace(product.MainImageUrl))
                                 {
                                     <img src="@product.MainImageUrl" alt="@productName" />
@@ -311,7 +318,10 @@
 
                                 <button type="button"
                                         class="catalog-card__title border-0 p-0 text-start bg-transparent text-primary fw-semibold w-100"
-                                        onclick="checkAgeAndNavigate('@product.Id', @product.IsAgeRestricted.ToString().ToLower())">
+                                        data-age-navigate
+                                        data-product-id="@product.Id"
+                                        data-restricted="@(product.IsAgeRestricted ? "true" : "false")"
+                                        data-details-url="@Url.Action("Details", new { id = product.Id })">
                                     @productName
                                 </button>
 
@@ -403,8 +413,7 @@
     </div>
 </div>
 
-<!-- МОДАЛЬНЕ ВІКНО 18+ З ФОРМОЮ POST ДЛЯ COOKIE -->
-<div id="ageVerificationModal" class="d-none position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-75 d-flex align-items-center justify-content-center p-3" style="backdrop-filter: blur(4px); z-index: 9999;">
+<div id="ageVerificationModal" data-adult-confirmed="@(isAdultConfirmed ? "true" : "false")" class="d-none position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-75 d-flex align-items-center justify-content-center p-3" style="backdrop-filter: blur(4px); z-index: 9999;">
     <div class="bg-white rounded-4 shadow-lg p-4 text-center" style="max-width: 400px; width: 100%;">
         <div class="mx-auto d-flex align-items-center justify-content-center rounded-circle bg-danger bg-opacity-10 text-danger fs-3 fw-bold mb-3" style="width: 64px; height: 64px;">
             18+
@@ -414,7 +423,7 @@
             @Localizer["Цей товар має вікове обмеження. Вам вже виповнилося 18 років?"]
         </p>
         <div class="d-flex gap-2 justify-content-center">
-            <button type="button" onclick="closeAgeModal()" class="btn btn-light w-100 fw-medium">@Localizer["Ні, мені менше 18"]</button>
+            <button type="button" data-age-close class="btn btn-light w-100 fw-medium">@Localizer["Ні, мені менше 18"]</button>
 
             <form asp-action="ConfirmAge" asp-controller="Catalogue" method="post" class="w-100">
                 <input type="hidden" id="modalProductId" name="productId" value="" />
@@ -427,30 +436,5 @@
 
 @section Scripts {
     <script src="~/js/saved-searches.js" asp-append-version="true"></script>
-    <script>
-        const isAdultConfirmedServer = @(isAdultConfirmed.ToString().ToLower());
-        const ageModal = document.getElementById('ageVerificationModal');
-        const modalProductIdInput = document.getElementById('modalProductId');
-
-        function checkAgeAndNavigate(productId, isRestricted) {
-            if (isRestricted && !isAdultConfirmedServer) {
-                showAgeModal(productId);
-            } else {
-                window.location.href = `/Catalogue/Details/${productId}`;
-            }
-        }
-
-        function showAgeModal(productId) {
-            if (productId) {
-                modalProductIdInput.value = productId;
-            } else {
-                modalProductIdInput.value = '';
-            }
-            ageModal.classList.remove('d-none');
-        }
-
-        function closeAgeModal() {
-            ageModal.classList.add('d-none');
-        }
-    </script>
+    <script src="~/js/catalogue-age-gate.js" asp-append-version="true"></script>
 }

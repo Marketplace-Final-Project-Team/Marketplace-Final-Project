@@ -187,6 +187,25 @@ public class CatalogueController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost]
+    [Route("DisableAdultContent")]
+    public IActionResult DisableAdultContent(string? returnUrl)
+    {
+        Response.Cookies.Delete("AdultConfirmed", new CookieOptions
+        {
+            HttpOnly = true,
+            IsEssential = true,
+            SameSite = SameSiteMode.Lax
+        });
+
+        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return LocalRedirect(returnUrl);
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
     private void RecordRecentlyViewed(Guid productId)
     {
         if (!CookieConsent.IsAccepted(Request.Cookies))

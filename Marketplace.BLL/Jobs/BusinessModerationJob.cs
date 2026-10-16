@@ -5,7 +5,7 @@ using Marketplace.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using Quartz;
 
-namespace Marketplace.BLL.Services
+namespace Marketplace.BLL.Jobs
 {
     public class BusinessModerationJob: IJob
     {
