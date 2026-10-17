@@ -22,7 +22,7 @@
             MpCharts.bar("ratingChart", {
                 labels: ["1 ★", "2 ★", "3 ★", "4 ★", "5 ★"],
                 data: distribution,
-                label: "Відгуків",
+                label: __t("Відгуків"),
                 color: "#d99a16"
             });
         }

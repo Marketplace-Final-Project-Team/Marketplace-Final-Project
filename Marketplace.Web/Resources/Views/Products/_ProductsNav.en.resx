@@ -70,4 +70,7 @@
   <data name="Планування запасів" xml:space="preserve">
     <value>Stock planning</value>
   </data>
+  <data name="Категорії" xml:space="preserve">
+    <value>Categories</value>
+  </data>
 </root>

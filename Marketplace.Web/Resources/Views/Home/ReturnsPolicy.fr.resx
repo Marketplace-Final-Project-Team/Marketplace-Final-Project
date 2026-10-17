@@ -145,4 +145,97 @@
   <data name="Кошти за будь-яке замовлення з онлайн-оплатою резервуються платформою і переказуються продавцю лише після того, як ви підтвердите отримання товару, або автоматично - після завершення 14-денного періоду без претензій. Це гарантує, що ви завжди маєте час перевірити товар і оформити повернення до того, як гроші дійдуть до продавця." xml:space="preserve">
     <value>Les fonds de toute commande payée en ligne sont conservés par la plateforme et ne sont versés au vendeur qu'après votre confirmation de réception de l'article, ou automatiquement à l'issue de la période de 14 jours sans réclamation. Cela vous garantit toujours le temps nécessaire pour vérifier l'article et demander un retour avant que l'argent ne parvienne au vendeur.</value>
   </data>
+  <data name="10. Повернення коштів" xml:space="preserve">
+    <value>10. Remboursements</value>
+  </data>
+  <data name="11. Захист покупця" xml:space="preserve">
+    <value>11. Protection de l'acheteur</value>
+  </data>
+  <data name="12. Якщо спір не вдалося вирішити" xml:space="preserve">
+    <value>12. Si le litige n'a pas pu être résolu</value>
+  </data>
+  <data name="3. Часткове повернення замовлення" xml:space="preserve">
+    <value>3. Retour partiel d'une commande</value>
+  </data>
+  <data name="4. Умови повернення товару належної якості" xml:space="preserve">
+    <value>4. Conditions de retour d'un article conforme</value>
+  </data>
+  <data name="5. Повернення товару неналежної якості та спори" xml:space="preserve">
+    <value>5. Retour d'articles défectueux et litiges</value>
+  </data>
+  <data name="6. Товари, що не підлягають поверненню" xml:space="preserve">
+    <value>6. Articles non retournables</value>
+  </data>
+  <data name="7. Хто оплачує зворотну доставку" xml:space="preserve">
+    <value>7. Qui paie les frais de retour</value>
+  </data>
+  <data name="8. Обмін товару" xml:space="preserve">
+    <value>8. Échange d'articles</value>
+  </data>
+  <data name="9. Гарантія виробника" xml:space="preserve">
+    <value>9. Garantie du fabricant</value>
+  </data>
+  <data name="Ви можете оформити повернення товару належної якості протягом &lt;strong&gt;14 календарних днів&lt;/strong&gt; з дати доставки замовлення - це період дії «Захисту покупця». Товар неналежної якості (пошкоджений, невідповідний опису, некомплектний) можна повернути в будь-який момент після виявлення проблеми через розділ «Відкрити спір»." xml:space="preserve">
+    <value>Vous pouvez retourner un article conforme dans un délai de &lt;strong&gt;14 jours calendaires&lt;/strong&gt; à compter de la date de livraison — c'est la période de « Protection de l'acheteur ». Un article défectueux (endommagé, non conforme à la description, incomplet) peut être retourné à tout moment après la découverte du problème via la section « Ouvrir un litige ».</value>
+  </data>
+  <data name="Кошти повертаються тим самим способом, яким було здійснено оплату. Для оплати карткою онлайн через LiqPay повернення відбувається протягом 3–10 банківських днів після підтвердження повернення продавцем. Для замовлень з оплатою при отриманні кошти повертаються на реквізити, узгоджені з підтримкою під час розгляду заявки." xml:space="preserve">
+    <value>Les fonds sont remboursés par le même moyen que celui utilisé pour le paiement. Pour un paiement par carte en ligne via LiqPay, le remboursement intervient sous 3 à 10 jours ouvrés bancaires après confirmation du retour par le vendeur. Pour les commandes payées à la réception, les fonds sont remboursés sur les coordonnées convenues avec le support lors de l'examen de la demande.</value>
+  </data>
+  <data name="На поточному етапі Платформа підтримує повернення товару з поверненням коштів; прямий обмін на інший розмір чи модель не є окремою функцією. Якщо вам потрібен інший варіант товару - оформіть повернення коштів за поточну позицію та окреме нове замовлення на потрібний варіант." xml:space="preserve">
+    <value>À ce stade, la Plateforme prend en charge les retours avec remboursement ; l'échange direct contre une autre taille ou un autre modèle n'est pas une fonctionnalité distincte. Si vous avez besoin d'une autre variante, demandez le remboursement de l'article actuel et passez une nouvelle commande pour la variante souhaitée.</value>
+  </data>
+  <data name="Наведені вище строки й умови стосуються права на повернення товару як такого. Якщо на товар поширюється гарантія виробника (зазначається в картці товару чи гарантійному талоні), вона діє незалежно від строку повернення на Платформі й реалізується безпосередньо через сервісні центри виробника чи продавця." xml:space="preserve">
+    <value>Les délais et conditions ci-dessus concernent le droit de retour en tant que tel. Si le produit bénéficie d'une garantie du fabricant (indiquée dans la fiche produit ou le certificat de garantie), elle s'applique indépendamment du délai de retour sur la Plateforme et s'exerce directement auprès des centres de service du fabricant ou du vendeur.</value>
+  </data>
+  <data name="Надішліть заявку - вона одразу отримує статус «Очікує розгляду» й відображається у вас на сторінці замовлення;" xml:space="preserve">
+    <value>Envoyez la demande — elle obtient immédiatement le statut « En attente d'examen » et s'affiche sur la page de votre commande ;</value>
+  </data>
+  <data name="Натисніть кнопку «Оформити повернення» в блоці «Післяпродажний сервіс та безпека» біля конкретної позиції замовлення;" xml:space="preserve">
+    <value>Cliquez sur le bouton « Demander un retour » dans le bloc « Service après-vente et sécurité » à côté de l'article concerné ;</value>
+  </data>
+  <data name="Наявний документ, що підтверджує факт і умови купівлі (номер замовлення в акаунті достатньо - друкований чек не потрібен);" xml:space="preserve">
+    <value>Un document attestant l'achat et ses conditions (le numéro de commande dans le compte suffit — un ticket imprimé n'est pas nécessaire) ;</value>
+  </data>
+  <data name="Оберіть причину повернення зі списку та за бажанням додайте коментар з деталями й фото товару;" xml:space="preserve">
+    <value>Choisissez un motif de retour dans la liste et ajoutez, si vous le souhaitez, un commentaire détaillé et des photos de l'article ;</value>
+  </data>
+  <data name="Очікуйте на зворотний зв'язок протягом 1–2 робочих днів; якщо продавець не реагує довше - звертайтесь у підтримку, і ми ескалюємо заявку." xml:space="preserve">
+    <value>Attendez une réponse sous 1 à 2 jours ouvrés ; si le vendeur ne répond pas plus longtemps, contactez le support et nous escaladerons la demande.</value>
+  </data>
+  <data name="Продавець розглядає заявку та ухвалює рішення - повернути кошти чи відхилити запит з поясненням причини;" xml:space="preserve">
+    <value>Le vendeur examine la demande et décide de rembourser ou de la refuser en expliquant pourquoi ;</value>
+  </data>
+  <data name="Підтримки" xml:space="preserve">
+    <value>Assistance</value>
+  </data>
+  <data name="Редакція від 16 вересня 2026 року." xml:space="preserve">
+    <value>Version du 16 septembre 2026.</value>
+  </data>
+  <data name="Товар не входить до переліку, що не підлягає поверненню чи обміну (див. пункт 6)." xml:space="preserve">
+    <value>L'article ne figure pas dans la liste des articles non retournables ni échangeables (voir point 6).</value>
+  </data>
+  <data name="Цей перелік не поширюється на випадки, коли сам товар неналежної якості - у такому разі застосовується пункт 5, а не цей." xml:space="preserve">
+    <value>Cette liste ne s'applique pas lorsque l'article lui-même est défectueux — dans ce cas, c'est le point 5 qui s'applique.</value>
+  </data>
+  <data name="Якщо ви повертаєте товар належної якості за власним бажанням (передумали, не підійшов розмір тощо) - вартість зворотної доставки покриває покупець. Якщо причиною повернення є брак, пошкодження чи невідповідність опису - зворотну доставку оплачує продавець." xml:space="preserve">
+    <value>Si vous retournez un article conforme de votre propre initiative (changement d'avis, taille inadaptée, etc.), les frais de retour sont à la charge de l'acheteur. Si le retour est dû à un défaut, à un dommage ou à une non-conformité à la description, les frais de retour sont à la charge du vendeur.</value>
+  </data>
+  <data name="Якщо замовлення містить кілька товарів, заявку на повернення можна оформити окремо по кожній позиції - немає потреби повертати все замовлення цілком, якщо проблема стосується лише одного товару. Кожна така заявка розглядається продавцем незалежно від інших позицій того самого замовлення." xml:space="preserve">
+    <value>Si une commande contient plusieurs articles, une demande de retour peut être faite séparément pour chacun — inutile de retourner toute la commande si le problème ne concerne qu'un seul produit. Chaque demande est examinée par le vendeur indépendamment des autres articles de la même commande.</value>
+  </data>
+  <data name="Якщо продавець відхилив заявку на повернення, а ви вважаєте це рішення необґрунтованим, зверніться через сторінку" xml:space="preserve">
+    <value>Si le vendeur a refusé votre demande de retour et que vous estimez cette décision injustifiée, contactez-nous via la page</value>
+  </data>
+  <data name="Якщо товар пошкоджений, некомплектний або не відповідає опису в картці товару - скористайтесь кнопкою «Відкрити спір» на сторінці замовлення. Оберіть тип проблеми та опишіть ситуацію максимально детально, додавши фото. Команда підтримки маркетплейсу підключається до вирішення спору та зв'язується з вами протягом 24 годин. У такому разі повернення коштів або заміна товару відбувається за рахунок продавця, без додаткових витрат для покупця." xml:space="preserve">
+    <value>Si l'article est endommagé, incomplet ou ne correspond pas à la description de la fiche produit, utilisez le bouton « Ouvrir un litige » sur la page de la commande. Choisissez le type de problème et décrivez la situation de manière aussi détaillée que possible, photos à l'appui. L'équipe support de la marketplace intervient pour résoudre le litige et vous contacte sous 24 heures. Dans ce cas, le remboursement ou le remplacement est à la charge du vendeur, sans frais supplémentaires pour l'acheteur.</value>
+  </data>
+  <data name="активовані промокоди та інші цифрові товари, які неможливо «повернути на склад» після використання." xml:space="preserve">
+    <value>codes promo activés et autres biens numériques qui ne peuvent pas être « remis en stock » après utilisation.</value>
+  </data>
+  <data name="з номером замовлення - команда MarketPlace додатково розгляне ситуацію як незалежна сторона." xml:space="preserve">
+    <value>en indiquant le numéro de commande — l'équipe MarketPlace réexaminera la situation en tant que partie indépendante.</value>
+  </data>
+  <data name="харчові продукти та товари з обмеженим строком придатності;" xml:space="preserve">
+    <value>denrées alimentaires et produits à durée de conservation limitée ;</value>
+  </data>
 </root>

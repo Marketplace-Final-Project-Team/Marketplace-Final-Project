@@ -184,4 +184,10 @@
   <data name="Після створення товар автоматично потрапить на модерацію." xml:space="preserve">
     <value>After creation, the item will automatically go into moderation.</value>
   </data>
+  <data name="Артикул (SKU)" xml:space="preserve">
+    <value>Article number (SKU)</value>
+  </data>
+  <data name="Наприклад, TS-BLK-001" xml:space="preserve">
+    <value>For example, TS-BLK-001</value>
+  </data>
 </root>

@@ -1,4 +1,5 @@
-﻿using Marketplace.BLL.Interfaces;
+﻿using Marketplace.Web.Infrastructure;
+using Marketplace.BLL.Interfaces;
 using Marketplace.DAL.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -73,7 +74,7 @@ namespace Marketplace.Web.Controllers
             ViewBag.IsAdmin = isAdmin;
             ViewBag.RequestId = requestId;
             ViewBag.IsSellerChannel = isSellerChannel;
-            ViewBag.ItemName = request.OrderItem?.ProductName ?? "Товар";
+            ViewBag.ItemName = request.OrderItem?.ProductName ?? this.L("Товар");
             ViewBag.OrderNumber = request.OrderId.ToString()[..8].ToUpperInvariant();
             var backBusinessId = request.OrderItem?.Product?.BusinessId;
             string backUrl;
@@ -130,11 +131,11 @@ namespace Marketplace.Web.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
             {
-                return Json(new { success = false, message = "Потрібно увійти в акаунт." });
+                return Json(new { success = false, message = this.L("Потрібно увійти в акаунт.") });
             }
 
             var result = await _supportTicketService.CreateTicketAsync(userId, category, message);
-            return Json(new { success = result.Succeeded, message = result.Message });
+            return Json(new { success = result.Succeeded, message = this.L(result.Message) });
         }
 
         [HttpGet]

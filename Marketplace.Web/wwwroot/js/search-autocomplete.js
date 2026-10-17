@@ -52,7 +52,7 @@
 
             let html = "";
             if (corrected && corrected.toLowerCase() !== term.toLowerCase()) {
-                html += `<button type="button" class="search-suggest__corrected" data-corrected-term="${escapeHtml(corrected)}">Можливо, ви мали на увазі «<strong>${escapeHtml(corrected)}</strong>»?</button>`;
+                html += `<button type="button" class="search-suggest__corrected" data-corrected-term="${escapeHtml(corrected)}">${__t("Можливо, ви мали на увазі «{0}»?", `<strong>${escapeHtml(corrected)}</strong>`)}</button>`;
             }
 
             html += items
@@ -78,7 +78,7 @@
                 })
                 .join("");
 
-            html += `<button type="button" class="search-suggest__all" data-show-all>Усі результати для «${escapeHtml(term)}» →</button>`;
+            html += `<button type="button" class="search-suggest__all" data-show-all>${__t("Усі результати для «{0}» →", escapeHtml(term))}</button>`;
 
             dropdown.innerHTML = html;
             dropdown.hidden = false;

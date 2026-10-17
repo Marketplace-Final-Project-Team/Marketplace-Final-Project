@@ -91,7 +91,7 @@ public class OrderController : Controller
 
         if (model.Items.Count == 0)
         {
-            TempData["Error"] = "Додайте товари до кошика перед оформленням.";
+            TempData["Error"] = this.L("Додайте товари до кошика перед оформленням.");
             return RedirectToAction("Index", "Cart");
         }
 
@@ -114,7 +114,7 @@ public class OrderController : Controller
 
         if (model.Items.Count == 0)
         {
-            ModelState.AddModelError(string.Empty, "Кошик порожній.");
+            ModelState.AddModelError(string.Empty, this.L("Кошик порожній."));
         }
 
         if (!ModelState.IsValid)
@@ -146,7 +146,7 @@ public class OrderController : Controller
 
         if (!result.Succeeded)
         {
-            ModelState.AddModelError(string.Empty, result.Message);
+            ModelState.AddModelError(string.Empty, this.L(result.Message));
             return View(model);
         }
 
@@ -163,8 +163,8 @@ public class OrderController : Controller
         }
 
         TempData["Success"] = model.PaymentMethod == PaymentMethods.CashOnDelivery
-            ? "Замовлення оформлено. Оплата - при отриманні."
-            : "Замовлення успішно оформлено.";
+            ? this.L("Замовлення оформлено. Оплата - при отриманні.")
+            : this.L("Замовлення успішно оформлено.");
         return RedirectToAction(nameof(Details), new { id = result.OrderId });
     }
 
@@ -183,7 +183,7 @@ public class OrderController : Controller
 
         if (!result.Succeeded)
         {
-            return Json(new { success = false, message = result.Message });
+            return Json(new { success = false, message = this.L(result.Message) });
         }
 
         await _activityLog.LogUserActionAsync(GetUserId(), "ReturnRequested", $"Подано заявку на повернення товару в замовленні (причина: {reason?.Trim()}).", relatedEntityId: orderItemId);
@@ -201,7 +201,7 @@ public class OrderController : Controller
         var result = await _orderService.ChangeOrderStatus(orderId, status);
         if (!result.Succeeded)
         {
-            TempData["Error"] = result.Message;
+            TempData["Error"] = this.L(result.Message);
         }
 
         return RedirectToAction(nameof(Details), new { id = orderId });

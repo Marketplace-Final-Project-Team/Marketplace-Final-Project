@@ -1,4 +1,5 @@
-﻿using Marketplace.BLL.Interfaces;
+﻿using Marketplace.Web.Infrastructure;
+using Marketplace.BLL.Interfaces;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -66,7 +67,7 @@ namespace Marketplace.Web.Controllers
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                TempData["Error"] = "Назва не може бути порожньою.";
+                TempData["Error"] = this.L("Назва не може бути порожньою.");
                 return View();
             }
 
@@ -75,11 +76,11 @@ namespace Marketplace.Web.Controllers
 
             if (!result.Succeeded)
             {
-                TempData["Error"] = result.Message;
+                TempData["Error"] = this.L(result.Message);
                 return View();
             }
 
-            TempData["Success"] = "Колекцію створено!";
+            TempData["Success"] = this.L("Колекцію створено!");
             return RedirectToAction(nameof(Index));
         }
 
@@ -105,7 +106,7 @@ namespace Marketplace.Web.Controllers
 
             if (string.IsNullOrWhiteSpace(name))
             {
-                TempData["Error"] = "Назва не може бути порожньою.";
+                TempData["Error"] = this.L("Назва не може бути порожньою.");
                 return RedirectToAction(nameof(Edit), new { id });
             }
 
@@ -113,11 +114,11 @@ namespace Marketplace.Web.Controllers
 
             if (!result.Succeeded)
             {
-                TempData["Error"] = result.Message;
+                TempData["Error"] = this.L(result.Message);
                 return RedirectToAction(nameof(Edit), new { id });
             }
 
-            TempData["Success"] = "Колекцію оновлено!";
+            TempData["Success"] = this.L("Колекцію оновлено!");
             return RedirectToAction(nameof(Index));
         }
 
@@ -131,11 +132,11 @@ namespace Marketplace.Web.Controllers
 
             if (!result.Succeeded)
             {
-                TempData["Error"] = result.Message;
+                TempData["Error"] = this.L(result.Message);
             }
             else
             {
-                TempData["Success"] = "Колекцію видалено!";
+                TempData["Success"] = this.L("Колекцію видалено!");
             }
 
             return RedirectToAction(nameof(Index));
@@ -151,11 +152,11 @@ namespace Marketplace.Web.Controllers
 
             if (!result.Succeeded)
             {
-                TempData["Error"] = result.Message;
+                TempData["Error"] = this.L(result.Message);
             }
             else
             {
-                TempData["Success"] = "Товар додано до колекції!";
+                TempData["Success"] = this.L("Товар додано до колекції!");
             }
 
             return Redirect(returnUrl ?? Url.Action(nameof(Details), new { id = collectionId })!);
@@ -171,11 +172,11 @@ namespace Marketplace.Web.Controllers
 
             if (!result.Succeeded)
             {
-                TempData["Error"] = result.Message;
+                TempData["Error"] = this.L(result.Message);
             }
             else
             {
-                TempData["Success"] = "Товар видалено з колекції!";
+                TempData["Success"] = this.L("Товар видалено з колекції!");
             }
 
             return Redirect(returnUrl ?? Url.Action(nameof(Details), new { id = collectionId })!);

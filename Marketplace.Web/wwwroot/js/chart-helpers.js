@@ -105,7 +105,7 @@ window.MpCharts = (() => {
                 datasets: [
                     {
                         type: "line",
-                        label: revenueLabel || "Виручка, ₴",
+                        label: revenueLabel || __t("Виручка, ₴"),
                         data: revenue,
                         borderColor: "#3157d7",
                         backgroundColor: "rgba(49, 87, 215, 0.12)",
@@ -117,7 +117,7 @@ window.MpCharts = (() => {
                     },
                     {
                         type: "bar",
-                        label: ordersLabel || "Замовлення",
+                        label: ordersLabel || __t("Замовлення"),
                         data: orders,
                         backgroundColor: "rgba(66, 169, 139, 0.55)",
                         yAxisID: "orders",

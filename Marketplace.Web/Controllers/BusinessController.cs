@@ -1,3 +1,4 @@
+using Marketplace.Web.Infrastructure;
 using Marketplace.BLL.Common;
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
@@ -296,11 +297,11 @@ namespace Marketplace.Web.Controllers
 
             if (!result.Succeeded)
             {
-                ModelState.AddModelError("", result.Message);
+                ModelState.AddModelError("", this.L(result.Message));
                 return View(model);
             }
 
-            TempData["Success"] = "Бізнес створено та відправлено на перевірку.";
+            TempData["Success"] = this.L("Бізнес створено та відправлено на перевірку.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -437,7 +438,7 @@ namespace Marketplace.Web.Controllers
             }
 
             TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded
-                ? "Рішення щодо заявки збережено."
+                ? this.L("Рішення щодо заявки збережено.")
                 : result.Message;
 
             if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
@@ -516,7 +517,7 @@ namespace Marketplace.Web.Controllers
                     actorUserId: _userManager.GetUserId(User), relatedEntityId: requestId);
             }
 
-            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            TempData[result.Succeeded ? "Success" : "Error"] = this.L(result.Message);
             return RedirectToAction(nameof(OrderDetails), new { businessId, orderId });
         }
 
@@ -529,7 +530,7 @@ namespace Marketplace.Web.Controllers
             var business = await GetAccessibleBusinessOrNullAsync(businessId);
             if (business is null)
             {
-                return Json(new { success = false, message = "Немає доступу до цього магазину." });
+                return Json(new { success = false, message = this.L("Немає доступу до цього магазину.") });
             }
 
             var result = await _postSaleService.SellerDisputeAsync(requestId, businessId, reason);
@@ -540,7 +541,7 @@ namespace Marketplace.Web.Controllers
                     actorUserId: _userManager.GetUserId(User), relatedEntityId: requestId);
             }
 
-            return Json(new { success = result.Succeeded, message = result.Message, requestId });
+            return Json(new { success = result.Succeeded, message = this.L(result.Message), requestId });
         }
 
 
@@ -563,14 +564,14 @@ namespace Marketplace.Web.Controllers
             var result = await _orderService.ChangeOrderStatus(orderId, status);
             if (!result.Succeeded)
             {
-                TempData["Error"] = result.Message;
+                TempData["Error"] = this.L(result.Message);
             }
             else
             {
                 await _activityLog.LogBusinessActionAsync(businessId, "OrderStatusChanged",
                     $"Статус замовлення змінено на «{status}».",
                     actorUserId: _userManager.GetUserId(User), relatedEntityId: orderId);
-                TempData["Success"] = "Статус замовлення оновлено.";
+                TempData["Success"] = this.L("Статус замовлення оновлено.");
             }
 
             return RedirectToAction(nameof(OrderDetails), new { businessId, orderId });
@@ -605,7 +606,7 @@ namespace Marketplace.Web.Controllers
                 Members = members.Select(m => new BusinessTeamMemberViewModel
                 {
                     Id = m.Id,
-                    Email = m.User?.Email ?? "невідомо",
+                    Email = m.User?.Email ?? this.L("невідомо"),
                     Role = m.Role,
                     IsAccepted = m.IsAccepted
                 }).ToList()
@@ -633,7 +634,7 @@ namespace Marketplace.Web.Controllers
 
             if (member.Role == BusinessMemberRole.Owner || newRole == BusinessMemberRole.Owner)
             {
-                TempData["Error"] = "Неможливо змінити роль власника або призначити нового власника таким способом.";
+                TempData["Error"] = this.L("Неможливо змінити роль власника або призначити нового власника таким способом.");
                 return RedirectToAction(nameof(Team), new { businessId });
             }
 
@@ -645,7 +646,7 @@ namespace Marketplace.Web.Controllers
                 $"Роль учасника змінено на «{newRole}».",
                 actorUserId: _userManager.GetUserId(User), relatedEntityId: memberId);
 
-            TempData["Success"] = "Роль учасника успішно оновлено.";
+            TempData["Success"] = this.L("Роль учасника успішно оновлено.");
             return RedirectToAction(nameof(Team), new { businessId });
         }
 
@@ -670,7 +671,7 @@ namespace Marketplace.Web.Controllers
             member.IsDeleted = true;
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "Учасника видалено з команди.";
+            TempData["Success"] = this.L("Учасника видалено з команди.");
             return RedirectToAction(nameof(Team), new { businessId });
         }
 
@@ -711,7 +712,7 @@ namespace Marketplace.Web.Controllers
 
             if (!result.Succeeded)
             {
-                ModelState.AddModelError("", result.Message);
+                ModelState.AddModelError("", this.L(result.Message));
                 return View(model);
             }
 
@@ -723,7 +724,7 @@ namespace Marketplace.Web.Controllers
                 $"<a href='{approveLink}'>Прийняти</a>" +
                 $"<a href='{denyLink}'>Відхилити</a>");
 
-            TempData["Success"] = "Запрошення надіслано.";
+            TempData["Success"] = this.L("Запрошення надіслано.");
             return RedirectToAction(nameof(Team), new { businessId = model.BusinessId });
         }
 
@@ -732,7 +733,7 @@ namespace Marketplace.Web.Controllers
         public async Task<IActionResult> ApproveMembership(Guid businessId, string userId, string token, BusinessMemberRole role)
         {
             var result = await _businessService.ApproveMembershipAsync(userId, businessId, token, role);
-            return RedirectToAction("MembershipResult", new { message = result.Message });
+            return RedirectToAction("MembershipResult", new { message = this.L(result.Message) });
         }
 
         [AllowAnonymous]
@@ -740,7 +741,7 @@ namespace Marketplace.Web.Controllers
         public async Task<IActionResult> DenyMembership(Guid businessId, string userId, string token, BusinessMemberRole role)
         {
             var result = await _businessService.DenyMembershipAsync(userId, businessId, token, role);
-            return RedirectToAction("MembershipResult", new { message = result.Message });
+            return RedirectToAction("MembershipResult", new { message = this.L(result.Message) });
         }
 
         [AllowAnonymous]
@@ -911,7 +912,7 @@ namespace Marketplace.Web.Controllers
                     $"Встановлено знижку {discountPercent}% на весь магазин «{business.StoreName}».",
                     actorUserId: _userManager.GetUserId(User));
             }
-            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            TempData[result.Succeeded ? "Success" : "Error"] = this.L(result.Message);
 
             return RedirectToAction(nameof(PromoCodes), new { businessId });
         }
@@ -933,7 +934,7 @@ namespace Marketplace.Web.Controllers
                     $"Скасовано знижку на весь магазин «{business.StoreName}».",
                     actorUserId: _userManager.GetUserId(User));
             }
-            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            TempData[result.Succeeded ? "Success" : "Error"] = this.L(result.Message);
 
             return RedirectToAction(nameof(PromoCodes), new { businessId });
         }
@@ -958,7 +959,7 @@ namespace Marketplace.Web.Controllers
                     $"Створено промокод «{code}» (знижка {percent}%, {usageNote}).",
                     actorUserId: _userManager.GetUserId(User), relatedEntityId: result.EntityId);
             }
-            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            TempData[result.Succeeded ? "Success" : "Error"] = this.L(result.Message);
 
             return RedirectToAction(nameof(PromoCodes), new { businessId });
         }
@@ -980,7 +981,7 @@ namespace Marketplace.Web.Controllers
                     "Промокод деактивовано.",
                     actorUserId: _userManager.GetUserId(User), relatedEntityId: promoCodeId);
             }
-            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            TempData[result.Succeeded ? "Success" : "Error"] = this.L(result.Message);
 
             return RedirectToAction(nameof(PromoCodes), new { businessId });
         }
@@ -1035,7 +1036,7 @@ namespace Marketplace.Web.Controllers
             _context.Businesses.Update(business);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "Дані магазину оновлено.";
+            TempData["Success"] = this.L("Дані магазину оновлено.");
             return RedirectToAction(nameof(Settings), new { businessId = model.BusinessId });
         }
 
@@ -1052,7 +1053,7 @@ namespace Marketplace.Web.Controllers
             var userId = _userManager.GetUserId(User);
             var result = await _businessService.RequestAdultStatusAsync(businessId, userId!);
             TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded
-                ? "Заявку на розміщення 18+ контенту подано на розгляд адміністрації."
+                ? this.L("Заявку на розміщення 18+ контенту подано на розгляд адміністрації.")
                 : result.Message;
 
             if (result.Succeeded)

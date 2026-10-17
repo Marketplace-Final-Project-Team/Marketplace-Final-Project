@@ -43,7 +43,7 @@
             if (Number.isFinite(previous.price) && price < previous.price) {
                 if (alertEl) {
                     alertEl.hidden = false;
-                    alertEl.textContent = "↓ Ціна знизилась";
+                    alertEl.textContent = __t("↓ Ціна знизилась");
                     alertEl.classList.add("wishlist-card__alert--price");
                 }
                 if (priceEl) {
@@ -55,7 +55,7 @@
             } else if (previous.inStock === false && inStock) {
                 if (alertEl) {
                     alertEl.hidden = false;
-                    alertEl.textContent = "Знову в наявності";
+                    alertEl.textContent = __t("Знову в наявності");
                     alertEl.classList.add("wishlist-card__alert--stock");
                 }
                 alertCount += 1;
@@ -74,8 +74,8 @@
             note.className = "wishlist-notifications-summary";
             note.textContent =
                 alertCount === 1
-                    ? "В 1 товарі щось змінилося з часу останнього перегляду - дивіться позначку на картці."
-                    : `У ${alertCount} товарах щось змінилося з часу останнього перегляду - дивіться позначки на картках.`;
+                    ? __t("В 1 товарі щось змінилося з часу останнього перегляду - дивіться позначку на картці.")
+                    : __t("У {0} товарах щось змінилося з часу останнього перегляду - дивіться позначки на картках.", alertCount);
             summary.insertAdjacentElement("afterend", note);
         }
     }

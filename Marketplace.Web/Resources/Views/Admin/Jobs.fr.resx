@@ -172,4 +172,142 @@
   <data name="ще не запускалась" xml:space="preserve">
     <value>jamais exécutée</value>
   </data>
+  <data name="Без назви" xml:space="preserve">
+    <value>Sans nom</value>
+  </data>
+  <data name="Власник" xml:space="preserve">
+    <value>Propriétaire</value>
+  </data>
+  <data name="Відкрити сторінку магазину" xml:space="preserve">
+    <value>Ouvrir la page de la boutique</value>
+  </data>
+  <data name="Відхилити" xml:space="preserve">
+    <value>Rejeter</value>
+  </data>
+  <data name="Глобальні заявки" xml:space="preserve">
+    <value>Demandes générales</value>
+  </data>
+  <data name="Закрити" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="Зараз немає заявок на повернення, що очікують розгляду." xml:space="preserve">
+    <value>Aucune demande de retour n'est actuellement en attente d'examen.</value>
+  </data>
+  <data name="Зараз немає заявок на розміщення 18+ контенту." xml:space="preserve">
+    <value>Aucune demande de publication de contenu 18+ pour le moment.</value>
+  </data>
+  <data name="Зараз немає звернень від користувачів." xml:space="preserve">
+    <value>Aucune demande d'utilisateur pour le moment.</value>
+  </data>
+  <data name="Заявка на 18+ контент" xml:space="preserve">
+    <value>Demande de contenu 18+</value>
+  </data>
+  <data name="Заявка на повернення" xml:space="preserve">
+    <value>Demande de retour</value>
+  </data>
+  <data name="Заявки на 18+ контент" xml:space="preserve">
+    <value>Demandes de contenu 18+</value>
+  </data>
+  <data name="Заявки на повернення" xml:space="preserve">
+    <value>Demandes de retour</value>
+  </data>
+  <data name="Звернення користувача" xml:space="preserve">
+    <value>Demande de l'utilisateur</value>
+  </data>
+  <data name="Коментар:" xml:space="preserve">
+    <value>Commentaire :</value>
+  </data>
+  <data name="Користувач" xml:space="preserve">
+    <value>Utilisateur</value>
+  </data>
+  <data name="Користувач:" xml:space="preserve">
+    <value>Utilisateur :</value>
+  </data>
+  <data name="Магазин" xml:space="preserve">
+    <value>Boutique</value>
+  </data>
+  <data name="Магазин подав заявку на розміщення товарів для повнолітніх (18+)." xml:space="preserve">
+    <value>La boutique a demandé à publier des produits pour adultes (18+).</value>
+  </data>
+  <data name="Обґрунтування продавця:" xml:space="preserve">
+    <value>Justification du vendeur :</value>
+  </data>
+  <data name="Очікує розгляду" xml:space="preserve">
+    <value>En attente d'examen</value>
+  </data>
+  <data name="Переглянути" xml:space="preserve">
+    <value>Voir</value>
+  </data>
+  <data name="Повідомлення:" xml:space="preserve">
+    <value>Message :</value>
+  </data>
+  <data name="Подано" xml:space="preserve">
+    <value>Soumis</value>
+  </data>
+  <data name="Подано:" xml:space="preserve">
+    <value>Soumis :</value>
+  </data>
+  <data name="Покупець" xml:space="preserve">
+    <value>Client</value>
+  </data>
+  <data name="Покупець:" xml:space="preserve">
+    <value>Acheteur :</value>
+  </data>
+  <data name="Поясніть власнику магазину, чому заявку відхилено..." xml:space="preserve">
+    <value>Expliquez au propriétaire de la boutique pourquoi la demande a été refusée...</value>
+  </data>
+  <data name="Поясніть покупцю, чому заявку відхилено..." xml:space="preserve">
+    <value>Expliquez à l'acheteur pourquoi la demande a été refusée...</value>
+  </data>
+  <data name="Причина" xml:space="preserve">
+    <value>Motif</value>
+  </data>
+  <data name="Причина відхилення" xml:space="preserve">
+    <value>Motif du rejet</value>
+  </data>
+  <data name="Причина:" xml:space="preserve">
+    <value>Motif :</value>
+  </data>
+  <data name="Продавець відхилив це повернення." xml:space="preserve">
+    <value>Le vendeur a refusé ce retour.</value>
+  </data>
+  <data name="Продавець відхилив — потрібне остаточне рішення" xml:space="preserve">
+    <value>Refusé par le vendeur — décision finale requise</value>
+  </data>
+  <data name="Підтвердити 18+" xml:space="preserve">
+    <value>Confirmer 18+</value>
+  </data>
+  <data name="Підтвердити відхилення" xml:space="preserve">
+    <value>Confirmer le refus</value>
+  </data>
+  <data name="Підтвердити повернення" xml:space="preserve">
+    <value>Confirmer le retour</value>
+  </data>
+  <data name="Статус" xml:space="preserve">
+    <value>Statut</value>
+  </data>
+  <data name="Тема" xml:space="preserve">
+    <value>Sujet</value>
+  </data>
+  <data name="Тема:" xml:space="preserve">
+    <value>Sujet :</value>
+  </data>
+  <data name="Увійти в чат" xml:space="preserve">
+    <value>Ouvrir le chat</value>
+  </data>
+  <data name="Фото від покупця:" xml:space="preserve">
+    <value>Photos de l'acheteur :</value>
+  </data>
+  <data name="Фото товару" xml:space="preserve">
+    <value>Photo du produit</value>
+  </data>
+  <data name="Чат з покупцем" xml:space="preserve">
+    <value>Chat avec l'acheteur</value>
+  </data>
+  <data name="Чат з продавцем" xml:space="preserve">
+    <value>Chat avec le vendeur</value>
+  </data>
+  <data name="шт." xml:space="preserve">
+    <value>unités</value>
+  </data>
 </root>

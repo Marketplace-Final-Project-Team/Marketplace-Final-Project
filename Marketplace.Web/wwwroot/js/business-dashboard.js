@@ -18,7 +18,7 @@
                 MpCharts.line("aovChart", {
                     labels: points.map((p) => p.date),
                     data: points.map((p) => (p.orders > 0 ? Math.round((p.revenue / p.orders) * 100) / 100 : 0)),
-                    label: "Середній чек, ₴",
+                    label: __t("Середній чек, ₴"),
                     color: "#8a4fd6"
                 });
             }
@@ -30,7 +30,7 @@
         const d = MpCharts.readData(statusCanvas);
         if (d) {
             MpCharts.doughnut("productStatusChart", {
-                labels: ["Активні", "На модерації", "Немає в наявності", "Мало на складі"],
+                labels: [__t("Активні"), __t("На модерації"), __t("Немає в наявності"), __t("Мало на складі")],
                 data: [d.active, d.pending, d.outOfStock, d.lowStock],
                 colors: ["#22a06b", "#d99a16", "#d92d20", "#f59e0b"]
             });
@@ -44,7 +44,7 @@
             MpCharts.bar("topProductsChart", {
                 labels: items.map((p) => p.name),
                 data: items.map((p) => p.revenue),
-                label: "Виручка, ₴",
+                label: __t("Виручка, ₴"),
                 color: "#3157d7",
                 horizontal: true
             });
@@ -58,7 +58,7 @@
             MpCharts.bar("topCustomersChart", {
                 labels: items.map((c) => c.name),
                 data: items.map((c) => c.revenue),
-                label: "Виручка, ₴",
+                label: __t("Виручка, ₴"),
                 color: "#42a98b",
                 horizontal: true
             });
@@ -70,9 +70,9 @@
         const d = MpCharts.readData(trafficCanvas);
         if (d) {
             MpCharts.bar("trafficChart", {
-                labels: ["Перегляди", "У кошик", "У побажання", "Замовлення"],
+                labels: [__t("Перегляди"), __t("У кошик"), __t("У побажання"), __t("Замовлення")],
                 data: [d.views, d.cartAdds, d.wishlistAdds, d.orders],
-                label: "Дії",
+                label: __t("Дії"),
                 color: "#42a98b"
             });
         }

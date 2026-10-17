@@ -1,11 +1,11 @@
 ﻿@model List<Marketplace.BLL.DTOs.RefundChatMessageDto>
 @{
-    ViewData["Title"] = "Чат підтримки з приводу повернення";
+    ViewData["Title"] = Localizer["Чат підтримки з приводу повернення"].Value;
     var isAdmin = (bool)ViewBag.IsAdmin;
     var requestId = (Guid)ViewBag.RequestId;
     var isSellerChannel = (bool)ViewBag.IsSellerChannel;
     var backUrl = ViewBag.BackUrl as string ?? "/Order";
-    var backLabel = ViewBag.BackLabel as string ?? "← До моїх замовлень";
+    var backLabel = Localizer[ViewBag.BackLabel as string ?? "← До моїх замовлень"].Value;
 }
 
 @section Styles {
@@ -19,20 +19,20 @@
             <div class="chat-header__identity">
                 <span class="chat-header__avatar" aria-hidden="true">↩</span>
                 <div>
-                    <span class="chat-header__eyebrow">Повернення товару</span>
-                    <h1>Чат щодо повернення</h1>
-                    <span class="chat-header__status"><i aria-hidden="true"></i> @(isSellerChannel ? "Канал із продавцем" : "Канал із покупцем")</span>
+                    <span class="chat-header__eyebrow">@Localizer["Повернення товару"]</span>
+                    <h1>@Localizer["Чат щодо повернення"]</h1>
+                    <span class="chat-header__status"><i aria-hidden="true"></i> @(isSellerChannel ? Localizer["Канал із продавцем"] : Localizer["Канал із покупцем"])</span>
                 </div>
             </div>
             <a href="@backUrl" class="chat-action">@backLabel</a>
         </header>
 
-        <section class="chat-context chat-context--product" aria-label="Товар і замовлення">
+        <section class="chat-context chat-context--product" aria-label="@Localizer["Товар і замовлення"]">
             <span class="chat-context__icon" aria-hidden="true">#</span>
             <div>
-                <small>Замовлення #@ViewBag.OrderNumber</small>
+                <small>@Localizer["Замовлення"] #@ViewBag.OrderNumber</small>
                 <strong>@ViewBag.ItemName</strong>
-                <p>Обговорюйте тут статус і деталі повернення цього товару.</p>
+                <p>@Localizer["Обговорюйте тут статус і деталі повернення цього товару."]</p>
             </div>
         </section>
 
@@ -48,14 +48,14 @@
         </div>
 
         <footer class="chat-composer">
-            <div class="chat-quick-replies" aria-label="Швидкі відповіді">
-                <button type="button" data-chat-quick-reply data-text="Підкажіть, будь ласка, поточний статус повернення.">Уточнити статус</button>
-                <button type="button" data-chat-quick-reply data-text="Я вже відправив товар і можу надати номер накладної.">Товар відправлено</button>
-                <button type="button" data-chat-quick-reply data-text="Дякую, питання вирішено.">Питання вирішено</button>
+            <div class="chat-quick-replies" aria-label="@Localizer["Швидкі відповіді"]">
+                <button type="button" data-chat-quick-reply data-text="@Localizer["Підкажіть, будь ласка, поточний статус повернення."]">@Localizer["Уточнити статус"]</button>
+                <button type="button" data-chat-quick-reply data-text="@Localizer["Я вже відправив товар і можу надати номер накладної."]">@Localizer["Товар відправлено"]</button>
+                <button type="button" data-chat-quick-reply data-text="@Localizer["Дякую, питання вирішено."]">@Localizer["Питання вирішено"]</button>
             </div>
             <div class="chat-input-area">
-                <input type="text" id="messageInput" class="form-control" placeholder="Напишіть повідомлення..." autocomplete="off" />
-                <button type="button" id="sendButton" class="chat-send" aria-label="Надіслати повідомлення">Надіслати <span aria-hidden="true">→</span></button>
+                <input type="text" id="messageInput" class="form-control" placeholder="@Localizer["Напишіть повідомлення..."]" autocomplete="off" />
+                <button type="button" id="sendButton" class="chat-send" aria-label="@Localizer["Надіслати повідомлення"]">@Localizer["Надіслати"] <span aria-hidden="true">→</span></button>
             </div>
         </footer>
     </div>

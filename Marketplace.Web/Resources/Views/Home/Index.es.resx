@@ -193,9 +193,6 @@
   <data name="Додати" xml:space="preserve">
     <value>Añadir</value>
   </data>
-  <data name="до кошика" xml:space="preserve">
-    <value>al carrito</value>
-  </data>
   <data name="Попередній" xml:space="preserve">
     <value>Anterior</value>
   </data>
@@ -282,5 +279,17 @@
   </data>
   <data name="Вигляд товарів" xml:space="preserve">
     <value>Vista</value>
+  </data>
+  <data name="Без відгуків" xml:space="preserve">
+    <value>Sin reseñas</value>
+  </data>
+  <data name="До кошика" xml:space="preserve">
+    <value>Al carrito</value>
+  </data>
+  <data name="Рейтинг {0} з 5, {1} відгуків" xml:space="preserve">
+    <value>Valoración {0} de 5, {1} opiniones</value>
+  </data>
+  <data name="Додати {0} до кошика" xml:space="preserve">
+    <value>Añadir {0} al carrito</value>
   </data>
 </root>

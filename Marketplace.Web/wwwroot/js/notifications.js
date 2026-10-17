@@ -41,9 +41,9 @@
     }
 
     function notificationLabel(type) {
-        if (type === "RefundChat") return "Чат повернення";
-        if (type === "SupportTicket") return "Підтримка";
-        return "Замовлення";
+        if (type === "RefundChat") return __t("Чат повернення");
+        if (type === "SupportTicket") return __t("Підтримка");
+        return __t("Замовлення");
     }
 
     function createFeedItem(item) {
@@ -67,7 +67,7 @@
         type.textContent = notificationLabel(item.type);
 
         const text = document.createElement("strong");
-        text.textContent = item.text || "Нове сповіщення";
+        text.textContent = item.text || __t("Нове сповіщення");
 
         const time = document.createElement("time");
         const parsedTime = new Date(item.time);
@@ -175,7 +175,7 @@
 
     async function loadRecent() {
         if (!dropdownList) return;
-        dropdownList.innerHTML = '<div class="notif-dropdown__empty">Завантаження...</div>';
+        dropdownList.innerHTML = `<div class="notif-dropdown__empty">${__t("Завантаження...")}</div>`;
 
         try {
             const response = await fetch("/Notification/GetRecent");
@@ -183,7 +183,7 @@
             const items = await response.json();
 
             if (items.length === 0) {
-                dropdownList.innerHTML = '<div class="notif-dropdown__empty">Немає нових сповіщень</div>';
+                dropdownList.innerHTML = `<div class="notif-dropdown__empty">${__t("Немає нових сповіщень")}</div>`;
                 return;
             }
 
