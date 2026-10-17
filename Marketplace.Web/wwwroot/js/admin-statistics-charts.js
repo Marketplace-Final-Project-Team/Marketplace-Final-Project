@@ -11,8 +11,8 @@
                 labels: points.map((p) => p.label),
                 revenue: points.map((p) => p.turnover),
                 orders: points.map((p) => p.orders),
-                revenueLabel: "Товарооборот, ₴",
-                ordersLabel: "Продажів"
+                revenueLabel: __t("Товарооборот, ₴"),
+                ordersLabel: __t("Продажів")
             });
         }
     }
@@ -24,7 +24,7 @@
             MpCharts.bar("businessTurnoverChart", {
                 labels: items.map((b) => b.name),
                 data: items.map((b) => b.turnover),
-                label: "Товарооборот, ₴",
+                label: __t("Товарооборот, ₴"),
                 color: "#3157d7",
                 horizontal: true
             });

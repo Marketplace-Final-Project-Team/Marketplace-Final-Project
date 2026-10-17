@@ -88,9 +88,6 @@
   <data name="Адреса доставки" xml:space="preserve">
     <value>Dirección de envío</value>
   </data>
-  <data name="Основна" xml:space="preserve">
-    <value>Predeterminada</value>
-  </data>
   <data name="Нова адреса" xml:space="preserve">
     <value>Nueva dirección</value>
   </data>
@@ -291,5 +288,17 @@
   </data>
   <data name="Промокод недійсний або термін його дії минув." xml:space="preserve">
     <value>El código promocional no es válido o ha caducado.</value>
+  </data>
+  <data name="Додати адресу" xml:space="preserve">
+    <value>Añadir dirección</value>
+  </data>
+  <data name="Оберіть або додайте адресу доставки" xml:space="preserve">
+    <value>Seleccione o añada una dirección de entrega</value>
+  </data>
+  <data name="У вас ще немає збережених адрес." xml:space="preserve">
+    <value>Aún no tiene direcciones guardadas.</value>
+  </data>
+  <data name="основна" xml:space="preserve">
+    <value>principal</value>
   </data>
 </root>

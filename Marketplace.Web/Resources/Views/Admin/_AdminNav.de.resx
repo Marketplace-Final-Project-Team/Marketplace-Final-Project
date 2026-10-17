@@ -103,4 +103,7 @@
   <data name="Чати повернень" xml:space="preserve">
     <value>Rückgabe-Chats</value>
   </data>
+  <data name="Відгуки" xml:space="preserve">
+    <value>Bewertungen</value>
+  </data>
 </root>

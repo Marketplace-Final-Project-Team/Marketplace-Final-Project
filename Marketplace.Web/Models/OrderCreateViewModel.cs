@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Marketplace.BLL.DTOs;
+using Microsoft.Extensions.Localization;
 
 namespace Marketplace.Web.Models;
 
@@ -50,23 +51,26 @@ public class OrderCreateViewModel : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
+        var localizer = validationContext.GetService(typeof(IStringLocalizer<SharedResource>)) as IStringLocalizer<SharedResource>;
+        string L(string text) => localizer?[text].Value ?? text;
+
         if (DeliveryCarrier == DeliveryCarriers.NovaPoshta
             && (string.IsNullOrWhiteSpace(NovaPoshtaCityRef) || string.IsNullOrWhiteSpace(NovaPoshtaBranchRef)
                 || string.IsNullOrWhiteSpace(NovaPoshtaCityName) || string.IsNullOrWhiteSpace(NovaPoshtaBranchName)))
         {
-            yield return new ValidationResult("Оберіть місто та відділення Нової пошти", new[] { nameof(NovaPoshtaBranchRef) });
+            yield return new ValidationResult(L("Оберіть місто та відділення Нової пошти"), new[] { nameof(NovaPoshtaBranchRef) });
         }
 
         if (DeliveryCarrier is DeliveryCarriers.Ukrposhta or DeliveryCarriers.Meest)
         {
             if (string.IsNullOrWhiteSpace(DeliveryCity))
             {
-                yield return new ValidationResult("Вкажіть місто доставки", new[] { nameof(DeliveryCity) });
+                yield return new ValidationResult(L("Вкажіть місто доставки"), new[] { nameof(DeliveryCity) });
             }
 
             if (string.IsNullOrWhiteSpace(DeliveryStreet))
             {
-                yield return new ValidationResult("Вкажіть адресу доставки", new[] { nameof(DeliveryStreet) });
+                yield return new ValidationResult(L("Вкажіть адресу доставки"), new[] { nameof(DeliveryStreet) });
             }
         }
     }

@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Апеляцій на розгляд немає." xml:space="preserve">
+    <value>No appeals to review.</value>
+  </data>
+  <data name="Апеляція очікує" xml:space="preserve">
+    <value>Appeal pending</value>
+  </data>
+  <data name="Апеляції" xml:space="preserve">
+    <value>Appeals</value>
+  </data>
+  <data name="Видалити" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Видалити цей відгук назавжди?" xml:space="preserve">
+    <value>Delete this review permanently?</value>
+  </data>
+  <data name="Виправлений текст автора" xml:space="preserve">
+    <value>Author's revised text</value>
+  </data>
+  <data name="Відгуки" xml:space="preserve">
+    <value>Reviews</value>
+  </data>
+  <data name="Відгуків не знайдено." xml:space="preserve">
+    <value>No reviews found.</value>
+  </data>
+  <data name="Відхилений відгук" xml:space="preserve">
+    <value>Rejected review</value>
+  </data>
+  <data name="Відхилено" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="Відхилені" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="Відхилити" xml:space="preserve">
+    <value>Reject</value>
+  </data>
+  <data name="Відхилити апеляцію" xml:space="preserve">
+    <value>Reject appeal</value>
+  </data>
+  <data name="Застосувати" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="Зберегти зміни" xml:space="preserve">
+    <value>Save changes</value>
+  </data>
+  <data name="Модерація відгуків покупців: відхиляйте порушення, видаляйте відгуки та розглядайте апеляції." xml:space="preserve">
+    <value>Moderate customer reviews: reject violations, delete reviews and handle appeals.</value>
+  </data>
+  <data name="Опубліковано" xml:space="preserve">
+    <value>Published</value>
+  </data>
+  <data name="Опубліковані" xml:space="preserve">
+    <value>Published</value>
+  </data>
+  <data name="Пошук відгуків" xml:space="preserve">
+    <value>Search reviews</value>
+  </data>
+  <data name="Причина відхилення (її побачить автор відгуку)" xml:space="preserve">
+    <value>Rejection reason (the review author will see it)</value>
+  </data>
+  <data name="Причина відхилення апеляції" xml:space="preserve">
+    <value>Appeal rejection reason</value>
+  </data>
+  <data name="Причина відхилення:" xml:space="preserve">
+    <value>Rejection reason:</value>
+  </data>
+  <data name="Підтвердити відхилення" xml:space="preserve">
+    <value>Confirm rejection</value>
+  </data>
+  <data name="Редагувати" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Схвалити й опублікувати" xml:space="preserve">
+    <value>Approve and publish</value>
+  </data>
+  <data name="Текст відгуку, товар або автор..." xml:space="preserve">
+    <value>Review text, product or author...</value>
+  </data>
+  <data name="Усі" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="Фільтр відгуків" xml:space="preserve">
+    <value>Review filter</value>
+  </data>
+</root>

@@ -169,4 +169,175 @@
   <data name="Залежно від тяжкості порушення адміністрація може застосувати попередження, тимчасове зняття товару чи магазину з публікації, тимчасове блокування або остаточне видалення бізнес-акаунту без відшкодування коштів за нараховану, але не виведену комісію." xml:space="preserve">
     <value>Según la gravedad de la infracción, la administración puede aplicar una advertencia, retirar temporalmente un producto o la tienda de la publicación, bloquearla temporalmente o eliminar definitivamente la cuenta comercial, sin reembolso de la comisión devengada pero no retirada.</value>
   </data>
+  <data name="10. Комісія платформи" xml:space="preserve">
+    <value>10. Comisión de la plataforma</value>
+  </data>
+  <data name="11. Виплати коштів" xml:space="preserve">
+    <value>11. Pagos</value>
+  </data>
+  <data name="12. Податки та звітність" xml:space="preserve">
+    <value>12. Impuestos y declaraciones</value>
+  </data>
+  <data name="13. Робота зі спорами та поверненнями" xml:space="preserve">
+    <value>13. Gestión de disputas y devoluciones</value>
+  </data>
+  <data name="14. Заборонені товари та дії" xml:space="preserve">
+    <value>14. Productos y acciones prohibidos</value>
+  </data>
+  <data name="15. Рейтинг та якість обслуговування" xml:space="preserve">
+    <value>15. Valoración y calidad del servicio</value>
+  </data>
+  <data name="16. Наслідки порушень" xml:space="preserve">
+    <value>16. Consecuencias de las infracciones</value>
+  </data>
+  <data name="2. Команда магазину" xml:space="preserve">
+    <value>2. Equipo de la tienda</value>
+  </data>
+  <data name="3. Вимоги до карток товарів" xml:space="preserve">
+    <value>3. Requisitos de las fichas de producto</value>
+  </data>
+  <data name="4. Категорії товарів" xml:space="preserve">
+    <value>4. Categorías de productos</value>
+  </data>
+  <data name="5. Товари категорії 18+" xml:space="preserve">
+    <value>5. Productos +18</value>
+  </data>
+  <data name="6. Ціноутворення та знижки" xml:space="preserve">
+    <value>6. Precios y descuentos</value>
+  </data>
+  <data name="7. Промокоди" xml:space="preserve">
+    <value>7. Códigos promocionales</value>
+  </data>
+  <data name="8. Обробка замовлень" xml:space="preserve">
+    <value>8. Tramitación de pedidos</value>
+  </data>
+  <data name="9. Управління залишками" xml:space="preserve">
+    <value>9. Gestión de existencias</value>
+  </data>
+  <data name=";" xml:space="preserve">
+    <value>;</value>
+  </data>
+  <data name="MarketPlace утримує комісію з кожного успішно завершеного замовлення. Стандартна комісія становить 20% від суми замовлення й відображається в кабінеті продавця для кожного конкретного магазину; адміністрація може встановити індивідуальний тариф для окремих магазинів чи категорій товарів. Комісія розраховується автоматично й утримується з суми, що зараховується на баланс магазину - додаткових рахунків продавцю не виставляється." xml:space="preserve">
+    <value>MarketPlace retiene una comisión de cada pedido completado con éxito. La comisión estándar es del 20 % del importe del pedido y se muestra en el panel del vendedor para cada tienda; la administración puede fijar una tarifa individual para determinadas tiendas o categorías de productos. La comisión se calcula automáticamente y se descuenta del importe abonado al saldo de la tienda: no se emiten facturas adicionales al vendedor.</value>
+  </data>
+  <data name="Адміністратор магазину" xml:space="preserve">
+    <value>Administrador de la tienda</value>
+  </data>
+  <data name="Адміністрація відстежує показники якості кожного магазину: частку скасованих замовлень, середній час підтвердження замовлення, частку обґрунтованих скарг і спорів, а також швидкість реакції на заявки покупців. Магазини зі стабільно низькими показниками отримують попередження й можуть бути тимчасово обмежені у видимості в каталозі до покращення показників." xml:space="preserve">
+    <value>La administración supervisa los indicadores de calidad de cada tienda: proporción de pedidos cancelados, tiempo medio de confirmación, proporción de reclamaciones y disputas justificadas y rapidez de respuesta a las solicitudes de los compradores. Las tiendas con indicadores bajos de forma continuada reciben una advertencia y pueden ver su visibilidad en el catálogo limitada temporalmente hasta que mejoren.</value>
+  </data>
+  <data name="Аналітик" xml:space="preserve">
+    <value>Analista</value>
+  </data>
+  <data name="Вивести кошти з балансу можна в розділі фінансів кабінету продавця, вказавши суму, номер картки та імʼя отримувача;" xml:space="preserve">
+    <value>Puede retirar fondos del saldo en la sección de finanzas del panel del vendedor indicando el importe, el número de tarjeta y el nombre del destinatario;</value>
+  </data>
+  <data name="Власник" xml:space="preserve">
+    <value>Propietario</value>
+  </data>
+  <data name="Власник магазину може запросити до співпраці інших користувачів і призначити їм одну з ролей:" xml:space="preserve">
+    <value>El propietario de la tienda puede invitar a otros usuarios a colaborar y asignarles uno de los siguientes roles:</value>
+  </data>
+  <data name="Власник магазину несе відповідальність за дії всіх учасників команди в межах бізнес-акаунту." xml:space="preserve">
+    <value>El propietario de la tienda es responsable de las acciones de todos los miembros del equipo dentro de la cuenta de empresa.</value>
+  </data>
+  <data name="Для товарів із варіантами (наприклад, розмірами одягу) необхідно вказувати залишок окремо по кожному варіанту;" xml:space="preserve">
+    <value>Para productos con variantes (por ejemplo, tallas de ropa), las existencias deben indicarse por separado para cada variante;</value>
+  </data>
+  <data name="Додавання й редагування товарів, створення промокодів" xml:space="preserve">
+    <value>Añadir y editar productos, crear códigos promocionales</value>
+  </data>
+  <data name="Доступ" xml:space="preserve">
+    <value>Acceso</value>
+  </data>
+  <data name="Залежно від тяжкості порушення адміністрація може застосувати попередження, тимчасове зняття товару чи магазину з публікації, тимчасове блокування або остаточне видалення бізнес-акаунту без відшкодування коштів за нараховану, але не виведену комісію. Продавець має право оскаржити рішення адміністрації протягом 14 днів через сторінку Підтримки, надавши додаткові пояснення чи докази." xml:space="preserve">
+    <value>Según la gravedad de la infracción, la administración puede emitir una advertencia, retirar temporalmente un producto o una tienda, bloquear temporalmente o eliminar definitivamente la cuenta de empresa sin compensación por los importes acumulados no retirados. El vendedor puede recurrir la decisión de la administración en un plazo de 14 días a través de la página de Soporte, aportando explicaciones o pruebas adicionales.</value>
+  </data>
+  <data name="Заявка на виведення коштів розглядається адміністрацією та проходить статуси «Очікує розгляду» → «В обробці» → «Виконано», або «Відхилено» з поясненням причини;" xml:space="preserve">
+    <value>La solicitud de retirada la revisa la administración y pasa por los estados «Pendiente de revisión» → «En proceso» → «Completada», o «Rechazada» con explicación del motivo;</value>
+  </data>
+  <data name="Заявки на повернення оформлюються окремо по кожній позиції замовлення - продавець розглядає й ухвалює рішення по кожній із них незалежно;" xml:space="preserve">
+    <value>Las solicitudes de devolución se presentan por separado para cada artículo del pedido: el vendedor revisa y decide sobre cada una de forma independiente;</value>
+  </data>
+  <data name="Кожен товар має бути розміщений у відповідній категорії каталогу. Розміщення товару в категорії, що не відповідає його суті, з метою підвищення видимості вважається порушенням і може призвести до зняття товару з публікації. Перелік категорій визначається адміністрацією Платформи; пропозиції щодо нових категорій можна надсилати через підтримку." xml:space="preserve">
+    <value>Cada producto debe colocarse en la categoría adecuada del catálogo. Colocar un producto en una categoría que no corresponde a su naturaleza para aumentar su visibilidad es una infracción y puede llevar a su retirada. La lista de categorías la determina la administración de la Plataforma; las propuestas de nuevas categorías pueden enviarse a través de soporte.</value>
+  </data>
+  <data name="Кошти за замовлення зараховуються на баланс магазину після підтвердження отримання товару покупцем (для онлайн-оплати) або після позначки «Доставлено» кур'єром (для оплати при отриманні) - за вирахуванням комісії платформи;" xml:space="preserve">
+    <value>Los fondos del pedido se abonan al saldo de la tienda después de que el comprador confirme la recepción (pago en línea) o tras la marca «Entregado» del mensajero (pago contra reembolso), descontada la comisión de la plataforma;</value>
+  </data>
+  <data name="Масове створення промокодів з метою обходу комісії платформи (наприклад, «знижка 99%» у парі з домовленістю про доплату поза сайтом) є порушенням цих Правил і Умов використання." xml:space="preserve">
+    <value>La creación masiva de códigos promocionales para eludir la comisión de la plataforma (por ejemplo, un «descuento del 99 %» junto con un acuerdo de pago adicional fuera del sitio) infringe estas Normas y las Condiciones de uso.</value>
+  </data>
+  <data name="Менеджер товарів" xml:space="preserve">
+    <value>Gestor de productos</value>
+  </data>
+  <data name="Новий магазин перевіряється адміністрацією протягом 1–3 робочих днів перед публікацією в каталозі." xml:space="preserve">
+    <value>La administración revisa una nueva tienda en un plazo de 1–3 días hábiles antes de publicarla en el catálogo.</value>
+  </data>
+  <data name="Один користувач може керувати кількома магазинами, кожен з яких проходить окрему модерацію та має власний баланс і команду;" xml:space="preserve">
+    <value>Un usuario puede gestionar varias tiendas, cada una moderada por separado y con su propio saldo y equipo;</value>
+  </data>
+  <data name="Одночасно може бути активною лише одна заявка на суму, що не перевищує поточний баланс магазину за вирахуванням уже поданих заявок, що очікують розгляду." xml:space="preserve">
+    <value>Solo puede haber una solicitud activa a la vez, por un importe que no supere el saldo actual de la tienda menos las solicitudes ya presentadas pendientes de revisión.</value>
+  </data>
+  <data name="Перегляд статистики продажів без права редагування" xml:space="preserve">
+    <value>Ver estadísticas de ventas sin permisos de edición</value>
+  </data>
+  <data name="Повний доступ, включно з налаштуваннями магазину, керуванням командою та виведенням коштів" xml:space="preserve">
+    <value>Acceso completo, incluidos los ajustes de la tienda, la gestión del equipo y la retirada de fondos</value>
+  </data>
+  <data name="Політиці доставки" xml:space="preserve">
+    <value>Política de envío</value>
+  </data>
+  <data name="Продавець зобов'язаний пакувати замовлення з товарами 18+ нейтрально, без зовнішніх позначок вмісту;" xml:space="preserve">
+    <value>El vendedor debe embalar los pedidos con productos +18 de forma neutra, sin indicaciones externas del contenido;</value>
+  </data>
+  <data name="Продавець може створювати промокоди зі знижкою у відсотках, строком дії та позначкою «одноразовий» у кабінеті продавця;" xml:space="preserve">
+    <value>El vendedor puede crear en su panel códigos promocionales con descuento porcentual, periodo de validez y la marca «de un solo uso»;</value>
+  </data>
+  <data name="Продавець самостійно відповідає за актуальність кількості товару на складі в кабінеті продавця. Платформа автоматично позначає товар як такий, що закінчується, коли залишок опускається нижче встановленого порогу, і приховує товар з каталогу, коли кількість досягає нуля. Систематичний продаж товару, якого немає в наявності, є підставою для попередження чи обмежень магазину." xml:space="preserve">
+    <value>El vendedor es el único responsable de mantener actualizadas las existencias en su panel. La Plataforma marca automáticamente un producto como «a punto de agotarse» cuando las existencias bajan del umbral establecido y lo oculta del catálogo cuando la cantidad llega a cero. Vender sistemáticamente productos sin existencias es motivo de advertencia o de restricciones para la tienda.</value>
+  </data>
+  <data name="Продавець самостійно відповідає за дотримання податкового законодавства щодо доходів, отриманих від продажу товарів на Платформі, включно з реєстрацією як фізична особа-підприємець чи інша форма ведення діяльності, якщо це вимагається законодавством України. MarketPlace не є податковим агентом продавця, якщо інше прямо не погоджено окремим договором." xml:space="preserve">
+    <value>El vendedor es el único responsable de cumplir la legislación fiscal sobre los ingresos obtenidos por la venta de productos en la Plataforma, incluido el registro como empresario individual u otra forma de actividad si lo exige la legislación de Ucrania. MarketPlace no es agente fiscal del vendedor, salvo que se acuerde expresamente lo contrario en un contrato aparte.</value>
+  </data>
+  <data name="Продавці можуть встановлювати тимчасові знижки на рівні товару, категорії свого магазину, усього магазину або персонально для окремого покупця, вказуючи розмір знижки та період її дії. Якщо до товару застосовується кілька знижок одночасно, діє найбільша з них - вони не підсумовуються. Заявлена початкова ціна повинна відповідати реальній ціні, за якою товар продавався до початку акції - штучне завищення ціни перед оголошенням «знижки» заборонено." xml:space="preserve">
+    <value>Los vendedores pueden fijar descuentos temporales a nivel de producto, de una categoría de su tienda, de toda la tienda o de forma personal para un comprador concreto, indicando el importe y el periodo. Si a un producto se le aplican varios descuentos a la vez, prevalece el mayor; no se suman. El precio original indicado debe coincidir con el precio real al que se vendía el producto antes de la promoción: está prohibido inflar artificialmente el precio antes de anunciar un «descuento».</value>
+  </data>
+  <data name="Продаж товарів, призначених виключно для повнолітніх, дозволений лише магазинам, статус 18+ яких підтверджено адміністрацією окремо від загальної модерації магазину;" xml:space="preserve">
+    <value>La venta de productos destinados exclusivamente a adultos solo está permitida a las tiendas cuyo estado +18 haya sido confirmado por la administración, al margen de la moderación general de la tienda;</value>
+  </data>
+  <data name="Промокод діє лише в межах товарів того магазину, який його створив;" xml:space="preserve">
+    <value>Un código promocional solo es válido para los productos de la tienda que lo creó;</value>
+  </data>
+  <data name="Підтверджене замовлення повинно бути передане службі доставки протягом строку, вказаного в" xml:space="preserve">
+    <value>Un pedido confirmado debe entregarse al servicio de mensajería en el plazo indicado en la</value>
+  </data>
+  <data name="Редакція від 16 вересня 2026 року. Ці Правила є невіддільною частиною Умов використання." xml:space="preserve">
+    <value>Versión del 16 de septiembre de 2026. Estas Normas forman parte integrante de las Condiciones de uso.</value>
+  </data>
+  <data name="Роль" xml:space="preserve">
+    <value>Rol</value>
+  </data>
+  <data name="Спроба розмістити товар 18+ поза відповідною категорією чи без підтвердженого статусу магазину є грубим порушенням і може призвести до негайного блокування магазину." xml:space="preserve">
+    <value>Intentar publicar un producto +18 fuera de la categoría correspondiente o sin el estado de tienda confirmado es una infracción grave y puede conllevar el bloqueo inmediato de la tienda.</value>
+  </data>
+  <data name="Створити бізнес-акаунт може будь-який зареєстрований і верифікований користувач через розділ «Панель продавця» → «Створити бізнес»;" xml:space="preserve">
+    <value>Cualquier usuario registrado y verificado puede crear una cuenta de empresa desde «Panel del vendedor» → «Crear empresa»;</value>
+  </data>
+  <data name="Такі товари додатково розміщуються в категоріях, позначених адміністрацією як 18+, і автоматично приховуються від покупців, які не підтвердили повноліття;" xml:space="preserve">
+    <value>Estos productos se colocan además en categorías marcadas como +18 por la administración y se ocultan automáticamente a los compradores que no han confirmado su mayoría de edad;</value>
+  </data>
+  <data name="Товари, промокоди, статистика, керування командою - без доступу до налаштувань магазину" xml:space="preserve">
+    <value>Productos, códigos promocionales, estadísticas, gestión del equipo, sin acceso a los ajustes de la tienda</value>
+  </data>
+  <data name="У разі обґрунтованої претензії щодо якості товару продавець забезпечує повернення коштів за власний рахунок - відповідна сума списується з балансу магазину;" xml:space="preserve">
+    <value>En caso de reclamación justificada sobre la calidad del producto, el vendedor reembolsa el importe a su cargo: la cantidad correspondiente se descuenta del saldo de la tienda;</value>
+  </data>
+  <data name="продаж товарів, обіг яких обмежено чи заборонено законодавством України (зброя, наркотичні речовини, лікарські засоби рецептурного відпуску тощо);" xml:space="preserve">
+    <value>venta de productos cuya circulación está restringida o prohibida por la legislación de Ucrania (armas, estupefacientes, medicamentos con receta, etc.);</value>
+  </data>
+  <data name="розміщення товарів категорії 18+ поза відповідною категорією чи без підтвердженого статусу магазину;" xml:space="preserve">
+    <value>publicación de productos +18 fuera de la categoría correspondiente o sin el estado de tienda confirmado;</value>
+  </data>
 </root>

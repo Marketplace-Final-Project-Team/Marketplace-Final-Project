@@ -1,3 +1,4 @@
+using Marketplace.Web.Infrastructure;
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
@@ -192,7 +193,7 @@ namespace Marketplace.Web.Controllers
         {
             var userId = _userManager.GetUserId(User)!;
             var result = await _wishlistService.AddToWishlistAsync(userId, productId);
-            TempData[result.Succeeded ? "WishlistSuccess" : "WishlistError"] = result.Message;
+            TempData[result.Succeeded ? "WishlistSuccess" : "WishlistError"] = this.L(result.Message);
             return RedirectToLocalUrlOrWishlist(returnUrl);
         }
 
@@ -202,7 +203,7 @@ namespace Marketplace.Web.Controllers
         {
             var userId = _userManager.GetUserId(User)!;
             var result = await _wishlistService.RemoveFromWishlistAsync(userId, productId);
-            TempData[result.Succeeded ? "WishlistSuccess" : "WishlistError"] = result.Message;
+            TempData[result.Succeeded ? "WishlistSuccess" : "WishlistError"] = this.L(result.Message);
             return RedirectToLocalUrlOrWishlist(returnUrl);
         }
 
@@ -280,7 +281,7 @@ namespace Marketplace.Web.Controllers
                 return LocalRedirect(model.ReturnUrl);
             }
 
-            TempData["Success"] = "Адресу додано.";
+            TempData["Success"] = this.L("Адресу додано.");
             return RedirectToAction(nameof(Addresses));
         }
 
@@ -333,7 +334,7 @@ namespace Marketplace.Web.Controllers
             _addressRepository.Update(address);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "Адресу оновлено.";
+            TempData["Success"] = this.L("Адресу оновлено.");
             return RedirectToAction(nameof(Addresses));
         }
 
@@ -352,7 +353,7 @@ namespace Marketplace.Web.Controllers
             _addressRepository.Update(address);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "Адресу видалено.";
+            TempData["Success"] = this.L("Адресу видалено.");
             return RedirectToAction(nameof(Addresses));
         }
 
@@ -372,7 +373,7 @@ namespace Marketplace.Web.Controllers
             _addressRepository.Update(address);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "Основну адресу оновлено.";
+            TempData["Success"] = this.L("Основну адресу оновлено.");
             return RedirectToAction(nameof(Addresses));
         }
 
@@ -424,12 +425,12 @@ namespace Marketplace.Web.Controllers
 
             if (!result.Succeeded)
             {
-                ModelState.AddModelError(string.Empty, result.Message);
+                ModelState.AddModelError(string.Empty, this.L(result.Message));
                 model.CurrentAvatarUrl = (await _profileService.GetProfileAsync(userId!))?.Avatar;
                 return View(model);
             }
 
-            TempData["Success"] = "Профіль оновлено.";
+            TempData["Success"] = this.L("Профіль оновлено.");
             return RedirectToAction("Index");
         }
 
@@ -454,7 +455,7 @@ namespace Marketplace.Web.Controllers
 
             if (!result.Succeeded)
             {
-                ModelState.AddModelError("", result.Message);
+                ModelState.AddModelError("", this.L(result.Message));
                 return View(model);
             }
 
@@ -478,11 +479,11 @@ namespace Marketplace.Web.Controllers
 
             if (result.Succeeded)
             {
-                ViewData["Message"] = "Емейл було успішно змінено!";
+                ViewData["Message"] = this.L("Емейл було успішно змінено!");
             }
             else
             {
-                ViewData["Message"] = result.Message;
+                ViewData["Message"] = this.L(result.Message);
             }
 
             return View();
@@ -514,7 +515,7 @@ namespace Marketplace.Web.Controllers
 
             if (!result.Succeeded)
             {
-                ModelState.AddModelError("", result.Message);
+                ModelState.AddModelError("", this.L(result.Message));
                 return View(model);
             }
 

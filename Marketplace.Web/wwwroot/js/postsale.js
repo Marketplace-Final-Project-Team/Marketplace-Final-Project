@@ -38,7 +38,7 @@
     if (photosInput) {
         photosInput.addEventListener("change", () => {
             if (photosInput.files.length > 5) {
-                photosInput.setCustomValidity("Можна додати не більше 5 фото.");
+                photosInput.setCustomValidity(__t("Можна додати не більше 5 фото."));
             } else {
                 photosInput.setCustomValidity("");
             }
@@ -62,8 +62,8 @@
             successAnimation.style.cssText = 'display: none; text-align: center; padding: 2rem;';
             successAnimation.innerHTML = `
                 <div class="spinner-border text-primary" role="status"></div>
-                <h4 class="mt-3">Заявку створено!</h4>
-                <p class="text-muted">Переводимо вас у чат з адміністратором...</p>
+                <h4 class="mt-3">${__t("Заявку створено!")}</h4>
+                <p class="text-muted">${__t("Переводимо вас у чат з адміністратором...")}</p>
             `;
             modalCard.appendChild(successAnimation);
         }
@@ -74,7 +74,7 @@
             const submitBtn = returnForm.querySelector('button[type="submit"]');
             if (submitBtn) {
                 submitBtn.disabled = true;
-                submitBtn.textContent = "Надсилання...";
+                submitBtn.textContent = __t("Надсилання...");
             }
 
             const formData = new FormData(returnForm);
@@ -99,18 +99,18 @@
                         window.location.href = `/Support/RefundChat?requestId=${result.requestId}`;
                     }, 2000);
                 } else {
-                    alert("Помилка: " + (result.message || "Не вдалося створити заявку."));
+                    alert(__t("Помилка: ") + (result.message || __t("Не вдалося створити заявку.")));
                     if (submitBtn) {
                         submitBtn.disabled = false;
-                        submitBtn.textContent = "Надіслати заявку";
+                        submitBtn.textContent = __t("Надіслати заявку");
                     }
                 }
             } catch (error) {
                 console.error("Помилка відправки:", error);
-                alert("Сталася помилка з'єднання із сервером.");
+                alert(__t("Сталася помилка з'єднання із сервером."));
                 if (submitBtn) {
                     submitBtn.disabled = false;
-                    submitBtn.textContent = "Надіслати заявку";
+                    submitBtn.textContent = __t("Надіслати заявку");
                 }
             }
         });

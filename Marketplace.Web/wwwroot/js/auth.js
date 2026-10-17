@@ -12,8 +12,8 @@
 
             const shouldShow = input.type === "password";
             input.type = shouldShow ? "text" : "password";
-            toggle.textContent = shouldShow ? "Сховати" : "Показати";
-            toggle.setAttribute("aria-label", shouldShow ? "Сховати пароль" : "Показати пароль");
+            toggle.textContent = shouldShow ? __t("Сховати") : __t("Показати");
+            toggle.setAttribute("aria-label", shouldShow ? __t("Сховати пароль") : __t("Показати пароль"));
             toggle.setAttribute("aria-pressed", shouldShow.toString());
         });
     });
@@ -21,7 +21,7 @@
     const strengthInputs = document.querySelectorAll("[data-password-strength]");
 
     const calculateStrength = (password) => {
-        if (!password) return { score: 0, label: "Не вказано", state: "empty" };
+        if (!password) return { score: 0, label: __t("Не вказано"), state: "empty" };
 
         let score = 0;
         if (password.length >= 8) score += 1;
@@ -30,9 +30,9 @@
         if (/\d/.test(password)) score += 1;
         if (/[^\p{L}\p{N}\s]/u.test(password)) score += 1;
 
-        if (score <= 2) return { score: 1, label: "Слабкий", state: "weak" };
-        if (score <= 4) return { score: 2, label: "Середній", state: "medium" };
-        return { score: 3, label: "Надійний", state: "strong" };
+        if (score <= 2) return { score: 1, label: __t("Слабкий"), state: "weak" };
+        if (score <= 4) return { score: 2, label: __t("Середній"), state: "medium" };
+        return { score: 3, label: __t("Надійний"), state: "strong" };
     };
 
     strengthInputs.forEach((input) => {

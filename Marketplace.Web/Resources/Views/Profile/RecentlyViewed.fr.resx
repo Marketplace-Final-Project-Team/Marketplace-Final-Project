@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Історія перегляду вимкнена" xml:space="preserve">
+    <value>L'historique de consultation est désactivé</value>
+  </data>
+  <data name="Ви ще нічого не переглядали" xml:space="preserve">
+    <value>Vous n'avez encore rien consulté</value>
+  </data>
+  <data name="Відкрийте будь-який товар у каталозі - він з'явиться тут." xml:space="preserve">
+    <value>Ouvrez n'importe quel produit du catalogue : il apparaîtra ici.</value>
+  </data>
+  <data name="До кабінету" xml:space="preserve">
+    <value>Retour au compte</value>
+  </data>
+  <data name="Змінити налаштування кукі" xml:space="preserve">
+    <value>Modifier les paramètres des cookies</value>
+  </data>
+  <data name="Немає в наявності" xml:space="preserve">
+    <value>Rupture de stock</value>
+  </data>
+  <data name="Переглянути" xml:space="preserve">
+    <value>Voir</value>
+  </data>
+  <data name="Перейти до каталогу" xml:space="preserve">
+    <value>Aller au catalogue</value>
+  </data>
+  <data name="Товари, які ви нещодавно переглядали в цьому браузері." xml:space="preserve">
+    <value>Produits que vous avez récemment consultés dans ce navigateur.</value>
+  </data>
+  <data name="Щоб ми запам'ятовували переглянуті товари, потрібна ваша згода на функціональні кукі." xml:space="preserve">
+    <value>Pour que nous mémorisions les produits consultés, votre consentement aux cookies fonctionnels est nécessaire.</value>
+  </data>
+</root>

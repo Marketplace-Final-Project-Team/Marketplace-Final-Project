@@ -17,7 +17,7 @@
 
         const stock = Number(option.dataset.variantStock ?? "0");
         if (hint) {
-            hint.textContent = stock > 0 ? `Доступно: ${stock} шт.` : "Немає в наявності";
+            hint.textContent = stock > 0 ? __t("Доступно: {0} шт.", stock) : __t("Немає в наявності");
         }
     };
 

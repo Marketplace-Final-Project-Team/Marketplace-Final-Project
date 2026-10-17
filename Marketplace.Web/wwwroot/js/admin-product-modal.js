@@ -7,7 +7,7 @@
     const body = modal.querySelector("[data-admin-modal-body]");
 
     const openModal = async (productId) => {
-        body.innerHTML = '<p class="admin-empty">Завантаження...</p>';
+        body.innerHTML = `<p class="admin-empty">${__t("Завантаження...")}</p>`;
         modal.hidden = false;
 
         try {
@@ -17,7 +17,7 @@
             }
             body.innerHTML = await response.text();
         } catch {
-            body.innerHTML = '<p class="admin-empty">Не вдалося завантажити дані товару.</p>';
+            body.innerHTML = `<p class="admin-empty">${__t("Не вдалося завантажити дані товару.")}</p>`;
         }
     };
 

@@ -60,9 +60,9 @@
         const minRating = params.get("MinRating");
         if (minRating) parts.push(`${minRating}★+`);
 
-        if (params.get("InStockOnly")) parts.push("в наявності");
+        if (params.get("InStockOnly")) parts.push(__t("в наявності"));
 
-        return parts.length > 0 ? parts.join(" · ") : "Усі товари";
+        return parts.length > 0 ? parts.join(" · ") : __t("Усі товари");
     };
 
     const render = () => {
@@ -106,8 +106,8 @@
                             <strong>${escapeHtml(entry.name)}</strong>
                             <span>${escapeHtml(entry.summary)}</span>
                         </a>
-                        ${newCount > 0 ? `<span class="saved-search-card__badge">+${newCount} нових</span>` : ""}
-                        <button type="button" class="saved-search-card__remove" data-remove-search="${escapeHtml(entry.id)}" aria-label="Видалити збережений пошук">×</button>
+                        ${newCount > 0 ? `<span class="saved-search-card__badge">${__t("+{0} нових", newCount)}</span>` : ""}
+                        <button type="button" class="saved-search-card__remove" data-remove-search="${escapeHtml(entry.id)}" aria-label="${__t("Видалити збережений пошук")}">×</button>
                     </div>
                 `;
             })
@@ -128,7 +128,7 @@
 
     saveButton?.addEventListener("click", async () => {
         const defaultName = buildSummary();
-        const name = await askName("Назва для збереженого пошуку:", defaultName === "Усі товари" ? "Мій пошук" : defaultName);
+        const name = await askName(__t("Назва для збереженого пошуку:"), defaultName === __t("Усі товари") ? __t("Мій пошук") : defaultName);
         if (!name || !name.trim()) return;
 
         const saved = readSaved();

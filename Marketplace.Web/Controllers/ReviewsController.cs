@@ -1,4 +1,5 @@
-﻿using Marketplace.BLL.Interfaces;
+﻿using Marketplace.Web.Infrastructure;
+using Marketplace.BLL.Interfaces;
 using Marketplace.Domain.Entities;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -52,7 +53,7 @@ namespace Marketplace.Web.Controllers
 
             if (!result.Succeeded) 
             {
-                ModelState.AddModelError("", result.Message);
+                ModelState.AddModelError("", this.L(result.Message));
                 return View(model);
             }
 
@@ -100,7 +101,7 @@ namespace Marketplace.Web.Controllers
             
             if (!result.Succeeded)
             {
-                ModelState.AddModelError("", result.Message);
+                ModelState.AddModelError("", this.L(result.Message));
                 return View(model);
             }
             
@@ -116,7 +117,7 @@ namespace Marketplace.Web.Controllers
             var result = await _reviewService.DeleteReview(reviewId, userId!);
             if (!result.Succeeded)
             {
-                TempData["Error"] = result.Message;
+                TempData["Error"] = this.L(result.Message);
             }
 
             return RedirectToAction("Details", "Catalog", new { id = productId });
@@ -135,11 +136,11 @@ namespace Marketplace.Web.Controllers
             var result = await _reviewService.CreateReviewAppeal(dto);
             if (!result.Succeeded)
             {
-                TempData["Error"] = result.Message;
+                TempData["Error"] = this.L(result.Message);
             }
             else
             {
-                TempData["Success"] = result.Message;
+                TempData["Success"] = this.L(result.Message);
             }
 
             return result.EntityId is Guid productId

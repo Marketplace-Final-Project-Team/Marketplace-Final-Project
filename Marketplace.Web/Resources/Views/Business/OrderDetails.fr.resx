@@ -151,4 +151,82 @@
   <data name="Кошти повернуто" xml:space="preserve">
     <value>Remboursé</value>
   </data>
+  <data name="Адміністратор підтвердив повернення." xml:space="preserve">
+    <value>L'administrateur a confirmé le retour.</value>
+  </data>
+  <data name="Ваша відмова на розгляді у адміністратора" xml:space="preserve">
+    <value>Votre refus est en cours d'examen par l'administrateur</value>
+  </data>
+  <data name="Ваше обґрунтування передано адміністратору, очікуйте остаточного рішення." xml:space="preserve">
+    <value>Votre justification a été transmise à l'administrateur ; veuillez attendre la décision finale.</value>
+  </data>
+  <data name="Відповідь:" xml:space="preserve">
+    <value>Réponse :</value>
+  </data>
+  <data name="Відхилення повернення" xml:space="preserve">
+    <value>Refus du retour</value>
+  </data>
+  <data name="Відхилено" xml:space="preserve">
+    <value>Rejeté</value>
+  </data>
+  <data name="Відхилити з обґрунтуванням" xml:space="preserve">
+    <value>Refuser avec justification</value>
+  </data>
+  <data name="Закрити" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="Заявку розглядає адміністратор маркетплейсу. Коли рішення буде ухвалено, тут з'явиться дія для вас." xml:space="preserve">
+    <value>La demande est examinée par l'administrateur de la marketplace. Une fois la décision prise, une action pour vous apparaîtra ici.</value>
+  </data>
+  <data name="Надіслано!" xml:space="preserve">
+    <value>Envoyé !</value>
+  </data>
+  <data name="Надіслати на розгляд адміну" xml:space="preserve">
+    <value>Envoyer à l'administrateur pour examen</value>
+  </data>
+  <data name="Наприклад, товар був у справному стані при відправці..." xml:space="preserve">
+    <value>Par exemple, l'article était en bon état lors de l'expédition...</value>
+  </data>
+  <data name="Очікує вашого підтвердження" xml:space="preserve">
+    <value>En attente de votre confirmation</value>
+  </data>
+  <data name="Очікує розгляду адміністратором" xml:space="preserve">
+    <value>En attente d'examen par l'administrateur</value>
+  </data>
+  <data name="Переводимо вас у чат з адміністратором..." xml:space="preserve">
+    <value>Redirection vers le chat avec l'administrateur...</value>
+  </data>
+  <data name="Повернутися в чат" xml:space="preserve">
+    <value>Retour au chat</value>
+  </data>
+  <data name="Потрібна ваша дія!" xml:space="preserve">
+    <value>Une action de votre part est requise !</value>
+  </data>
+  <data name="Поясніть, чому ви не згодні з поверненням" xml:space="preserve">
+    <value>Expliquez pourquoi vous n'êtes pas d'accord avec le retour</value>
+  </data>
+  <data name="Підтверджено, кошти повернуто" xml:space="preserve">
+    <value>Confirmé, fonds remboursés</value>
+  </data>
+  <data name="Підтвердити повернення" xml:space="preserve">
+    <value>Confirmer le retour</value>
+  </data>
+  <data name="Підтвердити повернення? Кошти будуть одразу списані з балансу магазину та повернуті покупцю." xml:space="preserve">
+    <value>Confirmer le retour ? Les fonds seront immédiatement débités du solde de la boutique et remboursés à l'acheteur.</value>
+  </data>
+  <data name="Підтвердіть до" xml:space="preserve">
+    <value>Confirmez avant le</value>
+  </data>
+  <data name="Розмір:" xml:space="preserve">
+    <value>Taille :</value>
+  </data>
+  <data name="Товар:" xml:space="preserve">
+    <value>Produit :</value>
+  </data>
+  <data name="Фото на підтвердження (необов'язково)" xml:space="preserve">
+    <value>Photos justificatives (facultatif)</value>
+  </data>
+  <data name="інакше кошти будуть списані автоматично." xml:space="preserve">
+    <value>sinon les fonds seront débités automatiquement.</value>
+  </data>
 </root>

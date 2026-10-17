@@ -109,12 +109,12 @@
             if (response.ok && data && typeof data.message === 'string') {
                 appendMessage(data.message, 'bot');
             } else if (response.status === 401) {
-                appendMessage('Сесія закінчилася. Оновіть сторінку та увійдіть знову.', 'error');
+                appendMessage(__t('Сесія закінчилася. Оновіть сторінку та увійдіть знову.'), 'error');
             } else {
-                appendMessage((data && data.error) || 'Щось пішло не так. Спробуйте ще раз.', 'error');
+                appendMessage((data && data.error) || __t('Щось пішло не так. Спробуйте ще раз.'), 'error');
             }
         } catch {
-            appendMessage('Не вдалося з’єднатися з сервером. Перевірте інтернет-з’єднання.', 'error');
+            appendMessage(__t('Не вдалося з’єднатися з сервером. Перевірте інтернет-з’єднання.'), 'error');
         } finally {
             typing.hidden = true;
             isSending = false;

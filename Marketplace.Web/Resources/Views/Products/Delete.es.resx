@@ -94,4 +94,7 @@
   <data name="Так, видалити" xml:space="preserve">
     <value>Sí, eliminar</value>
   </data>
+  <data name="Назад до списку товарів" xml:space="preserve">
+    <value>Volver a la lista de productos</value>
+  </data>
 </root>

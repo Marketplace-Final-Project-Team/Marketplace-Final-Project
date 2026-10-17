@@ -133,4 +133,70 @@
   <data name="Рекомендуємо" xml:space="preserve">
     <value>Recomendado</value>
   </data>
+  <data name="Акції" xml:space="preserve">
+    <value>Ofertas</value>
+  </data>
+  <data name="Всі" xml:space="preserve">
+    <value>Todo</value>
+  </data>
+  <data name="Відповіді підтримки та оновлення чатів з'являться тут." xml:space="preserve">
+    <value>Las respuestas de soporte y las novedades de los chats aparecerán aquí.</value>
+  </data>
+  <data name="Відповіді підтримки та повідомлення щодо повернень." xml:space="preserve">
+    <value>Respuestas de soporte y mensajes sobre devoluciones.</value>
+  </data>
+  <data name="Для вас" xml:space="preserve">
+    <value>Para ti</value>
+  </data>
+  <data name="Для вас готова персональна добірка" xml:space="preserve">
+    <value>Tiene lista una selección personalizada</value>
+  </data>
+  <data name="Завантаження повідомлень..." xml:space="preserve">
+    <value>Cargando mensajes...</value>
+  </data>
+  <data name="Замовлення" xml:space="preserve">
+    <value>Pedidos</value>
+  </data>
+  <data name="Замовлення, повідомлення підтримки та персональні пропозиції - в одній стрічці." xml:space="preserve">
+    <value>Pedidos, mensajes de soporte y ofertas personalizadas, en un solo lugar.</value>
+  </data>
+  <data name="Замовлень ще немає" xml:space="preserve">
+    <value>Aún no hay pedidos</value>
+  </data>
+  <data name="Нове" xml:space="preserve">
+    <value>Novedad</value>
+  </data>
+  <data name="Новинки та персональні добірки з'являться тут пізніше." xml:space="preserve">
+    <value>Las novedades y selecciones personalizadas aparecerán aquí más adelante.</value>
+  </data>
+  <data name="Новинки та рекомендовані товари" xml:space="preserve">
+    <value>Novedades y productos recomendados</value>
+  </data>
+  <data name="Нових повідомлень немає" xml:space="preserve">
+    <value>No hay mensajes nuevos</value>
+  </data>
+  <data name="Оновлення з'являться тут після першого замовлення або звернення." xml:space="preserve">
+    <value>Las novedades aparecerán aquí tras su primer pedido o solicitud.</value>
+  </data>
+  <data name="Останні важливі події, упорядковані за датою." xml:space="preserve">
+    <value>Últimos eventos importantes, ordenados por fecha.</value>
+  </data>
+  <data name="Персональна добірка" xml:space="preserve">
+    <value>Selección personalizada</value>
+  </data>
+  <data name="Повідомлення" xml:space="preserve">
+    <value>Mensajes</value>
+  </data>
+  <data name="Поточний стан ваших замовлень." xml:space="preserve">
+    <value>Estado actual de sus pedidos.</value>
+  </data>
+  <data name="Пропозицій поки немає" xml:space="preserve">
+    <value>Aún no hay ofertas</value>
+  </data>
+  <data name="Після оформлення покупки її статус з'явиться тут." xml:space="preserve">
+    <value>Cuando realice una compra, su estado aparecerá aquí.</value>
+  </data>
+  <data name="Щойно в каталозі" xml:space="preserve">
+    <value>Recién llegado</value>
+  </data>
 </root>
