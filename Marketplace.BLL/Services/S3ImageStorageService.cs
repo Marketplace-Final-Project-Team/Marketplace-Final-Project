@@ -11,7 +11,7 @@ namespace Marketplace.BLL.Services
         private readonly string _bucketName;
 
         private static readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
-        private const long MaxFileSizeBytes = 5 * 1024 * 1024;
+        private const long MaxFileSizeBytes = 100 * 1024 * 1024;
 
         public S3ImageStorageService(IAmazonS3 s3Client, IConfiguration configuration)
         {
