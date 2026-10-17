@@ -180,4 +180,13 @@
   <data name="Оновіть адресу електронної пошти" xml:space="preserve">
     <value>Update your email address</value>
   </data>
+  <data name="ID користувача" xml:space="preserve">
+    <value>User ID</value>
+  </data>
+  <data name="Копіювати ID" xml:space="preserve">
+    <value>Copy ID</value>
+  </data>
+  <data name="Скопійовано" xml:space="preserve">
+    <value>Copied</value>
+  </data>
 </root>

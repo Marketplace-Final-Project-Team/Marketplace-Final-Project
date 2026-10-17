@@ -26,14 +26,14 @@
             }
 
             if (reason.length < 10) {
-                reasonField.setCustomValidity('Мінімум 10 символів.');
+                reasonField.setCustomValidity(__t('Мінімум 10 символів.'));
                 reasonField.reportValidity();
                 return;
             }
             reasonField.setCustomValidity('');
 
             button.disabled = true;
-            button.textContent = 'Надсилання...';
+            button.textContent = __t('Надсилання...');
 
             try {
                 const formData = new FormData();
@@ -59,9 +59,9 @@
                 });
 
                 if (!response.ok) {
-                    showError('Не вдалося надіслати заявку. Спробуйте ще раз.');
+                    showError(__t('Не вдалося надіслати заявку. Спробуйте ще раз.'));
                     button.disabled = false;
-                    button.textContent = 'Надіслати на розгляд адміну';
+                    button.textContent = __t('Надіслати на розгляд адміну');
                     return;
                 }
 
@@ -75,15 +75,15 @@
                         window.location.href = `/Support/RefundChat?requestId=${result.requestId}&isSellerChannel=true`;
                     }, 2000);
                 } else {
-                    showError(result.message || 'Не вдалося надіслати заявку.');
+                    showError(result.message || __t('Не вдалося надіслати заявку.'));
                     button.disabled = false;
-                    button.textContent = 'Надіслати на розгляд адміну';
+                    button.textContent = __t('Надіслати на розгляд адміну');
                 }
             } catch (error) {
                 console.error('Помилка відправки заявки:', error);
-                showError('Сталася помилка з’єднання із сервером.');
+                showError(__t('Сталася помилка з’єднання із сервером.'));
                 button.disabled = false;
-                button.textContent = 'Надіслати на розгляд адміну';
+                button.textContent = __t('Надіслати на розгляд адміну');
             }
         });
     });

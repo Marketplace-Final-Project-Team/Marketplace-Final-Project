@@ -235,10 +235,10 @@
                         var priceBands = new (string Label, decimal? Min, decimal? Max)[]
                         {
                             (Localizer["Усі"].Value, null, null),
-                            ("До 500 ₴", null, 500m),
+                            (Localizer["До 500 ₴"].Value, null, 500m),
                             ("500 - 1500 ₴", 500m, 1500m),
                             ("1500 - 5000 ₴", 1500m, 5000m),
-                            ("Понад 5000 ₴", 5000m, null),
+                            (Localizer["Понад 5000 ₴"].Value, 5000m, null),
                         };
                     }
                     @foreach (var band in priceBands)

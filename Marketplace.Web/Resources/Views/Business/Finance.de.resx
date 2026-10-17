@@ -208,4 +208,73 @@
   <data name="Заявку передано на розгляд адміністрації маркетплейсу." xml:space="preserve">
     <value>Der Antrag wurde zur Prüfung an die Marktplatzverwaltung weitergeleitet.</value>
   </data>
+  <data name="1–3 робочі дні" xml:space="preserve">
+    <value>1-3 Werktage</value>
+  </data>
+  <data name="Історія заявок" xml:space="preserve">
+    <value>Antragsverlauf</value>
+  </data>
+  <data name="В обробці:" xml:space="preserve">
+    <value>In Bearbeitung:</value>
+  </data>
+  <data name="Дата виплати" xml:space="preserve">
+    <value>Auszahlungsdatum</value>
+  </data>
+  <data name="Додати нову картку" xml:space="preserve">
+    <value>Neue Karte hinzufügen</value>
+  </data>
+  <data name="Доступний баланс" xml:space="preserve">
+    <value>Verfügbares Guthaben</value>
+  </data>
+  <data name="Заброньовано (14 днів)" xml:space="preserve">
+    <value>Reserviert (14 Tage)</value>
+  </data>
+  <data name="Запам'ятати цю картку для майбутніх виплат" xml:space="preserve">
+    <value>Diese Karte für zukünftige Auszahlungen speichern</value>
+  </data>
+  <data name="Запланована автовиплата" xml:space="preserve">
+    <value>Geplante automatische Auszahlung</value>
+  </data>
+  <data name="Заявок на виплату ще не було" xml:space="preserve">
+    <value>Noch keine Auszahlungsanträge</value>
+  </data>
+  <data name="Зберегти" xml:space="preserve">
+    <value>Speichern</value>
+  </data>
+  <data name="Картка для виплати" xml:space="preserve">
+    <value>Auszahlungskarte</value>
+  </data>
+  <data name="Комісія:" xml:space="preserve">
+    <value>Gebühr:</value>
+  </data>
+  <data name="Мінімальна сума:" xml:space="preserve">
+    <value>Mindestbetrag:</value>
+  </data>
+  <data name="Оберіть картку" xml:space="preserve">
+    <value>Karte auswählen</value>
+  </data>
+  <data name="Повторюється щомісяця в це саме число." xml:space="preserve">
+    <value>Wiederholt sich monatlich am selben Tag.</value>
+  </data>
+  <data name="Після оформлення першого запиту тут з'явиться детальний статус та історія транзакцій." xml:space="preserve">
+    <value>Nach Ihrem ersten Antrag erscheinen hier der detaillierte Status und der Transaktionsverlauf.</value>
+  </data>
+  <data name="Раз на місяць система сама виведе фіксовану суму на обрану картку, якщо вільного балансу вистачає." xml:space="preserve">
+    <value>Einmal im Monat zahlt das System automatisch einen festen Betrag auf die gewählte Karte aus, sofern das verfügbare Guthaben ausreicht.</value>
+  </data>
+  <data name="Спочатку подайте звичайну заявку на виплату зі збереженням картки." xml:space="preserve">
+    <value>Stellen Sie zuerst einen regulären Auszahlungsantrag und speichern Sie die Karte.</value>
+  </data>
+  <data name="Сума, ₴" xml:space="preserve">
+    <value>Betrag, ₴</value>
+  </data>
+  <data name="Термін обробки:" xml:space="preserve">
+    <value>Bearbeitungszeit:</value>
+  </data>
+  <data name="Увімкнути заплановану автовиплату" xml:space="preserve">
+    <value>Geplante automatische Auszahlung aktivieren</value>
+  </data>
+  <data name="Умови та регламент" xml:space="preserve">
+    <value>Bedingungen und Regeln</value>
+  </data>
 </root>

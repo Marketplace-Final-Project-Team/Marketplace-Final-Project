@@ -145,4 +145,70 @@
   <data name="На поточному етапі MarketPlace обслуговує доставку виключно в межах України. Розширення на міжнародні напрямки планується в майбутніх оновленнях платформи." xml:space="preserve">
     <value>Derzeit bietet MarketPlace ausschließlich Versand innerhalb der Ukraine an. Eine Erweiterung um internationale Ziele ist für künftige Plattform-Updates geplant.</value>
   </data>
+  <data name="10. Форс-мажорні затримки" xml:space="preserve">
+    <value>10. Verzögerungen durch höhere Gewalt</value>
+  </data>
+  <data name="11. Ваші права при порушенні строків" xml:space="preserve">
+    <value>11. Ihre Rechte bei Fristüberschreitung</value>
+  </data>
+  <data name="12. Міжнародна доставка" xml:space="preserve">
+    <value>12. Internationaler Versand</value>
+  </data>
+  <data name="4. Замовлення від кількох продавців" xml:space="preserve">
+    <value>4. Bestellungen von mehreren Verkäufern</value>
+  </data>
+  <data name="5. Пакування" xml:space="preserve">
+    <value>5. Verpackung</value>
+  </data>
+  <data name="6. Відстеження замовлення" xml:space="preserve">
+    <value>6. Sendungsverfolgung</value>
+  </data>
+  <data name="7. Зміна адреси після оформлення" xml:space="preserve">
+    <value>7. Adressänderung nach der Bestellung</value>
+  </data>
+  <data name="8. Неотримана посилка" xml:space="preserve">
+    <value>8. Nicht abgeholtes Paket</value>
+  </data>
+  <data name="9. Якщо посилка затримується або загублена" xml:space="preserve">
+    <value>9. Wenn ein Paket verspätet ist oder verloren geht</value>
+  </data>
+  <data name="Вартість доставки розраховується перевізником на основі ваги, габаритів посилки та відстані. Вона відображається на кроці «Огляд» перед підтвердженням замовлення - жодних прихованих доплат після оформлення. У межах промоакцій MarketPlace може пропонувати безкоштовну доставку - умови такої акції завжди вказуються окремо в каталозі та кошику." xml:space="preserve">
+    <value>Die Versandkosten werden vom Versanddienstleister anhand von Gewicht, Abmessungen des Pakets und Entfernung berechnet. Sie werden im Schritt „Übersicht“ vor der Bestätigung der Bestellung angezeigt — keine versteckten Aufschläge nach der Bestellung. Im Rahmen von Aktionen kann MarketPlace kostenlosen Versand anbieten — die Bedingungen werden stets gesondert im Katalog und im Warenkorb angegeben.</value>
+  </data>
+  <data name="Все, що потрібно знати про доставку замовлень: перевізники, орієнтовні строки, пакування та відстеження посилки." xml:space="preserve">
+    <value>Alles, was Sie über die Lieferung von Bestellungen wissen müssen: Versanddienstleister, voraussichtliche Lieferzeiten, Verpackung und Sendungsverfolgung.</value>
+  </data>
+  <data name="Політиці повернення та обміну" xml:space="preserve">
+    <value>Rückgabe- und Umtauschrichtlinie</value>
+  </data>
+  <data name="Порушення заявлених строків доставки саме собою не позбавляє вас права на «Захист покупця» й повернення - 14-денний відлік починається з фактичної дати доставки, а не з дати оформлення замовлення. Детальніше про повернення коштів - у" xml:space="preserve">
+    <value>Die Überschreitung der angegebenen Lieferfristen nimmt Ihnen nicht das Recht auf „Käuferschutz“ und Rückgabe — die 14-Tage-Frist beginnt mit dem tatsächlichen Lieferdatum, nicht mit dem Bestelldatum. Mehr zur Rückerstattung in der</value>
+  </data>
+  <data name="Продавці зобов'язані пакувати товари так, щоб забезпечити їх збереження під час транспортування, з урахуванням специфіки товару (крихкість, вологочутливість тощо). Замовлення, що містять товари категорії 18+, відправляються в нейтральному пакованні без позначок, що розкривають вміст посилки." xml:space="preserve">
+    <value>Verkäufer müssen Waren so verpacken, dass sie beim Transport geschützt sind, unter Berücksichtigung der Besonderheiten der Ware (Zerbrechlichkeit, Feuchtigkeitsempfindlichkeit usw.). Bestellungen mit 18+-Produkten werden in neutraler Verpackung ohne Hinweise auf den Inhalt versendet.</value>
+  </data>
+  <data name="Після відправлення статус замовлення змінюється на «Відправлено», і стає доступним номер для відстеження." xml:space="preserve">
+    <value>Nach dem Versand ändert sich der Bestellstatus auf „Versendet“ und eine Sendungsnummer wird verfügbar.</value>
+  </data>
+  <data name="Після оформлення замовлення продавець отримує сповіщення й зобов'язаний підтвердити наявність товару протягом 24 годин;" xml:space="preserve">
+    <value>Nach der Bestellung erhält der Verkäufer eine Benachrichtigung und muss die Verfügbarkeit der Ware innerhalb von 24 Stunden bestätigen;</value>
+  </data>
+  <data name="Редакція від 16 вересня 2026 року." xml:space="preserve">
+    <value>Fassung vom 16. September 2026.</value>
+  </data>
+  <data name="Спосіб доставки обирається на кроці «Доставка» під час оформлення замовлення і зберігається окремо для кожного замовлення. Точні строки залежать від місцезнаходження продавця, обраного відділення та завантаженості перевізника у конкретний період." xml:space="preserve">
+    <value>Die Versandart wird im Schritt „Lieferung“ beim Bestellvorgang gewählt und für jede Bestellung separat gespeichert. Die genauen Lieferzeiten hängen vom Standort des Verkäufers, der gewählten Filiale und der Auslastung des Versanddienstleisters im jeweiligen Zeitraum ab.</value>
+  </data>
+  <data name="У періоди підвищеного навантаження на перевізників, під час погодних обмежень чи інших обставин поза контролем MarketPlace та продавців (зокрема повʼязаних із воєнним станом) орієнтовні строки доставки можуть збільшуватись. Ми рекомендуємо стежити за статусом відстеження та звертатись у підтримку, якщо затримка викликає занепокоєння." xml:space="preserve">
+    <value>In Zeiten hoher Auslastung der Versanddienstleister, bei wetterbedingten Einschränkungen oder anderen Umständen außerhalb der Kontrolle von MarketPlace und den Verkäufern (insbesondere im Zusammenhang mit dem Kriegsrecht) können sich die voraussichtlichen Lieferzeiten verlängern. Wir empfehlen, den Sendungsstatus zu verfolgen und sich an den Support zu wenden, wenn eine Verzögerung Anlass zur Sorge gibt.</value>
+  </data>
+  <data name="Якщо ваше замовлення містить товари від різних продавців, кожен з них формує й відправляє свою частину окремою посилкою. Це означає, що товари можуть прибувати в різний час і з різними номерами для відстеження - статус кожної позиції видно окремо на сторінці замовлення." xml:space="preserve">
+    <value>Enthält Ihre Bestellung Produkte verschiedener Verkäufer, stellt jeder von ihnen seinen Teil zusammen und versendet ihn als separates Paket. Die Artikel können also zu unterschiedlichen Zeiten und mit unterschiedlichen Sendungsnummern ankommen — der Status jeder Position wird auf der Bestellseite separat angezeigt.</value>
+  </data>
+  <data name="Якщо посилку не забрано з відділення чи не вручено кур'єром протягом строку зберігання, встановленого перевізником, вона повертається відправнику. У такому разі підтримка зв'яжеться з вами щодо повторної відправки (за додаткову оплату доставки) або оформлення повернення коштів за товар." xml:space="preserve">
+    <value>Wird ein Paket nicht innerhalb der vom Versanddienstleister festgelegten Lagerfrist in der Filiale abgeholt oder vom Kurier zugestellt, geht es an den Absender zurück. In diesem Fall kontaktiert Sie der Support wegen eines erneuten Versands (gegen zusätzliche Versandkosten) oder einer Rückerstattung für die Ware.</value>
+  </data>
+  <data name="Якщо потрібно змінити адресу чи відділення отримання вже після оформлення замовлення, зверніться до продавця чи в підтримку якомога швидше - зміна можлива, доки замовлення не передано службі доставки. Після відправлення зміна адреси залежить від правил конкретного перевізника." xml:space="preserve">
+    <value>Wenn Sie die Lieferadresse oder Filiale nach der Bestellung ändern müssen, wenden Sie sich so schnell wie möglich an den Verkäufer oder den Support — eine Änderung ist möglich, solange die Bestellung noch nicht an den Versanddienst übergeben wurde. Nach dem Versand hängt eine Adressänderung von den Regeln des jeweiligen Versanddienstleisters ab.</value>
+  </data>
 </root>

@@ -127,4 +127,10 @@
   <data name="Деталі" xml:space="preserve">
     <value>Details</value>
   </data>
+  <data name="Потрібне підтвердження повернення" xml:space="preserve">
+    <value>Rückgabebestätigung erforderlich</value>
+  </data>
+  <data name="до" xml:space="preserve">
+    <value>bis</value>
+  </data>
 </root>

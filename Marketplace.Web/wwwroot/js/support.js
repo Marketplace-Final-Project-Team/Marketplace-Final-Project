@@ -58,16 +58,16 @@
             }
 
             if (!category) {
-                showError("Оберіть тему звернення.");
+                showError(__t("Оберіть тему звернення."));
                 return;
             }
             if (message.length < 10) {
-                showError("Опишіть ситуацію детальніше — щонайменше 10 символів.");
+                showError(__t("Опишіть ситуацію детальніше — щонайменше 10 символів."));
                 return;
             }
 
             submitButton.disabled = true;
-            submitButton.textContent = "Надсилання...";
+            submitButton.textContent = __t("Надсилання...");
 
             try {
                 const formData = new FormData();
@@ -98,15 +98,15 @@
                         window.location.reload();
                     }, 1500);
                 } else {
-                    showError(result.message || "Не вдалося надіслати заявку.");
+                    showError(result.message || __t("Не вдалося надіслати заявку."));
                     submitButton.disabled = false;
-                    submitButton.textContent = "Надіслати заявку";
+                    submitButton.textContent = __t("Надіслати заявку");
                 }
             } catch (error) {
                 console.error("Помилка відправки заявки:", error);
-                showError("Сталася помилка з'єднання із сервером.");
+                showError(__t("Сталася помилка з'єднання із сервером."));
                 submitButton.disabled = false;
-                submitButton.textContent = "Надіслати заявку";
+                submitButton.textContent = __t("Надіслати заявку");
             }
         });
     }

@@ -1,3 +1,4 @@
+using Marketplace.Web.Infrastructure;
 using Marketplace.BLL.Interfaces;
 using Marketplace.Domain.Entities;
 using Marketplace.Web.Models;
@@ -34,7 +35,7 @@ public class CartController : Controller
     public async Task<IActionResult> Add(Guid productId, Guid? variantId, int quantity = 1, string? returnUrl = null)
     {
         var result = await _cartService.AddToCart(GetUserId(), productId, variantId, quantity);
-        SetResultMessage(result.Succeeded, result.Message, "Товар додано до кошика.");
+        SetResultMessage(result.Succeeded, this.L(result.Message), this.L("Товар додано до кошика."));
 
         return !string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl)
             ? LocalRedirect(returnUrl)
@@ -48,7 +49,7 @@ public class CartController : Controller
         var result = await _cartService.AddToCart(GetUserId(), productId, variantId, quantity);
         if (!result.Succeeded)
         {
-            TempData["Error"] = result.Message;
+            TempData["Error"] = this.L(result.Message);
             return RedirectToAction("Details", "Catalog", new { id = productId });
         }
 
@@ -60,7 +61,7 @@ public class CartController : Controller
     public async Task<IActionResult> Remove(Guid productId, Guid? variantId)
     {
         var result = await _cartService.RemoveFromCart(GetUserId(), productId, variantId);
-        SetResultMessage(result.Succeeded, result.Message, "Товар видалено з кошика.");
+        SetResultMessage(result.Succeeded, this.L(result.Message), this.L("Товар видалено з кошика."));
         return RedirectToAction(nameof(Index));
     }
 
@@ -69,7 +70,7 @@ public class CartController : Controller
     public async Task<IActionResult> IncreaseQuantity(Guid productId, Guid? variantId)
     {
         var result = await _cartService.IncreaseQuantity(GetUserId(), productId, variantId);
-        SetResultMessage(result.Succeeded, result.Message);
+        SetResultMessage(result.Succeeded, this.L(result.Message));
         return RedirectToAction(nameof(Index));
     }
 
@@ -78,7 +79,7 @@ public class CartController : Controller
     public async Task<IActionResult> DecreaseQuantity(Guid productId, Guid? variantId)
     {
         var result = await _cartService.DecreaseQuantity(GetUserId(), productId, variantId);
-        SetResultMessage(result.Succeeded, result.Message);
+        SetResultMessage(result.Succeeded, this.L(result.Message));
         return RedirectToAction(nameof(Index));
     }
 

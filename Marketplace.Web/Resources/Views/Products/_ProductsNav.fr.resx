@@ -70,4 +70,7 @@
   <data name="Розділи товарів" xml:space="preserve">
     <value>Sections des produits</value>
   </data>
+  <data name="Категорії" xml:space="preserve">
+    <value>Catégories</value>
+  </data>
 </root>

@@ -190,4 +190,49 @@
   <data name="Так, мені є 18" xml:space="preserve">
     <value>Sí, tengo 18 años</value>
   </data>
+  <data name="Вимкнути" xml:space="preserve">
+    <value>Desactivar</value>
+  </data>
+  <data name="До 500 ₴" xml:space="preserve">
+    <value>Hasta 500 ₴</value>
+  </data>
+  <data name="Додати у список бажань" xml:space="preserve">
+    <value>Añadir a la lista de deseos</value>
+  </data>
+  <data name="Закрити фільтри" xml:space="preserve">
+    <value>Cerrar filtros</value>
+  </data>
+  <data name="Категорії" xml:space="preserve">
+    <value>Categorías</value>
+  </data>
+  <data name="Наявність" xml:space="preserve">
+    <value>Disponibilidad</value>
+  </data>
+  <data name="Понад 5000 ₴" xml:space="preserve">
+    <value>Más de 5000 ₴</value>
+  </data>
+  <data name="Пошук у каталозі" xml:space="preserve">
+    <value>Buscar en el catálogo</value>
+  </data>
+  <data name="Прибрати зі списку бажань" xml:space="preserve">
+    <value>Quitar de la lista de deseos</value>
+  </data>
+  <data name="Увійти, щоб додати у список бажань" xml:space="preserve">
+    <value>Inicia sesión para añadir a la lista de deseos</value>
+  </data>
+  <data name="Усі" xml:space="preserve">
+    <value>Todos</value>
+  </data>
+  <data name="Усі товари" xml:space="preserve">
+    <value>Todos los productos</value>
+  </data>
+  <data name="Фільтри" xml:space="preserve">
+    <value>Filtros</value>
+  </data>
+  <data name="Ціна" xml:space="preserve">
+    <value>Precio</value>
+  </data>
+  <data name="Швидкий вибір ціни" xml:space="preserve">
+    <value>Selección rápida de precio</value>
+  </data>
 </root>

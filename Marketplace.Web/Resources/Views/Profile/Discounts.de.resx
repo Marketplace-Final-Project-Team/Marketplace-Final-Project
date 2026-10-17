@@ -79,4 +79,40 @@
   <data name="Діє до" xml:space="preserve">
     <value>Gültig bis</value>
   </data>
+  <data name="Активна" xml:space="preserve">
+    <value>Aktiv</value>
+  </data>
+  <data name="Безстроково" xml:space="preserve">
+    <value>Unbefristet</value>
+  </data>
+  <data name="Гаманець переваг" xml:space="preserve">
+    <value>Vorteilsbörse</value>
+  </data>
+  <data name="Кількість активних знижок" xml:space="preserve">
+    <value>Anzahl aktiver Rabatte</value>
+  </data>
+  <data name="Неактивна" xml:space="preserve">
+    <value>Inaktiv</value>
+  </data>
+  <data name="Перейти до товарів" xml:space="preserve">
+    <value>Zu den Produkten</value>
+  </data>
+  <data name="Персональна знижка магазину" xml:space="preserve">
+    <value>Persönlicher Shoprabatt</value>
+  </data>
+  <data name="Персональна знижка прив'язана до магазину. Промокод, якщо він у вас є, можна додатково ввести під час оформлення замовлення." xml:space="preserve">
+    <value>Ein persönlicher Rabatt ist an einen Shop gebunden. Einen Promo-Code, falls vorhanden, können Sie zusätzlich beim Bestellvorgang eingeben.</value>
+  </data>
+  <data name="Персональні знижки від магазинів зібрані в одному місці й автоматично враховуються у доступних пропозиціях." xml:space="preserve">
+    <value>Persönliche Rabatte von Shops sind an einem Ort gesammelt und werden bei verfügbaren Angeboten automatisch berücksichtigt.</value>
+  </data>
+  <data name="Початок" xml:space="preserve">
+    <value>Beginn</value>
+  </data>
+  <data name="Як це працює?" xml:space="preserve">
+    <value>Wie funktioniert das?</value>
+  </data>
+  <data name="активних" xml:space="preserve">
+    <value>aktiv</value>
+  </data>
 </root>

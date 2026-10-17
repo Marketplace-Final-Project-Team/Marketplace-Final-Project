@@ -109,4 +109,25 @@
   <data name="Зберегти зміни" xml:space="preserve">
     <value>Guardar cambios</value>
   </data>
+  <data name="Артикул (SKU)" xml:space="preserve">
+    <value>Referencia (SKU)</value>
+  </data>
+  <data name="Видалити" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
+  <data name="До 8 додаткових фото загалом. JPG, PNG або WEBP, до 5 МБ кожне." xml:space="preserve">
+    <value>Hasta 8 fotos adicionales en total. JPG, PNG o WEBP, de hasta 5 MB cada una.</value>
+  </data>
+  <data name="Додаткове фото товару" xml:space="preserve">
+    <value>Foto adicional de</value>
+  </data>
+  <data name="Наприклад, TS-BLK-001" xml:space="preserve">
+    <value>Por ejemplo, TS-BLK-001</value>
+  </data>
+  <data name="Позначте фото, які потрібно видалити, і збережіть зміни." xml:space="preserve">
+    <value>Marque las fotos que desea eliminar y guarde los cambios.</value>
+  </data>
+  <data name="Поточні додаткові фото" xml:space="preserve">
+    <value>Fotos adicionales actuales</value>
+  </data>
 </root>

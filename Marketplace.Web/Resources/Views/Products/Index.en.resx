@@ -276,4 +276,28 @@
   <data name="Спробуйте змінити пошуковий запит або оберіть інший фільтр." xml:space="preserve">
     <value>Try changing your search query or choosing a different filter.</value>
   </data>
+  <data name="Імпортувати з файлу" xml:space="preserve">
+    <value>Import from file</value>
+  </data>
+  <data name="Архів" xml:space="preserve">
+    <value>Archive</value>
+  </data>
+  <data name="Архівований" xml:space="preserve">
+    <value>Archived</value>
+  </data>
+  <data name="Експортувати асортимент" xml:space="preserve">
+    <value>Export catalogue</value>
+  </data>
+  <data name="Завантажити приклад файлу" xml:space="preserve">
+    <value>Download sample file</value>
+  </data>
+  <data name="Категорія:" xml:space="preserve">
+    <value>Category:</value>
+  </data>
+  <data name="Прайс (Excel)" xml:space="preserve">
+    <value>Price list (Excel)</value>
+  </data>
+  <data name="Рядок з артикулом наявного товару оновить його, рядок без артикулу створить новий. «Категорія» має точно збігатися з назвою в каталозі; товари з розмірами через імпорт не оновлюються. Змінені товари повторно проходять модерацію." xml:space="preserve">
+    <value>A row with the SKU of an existing product updates it; a row without a SKU creates a new one. "Category" must exactly match the name in the catalogue; products with sizes are not updated via import. Changed products go through moderation again.</value>
+  </data>
 </root>

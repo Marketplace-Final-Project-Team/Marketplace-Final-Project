@@ -1,4 +1,5 @@
-﻿using Marketplace.BLL.Common;
+﻿using Marketplace.Web.Infrastructure;
+using Marketplace.BLL.Common;
 using Marketplace.BLL.Interfaces;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
@@ -138,11 +139,11 @@ namespace Marketplace.Web.Controllers
 
             if (result.Succeeded)
             {
-                TempData["Success"] = "Виплату успішно здійснено.";
+                TempData["Success"] = this.L("Виплату успішно здійснено.");
             }
             else
             {
-                TempData["Error"] = result.Message;
+                TempData["Error"] = this.L(result.Message);
             }
 
             return RedirectToAction("Withdrawals");
@@ -157,7 +158,7 @@ namespace Marketplace.Web.Controllers
 
             if (string.IsNullOrWhiteSpace(reason))
             {
-                TempData["Error"] = "Вкажіть причину відхилення.";
+                TempData["Error"] = this.L("Вкажіть причину відхилення.");
                 return RedirectToAction("Withdrawals");
             }
 
@@ -165,11 +166,11 @@ namespace Marketplace.Web.Controllers
 
             if (result.Succeeded)
             {
-                TempData["Success"] = "Запит відхилено.";
+                TempData["Success"] = this.L("Запит відхилено.");
             }
             else
             {
-                TempData["Error"] = result.Message;
+                TempData["Error"] = this.L(result.Message);
             }
 
             return RedirectToAction("Withdrawals");

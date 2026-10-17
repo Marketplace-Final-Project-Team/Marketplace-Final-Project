@@ -124,4 +124,19 @@
   <data name="Оформити замовлення" xml:space="preserve">
     <value>Realizar pedido</value>
   </data>
+  <data name="Для вас" xml:space="preserve">
+    <value>Para ti</value>
+  </data>
+  <data name="Добірка на основі ваших переглядів, оцінок і покупок." xml:space="preserve">
+    <value>Una selección basada en tus visitas, valoraciones y compras.</value>
+  </data>
+  <data name="Переглянути каталог" xml:space="preserve">
+    <value>Ver catálogo</value>
+  </data>
+  <data name="Рекомендовані товари" xml:space="preserve">
+    <value>Productos recomendados</value>
+  </data>
+  <data name="Розмір:" xml:space="preserve">
+    <value>Talla:</value>
+  </data>
 </root>

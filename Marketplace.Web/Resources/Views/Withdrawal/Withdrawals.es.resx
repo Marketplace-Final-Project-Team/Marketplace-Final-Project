@@ -127,4 +127,61 @@
   <data name="Відхилити" xml:space="preserve">
     <value>Rechazar</value>
   </data>
+  <data name="Ви точно впевнені, що хочете виплатити" xml:space="preserve">
+    <value>¿Seguro que desea pagar</value>
+  </data>
+  <data name="Виплачено (у перегляді)" xml:space="preserve">
+    <value>Pagado (en la vista)</value>
+  </data>
+  <data name="Детальніше" xml:space="preserve">
+    <value>Detalles</value>
+  </data>
+  <data name="Закрити" xml:space="preserve">
+    <value>Cerrar</value>
+  </data>
+  <data name="Заявка на виплату" xml:space="preserve">
+    <value>Solicitud de pago</value>
+  </data>
+  <data name="Заявок за цим фільтром немає." xml:space="preserve">
+    <value>No hay solicitudes con este filtro.</value>
+  </data>
+  <data name="Картка:" xml:space="preserve">
+    <value>Tarjeta:</value>
+  </data>
+  <data name="Отримувач:" xml:space="preserve">
+    <value>Destinatario:</value>
+  </data>
+  <data name="Очікують дій" xml:space="preserve">
+    <value>Pendientes de acción</value>
+  </data>
+  <data name="Поясніть продавцю, чому заявку відхилено..." xml:space="preserve">
+    <value>Explique al vendedor por qué se rechazó la solicitud...</value>
+  </data>
+  <data name="Підтвердити відхилення" xml:space="preserve">
+    <value>Confirmar rechazo</value>
+  </data>
+  <data name="Розгляньте та підтвердіть або відхиліть запити продавців на виведення коштів." xml:space="preserve">
+    <value>Revise y apruebe o rechace las solicitudes de retirada de fondos de los vendedores.</value>
+  </data>
+  <data name="Сума в очікуванні" xml:space="preserve">
+    <value>Importe pendiente</value>
+  </data>
+  <data name="Сума:" xml:space="preserve">
+    <value>Importe:</value>
+  </data>
+  <data name="Так, виплатити" xml:space="preserve">
+    <value>Sí, pagar</value>
+  </data>
+  <data name="Усього заявок" xml:space="preserve">
+    <value>Total de solicitudes</value>
+  </data>
+  <data name="Усі заявки" xml:space="preserve">
+    <value>Todas las solicitudes</value>
+  </data>
+  <data name="Фільтр за статусом" xml:space="preserve">
+    <value>Filtrar por estado</value>
+  </data>
+  <data name="на картку" xml:space="preserve">
+    <value>a la tarjeta</value>
+  </data>
 </root>

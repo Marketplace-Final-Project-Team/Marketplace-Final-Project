@@ -14,7 +14,7 @@
             const shifted = input.value && !Number.isNaN(date.getTime()) &&
                 toLocalInput(date) !== input.value.slice(0, 16);
             input.setCustomValidity(shifted
-                ? "Цей місцевий час не існує через переведення годинника. Оберіть інший час."
+                ? __t("Цей місцевий час не існує через переведення годинника. Оберіть інший час.")
                 : "");
         };
         input.addEventListener("input", validateLocalTime);

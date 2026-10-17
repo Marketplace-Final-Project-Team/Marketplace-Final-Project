@@ -1,3 +1,4 @@
+using Marketplace.Web.Infrastructure;
 using System.Security.Claims;
 using Marketplace.BLL.Common;
 using Marketplace.BLL.DTOs.Products;
@@ -48,7 +49,7 @@ public class ProductsController : Controller
         var businesses = await _businessAccessService.GetAccessibleBusinessesAsync(userId, BusinessPermissions.ProductCrud);
         if (businesses.Count == 0)
         {
-            TempData["Error"] = "У вас поки немає бізнесу з доступом до керування товарами.";
+            TempData["Error"] = this.L("У вас поки немає бізнесу з доступом до керування товарами.");
             ViewBag.Businesses = Array.Empty<SelectListItem>();
             return View(new ProductsIndexViewModel());
         }
@@ -148,7 +149,7 @@ public class ProductsController : Controller
         var businesses = await _businessAccessService.GetAccessibleBusinessesAsync(userId, BusinessPermissions.ProductCrud);
         if (businesses.Count == 0)
         {
-            TempData["Error"] = "У вас поки немає бізнесу з доступом до керування товарами.";
+            TempData["Error"] = this.L("У вас поки немає бізнесу з доступом до керування товарами.");
             return View(new List<ProductCategorySummaryViewModel>());
         }
 
@@ -216,7 +217,7 @@ public class ProductsController : Controller
 
         if (file is null || file.Length == 0)
         {
-            TempData["Error"] = "Оберіть файл .xlsx для імпорту.";
+            TempData["Error"] = this.L("Оберіть файл .xlsx для імпорту.");
             return RedirectToAction(nameof(Index), new { businessId });
         }
 
@@ -228,7 +229,7 @@ public class ProductsController : Controller
         }
         catch (DuplicateProductSkuException ex)
         {
-            TempData["Error"] = ex.Message;
+            TempData["Error"] = this.L(ex.Message);
             return RedirectToAction(nameof(Index), new { businessId });
         }
 
@@ -237,12 +238,12 @@ public class ProductsController : Controller
 
         if (result.RowErrors.Count == 0)
         {
-            TempData["Success"] = $"Імпорт завершено: створено {result.CreatedCount}, оновлено {result.UpdatedCount}.";
+            TempData["Success"] = this.L("Імпорт завершено: створено {0}, оновлено {1}.", result.CreatedCount, result.UpdatedCount);
         }
         else
         {
-            var errorsPreview = string.Join(" ", result.RowErrors.Take(5).Select(e => $"Рядок {e.RowNumber}: {e.Error}"));
-            TempData["Error"] = $"Створено {result.CreatedCount}, оновлено {result.UpdatedCount}. Помилки в {result.RowErrors.Count} рядках. {errorsPreview}";
+            var errorsPreview = string.Join(" ", result.RowErrors.Take(5).Select(e => this.L("Рядок {0}: {1}", e.RowNumber, e.Error)));
+            TempData["Error"] = this.L("Створено {0}, оновлено {1}. Помилки в {2} рядках. {3}", result.CreatedCount, result.UpdatedCount, result.RowErrors.Count, errorsPreview);
         }
 
         return RedirectToAction(nameof(Index), new { businessId });
@@ -290,11 +291,11 @@ public class ProductsController : Controller
         var result = await _productService.UpdateQuantityAsync(productId, quantity);
         if (result.Succeeded)
         {
-            TempData["Success"] = "Залишок оновлено.";
+            TempData["Success"] = this.L("Залишок оновлено.");
         }
         else
         {
-            TempData["Error"] = result.Message;
+            TempData["Error"] = this.L(result.Message);
         }
 
         return RedirectToAction(nameof(Warehouse), new { businessId });
@@ -378,14 +379,14 @@ public class ProductsController : Controller
 
         if (!await _categoryRepository.ExistsAsync(category => category.Id == model.CategoryId))
         {
-            ModelState.AddModelError(nameof(model.CategoryId), "Оберіть доступну категорію.");
+            ModelState.AddModelError(nameof(model.CategoryId), this.L("Оберіть доступну категорію."));
         }
 
         var maxProducts = await _settingsService.GetIntAsync("BusinessRules", "MaxProductsPerBusiness", 200);
         var currentProductCount = (await _productService.GetByBusinessAsync(model.BusinessId)).Count;
         if (currentProductCount >= maxProducts)
         {
-            ModelState.AddModelError(string.Empty, $"Досягнуто максимальної кількості товарів для одного бізнесу ({maxProducts}).");
+            ModelState.AddModelError(string.Empty, this.L("Досягнуто максимальної кількості товарів для одного бізнесу ({0}).", maxProducts));
         }
 
         if (!ModelState.IsValid)
@@ -415,13 +416,13 @@ public class ProductsController : Controller
         }
         catch (DuplicateProductSkuException ex)
         {
-            ModelState.AddModelError(nameof(model.Sku), ex.Message);
+            ModelState.AddModelError(nameof(model.Sku), this.L(ex.Message));
             await PopulateCreateOptionsAsync(model);
             return View(model);
         }
         catch (InvalidOperationException ex)
         {
-            ModelState.AddModelError(string.Empty, ex.Message);
+            ModelState.AddModelError(string.Empty, this.L(ex.Message));
             await PopulateCreateOptionsAsync(model);
             return View(model);
         }
@@ -429,7 +430,7 @@ public class ProductsController : Controller
         await _activityLog.LogBusinessActionAsync(model.BusinessId, "ProductCreated",
             $"Додано товар «{createdProductDto.Name}».", actorUserId: userId);
 
-        TempData["Success"] = "Товар створено та відправлено на модерацію.";
+        TempData["Success"] = this.L("Товар створено та відправлено на модерацію.");
         return RedirectToAction(nameof(Index), new { businessId = model.BusinessId });
     }
 
@@ -480,7 +481,7 @@ public class ProductsController : Controller
 
         if (!await _categoryRepository.ExistsAsync(category => category.Id == model.CategoryId))
         {
-            ModelState.AddModelError(nameof(model.CategoryId), "Оберіть доступну категорію.");
+            ModelState.AddModelError(nameof(model.CategoryId), this.L("Оберіть доступну категорію."));
         }
 
         if (!ModelState.IsValid)
@@ -520,7 +521,7 @@ public class ProductsController : Controller
         }
         catch (DuplicateProductSkuException ex)
         {
-            ModelState.AddModelError(nameof(model.Sku), ex.Message);
+            ModelState.AddModelError(nameof(model.Sku), this.L(ex.Message));
             var userId = GetCurrentUserId();
             var businesses = userId is null
                 ? Array.Empty<Business>()
@@ -533,7 +534,7 @@ public class ProductsController : Controller
         }
         catch (InvalidOperationException ex)
         {
-            ModelState.AddModelError(string.Empty, ex.Message);
+            ModelState.AddModelError(string.Empty, this.L(ex.Message));
             var userId = GetCurrentUserId();
             var businesses = userId is null
                 ? Array.Empty<Business>()
@@ -545,7 +546,7 @@ public class ProductsController : Controller
             return View(model);
         }
 
-        TempData["Success"] = "Товар оновлено та відправлено на повторну модерацію.";
+        TempData["Success"] = this.L("Товар оновлено та відправлено на повторну модерацію.");
         return RedirectToAction(nameof(Index), new { businessId = accessible.Product!.BusinessId });
     }
 
@@ -583,8 +584,8 @@ public class ProductsController : Controller
 
         var outcome = await _productService.DeleteOrArchiveAsync(id);
         TempData["Success"] = outcome == ProductDeleteOutcome.Archived
-            ? "Товар має історію замовлень, тому його архівовано й приховано з каталогу."
-            : "Товар видалено.";
+            ? this.L("Товар має історію замовлень, тому його архівовано й приховано з каталогу.")
+            : this.L("Товар видалено.");
         return RedirectToAction(nameof(Index), new { businessId = accessible.Product!.BusinessId });
     }
 

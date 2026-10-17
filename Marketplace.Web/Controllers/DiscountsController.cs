@@ -1,3 +1,4 @@
+using Marketplace.Web.Infrastructure;
 using Marketplace.BLL.Common;
 using Marketplace.BLL.Interfaces;
 using Marketplace.BLL.Services;
@@ -54,11 +55,11 @@ namespace Marketplace.Web.Controllers
                 await _activityLog.LogBusinessActionAsync(product.BusinessId, "DiscountSet",
                     $"Встановлено знижку {percent}% на товар «{product.Name}».",
                     actorUserId: CurrentUserId, relatedEntityId: productId);
-                TempData["Success"] = "Знижку встановлено.";
+                TempData["Success"] = this.L("Знижку встановлено.");
             }
             catch (Exception ex) when (ex is ArgumentOutOfRangeException or ArgumentException)
             {
-                TempData["Error"] = ex.Message;
+                TempData["Error"] = this.L(ex.Message);
             }
 
             return RedirectToAction("Index", "Products");
@@ -79,7 +80,7 @@ namespace Marketplace.Web.Controllers
             await _activityLog.LogBusinessActionAsync(product.BusinessId, "DiscountRemoved",
                 $"Знижку на товар «{product.Name}» скасовано.",
                 actorUserId: CurrentUserId, relatedEntityId: productId);
-            TempData["Success"] = "Знижку скасовано.";
+            TempData["Success"] = this.L("Знижку скасовано.");
 
             return RedirectToAction("Index", "Products");
         }
@@ -102,11 +103,11 @@ namespace Marketplace.Web.Controllers
                 await _activityLog.LogBusinessActionAsync(businessId, "BusinessDiscountSet",
                     $"Адміністратор встановив знижку {discountPercent}% на весь бізнес «{business.StoreName}».",
                     actorUserId: CurrentUserId);
-                TempData["Success"] = result.Message;
+                TempData["Success"] = this.L(result.Message);
             }
             else
             {
-                TempData["Error"] = result.Message;
+                TempData["Error"] = this.L(result.Message);
             }
 
             return RedirectToAction("Index","Business");
@@ -129,11 +130,11 @@ namespace Marketplace.Web.Controllers
                 await _activityLog.LogBusinessActionAsync(businessId, "BusinessDiscountRemoved",
                     $"Адміністратор скасував знижку на весь бізнес «{business.StoreName}».",
                     actorUserId: CurrentUserId);
-                TempData["Success"] = result.Message;
+                TempData["Success"] = this.L(result.Message);
             }
             else
             {
-                TempData["Error"] = result.Message;
+                TempData["Error"] = this.L(result.Message);
             }
 
             return RedirectToAction("Index", "Business");
@@ -174,11 +175,11 @@ namespace Marketplace.Web.Controllers
                 await _activityLog.LogBusinessActionAsync(businessId, "CategoryDiscountSet",
                     $"Адміністратор встановив знижку {discountPercent}% на категорію «{category.Name}».",
                     actorUserId: CurrentUserId);
-                TempData["Success"] = result.Message;
+                TempData["Success"] = this.L(result.Message);
             }
             else
             {
-                TempData["Error"] = result.Message;
+                TempData["Error"] = this.L(result.Message);
             }
 
             return RedirectToAction("PromoCodes", "Business", new { businessId });
@@ -201,11 +202,11 @@ namespace Marketplace.Web.Controllers
                 await _activityLog.LogBusinessActionAsync(businessId, "CategoryDiscountRemoved",
                     $"Адміністратор скасував знижку на категорію «{category.Name}».",
                     actorUserId: CurrentUserId);
-                TempData["Success"] = result.Message;
+                TempData["Success"] = this.L(result.Message);
             }
             else
             {
-                TempData["Error"] = result.Message;
+                TempData["Error"] = this.L(result.Message);
             }
 
             return RedirectToAction("PromoCodes", "Business", new { businessId });

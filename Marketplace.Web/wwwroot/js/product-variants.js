@@ -11,10 +11,10 @@
         row.className = "product-variant-row";
         row.setAttribute("data-variant-row", "");
         row.innerHTML = `
-            <input name="Variants[${index}].Size" class="form-control" placeholder="Розмір (S, M, L...)" />
-            <input name="Variants[${index}].Sku" class="form-control" placeholder="Артикул розміру" />
-            <input name="Variants[${index}].Quantity" type="number" min="0" value="0" class="form-control" placeholder="К-сть" />
-            <button type="button" class="product-variant-row__remove" data-remove-variant aria-label="Видалити розмір">✕</button>
+            <input name="Variants[${index}].Size" class="form-control" placeholder="${__t("Розмір (S, M, L...)")}" />
+            <input name="Variants[${index}].Sku" class="form-control" placeholder="${__t("Артикул розміру")}" />
+            <input name="Variants[${index}].Quantity" type="number" min="0" value="0" class="form-control" placeholder="${__t("К-сть")}" />
+            <button type="button" class="product-variant-row__remove" data-remove-variant aria-label="${__t("Видалити розмір")}">✕</button>
         `;
         return row;
     };

@@ -184,4 +184,10 @@
   <data name="Після створення товар автоматично потрапить на модерацію." xml:space="preserve">
     <value>Nach dem Erstellen wird der Artikel automatisch zur Prüfung eingereicht.</value>
   </data>
+  <data name="Артикул (SKU)" xml:space="preserve">
+    <value>Artikelnummer (SKU)</value>
+  </data>
+  <data name="Наприклад, TS-BLK-001" xml:space="preserve">
+    <value>Zum Beispiel TS-BLK-001</value>
+  </data>
 </root>

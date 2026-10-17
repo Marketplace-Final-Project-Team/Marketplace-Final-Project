@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using Marketplace.Web.Infrastructure;
+using System.Security.Claims;
 using Marketplace.BLL.Interfaces;
 using Marketplace.Domain.Enums;
 using Marketplace.Web.Models;
@@ -283,7 +284,7 @@ namespace Marketplace.Web.Controllers
         public async Task<IActionResult> ApproveAdultStatus(Guid businessId, string? returnUrl = null)
         {
             var result = await _adminService.ApproveAdultStatusAsync(businessId);
-            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            TempData[result.Succeeded ? "Success" : "Error"] = this.L(result.Message);
             if (result.Succeeded)
             {
                 await _activityLog.LogBusinessActionAsync(businessId, "AdultStatusApproved",
@@ -300,7 +301,7 @@ namespace Marketplace.Web.Controllers
         public async Task<IActionResult> RejectAdultStatus(Guid businessId, string reason, string? returnUrl = null)
         {
             var result = await _adminService.RejectAdultStatusAsync(businessId, reason);
-            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            TempData[result.Succeeded ? "Success" : "Error"] = this.L(result.Message);
             if (result.Succeeded)
             {
                 await _activityLog.LogBusinessActionAsync(businessId, "AdultStatusRejected",
@@ -416,12 +417,12 @@ namespace Marketplace.Web.Controllers
                 if (entityType == "Product")
                 {
                     var product = await _productService.GetByIdAsync(entityId);
-                    name = product?.Name ?? "(товар видалено)";
+                    name = product?.Name ?? this.L("(товар видалено)");
                 }
                 else
                 {
                     var business = await _businessService.GetByIdAsync(entityId);
-                    name = business?.StoreName ?? "(бізнес видалено)";
+                    name = business?.StoreName ?? this.L("(бізнес видалено)");
                 }
 
                 scheduledJobs.Add(new ScheduledModerationJobViewModel
@@ -457,8 +458,8 @@ namespace Marketplace.Web.Controllers
                 {
                     GroupName = cleanupJobKey.Group,
                     JobName = cleanupJobKey.Name,
-                    DisplayName = "Автоскасування прострочених замовлень",
-                    Description = "Щогодини скасовує замовлення зі статусом «Очікує підтвердження», якщо оплата не надійшла протягом налаштованого часу (за замовчуванням 48 год.).",
+                    DisplayName = this.L("Автоскасування прострочених замовлень"),
+                    Description = this.L("Щогодини скасовує замовлення зі статусом «Очікує підтвердження», якщо оплата не надійшла протягом налаштованого часу (за замовчуванням 48 год.)."),
                     NextRunAtUtc = nextRun,
                     PreviousRunAtUtc = previousRun
                 });
@@ -522,7 +523,7 @@ namespace Marketplace.Web.Controllers
                 await _settingsService.SetAsync("GoogleAI", "Model", model, isSecret: false, actorUserId: CurrentAdminId);
             }
 
-            TempData["Success"] = "Налаштування Gemini API оновлено.";
+            TempData["Success"] = this.L("Налаштування Gemini API оновлено.");
             return RedirectToAction("Jobs");
         }
 
@@ -546,7 +547,7 @@ namespace Marketplace.Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                TempData["Error"] = "Перевірте введені значення - деякі з них поза допустимими межами.";
+                TempData["Error"] = this.L("Перевірте введені значення - деякі з них поза допустимими межами.");
                 return View(model);
             }
 
@@ -557,7 +558,7 @@ namespace Marketplace.Web.Controllers
             await _settingsService.SetAsync("BusinessRules", "PendingOrderExpiryHours", model.PendingOrderExpiryHours.ToString(), false, CurrentAdminId);
             await _settingsService.SetAsync("BusinessRules", "LowStockThreshold", model.LowStockThreshold.ToString(), false, CurrentAdminId);
 
-            TempData["Success"] = "Ліміти бізнесу збережено.";
+            TempData["Success"] = this.L("Ліміти бізнесу збережено.");
             return RedirectToAction("BusinessLimits");
         }
 
@@ -596,7 +597,7 @@ namespace Marketplace.Web.Controllers
             }
             else
             {
-                TempData["Error"] = result.Message;
+                TempData["Error"] = this.L(result.Message);
             }
             if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
             {
@@ -617,18 +618,18 @@ namespace Marketplace.Web.Controllers
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                TempData["Error"] = "Назва категорії не може бути порожньою.";
+                TempData["Error"] = this.L("Назва категорії не може бути порожньою.");
                 return RedirectToAction("Categories");
             }
 
             var result = await _categoryService.CreateCategory(name.Trim(), imageUrl);
             if (result.Succeeded)
             {
-                TempData["Success"] = $"Категорію «{name}» створено.";
+                TempData["Success"] = this.L("Категорію «{0}» створено.", name);
             }
             else
             {
-                TempData["Error"] = result.Message;
+                TempData["Error"] = this.L(result.Message);
             }
 
             return RedirectToAction("Categories");
@@ -639,12 +640,12 @@ namespace Marketplace.Web.Controllers
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                TempData["Error"] = "Назва категорії не може бути порожньою.";
+                TempData["Error"] = this.L("Назва категорії не може бути порожньою.");
                 return RedirectToAction("Categories");
             }
 
             var result = await _categoryService.UpdateCategory(name.Trim(), categoryId, imageUrl);
-            TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded ? "Категорію оновлено." : result.Message;
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded ? this.L("Категорію оновлено.") : this.L(result.Message);
 
             return RedirectToAction("Categories");
         }
@@ -654,7 +655,7 @@ namespace Marketplace.Web.Controllers
         {
             var result = await _categoryService.SetCategoryAdultStatus(categoryId, isAdultOnly);
             TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded
-                ? (isAdultOnly ? "Категорію позначено як 18+." : "Позначку 18+ знято з категорії.")
+                ? (isAdultOnly ? this.L("Категорію позначено як 18+.") : this.L("Позначку 18+ знято з категорії."))
                 : result.Message;
 
             return RedirectToAction("Categories");
@@ -664,7 +665,7 @@ namespace Marketplace.Web.Controllers
         public async Task<IActionResult> DeleteCategory(Guid categoryId)
         {
             var result = await _categoryService.DeleteCategory(categoryId);
-            TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded ? "Категорію видалено." : result.Message;
+            TempData[result.Succeeded ? "Success" : "Error"] = result.Succeeded ? this.L("Категорію видалено.") : this.L(result.Message);
 
             return RedirectToAction("Categories");
         }
@@ -730,7 +731,7 @@ namespace Marketplace.Web.Controllers
 
             if (scheduler.InStandbyMode)
             {
-                TempData["Error"] = "Планувальник вже призупинено.";
+                TempData["Error"] = this.L("Планувальник вже призупинено.");
                 return RedirectToAction("Jobs");
             }
 
@@ -740,7 +741,7 @@ namespace Marketplace.Web.Controllers
                 "Планувальник задач модерації призупинено адміністратором.",
                 actorUserId: CurrentAdminId);
 
-            TempData["Success"] = "Планувальник призупинено. Нові задачі не запускатимуться до відновлення.";
+            TempData["Success"] = this.L("Планувальник призупинено. Нові задачі не запускатимуться до відновлення.");
             return RedirectToAction("Jobs");
         }
 
@@ -751,7 +752,7 @@ namespace Marketplace.Web.Controllers
 
             if (!scheduler.InStandbyMode)
             {
-                TempData["Error"] = "Планувальник і так активний.";
+                TempData["Error"] = this.L("Планувальник і так активний.");
                 return RedirectToAction("Jobs");
             }
 
@@ -761,7 +762,7 @@ namespace Marketplace.Web.Controllers
                 "Планувальник задач модерації відновлено адміністратором.",
                 actorUserId: CurrentAdminId);
 
-            TempData["Success"] = "Планувальник відновлено.";
+            TempData["Success"] = this.L("Планувальник відновлено.");
             return RedirectToAction("Jobs");
         }
 
@@ -776,7 +777,7 @@ namespace Marketplace.Web.Controllers
 
             if (!await scheduler.CheckExists(jobKey))
             {
-                TempData["Error"] = "Задачу не знайдено в черзі — можливо, вона вже виконана.";
+                TempData["Error"] = this.L("Задачу не знайдено в черзі — можливо, вона вже виконана.");
                 return RedirectToAction("Jobs");
             }
 
@@ -786,7 +787,7 @@ namespace Marketplace.Web.Controllers
                 $"Модерацію ({entityType}) {entityId} запущено вручну адміністратором.",
                 actorUserId: CurrentAdminId);
 
-            TempData["Success"] = "Задачу запущено негайно.";
+            TempData["Success"] = this.L("Задачу запущено негайно.");
             return RedirectToAction("Jobs");
         }
 
@@ -802,7 +803,7 @@ namespace Marketplace.Web.Controllers
                     actorUserId: CurrentAdminId);
             }
 
-            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            TempData[result.Succeeded ? "Success" : "Error"] = this.L(result.Message);
             return RedirectToAction("Jobs");
         }
 
@@ -818,7 +819,7 @@ namespace Marketplace.Web.Controllers
                     actorUserId: CurrentAdminId);
             }
 
-            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            TempData[result.Succeeded ? "Success" : "Error"] = this.L(result.Message);
             return RedirectToAction("Jobs");
         }
 
@@ -840,7 +841,7 @@ namespace Marketplace.Web.Controllers
 
             if (!await scheduler.CheckExists(jobKey))
             {
-                TempData["Error"] = "Задачу не знайдено.";
+                TempData["Error"] = this.L("Задачу не знайдено.");
                 return RedirectToAction("Jobs");
             }
 
@@ -850,7 +851,7 @@ namespace Marketplace.Web.Controllers
                 $"Задачу «{jobName}» запущено вручну адміністратором (позачергово, регулярний розклад не порушено).",
                 actorUserId: CurrentAdminId);
 
-            TempData["Success"] = "Задачу запущено негайно.";
+            TempData["Success"] = this.L("Задачу запущено негайно.");
             return RedirectToAction("Jobs");
         }
         [HttpGet]
@@ -952,7 +953,7 @@ namespace Marketplace.Web.Controllers
 
         private IActionResult ModerationResult(ServiceResult result)
         {
-            var response = new { message = result.Message };
+            var response = new { message = this.L(result.Message) };
             if (result.Succeeded)
             {
                 return Ok(response);

@@ -59,7 +59,7 @@
         } else if (savedCards.length === 0) {
  
             selectedCardIdInput.value = "";
-            selectorCurrent.textContent = "Нова картка";
+            selectorCurrent.textContent = __t("Нова картка");
             newCardFields.hidden = false;
         }
     }
@@ -75,7 +75,7 @@
 
     addCardBtn?.addEventListener("click", () => {
         selectedCardIdInput.value = "";
-        selectorCurrent.textContent = "Нова картка";
+        selectorCurrent.textContent = __t("Нова картка");
         newCardFields.hidden = false;
         selectorMenu.hidden = true;
     });
@@ -92,7 +92,7 @@
         const savedCardId = selectedCardIdInput.value;
 
         if (!amount || Number(amount) <= 0) {
-            errorEl.textContent = "Вкажіть суму більшу за нуль.";
+            errorEl.textContent = __t("Вкажіть суму більшу за нуль.");
             errorEl.hidden = false;
             return;
         }
@@ -107,7 +107,7 @@
             rememberCard = modal.querySelector("[data-remember-card]")?.checked ?? false;
 
             if (!cardNumber || !recipientName) {
-                errorEl.textContent = "Заповніть номер картки та отримувача, або оберіть збережену картку.";
+                errorEl.textContent = __t("Заповніть номер картки та отримувача, або оберіть збережену картку.");
                 errorEl.hidden = false;
                 return;
             }
@@ -135,7 +135,7 @@
 
             if (!response.ok) {
                 const text = await response.text();
-                errorEl.textContent = text || "Не вдалося надіслати запит.";
+                errorEl.textContent = text || __t("Не вдалося надіслати запит.");
                 errorEl.hidden = false;
                 submitBtn.disabled = false;
                 return;
@@ -144,7 +144,7 @@
             modal.querySelector("[data-payout-form]").hidden = true;
             modal.querySelector("[data-payout-success]").hidden = false;
         } catch {
-            errorEl.textContent = "Помилка мережі. Спробуйте ще раз.";
+            errorEl.textContent = __t("Помилка мережі. Спробуйте ще раз.");
             errorEl.hidden = false;
             submitBtn.disabled = false;
         }
@@ -187,7 +187,7 @@
 
         if (enabled && (!amount || Number(amount) <= 0)) {
             if (errorEl) {
-                errorEl.textContent = "Вкажіть суму більшу за нуль.";
+                errorEl.textContent = __t("Вкажіть суму більшу за нуль.");
                 errorEl.hidden = false;
             }
             return;
@@ -215,16 +215,16 @@
             if (!response.ok) {
                 const text = await response.text();
                 if (errorEl) {
-                    errorEl.textContent = text || "Не вдалося зберегти налаштування.";
+                    errorEl.textContent = text || __t("Не вдалося зберегти налаштування.");
                     errorEl.hidden = false;
                 }
             } else if (successEl) {
-                successEl.textContent = "Налаштування збережено.";
+                successEl.textContent = __t("Налаштування збережено.");
                 successEl.hidden = false;
             }
         } catch {
             if (errorEl) {
-                errorEl.textContent = "Помилка мережі. Спробуйте ще раз.";
+                errorEl.textContent = __t("Помилка мережі. Спробуйте ще раз.");
                 errorEl.hidden = false;
             }
         } finally {
