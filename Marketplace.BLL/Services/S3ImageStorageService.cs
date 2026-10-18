@@ -52,7 +52,7 @@ namespace Marketplace.BLL.Services
                     return null;
                 }
 
-                return $"https://{_bucketName}.s3.amazonaws.com/{key}";
+                return $"https://dq775fvjocmue.cloudfront.net/{key}";
             }
             catch (AmazonS3Exception ex)
             {
