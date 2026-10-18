@@ -2,7 +2,7 @@
     const uploader = document.querySelector("[data-product-uploader]");
     if (!uploader) return;
 
-    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    const MAX_FILE_SIZE = 1 * 1024 * 1024;
     const MAX_ADDITIONAL_FILES = 8;
     const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
     const ALLOWED_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp"]);
@@ -20,7 +20,7 @@
             return __t("«{0}» має непідтримуваний формат. Оберіть JPG, PNG або WEBP.", file.name);
         }
         if (file.size === 0) return __t("«{0}» порожній і не може бути завантажений.", file.name);
-        if (file.size > MAX_FILE_SIZE) return __t("«{0}» завеликий ({1}). Максимум - 5 МБ.", file.name, formatBytes(file.size));
+        if (file.size > MAX_FILE_SIZE) return __t("«{0}» завеликий ({1}). Максимум - 1 МБ.", file.name, formatBytes(file.size));
         return null;
     };
 

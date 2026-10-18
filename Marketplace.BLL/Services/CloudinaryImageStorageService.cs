@@ -12,7 +12,7 @@ namespace Marketplace.BLL.Services
         private readonly ILogger<CloudinaryImageStorageService> _logger;
 
         private static readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
-        private const long MaxFileSizeBytes = 100 * 1024 * 1024;
+        private const long MaxFileSizeBytes = 1 * 1024 * 1024;
 
         public CloudinaryImageStorageService(Cloudinary cloudinary, ILogger<CloudinaryImageStorageService> logger)
         {
