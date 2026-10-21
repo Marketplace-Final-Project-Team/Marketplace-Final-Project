@@ -1,4 +1,5 @@
 ﻿using Marketplace.DAL.Data;
+using Marketplace.Domain.Common;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
@@ -25,6 +26,7 @@ public class DbSeeder
         }
 
         await CategoriesSeedAsync(context);
+        await EnsureFallbackCategoryAsync(context);
         await SeedAdminAsync(userManager, roleManager);
         await ProductsAndDiscountsSeedAsync(context);
     }
@@ -42,6 +44,15 @@ public class DbSeeder
                 new Category { Name = "Спорт і відпочинок" }
             };
             await context.Categories.AddRangeAsync(categories);
+            await context.SaveChangesAsync();
+        }
+    }
+
+    public static async Task EnsureFallbackCategoryAsync(AppDbContext context)
+    {
+        if (!await context.Categories.AnyAsync(c => c.Name == SystemCategories.Other))
+        {
+            await context.Categories.AddAsync(new Category { Name = SystemCategories.Other, IsAdultOnly = false });
             await context.SaveChangesAsync();
         }
     }
@@ -94,7 +105,7 @@ public class DbSeeder
     {
         if (await context.Products.AnyAsync()) return;
 
-        var category = await context.Categories.FirstOrDefaultAsync();
+        var category = await context.Categories.FirstOrDefaultAsync(c => c.Name != SystemCategories.Other);
         if (category == null) return;
 
         var adminUser = await context.Users.FirstOrDefaultAsync(u => u.UserName == "admin");

@@ -5,14 +5,14 @@ using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
 using Marketplace.Domain.Interfaces;
 using Marketplace.BLL.DTOs;
+using Marketplace.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace Marketplace.BLL.Services
 {
     public class CategoryService : ICategoryService
     {
-        
-        public const string FallbackCategoryName = "Інше";
+        public const string FallbackCategoryName = SystemCategories.Other;
 
         private readonly IGenericRepository<Category> _categoryRepository;
         private readonly AppDbContext _context;
