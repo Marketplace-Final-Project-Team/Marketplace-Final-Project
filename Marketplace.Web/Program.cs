@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
 using System.Globalization;
+using Marketplace.Web.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -165,7 +166,8 @@ builder.Services.AddScoped<IWithdrawalService, WithdrawalService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<INotificationService, NotificationService>();
-builder.Services.AddScoped<Marketplace.BLL.Interfaces.INotificationPusher, Marketplace.Web.Infrastructure.SignalRNotificationPusher>();
+builder.Services.AddScoped<INotificationPusher, SignalRNotificationPusher>();
+builder.Services.AddScoped<IShedulerAdminService, ShedulerAdminService>();
 
 builder.Services.AddScoped<IGeminiChatApiClient, GeminiChatApiClient>();
 builder.Services.AddScoped<ChatToolDispatcher>();
