@@ -372,5 +372,83 @@ namespace Marketplace.BLL.Services
             return business;
         }
 
+        public async Task<List<BusinessTeamMemberDto>> GetTeamMembersAsync(Guid businessId)
+        {
+            var members = await _businessMemberRepo.FindAsync(m => m.BusinessId == businessId);
+            
+            return members.Select(m => new BusinessTeamMemberDto
+            {
+                Id = m.Id,
+                Email = m.User?.Email ?? string.Empty,
+                Role = m.Role,
+                IsAccepted = m.IsAccepted
+            }).ToList();
+        }
+
+        public async Task<ServiceResult> UpdateTeamMemberAsync(Guid memberId, Guid businessId, BusinessMemberRole newRole)
+        {
+            var member = await _businessMemberRepo.FirstOrDefaultAsync(m => m.Id == memberId && m.BusinessId == businessId && !m.IsDeleted);
+
+            if (member == null)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Учасник не знайдений" };
+            }
+
+            if (member.Role == BusinessMemberRole.Owner || newRole == BusinessMemberRole.Owner)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Неможливо змінити роль власника або призначити нового власника таким способом." };
+            }
+
+            member.Role = newRole;
+            _businessMemberRepo.Update(member);
+            await _context.SaveChangesAsync();
+
+            return new ServiceResult { Succeeded = true, Message = "Роль учасника успішно оновлено." };
+        }
+
+        public async Task<ServiceResult> RemoveTeamMemberAsync(Guid memberId, Guid businessId)
+        {
+            var member = await _businessMemberRepo.FirstOrDefaultAsync(m => m.Id == memberId && m.BusinessId == businessId && !m.IsDeleted);
+
+            if (member == null)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Учасник не знайдений" };
+            }
+
+            member.IsDeleted = true;
+            _businessMemberRepo.Update(member);
+            await _context.SaveChangesAsync();
+
+            return new ServiceResult { Succeeded = true, Message = string.Empty };
+        }
+
+        public async Task<ServiceResult> UpdateProfileAsync(Guid businessId, string newStoreName, string newDescription)
+        {
+            var business = await _businessRepo.GetByIdAsync(businessId);
+
+            if(business == null)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Магазин не знайдений" };
+            }
+
+            if (!string.IsNullOrWhiteSpace(newStoreName) && newStoreName != business!.StoreName)
+            {
+                if (await _businessRepo.ExistsAsync(b => b.StoreName == newStoreName))
+                {
+                    return new ServiceResult { Succeeded = false, Message = "Це ім'я вже використовується" };
+                }
+                business.StoreName = newStoreName;
+            }
+
+            if (!string.IsNullOrWhiteSpace(newDescription))
+            {
+                business.Description = newDescription;
+            }
+
+            _businessRepo.Update(business);
+            await _context.SaveChangesAsync();
+            
+            return new ServiceResult { Succeeded = true, Message = string.Empty };
+        }
     }
 }

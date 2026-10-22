@@ -17,5 +17,9 @@ namespace Marketplace.BLL.Interfaces
         Task<ServiceResult> RequestAdultStatusAsync(Guid businessId, string userId);
         Task<decimal> GetBusinessBalance(Guid businessid);
         Task<Business> GetByIdAsync(Guid id);
+        Task<List<BusinessTeamMemberDto>> GetTeamMembersAsync(Guid businessId);
+        Task<ServiceResult> UpdateTeamMemberAsync(Guid memberId, Guid businessId, BusinessMemberRole newRole);
+        Task<ServiceResult> RemoveTeamMemberAsync(Guid memberId, Guid businessId);
+        Task<ServiceResult> UpdateProfileAsync(Guid businessId, string newStoreName, string newDescription);
     }
 }

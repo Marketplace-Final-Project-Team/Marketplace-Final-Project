@@ -278,5 +278,23 @@ namespace Marketplace.BLL.Services
 
             return null;
         }
+
+        public async Task<int> GetReviewCountByBusinessAsync(Guid businessId) 
+        {
+            var count = await _context.Reviews
+                .Where(r => r.Product.BusinessId == businessId && r.Status == ReviewStatus.Approved && !r.IsDeleted)
+                .CountAsync();
+
+            return count;
+        }
+
+        public async Task<float> GetAvgRatingByBusinessAsync(Guid businessId)
+        {
+            var avg = await _context.Reviews
+                .Where(r => r.Product.BusinessId == businessId && r.Status == ReviewStatus.Approved && !r.IsDeleted)
+                .AverageAsync(r => (float?)r.Rating);
+
+            return avg.HasValue ? (float)Math.Round(avg.Value, 1) : 0f;
+        }
     }
 }
