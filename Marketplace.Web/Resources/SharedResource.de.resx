@@ -1149,4 +1149,7 @@
   <data name="Неможливо видалити власника бізнесу." xml:space="preserve">
     <value>Der Inhaber des Unternehmens kann nicht entfernt werden.</value>
   </data>
+  <data name="Адресу не знайдено" xml:space="preserve">
+    <value>Adresse nicht gefunden</value>
+  </data>
 </root>

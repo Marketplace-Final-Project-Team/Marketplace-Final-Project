@@ -17,14 +17,11 @@ namespace Marketplace.Web.Controllers
         private readonly ISystemSettingsService _settingsService;
         private readonly IActivityLogService _activityLog;
         private readonly IProductService _productService;
-        private readonly IBusinessService _businessService;
         private readonly IMarketplaceBalanceService _marketplaceBalanceService;
         private readonly ICategoryService _categoryService;
         private readonly IDiscountService _discountService;
         private readonly IOrderService _orderService;
         private readonly IPostSaleService _postSaleService;
-        private readonly IRefundChatService _refundChatService;
-        private readonly ISupportTicketService _supportTicketService;
         private readonly IWithdrawalService _withdrawalService;
         private readonly IShedulerAdminService _shedulerAdminService;
         private readonly IAdminInboxService _adminInboxService;
@@ -36,12 +33,9 @@ namespace Marketplace.Web.Controllers
             IProductService productService,
             IMarketplaceBalanceService marketplaceBalanceService,
             ICategoryService categoryService,
-            IBusinessService businessService,
             IDiscountService discountService,
             IOrderService orderService,
             IPostSaleService postSaleService,
-            IRefundChatService refundChatService,
-            ISupportTicketService supportTicketService,
             IWithdrawalService withdrawalService,
             IShedulerAdminService shedulerAdminService,
             IAdminInboxService adminInboxService)
@@ -52,12 +46,9 @@ namespace Marketplace.Web.Controllers
             _productService = productService;
             _marketplaceBalanceService = marketplaceBalanceService;
             _categoryService = categoryService;
-            _businessService = businessService;
             _discountService = discountService;
             _orderService = orderService;
             _postSaleService = postSaleService;
-            _refundChatService = refundChatService;
-            _supportTicketService = supportTicketService;
             _withdrawalService = withdrawalService;
             _shedulerAdminService = shedulerAdminService;
             _adminInboxService = adminInboxService;
