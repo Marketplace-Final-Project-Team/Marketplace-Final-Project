@@ -11,5 +11,7 @@ namespace Marketplace.BLL.Interfaces
         Task<IReadOnlyList<ReviewDto>> GetReviewsByProductId(Guid productId);
         Task<ReviewUpdateDto?> GetReviewUpdateDtoAsync(Guid reviewId, string userId);
         Task<ServiceResult> CreateReviewAppeal(ReviewAppealCreateDto dto);
+        Task<float> GetAvgRatingByBusinessAsync(Guid businessId);
+        Task<int> GetReviewCountByBusinessAsync(Guid businessId);
     }
 }

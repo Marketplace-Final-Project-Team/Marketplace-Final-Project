@@ -130,4 +130,91 @@
   <data name="Змінити налаштування кукі" xml:space="preserve">
     <value>Cambiar la configuración de cookies</value>
   </data>
+  <data name="1. Що таке кукі" xml:space="preserve">
+    <value>1. Qué son las cookies</value>
+  </data>
+  <data name="2. Обов'язкові кукі" xml:space="preserve">
+    <value>2. Cookies esenciales</value>
+  </data>
+  <data name="3. Функціональні кукі" xml:space="preserve">
+    <value>3. Cookies funcionales</value>
+  </data>
+  <data name="30 днів" xml:space="preserve">
+    <value>30 días</value>
+  </data>
+  <data name="4. Аналітичні та рекламні кукі" xml:space="preserve">
+    <value>4. Cookies analíticas y publicitarias</value>
+  </data>
+  <data name="5. Сторонні кукі" xml:space="preserve">
+    <value>5. Cookies de terceros</value>
+  </data>
+  <data name="6. Дані в локальному сховищі браузера" xml:space="preserve">
+    <value>6. Datos en el almacenamiento local del navegador</value>
+  </data>
+  <data name="7. Як керувати кукі у браузері" xml:space="preserve">
+    <value>7. Cómo gestionar las cookies en el navegador</value>
+  </data>
+  <data name="8. Керування вибором" xml:space="preserve">
+    <value>8. Gestión de su elección</value>
+  </data>
+  <data name="9. Зміни до Політики" xml:space="preserve">
+    <value>9. Cambios en la Política</value>
+  </data>
+  <data name="Ви можете змінити свій вибір щодо функціональних кукі на цьому сайті в будь-який момент." xml:space="preserve">
+    <value>Puede cambiar su elección sobre las cookies funcionales en este sitio en cualquier momento.</value>
+  </data>
+  <data name="Запам'ятовує ваш вибір у вікні згоди на кукі (прийняти / відхилити)" xml:space="preserve">
+    <value>Recuerda su elección en la ventana de consentimiento de cookies (aceptar / rechazar)</value>
+  </data>
+  <data name="Запам'ятовує обрану мову інтерфейсу" xml:space="preserve">
+    <value>Recuerda el idioma de la interfaz seleccionado</value>
+  </data>
+  <data name="Зверніть увагу: вимкнення обов'язкових кукі на рівні браузера унеможливить вхід в акаунт і оформлення замовлень на Платформі." xml:space="preserve">
+    <value>Tenga en cuenta: desactivar las cookies esenciales en el navegador impedirá iniciar sesión y realizar pedidos en la Plataforma.</value>
+  </data>
+  <data name="Кукі - це невеликі текстові файли, які сайт зберігає у вашому браузері під час відвідування. Вони бувають «сесійними» (видаляються після закриття браузера) і «постійними» (зберігаються визначений термін), а також «першими» (встановлює сам сайт) і «сторонніми» (встановлює інший домен). Нижче ми пояснюємо, які саме кукі використовує MarketPlace, до якої категорії вони належать і як довго живуть." xml:space="preserve">
+    <value>Las cookies son pequeños archivos de texto que un sitio web guarda en su navegador cuando lo visita. Pueden ser «de sesión» (se eliminan al cerrar el navegador) o «persistentes» (se conservan durante un plazo determinado), así como «propias» (las instala el propio sitio) o «de terceros» (las instala otro dominio). A continuación explicamos qué cookies utiliza MarketPlace, a qué categoría pertenecen y cuánto tiempo duran.</value>
+  </data>
+  <data name="Налаштування → Конфіденційність і безпека → Кукі та інші дані сайтів;" xml:space="preserve">
+    <value>Configuración → Privacidad y seguridad → Cookies y otros datos de sitios;</value>
+  </data>
+  <data name="Налаштування → Конфіденційність → Керувати даними сайтів;" xml:space="preserve">
+    <value>Ajustes → Privacidad → Gestionar datos de sitios web;</value>
+  </data>
+  <data name="Налаштування → Конфіденційність, пошук і служби → Кукі та дозволи сайтів." xml:space="preserve">
+    <value>Configuración → Privacidad, búsqueda y servicios → Cookies y permisos del sitio.</value>
+  </data>
+  <data name="Налаштування → Приватність і захист → Кукі та дані сайтів;" xml:space="preserve">
+    <value>Ajustes → Privacidad y seguridad → Cookies y datos del sitio;</value>
+  </data>
+  <data name="Наразі MarketPlace не використовує аналітичні сервіси (на кшталт Google Analytics) чи рекламні мережі, а отже не встановлює жодних аналітичних або рекламних кукі та не показує персоналізовану рекламу на основі вашої поведінки на сайті. Якщо ситуація зміниться, ми оновимо цю Політику та запитаємо окрему згоду перед активацією таких кукі." xml:space="preserve">
+    <value>Actualmente MarketPlace no utiliza servicios de analítica (como Google Analytics) ni redes publicitarias, por lo que no instala cookies analíticas ni publicitarias ni muestra publicidad personalizada basada en su comportamiento en el sitio. Si esto cambia, actualizaremos esta Política y pediremos un consentimiento específico antes de activar dichas cookies.</value>
+  </data>
+  <data name="Обраний спосіб оплати (онлайн / при отриманні) для конкретного замовлення" xml:space="preserve">
+    <value>El método de pago elegido (en línea / contra reembolso) para un pedido concreto</value>
+  </data>
+  <data name="Окрім налаштувань нижче, ви можете керувати кукі безпосередньо в браузері:" xml:space="preserve">
+    <value>Además de los ajustes que se indican a continuación, puede gestionar las cookies directamente en su navegador:</value>
+  </data>
+  <data name="Потрібні для роботи сайту - без них неможливо увійти в акаунт, оформити замовлення чи скористатись віковим підтвердженням. Їх не можна вимкнути, оскільки вони не повʼязані з обробкою маркетингових чи аналітичних даних, а обслуговують базову функціональність і безпеку." xml:space="preserve">
+    <value>Necesarias para el funcionamiento del sitio: sin ellas no es posible iniciar sesión, realizar un pedido ni usar la verificación de edad. No se pueden desactivar porque no están relacionadas con el tratamiento de datos de marketing o analítica, sino que garantizan la funcionalidad básica y la seguridad.</value>
+  </data>
+  <data name="Прозоро про те, які кукі та подібні технології ставить цей сайт, навіщо вони потрібні та скільки часу зберігаються." xml:space="preserve">
+    <value>Con total transparencia: qué cookies y tecnologías similares utiliza este sitio, para qué sirven y cuánto tiempo se conservan.</value>
+  </data>
+  <data name="Підтвердження повноліття для перегляду товарів категорії 18+ - технічно необхідне для дотримання вікових обмежень" xml:space="preserve">
+    <value>Confirmación de la mayoría de edad para ver productos +18: técnicamente necesaria para cumplir las restricciones de edad</value>
+  </data>
+  <data name="Редакція від 16 вересня 2026 року." xml:space="preserve">
+    <value>Versión del 16 de septiembre de 2026.</value>
+  </data>
+  <data name="Сам сайт MarketPlace не вбудовує сторонніх віджетів (соцмереж, чатів, реклами), які встановлюють кукі. Виняток - момент оплати: якщо ви обираєте онлайн-оплату, вас перенаправляє на захищену сторінку платіжної системи LiqPay, яка може встановлювати власні кукі відповідно до своєї політики конфіденційності, незалежної від MarketPlace." xml:space="preserve">
+    <value>El propio sitio MarketPlace no integra widgets de terceros (redes sociales, chats, publicidad) que instalen cookies. La excepción es el pago: si elige el pago en línea, se le redirige a la página segura del sistema de pago LiqPay, que puede instalar sus propias cookies según su propia política de privacidad, independiente de MarketPlace.</value>
+  </data>
+  <data name="Це не кукі - вони не передаються на сервер автоматично з кожним запитом - але для повноти картини: сайт також зберігає у &lt;code&gt;localStorage&lt;/code&gt; вашого браузера деякі суто клієнтські дані, наприклад підтвердження перегляду 18+ контенту на головній, збережені пошукові фільтри в каталозі та локальний чернетковий список запитань до продавця на сторінці товару. Ці дані ніколи не покидають ваш пристрій і не повʼязуються з вашим обліковим записом на сервері." xml:space="preserve">
+    <value>No son cookies —no se envían automáticamente al servidor con cada solicitud—, pero para que la información sea completa: el sitio también guarda en el &lt;code&gt;localStorage&lt;/code&gt; de su navegador algunos datos puramente del lado del cliente, por ejemplo la confirmación para ver contenido +18 en la página principal, los filtros de búsqueda guardados en el catálogo y una lista local de borrador de preguntas al vendedor en la página del producto. Estos datos nunca salen de su dispositivo y no se vinculan a su cuenta en el servidor.</value>
+  </data>
+  <data name="Якщо перелік використовуваних кукі зміниться - зокрема якщо ми додамо аналітичні чи рекламні кукі - ми оновимо цю сторінку із зазначенням дати останнього оновлення." xml:space="preserve">
+    <value>Si la lista de cookies utilizadas cambia —en particular si añadimos cookies analíticas o publicitarias—, actualizaremos esta página indicando la fecha de la última actualización.</value>
+  </data>
 </root>

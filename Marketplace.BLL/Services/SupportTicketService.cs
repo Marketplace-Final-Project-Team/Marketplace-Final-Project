@@ -201,5 +201,47 @@ namespace Marketplace.BLL.Services
             CreatedAt = t.CreatedAt,
             UnreadForAdmin = unread
         };
+
+        public async Task<TicketChatPageDto> GetTicketChatAsync(Guid ticketId, string? userId, bool isAdmin)
+        {
+            var ticket = await _context.SupportTickets
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.Id == ticketId);
+
+            if (ticket is null)
+                return new() { Status = AccessStatus.NotFound };
+
+            if (!isAdmin && ticket.UserId != userId)
+                return new() { Status = AccessStatus.Forbidden };
+
+            if (isAdmin)
+                await AdminOpenChatAsync(ticketId);
+
+            await MarkAsReadAsync(ticketId, isAdmin);
+            var messages = await GetMessagesAsync(ticketId);
+
+            return new()
+            {
+                Status = AccessStatus.Ok,
+                TicketId = ticketId,
+                Category = ticket.Category,
+                Messages = messages
+            };
+        }
+
+        public async Task<TicketStatusDto> GetTicketStatusAsync(Guid ticketId, string? userId)
+        {
+            var ticket = await _context.SupportTickets
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.Id == ticketId);
+
+            if (ticket is null)
+                return new() { Access = AccessStatus.NotFound };
+
+            if (ticket.UserId != userId)
+                return new() { Access = AccessStatus.Forbidden };
+
+            return new() { Access = AccessStatus.Ok, TicketStatus = ticket.Status.ToString() };
+        }
     }
 }

@@ -328,4 +328,13 @@
   <data name="Сортування відгуків" xml:space="preserve">
     <value>Ordenar opiniones</value>
   </data>
+  <data name="Відкрити список бажань →" xml:space="preserve">
+    <value>Abrir lista de deseos →</value>
+  </data>
+  <data name="Кількість" xml:space="preserve">
+    <value>Cantidad</value>
+  </data>
+  <data name="Список бажань" xml:space="preserve">
+    <value>Lista de deseos</value>
+  </data>
 </root>

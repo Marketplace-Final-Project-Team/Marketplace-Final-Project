@@ -325,7 +325,7 @@ public sealed class ProductServiceImageTests
 
     private sealed class FakeImageStorageService : IImageStorageService
     {
-        public Task<string?> UploadImageAsync(IFormFile file)
+        public Task<string?> UploadImageAsync(IFormFile file, string folder)
             => Task.FromResult<string?>($"https://test.local/{file.FileName}");
     }
 }

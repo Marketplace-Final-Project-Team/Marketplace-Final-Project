@@ -2,6 +2,7 @@
 using Marketplace.BLL.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Marketplace.BLL.Services
 {
@@ -12,14 +13,16 @@ namespace Marketplace.BLL.Services
 
         private static readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
         private const long MaxFileSizeBytes = 5 * 1024 * 1024;
+        private readonly ILogger<S3ImageStorageService> _logger;
 
-        public S3ImageStorageService(IAmazonS3 s3Client, IConfiguration configuration)
+        public S3ImageStorageService(IAmazonS3 s3Client, IConfiguration configuration, ILogger<S3ImageStorageService> logger)
         {
             _s3Client = s3Client;
             _bucketName = configuration["AWS:S3BucketName"] ?? throw new InvalidOperationException("AWS:S3BucketName не налаштовано");
+            _logger = logger;
         }
 
-        public async Task<string?> UploadImageAsync(IFormFile file) 
+        public async Task<string?> UploadImageAsync(IFormFile file, string folder) 
         {
             if(file == null || file.Length == 0) return null;
 
@@ -30,7 +33,7 @@ namespace Marketplace.BLL.Services
 
             try 
             {
-                var key = $"products/{Guid.NewGuid()}{extension}";
+                var key = $"{folder}/{Guid.NewGuid()}{extension}";
 
                 await using var stream = file.OpenReadStream();
 
@@ -49,10 +52,16 @@ namespace Marketplace.BLL.Services
                     return null;
                 }
 
-                return $"https://{_bucketName}.s3.amazonaws.com/{key}";
+                return $"https://dq775fvjocmue.cloudfront.net/{key}";
             }
-            catch 
+            catch (AmazonS3Exception ex)
             {
+                _logger.LogError(ex, "S3 помилка: {Code} / {Message}", ex.ErrorCode, ex.Message);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Не вдалося завантажити {File}", file.FileName);
                 return null;
             }
 

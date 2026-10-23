@@ -101,7 +101,7 @@ namespace Marketplace.BLL.Services
             var photoUrls = new List<string>();
             foreach (var photo in validPhotos)
             {
-                var url = await _imageStorageService.UploadImageAsync(photo);
+                var url = await _imageStorageService.UploadImageAsync(photo, "photos");
                 if (url is null)
                 {
                     return new ServiceResult { Succeeded = false, Message = "Не вдалося завантажити одне з фото. Спробуйте ще раз." };

@@ -15,13 +15,15 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
 using System.Globalization;
+using Marketplace.Web.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 builder.Services.AddControllersWithViews()
     .AddViewLocalization(Microsoft.AspNetCore.Mvc.Razor.LanguageViewLocationExpanderFormat.Suffix)
-    .AddDataAnnotationsLocalization();
+    .AddDataAnnotationsLocalization(options =>
+        options.DataAnnotationLocalizerProvider = (_, factory) => factory.Create(typeof(Marketplace.Web.SharedResource)));
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -164,7 +166,9 @@ builder.Services.AddScoped<IWithdrawalService, WithdrawalService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<INotificationService, NotificationService>();
-builder.Services.AddScoped<Marketplace.BLL.Interfaces.INotificationPusher, Marketplace.Web.Infrastructure.SignalRNotificationPusher>();
+builder.Services.AddScoped<INotificationPusher, SignalRNotificationPusher>();
+builder.Services.AddScoped<IShedulerAdminService, ShedulerAdminService>();
+builder.Services.AddScoped<IAdminInboxService, AdminInboxService>();
 
 builder.Services.AddScoped<IGeminiChatApiClient, GeminiChatApiClient>();
 builder.Services.AddScoped<ChatToolDispatcher>();

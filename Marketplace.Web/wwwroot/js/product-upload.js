@@ -2,14 +2,14 @@
     const uploader = document.querySelector("[data-product-uploader]");
     if (!uploader) return;
 
-    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    const MAX_FILE_SIZE = 1 * 1024 * 1024;
     const MAX_ADDITIONAL_FILES = 8;
     const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
     const ALLOWED_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp"]);
 
     const formatBytes = (bytes) => {
-        if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} КБ`;
-        return `${(bytes / (1024 * 1024)).toFixed(1).replace(".0", "")} МБ`;
+        if (bytes < 1024 * 1024) return __t("{0} КБ", Math.max(1, Math.round(bytes / 1024)));
+        return __t("{0} МБ", (bytes / (1024 * 1024)).toFixed(1).replace(".0", ""));
     };
 
     const fileKey = (file) => `${file.name}:${file.size}:${file.lastModified}`;
@@ -17,10 +17,10 @@
     const validateFile = (file) => {
         const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
         if (!ALLOWED_TYPES.has(file.type) || !ALLOWED_EXTENSIONS.has(extension)) {
-            return `«${file.name}» має непідтримуваний формат. Оберіть JPG, PNG або WEBP.`;
+            return __t("«{0}» має непідтримуваний формат. Оберіть JPG, PNG або WEBP.", file.name);
         }
-        if (file.size === 0) return `«${file.name}» порожній і не може бути завантажений.`;
-        if (file.size > MAX_FILE_SIZE) return `«${file.name}» завеликий (${formatBytes(file.size)}). Максимум - 5 МБ.`;
+        if (file.size === 0) return __t("«{0}» порожній і не може бути завантажений.", file.name);
+        if (file.size > MAX_FILE_SIZE) return __t("«{0}» завеликий ({1}). Максимум - 1 МБ.", file.name, formatBytes(file.size));
         return null;
     };
 
@@ -53,7 +53,7 @@
         };
 
         const updateCounter = () => {
-            if (counter) counter.textContent = `${state.files.length} / ${MAX_ADDITIONAL_FILES} файлів`;
+            if (counter) counter.textContent = __t("{0} / {1} файлів", state.files.length, MAX_ADDITIONAL_FILES);
         };
 
         const revokeUnusedUrls = () => {
@@ -80,27 +80,27 @@
 
                 const image = document.createElement("img");
                 image.src = objectUrl;
-                image.alt = `Попередній перегляд ${file.name}`;
+                image.alt = __t("Попередній перегляд {0}", file.name);
 
                 const information = document.createElement("div");
                 information.className = "product-file-card__info";
 
                 const role = document.createElement("span");
                 role.className = "product-file-card__role";
-                role.textContent = isMultiple ? `Фото ${index + 1}` : "Головне фото";
+                role.textContent = isMultiple ? __t("Фото {0}", index + 1) : __t("Головне фото");
 
                 const name = document.createElement("strong");
                 name.title = file.name;
                 name.textContent = file.name;
 
                 const size = document.createElement("small");
-                size.textContent = `${formatBytes(file.size)} · готове до завантаження`;
+                size.textContent = __t("{0} · готове до завантаження", formatBytes(file.size));
 
                 const remove = document.createElement("button");
                 remove.type = "button";
                 remove.className = "product-file-card__remove";
                 remove.dataset.removeFile = index.toString();
-                remove.setAttribute("aria-label", `Прибрати ${file.name}`);
+                remove.setAttribute("aria-label", __t("Прибрати {0}", file.name));
                 remove.innerHTML = "<span aria-hidden=\"true\">×</span>";
 
                 information.append(role, name, size);
@@ -128,12 +128,12 @@
                 const uniqueFiles = validFiles.filter((file) => !existingKeys.has(fileKey(file)));
                 const availableSlots = MAX_ADDITIONAL_FILES - state.files.length;
                 if (uniqueFiles.length > availableSlots) {
-                    messages.push(`Можна додати не більше ${MAX_ADDITIONAL_FILES} додаткових фото.`);
+                    messages.push(__t("Можна додати не більше {0} додаткових фото.", MAX_ADDITIONAL_FILES));
                 }
                 state.files.push(...uniqueFiles.slice(0, Math.max(0, availableSlots)));
             } else {
                 state.files = validFiles.slice(0, 1);
-                if (validFiles.length > 1) messages.push("Для головного фото можна обрати лише один файл.");
+                if (validFiles.length > 1) messages.push(__t("Для головного фото можна обрати лише один файл."));
             }
 
             setError(messages);

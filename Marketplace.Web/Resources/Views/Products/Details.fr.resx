@@ -103,4 +103,16 @@
   <data name="Додаткове фото товару" xml:space="preserve">
     <value>Photo supplémentaire de</value>
   </data>
+  <data name="Артикул (SKU)" xml:space="preserve">
+    <value>Référence (SKU)</value>
+  </data>
+  <data name="Архівований" xml:space="preserve">
+    <value>Archivé</value>
+  </data>
+  <data name="Він прихований з каталогу, але історія замовлень і фінанси збережені." xml:space="preserve">
+    <value>Il est masqué du catalogue, mais l'historique des commandes et les données financières sont conservés.</value>
+  </data>
+  <data name="Товар архівовано." xml:space="preserve">
+    <value>Produit archivé.</value>
+  </data>
 </root>

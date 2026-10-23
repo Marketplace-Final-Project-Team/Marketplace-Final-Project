@@ -49,7 +49,7 @@ namespace Marketplace.BLL.Services
 
             if (dto.Avatar != null)
             {
-                var avatarUrl = await _imageService.UploadImageAsync(dto.Avatar);
+                var avatarUrl = await _imageService.UploadImageAsync(dto.Avatar, "photos");
 
                 if (avatarUrl == null)
                 {

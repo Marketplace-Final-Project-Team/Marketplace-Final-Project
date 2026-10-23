@@ -9,7 +9,7 @@
 
             const show = input.type === "password";
             input.type = show ? "text" : "password";
-            toggle.textContent = show ? "Сховати" : "Показати";
+            toggle.textContent = show ? __t("Сховати") : __t("Показати");
             toggle.setAttribute("aria-pressed", show.toString());
         });
     });

@@ -14,10 +14,12 @@ namespace Marketplace.BLL.Services
     public class RefundChatService : IRefundChatService
     {
         private readonly AppDbContext _context;
+        private readonly IBusinessAccessService _businessAccessService;
 
-        public RefundChatService(AppDbContext context)
+        public RefundChatService(AppDbContext context, IBusinessAccessService businessAccessService)
         {
             _context = context;
+            _businessAccessService = businessAccessService;
         }
 
         public async Task<RefundChatMessageDto?> SaveMessageAsync(Guid postSaleRequestId, string senderId, bool isFromAdmin, bool isSellerChannel, string text)
@@ -135,5 +137,41 @@ namespace Marketplace.BLL.Services
                     && !m.IsRead);
         }
 
+        public async Task<RefundChatPageDto> GetChatPageAsync(Guid requestId, string? userId, bool isAdmin, bool isSellerChannel)
+        {
+            var request = await _context.PostSaleRequests
+                .AsNoTracking()
+                .Include(r => r.OrderItem).ThenInclude(oi => oi.Product)
+                .FirstOrDefaultAsync(r => r.Id == requestId);
+
+            if (request is null) return new() { Status = AccessStatus.NotFound };
+
+            var businessId = request.OrderItem?.Product?.BusinessId;
+
+            bool allowed = isAdmin || (isSellerChannel ? businessId.HasValue && !string.IsNullOrEmpty(userId) && await _businessAccessService.HasAccessAsync(businessId.Value, userId) : request.BuyerId == userId);
+
+            if (!allowed) return new() { Status = AccessStatus.Forbidden };
+
+            await MarkAsReadAsync(requestId, isAdmin, isSellerChannel);
+            var messages = await GetMessagesAsync(requestId, isSellerChannel);
+
+            return new()
+            {
+                Status = AccessStatus.Ok,
+                RequestId = requestId,
+                OrderId = request.OrderId,
+                BusinessId = businessId,
+                ProductName = request.OrderItem?.ProductName,
+                Messages = messages
+            };
+        }
+
+        public async Task<Guid?> GetRequestIdByOrderItemAsync(Guid orderItemId)
+        {
+            return await _context.PostSaleRequests
+                .Where(r => r.OrderItemId == orderItemId)
+                .Select(r => (Guid?)r.Id)
+                .FirstOrDefaultAsync();
+        }
     }
 }

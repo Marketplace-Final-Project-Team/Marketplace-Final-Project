@@ -128,23 +128,23 @@
 
             <section class="admin-panel table-responsive mt-3">
                 <div class="admin-header" style="padding: 1rem 1.25rem 0;">
-                    <h2 class="admin-title" style="font-size: 1.1rem;">Заявки на повернення</h2>
+                    <h2 class="admin-title" style="font-size: 1.1rem;">@Localizer["Заявки на повернення"]</h2>
                 </div>
                 @if (Model.OpenReturnRequests.Count == 0)
                 {
-                    <p class="admin-empty">Зараз немає заявок на повернення, що очікують розгляду.</p>
+                    <p class="admin-empty">@Localizer["Зараз немає заявок на повернення, що очікують розгляду."]</p>
                 }
                 else
                 {
                     <table class="table admin-table">
                         <thead>
                             <tr>
-                                <th>Товар</th>
-                                <th>Покупець</th>
-                                <th>Причина</th>
-                                <th>Статус</th>
-                                <th>Подано</th>
-                                <th class="text-end">Дії</th>
+                                <th>@Localizer["Товар"]</th>
+                                <th>@Localizer["Покупець"]</th>
+                                <th>@Localizer["Причина"]</th>
+                                <th>@Localizer["Статус"]</th>
+                                <th>@Localizer["Подано"]</th>
+                                <th class="text-end">@Localizer["Дії"]</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -162,11 +162,11 @@
                                     </td>
                                     <td class="admin-entity-meta">@request.BuyerEmail</td>
                                     <td class="admin-entity-meta">@request.Reason</td>
-                                    <td class="admin-entity-meta">@ReturnStatusLabel(request.Status)</td>
+                                    <td class="admin-entity-meta">@Localizer[ReturnStatusLabel(request.Status)]</td>
                                     <td>@request.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
                                     <td class="text-end">
                                         <button type="button" class="btn btn-sm btn-outline-primary position-relative" data-bs-toggle="modal" data-bs-target="#returnRequestModal-@request.Id">
-                                            Переглянути
+                                            @Localizer["Переглянути"]
                                             @if (request.UnreadFromBuyer + request.UnreadFromSeller > 0)
                                             {
                                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -184,21 +184,21 @@
 
             <section class="admin-panel table-responsive mt-3">
                 <div class="admin-header" style="padding: 1rem 1.25rem 0;">
-                    <h2 class="admin-title" style="font-size: 1.1rem;">Заявки на 18+ контент</h2>
+                    <h2 class="admin-title" style="font-size: 1.1rem;">@Localizer["Заявки на 18+ контент"]</h2>
                 </div>
                 @if (Model.AdultRequests.Count == 0)
                 {
-                    <p class="admin-empty">Зараз немає заявок на розміщення 18+ контенту.</p>
+                    <p class="admin-empty">@Localizer["Зараз немає заявок на розміщення 18+ контенту."]</p>
                 }
                 else
                 {
                     <table class="table admin-table">
                         <thead>
                             <tr>
-                                <th>Магазин</th>
-                                <th>Власник</th>
-                                <th>Статус</th>
-                                <th class="text-end">Дії</th>
+                                <th>@Localizer["Магазин"]</th>
+                                <th>@Localizer["Власник"]</th>
+                                <th>@Localizer["Статус"]</th>
+                                <th class="text-end">@Localizer["Дії"]</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -211,14 +211,14 @@
                                             {
                                                 <img class="admin-entity-thumb" src="@business.LogoUrl" alt="@business.Name" />
                                             }
-                                            <span class="admin-entity-name">@(string.IsNullOrWhiteSpace(business.Name) ? "Без назви" : business.Name)</span>
+                                            <span class="admin-entity-name">@(string.IsNullOrWhiteSpace(business.Name) ? Localizer["Без назви"].Value : business.Name)</span>
                                         </div>
                                     </td>
                                     <td class="admin-entity-meta">@business.Owner</td>
-                                    <td class="admin-entity-meta">Очікує розгляду</td>
+                                    <td class="admin-entity-meta">@Localizer["Очікує розгляду"]</td>
                                     <td class="text-end">
                                         <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#adultRequestModal-@business.Id">
-                                            Переглянути
+                                            @Localizer["Переглянути"]
                                         </button>
                                     </td>
                                 </tr>
@@ -230,21 +230,21 @@
 
             <section class="admin-panel table-responsive mt-3">
                 <div class="admin-header" style="padding: 1rem 1.25rem 0;">
-                    <h2 class="admin-title" style="font-size: 1.1rem;">Глобальні заявки</h2>
+                    <h2 class="admin-title" style="font-size: 1.1rem;">@Localizer["Глобальні заявки"]</h2>
                 </div>
                 @if (Model.OpenTickets.Count == 0)
                 {
-                    <p class="admin-empty">Зараз немає звернень від користувачів.</p>
+                    <p class="admin-empty">@Localizer["Зараз немає звернень від користувачів."]</p>
                 }
                 else
                 {
                     <table class="table admin-table">
                         <thead>
                             <tr>
-                                <th>Користувач</th>
-                                <th>Тема</th>
-                                <th>Подано</th>
-                                <th class="text-end">Дії</th>
+                                <th>@Localizer["Користувач"]</th>
+                                <th>@Localizer["Тема"]</th>
+                                <th>@Localizer["Подано"]</th>
+                                <th class="text-end">@Localizer["Дії"]</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -256,7 +256,7 @@
                                     <td>@ticket.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
                                     <td class="text-end">
                                         <button type="button" class="btn btn-sm btn-outline-primary position-relative" data-bs-toggle="modal" data-bs-target="#ticketModal-@ticket.Id">
-                                            Переглянути
+                                            @Localizer["Переглянути"]
                                             @if (ticket.UnreadForAdmin > 0)
                                             {
                                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@ticket.UnreadForAdmin</span>
@@ -367,8 +367,8 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Заявка на повернення</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрити"></button>
+                    <h5 class="modal-title">@Localizer["Заявка на повернення"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["Закрити"]"></button>
                 </div>
                 <div class="modal-body">
                     <div class="d-flex align-items-center gap-3 mb-3">
@@ -378,37 +378,37 @@
                         }
                         <div>
                             <strong>@request.ProductName</strong>
-                            <div class="text-muted small">@request.Quantity шт. × @request.UnitPrice.ToString("N2") ₴</div>
+                            <div class="text-muted small">@request.Quantity @Localizer["шт."] × @request.UnitPrice.ToString("N2") ₴</div>
                         </div>
                     </div>
 
                     @if (request.Status == Marketplace.Domain.Enums.PostSaleRequestStatus.SellerDisputed)
                     {
                         <div class="alert alert-warning">
-                            <strong>Продавець відхилив це повернення.</strong>
+                            <strong>@Localizer["Продавець відхилив це повернення."]</strong>
                             @if (!string.IsNullOrWhiteSpace(request.SellerDisputeReason))
                             {
-                                <p class="mb-0 mt-1">Обґрунтування продавця: «@request.SellerDisputeReason»</p>
+                                <p class="mb-0 mt-1">@Localizer["Обґрунтування продавця:"] «@request.SellerDisputeReason»</p>
                             }
                         </div>
                     }
 
-                    <p class="mb-1"><strong>Покупець:</strong> @request.BuyerEmail</p>
-                    <p class="mb-1"><strong>Причина:</strong> @request.Reason</p>
+                    <p class="mb-1"><strong>@Localizer["Покупець:"]</strong> @request.BuyerEmail</p>
+                    <p class="mb-1"><strong>@Localizer["Причина:"]</strong> @request.Reason</p>
                     @if (!string.IsNullOrWhiteSpace(request.Comment))
                     {
-                        <p class="mb-1"><strong>Коментар:</strong> «@request.Comment»</p>
+                        <p class="mb-1"><strong>@Localizer["Коментар:"]</strong> «@request.Comment»</p>
                     }
-                    <p class="mb-3"><strong>Подано:</strong> @request.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
+                    <p class="mb-3"><strong>@Localizer["Подано:"]</strong> @request.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
 
                     @if (request.PhotoUrls.Any())
                     {
-                        <p class="mb-1"><strong>Фото від покупця:</strong></p>
+                        <p class="mb-1"><strong>@Localizer["Фото від покупця:"]</strong></p>
                         <div class="d-flex flex-wrap gap-2 mb-3">
                             @foreach (var url in request.PhotoUrls)
                             {
                                 <a href="@url" target="_blank" rel="noopener">
-                                    <img src="@url" alt="Фото товару" style="width:70px;height:70px;object-fit:cover;border-radius:6px;" />
+                                    <img src="@url" alt="@Localizer["Фото товару"]" style="width:70px;height:70px;object-fit:cover;border-radius:6px;" />
                                 </a>
                             }
                         </div>
@@ -418,22 +418,22 @@
                     <div id="rejectForm-@request.Id" class="collapse">
                         <form asp-action="RejectReturnRequest" method="post">
                             <input type="hidden" name="requestId" value="@request.Id" />
-                            <label class="form-label small">Причина відхилення</label>
-                            <textarea name="reason" class="form-control mb-2" rows="2" required minlength="5" placeholder="Поясніть покупцю, чому заявку відхилено..."></textarea>
-                            <button type="submit" class="btn btn-danger btn-sm w-100">Підтвердити відхилення</button>
+                            <label class="form-label small">@Localizer["Причина відхилення"]</label>
+                            <textarea name="reason" class="form-control mb-2" rows="2" required minlength="5" placeholder="@Localizer["Поясніть покупцю, чому заявку відхилено..."]"></textarea>
+                            <button type="submit" class="btn btn-danger btn-sm w-100">@Localizer["Підтвердити відхилення"]</button>
                         </form>
                     </div>
                 </div>
                 <div class="modal-footer flex-wrap gap-2">
                     <a asp-controller="Support" asp-action="RefundChat" asp-route-requestId="@request.Id" asp-route-isSellerChannel="false" class="btn btn-outline-secondary position-relative">
-                        Чат з покупцем
+                        @Localizer["Чат з покупцем"]
                         @if (request.UnreadFromBuyer > 0)
                         {
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@request.UnreadFromBuyer</span>
                         }
                     </a>
                     <a asp-controller="Support" asp-action="RefundChat" asp-route-requestId="@request.Id" asp-route-isSellerChannel="true" class="btn btn-outline-secondary position-relative">
-                        Чат з продавцем
+                        @Localizer["Чат з продавцем"]
                         @if (request.UnreadFromSeller > 0)
                         {
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@request.UnreadFromSeller</span>
@@ -441,12 +441,12 @@
                     </a>
 
                     <button type="button" class="btn btn-outline-danger" data-bs-toggle="collapse" data-bs-target="#rejectForm-@request.Id">
-                        Відхилити
+                        @Localizer["Відхилити"]
                     </button>
 
                     <form asp-action="ApproveReturnRequest" method="post" class="d-inline">
                         <input type="hidden" name="requestId" value="@request.Id" />
-                        <button type="submit" class="btn btn-success">Підтвердити повернення</button>
+                        <button type="submit" class="btn btn-success">@Localizer["Підтвердити повернення"]</button>
                     </form>
                 </div>
             </div>
@@ -460,8 +460,8 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Заявка на 18+ контент</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрити"></button>
+                    <h5 class="modal-title">@Localizer["Заявка на 18+ контент"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["Закрити"]"></button>
                 </div>
                 <div class="modal-body">
                     <div class="d-flex align-items-center gap-3 mb-3">
@@ -470,35 +470,35 @@
                             <img src="@business.LogoUrl" alt="@business.Name" style="width:56px;height:56px;object-fit:cover;border-radius:8px;" />
                         }
                         <div>
-                            <strong>@(string.IsNullOrWhiteSpace(business.Name) ? "Без назви" : business.Name)</strong>
+                            <strong>@(string.IsNullOrWhiteSpace(business.Name) ? Localizer["Без назви"].Value : business.Name)</strong>
                             <div class="text-muted small">@business.Owner</div>
                         </div>
                     </div>
 
-                    <p class="mb-3">Магазин подав заявку на розміщення товарів для повнолітніх (18+).</p>
+                    <p class="mb-3">@Localizer["Магазин подав заявку на розміщення товарів для повнолітніх (18+)."]</p>
 
-                    <a asp-action="BusinessDetails" asp-route-businessId="@business.Id" class="btn btn-sm btn-outline-secondary">Відкрити сторінку магазину</a>
+                    <a asp-action="BusinessDetails" asp-route-businessId="@business.Id" class="btn btn-sm btn-outline-secondary">@Localizer["Відкрити сторінку магазину"]</a>
 
                     <hr />
                     <div id="adultRejectForm-@business.Id" class="collapse">
                         <form asp-action="RejectAdultStatus" method="post">
                             <input type="hidden" name="businessId" value="@business.Id" />
                             <input type="hidden" name="returnUrl" value="@Url.Action("Jobs")" />
-                            <label class="form-label small">Причина відхилення</label>
-                            <textarea name="reason" class="form-control mb-2" rows="3" required minlength="5" placeholder="Поясніть власнику магазину, чому заявку відхилено..."></textarea>
-                            <button type="submit" class="btn btn-danger btn-sm w-100">Підтвердити відхилення</button>
+                            <label class="form-label small">@Localizer["Причина відхилення"]</label>
+                            <textarea name="reason" class="form-control mb-2" rows="3" required minlength="5" placeholder="@Localizer["Поясніть власнику магазину, чому заявку відхилено..."]"></textarea>
+                            <button type="submit" class="btn btn-danger btn-sm w-100">@Localizer["Підтвердити відхилення"]</button>
                         </form>
                     </div>
                 </div>
                 <div class="modal-footer flex-wrap gap-2">
                     <button type="button" class="btn btn-outline-danger" data-bs-toggle="collapse" data-bs-target="#adultRejectForm-@business.Id">
-                        Відхилити
+                        @Localizer["Відхилити"]
                     </button>
 
                     <form asp-action="ApproveAdultStatus" method="post" class="d-inline">
                         <input type="hidden" name="businessId" value="@business.Id" />
                         <input type="hidden" name="returnUrl" value="@Url.Action("Jobs")" />
-                        <button type="submit" class="btn btn-success">Підтвердити 18+</button>
+                        <button type="submit" class="btn btn-success">@Localizer["Підтвердити 18+"]</button>
                     </form>
                 </div>
             </div>
@@ -512,19 +512,19 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Звернення користувача</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрити"></button>
+                    <h5 class="modal-title">@Localizer["Звернення користувача"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="@Localizer["Закрити"]"></button>
                 </div>
                 <div class="modal-body">
-                    <p class="mb-1"><strong>Користувач:</strong> @ticket.UserEmail</p>
-                    <p class="mb-1"><strong>Тема:</strong> @ticket.Category</p>
-                    <p class="mb-1"><strong>Повідомлення:</strong></p>
+                    <p class="mb-1"><strong>@Localizer["Користувач:"]</strong> @ticket.UserEmail</p>
+                    <p class="mb-1"><strong>@Localizer["Тема:"]</strong> @ticket.Category</p>
+                    <p class="mb-1"><strong>@Localizer["Повідомлення:"]</strong></p>
                     <p class="mb-3">«@ticket.Message»</p>
-                    <p class="mb-0"><strong>Подано:</strong> @ticket.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
+                    <p class="mb-0"><strong>@Localizer["Подано:"]</strong> @ticket.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</p>
                 </div>
                 <div class="modal-footer">
                     <a asp-controller="Support" asp-action="TicketChat" asp-route-ticketId="@ticket.Id" class="btn btn-primary position-relative">
-                        Увійти в чат
+                        @Localizer["Увійти в чат"]
                         @if (ticket.UnreadForAdmin > 0)
                         {
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@ticket.UnreadForAdmin</span>
@@ -563,7 +563,7 @@
                         window.location.reload();
                     }
                 } catch (error) {
-                    console.error('Помилка опитування нових заявок:', error);
+                    console.error('Failed to poll new requests:', error);
                 }
             }, 10000);
         })();

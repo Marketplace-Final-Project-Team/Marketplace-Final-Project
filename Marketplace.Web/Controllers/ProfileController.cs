@@ -1,3 +1,4 @@
+using Marketplace.Web.Infrastructure;
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.DTOs.Products;
 using Marketplace.BLL.Interfaces;
@@ -9,7 +10,6 @@ using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Marketplace.Web.Controllers
 {
@@ -20,32 +20,29 @@ namespace Marketplace.Web.Controllers
         private readonly IOrderService _orderService;
         private readonly IWishlistService _wishlistService;
         private readonly IProductService _productService;
-        private readonly IGenericRepository<Address> _addressRepository;
-        private readonly AppDbContext _context;
         private readonly UserManager<User> _userManager;
         private readonly IEmailSender _emailSender;
         private readonly IUserDiscountService _userDiscountService;
+        private readonly IAddressService _addressService;
 
         public ProfileController(
             IProfileService profileService,
             IOrderService orderService,
             IWishlistService wishlistService,
             IProductService productService,
-            IGenericRepository<Address> addressRepository,
-            AppDbContext context,
             UserManager<User> userManager,
             IEmailSender emailSender,
-            IUserDiscountService userDiscountService)
+            IUserDiscountService userDiscountService,
+            IAddressService addressService)
         {
             _profileService = profileService;
             _orderService = orderService;
             _wishlistService = wishlistService;
             _productService = productService;
-            _addressRepository = addressRepository;
-            _context = context;
             _userManager = userManager;
             _emailSender = emailSender;
             _userDiscountService = userDiscountService;
+            _addressService = addressService;
         }
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -60,22 +57,12 @@ namespace Marketplace.Web.Controllers
             }
 
             var orders = await _orderService.GetUserOrders(userId!);
-            var addresses = await _addressRepository.FindAsync(a => a.UserId == userId);
+            var addresses = await _addressService.GetUserAddressesAsync(userId!);
             var wishlist = await _wishlistService.GetWishlistAsync(userId!);
             var discounts = await _userDiscountService.GetActiveDiscountsForUserAsync(userId!);
 
 
             var now = DateTime.UtcNow;
-            var personalDiscounts = await _context.UserDiscounts
-                .Where(ud => ud.UserId == userId && ud.StartDate <= now && ud.EndDate > now)
-                .OrderByDescending(ud => ud.Percent)
-                .Select(ud => new PersonalDiscountViewModel
-                {
-                    StoreName = ud.Business.StoreName,
-                    Percent = ud.Percent,
-                    EndDate = ud.EndDate
-                })
-                .ToListAsync();
 
             return View(new ProfileViewModel
             {
@@ -87,7 +74,15 @@ namespace Marketplace.Web.Controllers
                 AddressesCount = addresses.Count,
                 WishlistCount = wishlist.TotalItems,
                 DiscountsCount = discounts.Count,
-                PersonalDiscounts = personalDiscounts
+                PersonalDiscounts = discounts
+                .OrderByDescending(d => d.Percent)
+                .Select(d => new PersonalDiscountViewModel
+                {
+                    StoreName = d.StoreName!,
+                    Percent = d.Percent,
+                    EndDate = d.EndDate!.Value
+                })
+                .ToList()
             });
         }
 
@@ -192,7 +187,7 @@ namespace Marketplace.Web.Controllers
         {
             var userId = _userManager.GetUserId(User)!;
             var result = await _wishlistService.AddToWishlistAsync(userId, productId);
-            TempData[result.Succeeded ? "WishlistSuccess" : "WishlistError"] = result.Message;
+            TempData[result.Succeeded ? "WishlistSuccess" : "WishlistError"] = this.L(result.Message);
             return RedirectToLocalUrlOrWishlist(returnUrl);
         }
 
@@ -202,7 +197,7 @@ namespace Marketplace.Web.Controllers
         {
             var userId = _userManager.GetUserId(User)!;
             var result = await _wishlistService.RemoveFromWishlistAsync(userId, productId);
-            TempData[result.Succeeded ? "WishlistSuccess" : "WishlistError"] = result.Message;
+            TempData[result.Succeeded ? "WishlistSuccess" : "WishlistError"] = this.L(result.Message);
             return RedirectToLocalUrlOrWishlist(returnUrl);
         }
 
@@ -220,22 +215,22 @@ namespace Marketplace.Web.Controllers
         public async Task<IActionResult> Addresses()
         {
             var userId = _userManager.GetUserId(User);
-            var addresses = await _addressRepository.FindAsync(a => a.UserId == userId);
 
-            var model = addresses
-                .OrderByDescending(a => a.IsDefault)
-                .ThenByDescending(a => a.CreatedAt)
-                .Select(a => new AddressViewModel
-                {
-                    Id = a.Id,
-                    Country = a.Country,
-                    City = a.City,
-                    Street = a.Street,
-                    IsDefault = a.IsDefault
-                })
-                .ToList();
+            var res = await _addressService.GetUserAddressesAsync(userId!);
 
-            return View(model);
+            if (userId is null)
+            {
+                return NotFound();
+            }
+
+            return View(res.Select(a => new AddressViewModel 
+            {
+                Id = a.Id,
+                Country = a.Country,
+                City = a.City,
+                Street = a.Street,
+                IsDefault = a.IsDefault
+            }).ToList());
         }
 
         [HttpGet]
@@ -258,29 +253,26 @@ namespace Marketplace.Web.Controllers
 
             var userId = _userManager.GetUserId(User)!;
 
-            if (model.IsDefault)
+            var res = await _addressService.CreateAsync(userId, new AddressCreateDto
             {
-                await ClearDefaultAddressAsync(userId);
-            }
-
-            var address = new Address
-            {
-                UserId = userId,
                 Country = model.Country.Trim(),
                 City = model.City.Trim(),
                 Street = model.Street.Trim(),
                 IsDefault = model.IsDefault
-            };
+            });
 
-            await _addressRepository.AddAsync(address);
-            await _context.SaveChangesAsync();
+            if (!res.Succeeded)
+            {
+                TempData["Error"] = this.L(res.Message);
+                return View("AddressForm", model);
+            }
 
             if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
             {
                 return LocalRedirect(model.ReturnUrl);
             }
 
-            TempData["Success"] = "Адресу додано.";
+            TempData["Success"] = this.L("Адресу додано.");
             return RedirectToAction(nameof(Addresses));
         }
 
@@ -288,7 +280,9 @@ namespace Marketplace.Web.Controllers
         public async Task<IActionResult> EditAddress(Guid id)
         {
             var userId = _userManager.GetUserId(User);
-            var address = await _addressRepository.FirstOrDefaultAsync(a => a.Id == id && a.UserId == userId);
+
+            var address = await _addressService.GetByIdAsync(id, userId!);
+            
             if (address is null)
             {
                 return NotFound();
@@ -314,26 +308,28 @@ namespace Marketplace.Web.Controllers
             }
 
             var userId = _userManager.GetUserId(User)!;
-            var address = await _addressRepository.FirstOrDefaultAsync(a => a.Id == model.Id && a.UserId == userId);
-            if (address is null)
+
+            if (!model.Id.HasValue)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            if (model.IsDefault && !address.IsDefault)
+            var res = await _addressService.EditAsync(new AddressDto 
+            { 
+                Id = model.Id.Value, 
+                Country = model.Country, 
+                City = model.City,
+                Street = model.Street,
+                IsDefault = model.IsDefault
+            }, userId);
+
+            if(!res.Succeeded) 
             {
-                await ClearDefaultAddressAsync(userId);
+                TempData["Error"] = this.L(res.Message);
+                return View("AddressForm", model);
             }
 
-            address.Country = model.Country.Trim();
-            address.City = model.City.Trim();
-            address.Street = model.Street.Trim();
-            address.IsDefault = model.IsDefault;
-
-            _addressRepository.Update(address);
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] = "Адресу оновлено.";
+            TempData["Success"] = this.L("Адресу оновлено.");
             return RedirectToAction(nameof(Addresses));
         }
 
@@ -342,18 +338,20 @@ namespace Marketplace.Web.Controllers
         public async Task<IActionResult> DeleteAddress(Guid id)
         {
             var userId = _userManager.GetUserId(User);
-            var address = await _addressRepository.FirstOrDefaultAsync(a => a.Id == id && a.UserId == userId);
-            if (address is null)
+
+            var res = await _addressService.RemoveAsync(id, userId!);
+
+            if (!res.Succeeded)
             {
-                return NotFound();
+                TempData["Error"] = this.L(res.Message);
+            }
+            else 
+            {
+                TempData["Success"] = this.L("Адресу видалено.");
             }
 
-            address.IsDeleted = true;
-            _addressRepository.Update(address);
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] = "Адресу видалено.";
             return RedirectToAction(nameof(Addresses));
+
         }
 
         [HttpPost]
@@ -361,29 +359,19 @@ namespace Marketplace.Web.Controllers
         public async Task<IActionResult> SetDefaultAddress(Guid id)
         {
             var userId = _userManager.GetUserId(User)!;
-            var address = await _addressRepository.FirstOrDefaultAsync(a => a.Id == id && a.UserId == userId);
-            if (address is null)
+
+            var res = await _addressService.SetDefaultAddress(id, userId);
+
+            if (!res.Succeeded)
             {
-                return NotFound();
+                TempData["Error"] = this.L(res.Message);
+            }
+            else
+            {
+                TempData["Success"] = this.L("Основну адресу оновлено.");
             }
 
-            await ClearDefaultAddressAsync(userId);
-            address.IsDefault = true;
-            _addressRepository.Update(address);
-            await _context.SaveChangesAsync();
-
-            TempData["Success"] = "Основну адресу оновлено.";
             return RedirectToAction(nameof(Addresses));
-        }
-
-        private async Task ClearDefaultAddressAsync(string userId)
-        {
-            var currentDefaults = await _addressRepository.FindAsync(a => a.UserId == userId && a.IsDefault);
-            foreach (var address in currentDefaults)
-            {
-                address.IsDefault = false;
-                _addressRepository.Update(address);
-            }
         }
 
         [HttpGet]
@@ -424,12 +412,12 @@ namespace Marketplace.Web.Controllers
 
             if (!result.Succeeded)
             {
-                ModelState.AddModelError(string.Empty, result.Message);
+                ModelState.AddModelError(string.Empty, this.L(result.Message));
                 model.CurrentAvatarUrl = (await _profileService.GetProfileAsync(userId!))?.Avatar;
                 return View(model);
             }
 
-            TempData["Success"] = "Профіль оновлено.";
+            TempData["Success"] = this.L("Профіль оновлено.");
             return RedirectToAction("Index");
         }
 
@@ -454,7 +442,7 @@ namespace Marketplace.Web.Controllers
 
             if (!result.Succeeded)
             {
-                ModelState.AddModelError("", result.Message);
+                ModelState.AddModelError("", this.L(result.Message));
                 return View(model);
             }
 
@@ -478,11 +466,11 @@ namespace Marketplace.Web.Controllers
 
             if (result.Succeeded)
             {
-                ViewData["Message"] = "Емейл було успішно змінено!";
+                ViewData["Message"] = this.L("Емейл було успішно змінено!");
             }
             else
             {
-                ViewData["Message"] = result.Message;
+                ViewData["Message"] = this.L(result.Message);
             }
 
             return View();
@@ -514,7 +502,7 @@ namespace Marketplace.Web.Controllers
 
             if (!result.Succeeded)
             {
-                ModelState.AddModelError("", result.Message);
+                ModelState.AddModelError("", this.L(result.Message));
                 return View(model);
             }
 

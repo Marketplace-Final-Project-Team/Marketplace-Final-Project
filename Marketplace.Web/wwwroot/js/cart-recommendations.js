@@ -63,7 +63,7 @@
         const action = document.createElement("a");
         action.className = "cart-recommendation-card__action";
         action.href = productUrl(product.productId);
-        action.textContent = "Переглянути товар";
+        action.textContent = __t("Переглянути товар");
 
         body.append(category, name, price, action);
         card.append(media, body);

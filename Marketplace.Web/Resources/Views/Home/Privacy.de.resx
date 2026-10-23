@@ -238,4 +238,262 @@
   <data name="Ми можемо періодично оновлювати цю Політику. Про суттєві зміни ми повідомимо на цій сторінці із зазначенням дати останнього оновлення. Продовження використання Платформи після внесення змін означає вашу згоду з оновленою версією Політики." xml:space="preserve">
     <value>Wir können diese Richtlinie regelmäßig aktualisieren. Über wesentliche Änderungen informieren wir auf dieser Seite unter Angabe des Datums der letzten Aktualisierung. Die fortgesetzte Nutzung der Plattform nach Änderungen gilt als Ihre Zustimmung zur aktualisierten Fassung der Richtlinie.</value>
   </data>
+  <data name="(LiqPay) - дані, необхідні для проведення й підтвердження оплати та виплат продавцям;" xml:space="preserve">
+    <value>(LiqPay) — Daten, die zur Durchführung und Bestätigung von Zahlungen und Auszahlungen an Verkäufer erforderlich sind;</value>
+  </data>
+  <data name="(Нова пошта, Укрпошта, Meest Express) - контактні дані отримувача та адреса чи відділення;" xml:space="preserve">
+    <value>(Nova Poshta, Ukrposhta, Meest Express) — Kontaktdaten des Empfängers sowie Adresse oder Filiale;</value>
+  </data>
+  <data name="(реквізити юридичної особи публікуються в розділі «Контакти» цієї сторінки після завершення реєстрації суб'єкта господарювання). До моменту реєстрації запити щодо персональних даних приймаються на адресу, вказану в розділі 12." xml:space="preserve">
+    <value>(die Angaben zur juristischen Person werden nach Abschluss der Unternehmensregistrierung im Abschnitt „Kontakt“ dieser Seite veröffentlicht). Bis zur Registrierung werden Anfragen zu personenbezogenen Daten unter der in Abschnitt 12 angegebenen Adresse entgegengenommen.</value>
+  </data>
+  <data name="10. Ваші права" xml:space="preserve">
+    <value>10. Ihre Rechte</value>
+  </data>
+  <data name="11. Безпека даних" xml:space="preserve">
+    <value>11. Datensicherheit</value>
+  </data>
+  <data name="12. Діти та вікові обмеження" xml:space="preserve">
+    <value>12. Kinder und Altersbeschränkungen</value>
+  </data>
+  <data name="13. Маркетингові комунікації" xml:space="preserve">
+    <value>13. Marketingkommunikation</value>
+  </data>
+  <data name="14. Зміни до Політики" xml:space="preserve">
+    <value>14. Änderungen der Richtlinie</value>
+  </data>
+  <data name="15. Контакти" xml:space="preserve">
+    <value>15. Kontakt</value>
+  </data>
+  <data name="2. Терміни та визначення" xml:space="preserve">
+    <value>2. Begriffe und Definitionen</value>
+  </data>
+  <data name="3. Які дані ми збираємо" xml:space="preserve">
+    <value>3. Welche Daten wir erheben</value>
+  </data>
+  <data name="4. Правові підстави обробки" xml:space="preserve">
+    <value>4. Rechtsgrundlagen der Verarbeitung</value>
+  </data>
+  <data name="5. Мета обробки даних" xml:space="preserve">
+    <value>5. Zwecke der Datenverarbeitung</value>
+  </data>
+  <data name="6. Автоматизована обробка" xml:space="preserve">
+    <value>6. Automatisierte Verarbeitung</value>
+  </data>
+  <data name="7. Кому ми передаємо дані" xml:space="preserve">
+    <value>7. An wen wir Daten weitergeben</value>
+  </data>
+  <data name="8. Міжнародна передача даних" xml:space="preserve">
+    <value>8. Internationale Datenübermittlung</value>
+  </data>
+  <data name="9. Термін зберігання" xml:space="preserve">
+    <value>9. Speicherdauer</value>
+  </data>
+  <data name="IP-адреса, тип браузера й пристрою, кукі-файли, журнали відвідувань" xml:space="preserve">
+    <value>IP-Adresse, Browser- und Gerätetyp, Cookies, Besuchsprotokolle</value>
+  </data>
+  <data name="MarketPlace" xml:space="preserve">
+    <value>MarketPlace</value>
+  </data>
+  <data name="Історія покупок, обраний спосіб доставки й оплати, статус замовлення, заявки на повернення" xml:space="preserve">
+    <value>Kaufhistorie, gewählte Liefer- und Zahlungsart, Bestellstatus, Rückgabeanträge</value>
+  </data>
+  <data name="Бізнес-акаунт" xml:space="preserve">
+    <value>Geschäftskonto</value>
+  </data>
+  <data name="Вводяться під час оформлення замовлення чи в адресній книзі профілю" xml:space="preserve">
+    <value>Werden bei der Bestellung oder im Adressbuch des Profils eingegeben</value>
+  </data>
+  <data name="Виконання договору" xml:space="preserve">
+    <value>Vertragserfüllung</value>
+  </data>
+  <data name="Дані видаленого акаунту" xml:space="preserve">
+    <value>Daten eines gelöschten Kontos</value>
+  </data>
+  <data name="Дані облікового запису" xml:space="preserve">
+    <value>Kontodaten</value>
+  </data>
+  <data name="Дані про взаємодію з товарами" xml:space="preserve">
+    <value>Daten zur Interaktion mit Produkten</value>
+  </data>
+  <data name="Дані про замовлення та платежі" xml:space="preserve">
+    <value>Bestell- und Zahlungsdaten</value>
+  </data>
+  <data name="До 12 місяців" xml:space="preserve">
+    <value>Bis zu 12 Monate</value>
+  </data>
+  <data name="До 3 років з моменту закриття звернення" xml:space="preserve">
+    <value>Bis zu 3 Jahre ab Abschluss der Anfrage</value>
+  </data>
+  <data name="З питань, пов'язаних з обробкою персональних даних, звертайтеся на" xml:space="preserve">
+    <value>Bei Fragen zur Verarbeitung personenbezogener Daten wenden Sie sich an</value>
+  </data>
+  <data name="Законний інтерес" xml:space="preserve">
+    <value>Berechtigtes Interesse</value>
+  </data>
+  <data name="Залежно від категорії даних ми обробляємо їх на одній із таких підстав:" xml:space="preserve">
+    <value>Je nach Datenkategorie verarbeiten wir die Daten auf einer der folgenden Grundlagen:</value>
+  </data>
+  <data name="Звернення до підтримки" xml:space="preserve">
+    <value>Supportanfragen</value>
+  </data>
+  <data name="Згода" xml:space="preserve">
+    <value>Einwilligung</value>
+  </data>
+  <data name="Зміст звернень до підтримки, листування щодо спорів і повернень" xml:space="preserve">
+    <value>Inhalt von Supportanfragen, Korrespondenz zu Streitfällen und Rückgaben</value>
+  </data>
+  <data name="Знеособлюються або видаляються протягом 30 днів, окрім даних, збереження яких вимагає закон" xml:space="preserve">
+    <value>Werden innerhalb von 30 Tagen anonymisiert oder gelöscht, mit Ausnahme gesetzlich aufzubewahrender Daten</value>
+  </data>
+  <data name="Комунікаційні дані" xml:space="preserve">
+    <value>Kommunikationsdaten</value>
+  </data>
+  <data name="Користувач" xml:space="preserve">
+    <value>Nutzer</value>
+  </data>
+  <data name="Ми відповідаємо на запити щодо персональних даних не пізніше ніж протягом 30 календарних днів." xml:space="preserve">
+    <value>Wir beantworten Anfragen zu personenbezogenen Daten spätestens innerhalb von 30 Kalendertagen.</value>
+  </data>
+  <data name="Ми можемо періодично оновлювати цю Політику. Про суттєві зміни ми повідомимо на цій сторінці із зазначенням дати останнього оновлення, а за наявності контактних даних - і особисто. Продовження використання Платформи після внесення змін означає вашу згоду з оновленою версією Політики." xml:space="preserve">
+    <value>Wir können diese Richtlinie von Zeit zu Zeit aktualisieren. Über wesentliche Änderungen informieren wir auf dieser Seite unter Angabe des Datums der letzten Aktualisierung und, sofern Kontaktdaten vorliegen, auch persönlich. Die weitere Nutzung der Plattform nach den Änderungen bedeutet Ihre Zustimmung zur aktualisierten Fassung der Richtlinie.</value>
+  </data>
+  <data name="Ми не збираємо дані про стан здоров'я, релігійні чи політичні переконання та інші «чутливі» категорії персональних даних і просимо не вказувати таку інформацію в текстах відгуків, запитань до продавця чи звернень у підтримку." xml:space="preserve">
+    <value>Wir erheben keine Daten über Gesundheit, religiöse oder politische Überzeugungen oder andere „sensible“ Kategorien personenbezogener Daten und bitten Sie, solche Informationen nicht in Bewertungen, Fragen an Verkäufer oder Supportanfragen anzugeben.</value>
+  </data>
+  <data name="Надаються вами під час звернення" xml:space="preserve">
+    <value>Werden von Ihnen bei der Kontaktaufnahme angegeben</value>
+  </data>
+  <data name="Надаються під час створення та ведення бізнес-акаунту" xml:space="preserve">
+    <value>Werden beim Erstellen und Führen eines Geschäftskontos angegeben</value>
+  </data>
+  <data name="Назва магазину, опис, логотип, номер картки для виплат, склад команди магазину" xml:space="preserve">
+    <value>Shopname, Beschreibung, Logo, Kartennummer für Auszahlungen, Mitglieder des Shopteams</value>
+  </data>
+  <data name="Наразі Платформа не надсилає маркетингові розсилки електронною поштою. Якщо в майбутньому ми додамо таку функцію, вона буде доступна лише за вашою окремою згодою (opt-in) і з можливістю відписатися в один клік у кожному листі." xml:space="preserve">
+    <value>Die Plattform versendet derzeit keine Marketing-E-Mails. Sollten wir eine solche Funktion künftig einführen, ist sie nur mit Ihrer gesonderten Einwilligung (Opt-in) verfügbar und jede E-Mail enthält eine Abmeldemöglichkeit mit einem Klick.</value>
+  </data>
+  <data name="Не менше 3 років з моменту завершення замовлення (бухгалтерський облік, розгляд спорів)" xml:space="preserve">
+    <value>Mindestens 3 Jahre ab Abschluss der Bestellung (Buchhaltung, Streitbeilegung)</value>
+  </data>
+  <data name="Нещодавно переглянуті товари, список бажань, збережені пошукові фільтри, відгуки та запитання до продавця" xml:space="preserve">
+    <value>Zuletzt angesehene Produkte, Wunschliste, gespeicherte Suchfilter, Bewertungen und Fragen an Verkäufer</value>
+  </data>
+  <data name="Обробка" xml:space="preserve">
+    <value>Verarbeitung</value>
+  </data>
+  <data name="Окремо від віку реєстрації діє вікове підтвердження для перегляду товарів категорії 18+: підтвердження зберігається в технічному кукі-файлі протягом 30 днів і не повʼязується з обліковим записом." xml:space="preserve">
+    <value>Unabhängig vom Registrierungsalter gilt für das Ansehen von 18+-Produkten eine Altersbestätigung: Sie wird 30 Tage lang in einem technischen Cookie gespeichert und nicht mit dem Konto verknüpft.</value>
+  </data>
+  <data name="Паролі зберігаються виключно у вигляді криптографічних хешів (алгоритм PBKDF2 у складі ASP.NET Core Identity) і ніколи не зберігаються у відкритому вигляді. Доступ до персональних даних мають лише уповноважені співробітники, яким це необхідно для виконання службових обов'язків, за принципом мінімально необхідного доступу. З'єднання з Платформою захищене протоколом HTTPS, а форми на сайті захищені від підробки запитів (CSRF-токени)." xml:space="preserve">
+    <value>Passwörter werden ausschließlich als kryptografische Hashes gespeichert (PBKDF2-Algorithmus in ASP.NET Core Identity) und niemals im Klartext. Zugriff auf personenbezogene Daten haben nur befugte Mitarbeitende, die ihn für ihre Aufgaben benötigen, nach dem Prinzip der minimalen Rechte. Die Verbindung zur Plattform ist durch HTTPS geschützt, und die Formulare der Website sind gegen Anfragefälschung (CSRF-Token) gesichert.</value>
+  </data>
+  <data name="Персональні дані" xml:space="preserve">
+    <value>Personenbezogene Daten</value>
+  </data>
+  <data name="Платформа" xml:space="preserve">
+    <value>Plattform</value>
+  </data>
+  <data name="Платформа використовує прості автоматизовані механізми - сортування каталогу за популярністю, добірку «Нещодавно переглянуті», показ товарів тієї ж категорії у блоці «Схожі товари». Жоден із цих механізмів не ухвалює рішень, що мають для вас юридичні наслідки чи суттєво вас стосуються (наприклад, не впливає на можливість реєстрації, оформлення замовлення чи доступ до Платформи) - фінальний вибір завжди залишається за вами." xml:space="preserve">
+    <value>Die Plattform nutzt einfache automatisierte Mechanismen — Sortierung des Katalogs nach Beliebtheit, die Auswahl „Zuletzt angesehen“ und die Anzeige von Produkten derselben Kategorie im Block „Ähnliche Produkte“. Keiner dieser Mechanismen trifft Entscheidungen mit rechtlicher Wirkung für Sie oder die Sie erheblich beeinträchtigen (z. B. beeinflussen sie nicht die Registrierung, Bestellung oder den Zugang zur Plattform) — die endgültige Wahl liegt immer bei Ihnen.</value>
+  </data>
+  <data name="Платформа не призначена для осіб молодше 18 років, і ми свідомо не збираємо персональні дані дітей. Якщо вам стало відомо, що дитина надала нам свої дані без згоди батьків чи опікунів, повідомте про це через сторінку Підтримки - ми видалимо такі дані." xml:space="preserve">
+    <value>Die Plattform ist nicht für Personen unter 18 Jahren bestimmt, und wir erheben wissentlich keine personenbezogenen Daten von Kindern. Wenn Sie erfahren, dass ein Kind uns ohne Zustimmung der Eltern oder Erziehungsberechtigten Daten übermittelt hat, teilen Sie uns dies über die Support-Seite mit — wir löschen diese Daten.</value>
+  </data>
+  <data name="Платіжному провайдеру" xml:space="preserve">
+    <value>Zahlungsdienstleister</value>
+  </data>
+  <data name="Політика поширюється на всіх користувачів Платформи - покупців, продавців (власників і працівників бізнес-акаунтів) та відвідувачів, які переглядають каталог без реєстрації. Вона діє в межах, необхідних для функціонування Платформи, і не поширюється на сайти третіх осіб, посилання на які можуть траплятися в каталозі чи відгуках." xml:space="preserve">
+    <value>Die Richtlinie gilt für alle Nutzer der Plattform — Käufer, Verkäufer (Inhaber und Mitarbeitende von Geschäftskonten) und Besucher, die den Katalog ohne Registrierung ansehen. Sie gilt in dem für den Betrieb der Plattform erforderlichen Umfang und erstreckt sich nicht auf Websites Dritter, auf die im Katalog oder in Bewertungen verlinkt werden kann.</value>
+  </data>
+  <data name="Постачальникам інфраструктури" xml:space="preserve">
+    <value>Infrastrukturanbieter</value>
+  </data>
+  <data name="Протягом усього періоду існування акаунту" xml:space="preserve">
+    <value>Während der gesamten Bestehensdauer des Kontos</value>
+  </data>
+  <data name="Редакція від 16 вересня 2026 року. Це перша опублікована версія Політики." xml:space="preserve">
+    <value>Fassung vom 16. September 2026. Dies ist die erste veröffentlichte Version der Richtlinie.</value>
+  </data>
+  <data name="Розпорядником персональних даних є" xml:space="preserve">
+    <value>Verantwortlicher für die personenbezogenen Daten ist</value>
+  </data>
+  <data name="Строк зберігання" xml:space="preserve">
+    <value>Speicherdauer</value>
+  </data>
+  <data name="Технічні журнали (IP-адреси, логи доступу)" xml:space="preserve">
+    <value>Technische Protokolle (IP-Adressen, Zugriffsprotokolle)</value>
+  </data>
+  <data name="У разі виявлення інциденту, що загрожує безпеці персональних даних, ми повідомимо про нього постраждалих користувачів та, за потреби, уповноважений орган - у строки, передбачені законодавством." xml:space="preserve">
+    <value>Wird ein Vorfall festgestellt, der die Sicherheit personenbezogener Daten gefährdet, benachrichtigen wir die betroffenen Nutzer und bei Bedarf die zuständige Behörde innerhalb der gesetzlich vorgesehenen Fristen.</value>
+  </data>
+  <data name="Формуються автоматично під час перегляду каталогу" xml:space="preserve">
+    <value>Entstehen automatisch beim Durchsuchen des Katalogs</value>
+  </data>
+  <data name="Ця Політика конфіденційності (далі - «Політика») регулює порядок збору, зберігання, використання, передачі та захисту персональних даних користувачів платформи MarketPlace («ми», «нас», «Платформа»). Реєструючись на Платформі, оформлюючи замовлення або продовжуючи користуватися сайтом, ви підтверджуєте, що ознайомились з умовами цієї Політики та погоджуєтесь з ними." xml:space="preserve">
+    <value>Diese Datenschutzrichtlinie (die „Richtlinie“) regelt die Erhebung, Speicherung, Nutzung, Weitergabe und den Schutz personenbezogener Daten der Nutzer der Plattform MarketPlace („wir“, „uns“, die „Plattform“). Mit der Registrierung auf der Plattform, einer Bestellung oder der weiteren Nutzung der Website bestätigen Sie, dass Sie die Bedingungen dieser Richtlinie gelesen haben und ihnen zustimmen.</value>
+  </data>
+  <data name="Ця політика пояснює, які дані MarketPlace збирає, для чого їх використовує, на якій підставі, кому може передавати, як довго зберігає та як ви можете керувати своїми даними." xml:space="preserve">
+    <value>Diese Richtlinie erklärt, welche Daten MarketPlace erhebt, wofür und auf welcher Grundlage sie genutzt werden, an wen sie weitergegeben werden können, wie lange sie gespeichert werden und wie Sie Ihre Daten verwalten können.</value>
+  </data>
+  <data name="Частина постачальників інфраструктури, якими ми користуємось (зокрема хостинг і сховище зображень товарів), може фізично розміщувати сервери за межами України. У таких випадках ми покладаємось на договірні гарантії постачальника щодо належного рівня захисту даних і передаємо лише мінімально необхідний обсяг інформації." xml:space="preserve">
+    <value>Einige der von uns genutzten Infrastrukturanbieter (insbesondere Hosting und Speicherung von Produktbildern) können Server physisch außerhalb der Ukraine betreiben. In diesen Fällen stützen wir uns auf vertragliche Garantien des Anbieters für ein angemessenes Datenschutzniveau und übermitteln nur das unbedingt erforderliche Minimum an Informationen.</value>
+  </data>
+  <data name="Юридичний обов'язок" xml:space="preserve">
+    <value>Rechtliche Verpflichtung</value>
+  </data>
+  <data name="або через сторінку" xml:space="preserve">
+    <value>oder über die Seite</value>
+  </data>
+  <data name="будь-яка дія з персональними даними: збір, реєстрація, зберігання, зміна, використання, передача, знеособлення чи видалення;" xml:space="preserve">
+    <value>jeder Vorgang mit personenbezogenen Daten: Erhebung, Erfassung, Speicherung, Änderung, Nutzung, Übermittlung, Anonymisierung oder Löschung;</value>
+  </data>
+  <data name="будь-яка фізична особа, яка користується Платформою як покупець, продавець або відвідувач;" xml:space="preserve">
+    <value>jede natürliche Person, die die Plattform als Käufer, Verkäufer oder Besucher nutzt;</value>
+  </data>
+  <data name="будь-яка інформація, що прямо чи опосередковано стосується фізичної особи, яку ідентифіковано або можна ідентифікувати;" xml:space="preserve">
+    <value>alle Informationen, die sich direkt oder indirekt auf eine identifizierte oder identifizierbare natürliche Person beziehen;</value>
+  </data>
+  <data name="вебсайт і всі повʼязані сервіси MarketPlace." xml:space="preserve">
+    <value>die Website und alle zugehörigen Dienste von MarketPlace.</value>
+  </data>
+  <data name="виконання вимог законодавства (податкова звітність, розгляд спорів, запити уповноважених органів)." xml:space="preserve">
+    <value>Erfüllung gesetzlicher Anforderungen (Steuerberichterstattung, Streitbeilegung, Anfragen zuständiger Behörden).</value>
+  </data>
+  <data name="вимагати обмеження обробки в окремих випадках, передбачених законодавством;" xml:space="preserve">
+    <value>in bestimmten gesetzlich vorgesehenen Fällen eine Einschränkung der Verarbeitung verlangen;</value>
+  </data>
+  <data name="відкликати згоду на обробку даних у будь-який момент, без наслідків для раніше здійсненої обробки;" xml:space="preserve">
+    <value>die Einwilligung zur Datenverarbeitung jederzeit widerrufen, ohne Auswirkungen auf die bereits erfolgte Verarbeitung;</value>
+  </data>
+  <data name="дані, необхідні для реєстрації акаунту, оформлення й доставки замовлення, обробки оплати та повернень;" xml:space="preserve">
+    <value>Daten, die für die Kontoregistrierung, die Bestellung und Lieferung sowie die Abwicklung von Zahlungen und Rückgaben erforderlich sind;</value>
+  </data>
+  <data name="запобігання шахрайству, забезпечення безпеки Платформи, покращення роботи сайту на основі знеособленої статистики;" xml:space="preserve">
+    <value>Betrugsprävention, Sicherheit der Plattform und Verbesserung der Website anhand anonymisierter Statistiken;</value>
+  </data>
+  <data name="зберігання даних про фінансові операції для податкової звітності та розгляду законних запитів державних органів." xml:space="preserve">
+    <value>Speicherung von Daten über Finanztransaktionen für die Steuerberichterstattung und die Bearbeitung rechtmäßiger Anfragen von Behörden.</value>
+  </data>
+  <data name="обліковий запис продавця, створений для розміщення товарів і обробки замовлень;" xml:space="preserve">
+    <value>ein Verkäuferkonto, das zum Einstellen von Produkten und zur Bearbeitung von Bestellungen angelegt wurde;</value>
+  </data>
+  <data name="отримати доступ до даних, які ми про вас зберігаємо, та копію цих даних у машиночитному форматі;" xml:space="preserve">
+    <value>Zugang zu den über Sie gespeicherten Daten und eine Kopie davon in einem maschinenlesbaren Format erhalten;</value>
+  </data>
+  <data name="подати скаргу до уповноваженого органу з питань захисту персональних даних, якщо вважаєте, що ваші права порушено." xml:space="preserve">
+    <value>eine Beschwerde bei der zuständigen Datenschutzbehörde einreichen, wenn Sie der Ansicht sind, dass Ihre Rechte verletzt wurden.</value>
+  </data>
+  <data name="показ товарів, релевантних вашим переглядам і історії покупок (без прийняття юридично значущих рішень на основі профілювання);" xml:space="preserve">
+    <value>Anzeige von Produkten, die zu Ihren Aufrufen und Ihrer Kaufhistorie passen (ohne rechtlich erhebliche Entscheidungen auf Grundlage von Profiling);</value>
+  </data>
+  <data name="покращення роботи сайту на основі знеособленої статистики використання;" xml:space="preserve">
+    <value>Verbesserung der Website anhand anonymisierter Nutzungsstatistiken;</value>
+  </data>
+  <data name="функціональні кукі, маркетингові розсилки та інші необов'язкові функції - ви можете відкликати згоду в будь-який момент;" xml:space="preserve">
+    <value>funktionale Cookies, Marketing-E-Mails und andere optionale Funktionen — Sie können Ihre Einwilligung jederzeit widerrufen;</value>
+  </data>
+  <data name="хостинг, сховище зображень товарів і база даних, які обробляють дані від нашого імені на підставі договору й лише за нашими інструкціями;" xml:space="preserve">
+    <value>Hosting, Speicherung von Produktbildern und Datenbank, die Daten in unserem Auftrag auf vertraglicher Grundlage und nur nach unseren Weisungen verarbeiten;</value>
+  </data>
 </root>

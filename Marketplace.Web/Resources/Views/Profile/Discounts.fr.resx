@@ -79,4 +79,40 @@
   <data name="Діє до" xml:space="preserve">
     <value>Valable jusqu'au</value>
   </data>
+  <data name="Активна" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="Безстроково" xml:space="preserve">
+    <value>Sans limite</value>
+  </data>
+  <data name="Гаманець переваг" xml:space="preserve">
+    <value>Portefeuille d'avantages</value>
+  </data>
+  <data name="Кількість активних знижок" xml:space="preserve">
+    <value>Nombre de remises actives</value>
+  </data>
+  <data name="Неактивна" xml:space="preserve">
+    <value>Inactive</value>
+  </data>
+  <data name="Перейти до товарів" xml:space="preserve">
+    <value>Voir les produits</value>
+  </data>
+  <data name="Персональна знижка магазину" xml:space="preserve">
+    <value>Remise personnelle de la boutique</value>
+  </data>
+  <data name="Персональна знижка прив'язана до магазину. Промокод, якщо він у вас є, можна додатково ввести під час оформлення замовлення." xml:space="preserve">
+    <value>Une remise personnelle est liée à une boutique. Si vous avez un code promo, vous pouvez aussi le saisir lors de la commande.</value>
+  </data>
+  <data name="Персональні знижки від магазинів зібрані в одному місці й автоматично враховуються у доступних пропозиціях." xml:space="preserve">
+    <value>Les remises personnelles des boutiques sont réunies en un seul endroit et appliquées automatiquement aux offres disponibles.</value>
+  </data>
+  <data name="Початок" xml:space="preserve">
+    <value>Début</value>
+  </data>
+  <data name="Як це працює?" xml:space="preserve">
+    <value>Comment ça marche ?</value>
+  </data>
+  <data name="активних" xml:space="preserve">
+    <value>actifs</value>
+  </data>
 </root>

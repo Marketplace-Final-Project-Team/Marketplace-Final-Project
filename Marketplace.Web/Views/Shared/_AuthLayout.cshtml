@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#111827" />
     <title>@ViewData["Title"] - LUNEXA</title>
     <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+    <script src="~/js/i18n.js" asp-append-version="true"></script>
 </head>
 <body class="auth-page">
     <a class="skip-link" href="#main-content">@Localizer["Перейти до форми"]</a>

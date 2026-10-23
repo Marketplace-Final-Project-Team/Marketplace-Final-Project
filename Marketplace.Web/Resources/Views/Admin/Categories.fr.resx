@@ -109,4 +109,10 @@
   <data name="URL РєР°СЂС‚РёРЅРєРё (РЅРµРѕР±РѕРІ&apos;СЏР·РєРѕРІРѕ)" xml:space="preserve">
     <value>URL de l&apos;image (facultatif)</value>
   </data>
+  <data name="URL картинки" xml:space="preserve">
+    <value>URL de l'image</value>
+  </data>
+  <data name="URL картинки (необов'язково)" xml:space="preserve">
+    <value>URL de l'image (facultatif)</value>
+  </data>
 </root>

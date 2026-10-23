@@ -1,4 +1,5 @@
-﻿using Marketplace.BLL.Interfaces;
+﻿using Marketplace.Web.Infrastructure;
+using Marketplace.BLL.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -43,7 +44,7 @@ namespace Marketplace.Web.Controllers
             if (!result.Succeeded)
                 return BadRequest(result.Message);
 
-            return Ok(new { message = result.Message });
+            return Ok(new { message = this.L(result.Message) });
         }
 
         // DELETE /api/wishlist/remove/{productId}
@@ -58,7 +59,7 @@ namespace Marketplace.Web.Controllers
             if (!result.Succeeded)
                 return BadRequest(result.Message);
 
-            return Ok(new { message = result.Message });
+            return Ok(new { message = this.L(result.Message) });
         }
         
     }

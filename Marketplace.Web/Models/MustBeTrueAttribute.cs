@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.Extensions.Localization;
 
 namespace Marketplace.Web.Models
 {
@@ -21,7 +22,11 @@ namespace Marketplace.Web.Models
         public void AddValidation(ClientModelValidationContext context)
         {
             MergeAttribute(context.Attributes, "data-val", "true");
-            MergeAttribute(context.Attributes, "data-val-mustbetrue", FormatErrorMessage(context.ModelMetadata.GetDisplayName()));
+            var localizer = context.ActionContext.HttpContext.RequestServices.GetService<IStringLocalizer<SharedResource>>();
+            var message = localizer is null || string.IsNullOrEmpty(ErrorMessage)
+                ? FormatErrorMessage(context.ModelMetadata.GetDisplayName())
+                : localizer[ErrorMessage].Value;
+            MergeAttribute(context.Attributes, "data-val-mustbetrue", message);
         }
 
         private static void MergeAttribute(IDictionary<string, string> attributes, string key, string value)

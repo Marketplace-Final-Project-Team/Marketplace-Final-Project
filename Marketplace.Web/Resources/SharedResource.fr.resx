@@ -1,5 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
@@ -196,7 +255,7 @@
   <data name="Краса та догляд" xml:space="preserve">
     <value>Beauté et soins</value>
   </data>
-  <data name="Здоров&apos;я та wellness" xml:space="preserve">
+  <data name="Здоров'я та wellness" xml:space="preserve">
     <value>Santé et bien-être</value>
   </data>
   <data name="Дитячі товари" xml:space="preserve">
@@ -213,5 +272,887 @@
   </data>
   <data name="Сад і двір" xml:space="preserve">
     <value>Jardin et extérieur</value>
+  </data>
+  <data name="Акаунт" xml:space="preserve">
+    <value>Compte</value>
+  </data>
+  <data name="Завантаження..." xml:space="preserve">
+    <value>Chargement...</value>
+  </data>
+  <data name="Зміна пароля" xml:space="preserve">
+    <value>Changer le mot de passe</value>
+  </data>
+  <data name="Змінити Email" xml:space="preserve">
+    <value>Changer l'e-mail</value>
+  </data>
+  <data name="Колекції бажань" xml:space="preserve">
+    <value>Collections de favoris</value>
+  </data>
+  <data name="Мої знижки" xml:space="preserve">
+    <value>Mes réductions</value>
+  </data>
+  <data name="Мої списки" xml:space="preserve">
+    <value>Mes listes</value>
+  </data>
+  <data name="Налаштування покупок" xml:space="preserve">
+    <value>Paramètres d'achat</value>
+  </data>
+  <data name="Особистий кабінет" xml:space="preserve">
+    <value>Mon compte</value>
+  </data>
+  <data name="Покупки" xml:space="preserve">
+    <value>Achats</value>
+  </data>
+  <data name="Профіль" xml:space="preserve">
+    <value>Profil</value>
+  </data>
+  <data name="Список перегляду" xml:space="preserve">
+    <value>Liste de suivi</value>
+  </data>
+  <data name="Сповіщення" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
+  <data name="Створити список" xml:space="preserve">
+    <value>Créer une liste</value>
+  </data>
+  <data name="Продукт не знайдено" xml:space="preserve">
+    <value>Produit introuvable</value>
+  </data>
+  <data name="Користувач не знайдений" xml:space="preserve">
+    <value>Utilisateur introuvable</value>
+  </data>
+  <data name="Не вдалося оновити статус користувача" xml:space="preserve">
+    <value>Impossible de mettre à jour le statut de l'utilisateur</value>
+  </data>
+  <data name="Бізнес не знайдено" xml:space="preserve">
+    <value>Entreprise introuvable</value>
+  </data>
+  <data name="Магазин не знайдено" xml:space="preserve">
+    <value>Boutique introuvable</value>
+  </data>
+  <data name="Статус 18+ успішно підтверджено" xml:space="preserve">
+    <value>Statut 18+ confirmé avec succès</value>
+  </data>
+  <data name="Причина відхилення обов'язкова" xml:space="preserve">
+    <value>Le motif du refus est obligatoire</value>
+  </data>
+  <data name="Заявку на статус 18+ відхилено" xml:space="preserve">
+    <value>Demande de statut 18+ refusée</value>
+  </data>
+  <data name="Комісія повинна бути в межах від 0 до 100" xml:space="preserve">
+    <value>La commission doit être comprise entre 0 et 100</value>
+  </data>
+  <data name="Комісія успішно змінена" xml:space="preserve">
+    <value>Commission modifiée avec succès</value>
+  </data>
+  <data name="Кінцева дата знаходиться у майбутньому" xml:space="preserve">
+    <value>La date de fin est dans le futur</value>
+  </data>
+  <data name="Початкова дата більша за кінцеву" xml:space="preserve">
+    <value>La date de début est postérieure à la date de fin</value>
+  </data>
+  <data name="Без категорії" xml:space="preserve">
+    <value>Sans catégorie</value>
+  </data>
+  <data name="Не вдалося визначити адміністратора" xml:space="preserve">
+    <value>Impossible d'identifier l'administrateur</value>
+  </data>
+  <data name="Причина не може перевищувати 1000 символів" xml:space="preserve">
+    <value>Le motif ne peut pas dépasser 1000 caractères</value>
+  </data>
+  <data name="Вкажіть причину відхилення апеляції" xml:space="preserve">
+    <value>Indiquez le motif du rejet du recours</value>
+  </data>
+  <data name="Апеляцію не знайдено" xml:space="preserve">
+    <value>Recours introuvable</value>
+  </data>
+  <data name="Цю апеляцію вже було оброблено" xml:space="preserve">
+    <value>Ce recours a déjà été traité</value>
+  </data>
+  <data name="Апеляцію можна обробити лише для відхиленого відгуку" xml:space="preserve">
+    <value>Un recours ne peut être traité que pour un avis refusé</value>
+  </data>
+  <data name="Апеляцію оброблено" xml:space="preserve">
+    <value>Recours traité</value>
+  </data>
+  <data name="Відгук не знайдено" xml:space="preserve">
+    <value>Avis introuvable</value>
+  </data>
+  <data name="Відгук не можна видалити, поки апеляція очікує розгляду" xml:space="preserve">
+    <value>L'avis ne peut pas être supprimé tant qu'un recours est en attente</value>
+  </data>
+  <data name="Відгук видалено" xml:space="preserve">
+    <value>Avis supprimé</value>
+  </data>
+  <data name="Вкажіть причину відхилення відгуку" xml:space="preserve">
+    <value>Indiquez le motif du refus de l'avis</value>
+  </data>
+  <data name="Відгук відхилено" xml:space="preserve">
+    <value>Avis refusé</value>
+  </data>
+  <data name="Текст відгуку не може бути порожнім" xml:space="preserve">
+    <value>Le texte de l'avis ne peut pas être vide</value>
+  </data>
+  <data name="Текст відгуку не може перевищувати 300 символів" xml:space="preserve">
+    <value>Le texte de l'avis ne peut pas dépasser 300 caractères</value>
+  </data>
+  <data name="Відгук не можна редагувати, поки апеляція очікує розгляду" xml:space="preserve">
+    <value>L'avis ne peut pas être modifié tant qu'un recours est en attente</value>
+  </data>
+  <data name="Відгук оновлено" xml:space="preserve">
+    <value>Avis mis à jour</value>
+  </data>
+  <data name="Емейл вже використовується" xml:space="preserve">
+    <value>Cet e-mail est déjà utilisé</value>
+  </data>
+  <data name="Неправильна електронна пошта або пароль, або email ще не підтверджено." xml:space="preserve">
+    <value>E-mail ou mot de passe incorrect, ou e-mail pas encore confirmé.</value>
+  </data>
+  <data name="Забагато невдалих спроб. Спробуйте ще раз через 10 хвилин." xml:space="preserve">
+    <value>Trop de tentatives échouées. Réessayez dans 10 minutes.</value>
+  </data>
+  <data name="Неправильна електронна пошта або пароль." xml:space="preserve">
+    <value>E-mail ou mot de passe incorrect.</value>
+  </data>
+  <data name="Ваш акаунт заблоковано." xml:space="preserve">
+    <value>Votre compte a été bloqué.</value>
+  </data>
+  <data name="Не вдалося підтвердити емейл" xml:space="preserve">
+    <value>Impossible de confirmer l'e-mail</value>
+  </data>
+  <data name="Ви ще не маєте облікового запису." xml:space="preserve">
+    <value>Vous n'avez pas encore de compte.</value>
+  </data>
+  <data name="Панель власника" xml:space="preserve">
+    <value>Espace propriétaire</value>
+  </data>
+  <data name="Панель адміністратора" xml:space="preserve">
+    <value>Espace administrateur</value>
+  </data>
+  <data name="Панель менеджера" xml:space="preserve">
+    <value>Espace gestionnaire</value>
+  </data>
+  <data name="Панель керування" xml:space="preserve">
+    <value>Panneau de gestion</value>
+  </data>
+  <data name="Користувача не знайдено" xml:space="preserve">
+    <value>Utilisateur introuvable</value>
+  </data>
+  <data name="Невірний токен" xml:space="preserve">
+    <value>Jeton invalide</value>
+  </data>
+  <data name="Запит на членство не знайдено" xml:space="preserve">
+    <value>Demande d'adhésion introuvable</value>
+  </data>
+  <data name="Це ім'я вже використовується" xml:space="preserve">
+    <value>Ce nom est déjà utilisé</value>
+  </data>
+  <data name="Не вдалося завантажити логотип" xml:space="preserve">
+    <value>Impossible de téléverser le logo</value>
+  </data>
+  <data name="Не вдалося завантажити банер" xml:space="preserve">
+    <value>Impossible de téléverser la bannière</value>
+  </data>
+  <data name="Користувач вже є членом цього бізнесу" xml:space="preserve">
+    <value>L'utilisateur est déjà membre de cette entreprise</value>
+  </data>
+  <data name="Запит прийнято" xml:space="preserve">
+    <value>Demande acceptée</value>
+  </data>
+  <data name="Запит відхилено" xml:space="preserve">
+    <value>Demande refusée</value>
+  </data>
+  <data name="Немає прав для здійснення цієї операції" xml:space="preserve">
+    <value>Vous n'avez pas les droits pour effectuer cette opération</value>
+  </data>
+  <data name="Товар не знайдено." xml:space="preserve">
+    <value>Produit introuvable.</value>
+  </data>
+  <data name="Товару немає в наявності." xml:space="preserve">
+    <value>Produit en rupture de stock.</value>
+  </data>
+  <data name="У кошику вже максимальна доступна кількість товару." xml:space="preserve">
+    <value>Le panier contient déjà la quantité maximale disponible de ce produit.</value>
+  </data>
+  <data name="Товар не знайдено у кошику." xml:space="preserve">
+    <value>Produit introuvable dans le panier.</value>
+  </data>
+  <data name="Більше одиниць цього товару немає на складі." xml:space="preserve">
+    <value>Il n'y a plus d'unités de ce produit en stock.</value>
+  </data>
+  <data name="Така категорія вже існує" xml:space="preserve">
+    <value>Cette catégorie existe déjà</value>
+  </data>
+  <data name="Категорії з таким айді не існує" xml:space="preserve">
+    <value>Aucune catégorie ne correspond à cet identifiant</value>
+  </data>
+  <data name="Категорію видалено." xml:space="preserve">
+    <value>Catégorie supprimée.</value>
+  </data>
+  <data name="Дата закінчення має бути пізніше дати початку." xml:space="preserve">
+    <value>La date de fin doit être postérieure à la date de début.</value>
+  </data>
+  <data name="Дата початку знижки повинна бути менше дати закінчення" xml:space="preserve">
+    <value>La date de début de la remise doit être antérieure à la date de fin</value>
+  </data>
+  <data name="Дата початку знижки не може бути в минулому" xml:space="preserve">
+    <value>La date de début de la remise ne peut pas être dans le passé</value>
+  </data>
+  <data name="Дата закінчення знижки не може бути в минулому" xml:space="preserve">
+    <value>La date de fin de la remise ne peut pas être dans le passé</value>
+  </data>
+  <data name="Знижка успішно встановлена" xml:space="preserve">
+    <value>Remise définie avec succès</value>
+  </data>
+  <data name="Немає активної знижки для видалення" xml:space="preserve">
+    <value>Aucune remise active à supprimer</value>
+  </data>
+  <data name="Знижка успішно видалена" xml:space="preserve">
+    <value>Remise supprimée avec succès</value>
+  </data>
+  <data name="Категорія не знайдена" xml:space="preserve">
+    <value>Catégorie introuvable</value>
+  </data>
+  <data name="Неможливо встановити знижку для категорії, поки існує активна знижка для цієї категорії" xml:space="preserve">
+    <value>Impossible de définir une remise pour la catégorie tant qu'une remise active existe</value>
+  </data>
+  <data name="Перевірте дані отримувача та доставки." xml:space="preserve">
+    <value>Vérifiez les informations du destinataire et de livraison.</value>
+  </data>
+  <data name="Кошик пустий." xml:space="preserve">
+    <value>Le panier est vide.</value>
+  </data>
+  <data name="Замовлення не знайдено." xml:space="preserve">
+    <value>Commande introuvable.</value>
+  </data>
+  <data name="Позицію замовлення не знайдено." xml:space="preserve">
+    <value>Article de commande introuvable.</value>
+  </data>
+  <data name="За цей товар уже оформлено повернення." xml:space="preserve">
+    <value>Un retour a déjà été demandé pour ce produit.</value>
+  </data>
+  <data name="Повернення можливе лише для підтвердженого або доставленого замовлення." xml:space="preserve">
+    <value>Le retour n'est possible que pour une commande confirmée ou livrée.</value>
+  </data>
+  <data name="Товар у замовленні не знайдено" xml:space="preserve">
+    <value>Produit introuvable dans la commande</value>
+  </data>
+  <data name="Заявку можна подати лише для доставленого замовлення" xml:space="preserve">
+    <value>Une demande ne peut être soumise que pour une commande livrée</value>
+  </data>
+  <data name="Термін повернення товару сплив (минуло більше 14 днів з моменту доставки)." xml:space="preserve">
+    <value>Le délai de retour a expiré (plus de 14 jours se sont écoulés depuis la livraison).</value>
+  </data>
+  <data name="Оберіть причину повернення" xml:space="preserve">
+    <value>Choisissez un motif de retour</value>
+  </data>
+  <data name="Додайте хоча б одне фото товару" xml:space="preserve">
+    <value>Ajoutez au moins une photo du produit</value>
+  </data>
+  <data name="Заявку на повернення для цього товару вже подано" xml:space="preserve">
+    <value>Une demande de retour a déjà été soumise pour ce produit</value>
+  </data>
+  <data name="Не вдалося завантажити одне з фото. Спробуйте ще раз." xml:space="preserve">
+    <value>Impossible de téléverser l'une des photos. Veuillez réessayer.</value>
+  </data>
+  <data name="Заявку подано" xml:space="preserve">
+    <value>Demande soumise</value>
+  </data>
+  <data name="Некоректне рішення" xml:space="preserve">
+    <value>Décision invalide</value>
+  </data>
+  <data name="Заявку не знайдено" xml:space="preserve">
+    <value>Demande introuvable</value>
+  </data>
+  <data name="Цей товар не належить вашому магазину" xml:space="preserve">
+    <value>Ce produit n'appartient pas à votre boutique</value>
+  </data>
+  <data name="Заявку вже розглянуто" xml:space="preserve">
+    <value>La demande a déjà été examinée</value>
+  </data>
+  <data name="Не вдалося провести повернення коштів через платіжну систему" xml:space="preserve">
+    <value>Impossible d'effectuer le remboursement via le système de paiement</value>
+  </data>
+  <data name="Рішення збережено та оброблено" xml:space="preserve">
+    <value>Décision enregistrée et traitée</value>
+  </data>
+  <data name="Заявку вже опрацьовано" xml:space="preserve">
+    <value>La demande a déjà été traitée</value>
+  </data>
+  <data name="Заявку підтверджено. Очікуємо підтвердження продавця." xml:space="preserve">
+    <value>Demande approuvée. En attente de confirmation du vendeur.</value>
+  </data>
+  <data name="Вкажіть причину відхилення" xml:space="preserve">
+    <value>Indiquez le motif du refus</value>
+  </data>
+  <data name="Заявку відхилено." xml:space="preserve">
+    <value>Demande refusée.</value>
+  </data>
+  <data name="Вкажіть причину відмови" xml:space="preserve">
+    <value>Indiquez le motif du refus</value>
+  </data>
+  <data name="Ця заявка не очікує підтвердження" xml:space="preserve">
+    <value>Cette demande n'est pas en attente de confirmation</value>
+  </data>
+  <data name="Вашу відмову передано адміністратору на розгляд." xml:space="preserve">
+    <value>Votre refus a été transmis à l'administrateur pour examen.</value>
+  </data>
+  <data name="Повернення підтверджено, кошти повернуто покупцю." xml:space="preserve">
+    <value>Retour confirmé, fonds remboursés à l'acheteur.</value>
+  </data>
+  <data name="Магазин не знайдено." xml:space="preserve">
+    <value>Boutique introuvable.</value>
+  </data>
+  <data name="Ваш магазин не має підтвердженого статусу для розміщення товарів 18+." xml:space="preserve">
+    <value>Votre boutique n'a pas de statut confirmé pour publier des produits 18+.</value>
+  </data>
+  <data name="Головне зображення товару обов'язкове." xml:space="preserve">
+    <value>Une image principale du produit est obligatoire.</value>
+  </data>
+  <data name="Кількість не може бути від'ємною." xml:space="preserve">
+    <value>La quantité ne peut pas être négative.</value>
+  </data>
+  <data name="Не вказано назву товару." xml:space="preserve">
+    <value>Nom du produit non renseigné.</value>
+  </data>
+  <data name="Некоректна ціна." xml:space="preserve">
+    <value>Prix invalide.</value>
+  </data>
+  <data name="Некоректна кількість." xml:space="preserve">
+    <value>Quantité invalide.</value>
+  </data>
+  <data name="один з артикулів у файлі" xml:space="preserve">
+    <value>l'une des références du fichier</value>
+  </data>
+  <data name="Користувача не було знайдено" xml:space="preserve">
+    <value>Utilisateur introuvable</value>
+  </data>
+  <data name="Не вдалося завантажити аватар" xml:space="preserve">
+    <value>Impossible de téléverser l'avatar</value>
+  </data>
+  <data name="Не вдалося оновити ім'я користувача" xml:space="preserve">
+    <value>Impossible de mettre à jour le nom d'utilisateur</value>
+  </data>
+  <data name="Невірний пароль" xml:space="preserve">
+    <value>Mot de passe incorrect</value>
+  </data>
+  <data name="Це вже ваша поточна електронна адреса." xml:space="preserve">
+    <value>C'est déjà votre adresse e-mail actuelle.</value>
+  </data>
+  <data name="Ця пошта вже використовується" xml:space="preserve">
+    <value>Cet e-mail est déjà utilisé</value>
+  </data>
+  <data name="Не вдалося підтвердити електронну пошту" xml:space="preserve">
+    <value>Impossible de confirmer l'adresse e-mail</value>
+  </data>
+  <data name="Не вдалося змінити пароль" xml:space="preserve">
+    <value>Impossible de changer le mot de passe</value>
+  </data>
+  <data name="Код має містити від 3 до 30 символів." xml:space="preserve">
+    <value>Le code doit contenir de 3 à 30 caractères.</value>
+  </data>
+  <data name="Такий код уже використовується - оберіть інший." xml:space="preserve">
+    <value>Ce code est déjà utilisé — choisissez-en un autre.</value>
+  </data>
+  <data name="Промокод створено." xml:space="preserve">
+    <value>Code promo créé.</value>
+  </data>
+  <data name="Промокод не знайдено." xml:space="preserve">
+    <value>Code promo introuvable.</value>
+  </data>
+  <data name="Промокод деактивовано." xml:space="preserve">
+    <value>Code promo désactivé.</value>
+  </data>
+  <data name="Промокод недійсний або термін його дії минув." xml:space="preserve">
+    <value>Le code promo est invalide ou a expiré.</value>
+  </data>
+  <data name="Невідомий покупець" xml:space="preserve">
+    <value>Acheteur inconnu</value>
+  </data>
+  <data name="Чат розпочато" xml:space="preserve">
+    <value>Chat démarré</value>
+  </data>
+  <data name="Відгук створено успішно" xml:space="preserve">
+    <value>Avis créé avec succès</value>
+  </data>
+  <data name="У вас немає прав для оновлення цього відгуку" xml:space="preserve">
+    <value>Vous n'avez pas le droit de modifier cet avis</value>
+  </data>
+  <data name="Відхилений відгук можна змінити тільки через апеляцію" xml:space="preserve">
+    <value>Un avis refusé ne peut être modifié que via un recours</value>
+  </data>
+  <data name="Відгук оновлено успішно" xml:space="preserve">
+    <value>Avis mis à jour avec succès</value>
+  </data>
+  <data name="У вас немає прав для видалення цього відгуку" xml:space="preserve">
+    <value>Vous n'avez pas le droit de supprimer cet avis</value>
+  </data>
+  <data name="Відгук видалено успішно" xml:space="preserve">
+    <value>Avis supprimé avec succès</value>
+  </data>
+  <data name="У вас немає прав для подачі апеляції" xml:space="preserve">
+    <value>Vous n'avez pas le droit de déposer un recours</value>
+  </data>
+  <data name="Апеляцію можна подати тільки для відхиленого відгуку" xml:space="preserve">
+    <value>Un recours ne peut être déposé que pour un avis refusé</value>
+  </data>
+  <data name="У вас вже є апеляція, яка очікує перевірки" xml:space="preserve">
+    <value>Vous avez déjà un recours en attente d'examen</value>
+  </data>
+  <data name="Апеляцію успішно подано" xml:space="preserve">
+    <value>Recours déposé avec succès</value>
+  </data>
+  <data name="Текст відгуку є обов'язковим" xml:space="preserve">
+    <value>Le texte de l'avis est obligatoire</value>
+  </data>
+  <data name="Оцінка повинна бути в діапазоні від 1 до 5" xml:space="preserve">
+    <value>La note doit être comprise entre 1 et 5</value>
+  </data>
+  <data name="AWS:S3BucketName не налаштовано" xml:space="preserve">
+    <value>AWS:S3BucketName n'est pas configuré</value>
+  </data>
+  <data name="Оберіть тему звернення" xml:space="preserve">
+    <value>Choisissez le sujet de la demande</value>
+  </data>
+  <data name="Опишіть ситуацію детальніше — щонайменше 10 символів" xml:space="preserve">
+    <value>Décrivez la situation plus en détail — au moins 10 caractères</value>
+  </data>
+  <data name="У вас вже є активне звернення. Дочекайтесь відповіді або закриття поточного." xml:space="preserve">
+    <value>Vous avez déjà une demande active. Attendez une réponse ou la clôture de la demande en cours.</value>
+  </data>
+  <data name="Звернення надіслано. Очікуйте на відповідь." xml:space="preserve">
+    <value>Demande envoyée. Veuillez attendre une réponse.</value>
+  </data>
+  <data name="Звернення не знайдено" xml:space="preserve">
+    <value>Demande introuvable</value>
+  </data>
+  <data name="Звернення закрито." xml:space="preserve">
+    <value>Demande clôturée.</value>
+  </data>
+  <data name="Для цього покупця вже діє персональна знижка" xml:space="preserve">
+    <value>Une remise personnelle s'applique déjà à cet acheteur</value>
+  </data>
+  <data name="Активної персональної знижки для цього покупця не знайдено" xml:space="preserve">
+    <value>Aucune remise personnelle active trouvée pour cet acheteur</value>
+  </data>
+  <data name="Знижку успішно видалено" xml:space="preserve">
+    <value>Remise supprimée avec succès</value>
+  </data>
+  <data name="Невідомий товар" xml:space="preserve">
+    <value>Produit inconnu</value>
+  </data>
+  <data name="Товар уже в списку бажаного." xml:space="preserve">
+    <value>Le produit est déjà dans la liste d'envies.</value>
+  </data>
+  <data name="Товар додано до списку бажаного." xml:space="preserve">
+    <value>Produit ajouté à la liste d'envies.</value>
+  </data>
+  <data name="Товар не знайдено в списку бажаного." xml:space="preserve">
+    <value>Produit introuvable dans la liste d'envies.</value>
+  </data>
+  <data name="Товар видалено з списку бажаного." xml:space="preserve">
+    <value>Produit retiré de la liste d'envies.</value>
+  </data>
+  <data name="Обрану картку не знайдено." xml:space="preserve">
+    <value>La carte sélectionnée est introuvable.</value>
+  </data>
+  <data name="Вкажіть номер картки та отримувача." xml:space="preserve">
+    <value>Indiquez le numéro de carte et le bénéficiaire.</value>
+  </data>
+  <data name="Виплачено автоматично." xml:space="preserve">
+    <value>Versé automatiquement.</value>
+  </data>
+  <data name="Заявку автоматично оброблено та виплачено." xml:space="preserve">
+    <value>La demande a été traitée et versée automatiquement.</value>
+  </data>
+  <data name="Картку не знайдено." xml:space="preserve">
+    <value>Carte introuvable.</value>
+  </data>
+  <data name="Ця картка використовується для запланованої автовиплати - спочатку оберіть іншу картку там або вимкніть автовиплату." xml:space="preserve">
+    <value>Cette carte est utilisée pour le versement automatique programmé — choisissez d'abord une autre carte ou désactivez le versement automatique.</value>
+  </data>
+  <data name="Картку видалено." xml:space="preserve">
+    <value>Carte supprimée.</value>
+  </data>
+  <data name="Бізнес не знайдено." xml:space="preserve">
+    <value>Entreprise introuvable.</value>
+  </data>
+  <data name="Оберіть день місяця від 1 до 31." xml:space="preserve">
+    <value>Choisissez un jour du mois entre 1 et 31.</value>
+  </data>
+  <data name="Вкажіть суму, більшу за нуль." xml:space="preserve">
+    <value>Saisissez un montant supérieur à zéro.</value>
+  </data>
+  <data name="Спочатку збережіть хоча б одну картку для виплат." xml:space="preserve">
+    <value>Enregistrez d'abord au moins une carte de versement.</value>
+  </data>
+  <data name="Заплановану автовиплату увімкнено." xml:space="preserve">
+    <value>Versement automatique programmé activé.</value>
+  </data>
+  <data name="Заплановану автовиплату вимкнено." xml:space="preserve">
+    <value>Versement automatique programmé désactivé.</value>
+  </data>
+  <data name="Запит не знайдено." xml:space="preserve">
+    <value>Demande introuvable.</value>
+  </data>
+  <data name="Запит вже оброблено." xml:space="preserve">
+    <value>La demande a déjà été traitée.</value>
+  </data>
+  <data name="Недостатньо коштів на балансі бізнесу на момент обробки." xml:space="preserve">
+    <value>Solde de l'entreprise insuffisant au moment du traitement.</value>
+  </data>
+  <data name="(товар видалено)" xml:space="preserve">
+    <value>(produit supprimé)</value>
+  </data>
+  <data name="(бізнес видалено)" xml:space="preserve">
+    <value>(entreprise supprimée)</value>
+  </data>
+  <data name="Автоскасування прострочених замовлень" xml:space="preserve">
+    <value>Annulation automatique des commandes en retard</value>
+  </data>
+  <data name="Щогодини скасовує замовлення зі статусом «Очікує підтвердження», якщо оплата не надійшла протягом налаштованого часу (за замовчуванням 48 год.)." xml:space="preserve">
+    <value>Annule chaque heure les commandes au statut « En attente de confirmation » si le paiement n'a pas été reçu dans le délai configuré (48 h par défaut).</value>
+  </data>
+  <data name="Налаштування Gemini API оновлено." xml:space="preserve">
+    <value>Paramètres de l'API Gemini mis à jour.</value>
+  </data>
+  <data name="Перевірте введені значення - деякі з них поза допустимими межами." xml:space="preserve">
+    <value>Vérifiez les valeurs saisies — certaines sont hors des limites autorisées.</value>
+  </data>
+  <data name="Ліміти бізнесу збережено." xml:space="preserve">
+    <value>Limites de l'entreprise enregistrées.</value>
+  </data>
+  <data name="Назва категорії не може бути порожньою." xml:space="preserve">
+    <value>Le nom de la catégorie ne peut pas être vide.</value>
+  </data>
+  <data name="Категорію «{0}» створено." xml:space="preserve">
+    <value>Catégorie « {0} » créée.</value>
+  </data>
+  <data name="Категорію оновлено." xml:space="preserve">
+    <value>Catégorie mise à jour.</value>
+  </data>
+  <data name="Категорію позначено як 18+." xml:space="preserve">
+    <value>Catégorie marquée 18+.</value>
+  </data>
+  <data name="Позначку 18+ знято з категорії." xml:space="preserve">
+    <value>Marque 18+ retirée de la catégorie.</value>
+  </data>
+  <data name="Планувальник вже призупинено." xml:space="preserve">
+    <value>Le planificateur est déjà en pause.</value>
+  </data>
+  <data name="Планувальник призупинено. Нові задачі не запускатимуться до відновлення." xml:space="preserve">
+    <value>Planificateur en pause. Aucune nouvelle tâche ne démarrera avant la reprise.</value>
+  </data>
+  <data name="Планувальник і так активний." xml:space="preserve">
+    <value>Le planificateur est déjà actif.</value>
+  </data>
+  <data name="Планувальник відновлено." xml:space="preserve">
+    <value>Planificateur relancé.</value>
+  </data>
+  <data name="Задачу не знайдено в черзі — можливо, вона вже виконана." xml:space="preserve">
+    <value>Tâche introuvable dans la file — elle a peut-être déjà été exécutée.</value>
+  </data>
+  <data name="Задачу запущено негайно." xml:space="preserve">
+    <value>Tâche lancée immédiatement.</value>
+  </data>
+  <data name="Задачу не знайдено." xml:space="preserve">
+    <value>Tâche introuvable.</value>
+  </data>
+  <data name="Email успішно підтверджено! Тепер можна увійти." xml:space="preserve">
+    <value>E-mail confirmé avec succès ! Vous pouvez maintenant vous connecter.</value>
+  </data>
+  <data name="Введіть електронну пошту." xml:space="preserve">
+    <value>Saisissez votre e-mail.</value>
+  </data>
+  <data name="Бізнес створено та відправлено на перевірку." xml:space="preserve">
+    <value>Entreprise créée et envoyée pour vérification.</value>
+  </data>
+  <data name="Рішення щодо заявки збережено." xml:space="preserve">
+    <value>Décision sur la demande enregistrée.</value>
+  </data>
+  <data name="Немає доступу до цього магазину." xml:space="preserve">
+    <value>Pas d'accès à cette boutique.</value>
+  </data>
+  <data name="Статус замовлення оновлено." xml:space="preserve">
+    <value>Statut de la commande mis à jour.</value>
+  </data>
+  <data name="невідомо" xml:space="preserve">
+    <value>inconnu</value>
+  </data>
+  <data name="Неможливо змінити роль власника або призначити нового власника таким способом." xml:space="preserve">
+    <value>Impossible de modifier le rôle du propriétaire ou de désigner un nouveau propriétaire de cette manière.</value>
+  </data>
+  <data name="Роль учасника успішно оновлено." xml:space="preserve">
+    <value>Rôle du membre mis à jour avec succès.</value>
+  </data>
+  <data name="Учасника видалено з команди." xml:space="preserve">
+    <value>Membre retiré de l'équipe.</value>
+  </data>
+  <data name="Запрошення надіслано." xml:space="preserve">
+    <value>Invitation envoyée.</value>
+  </data>
+  <data name="одноразовий" xml:space="preserve">
+    <value>à usage unique</value>
+  </data>
+  <data name="багаторазовий" xml:space="preserve">
+    <value>à usage multiple</value>
+  </data>
+  <data name="Дані магазину оновлено." xml:space="preserve">
+    <value>Informations de la boutique mises à jour.</value>
+  </data>
+  <data name="Заявку на розміщення 18+ контенту подано на розгляд адміністрації." xml:space="preserve">
+    <value>La demande de publication de contenu 18+ a été soumise à l'administration pour examen.</value>
+  </data>
+  <data name="Товар додано до кошика." xml:space="preserve">
+    <value>Produit ajouté au panier.</value>
+  </data>
+  <data name="Товар видалено з кошика." xml:space="preserve">
+    <value>Produit retiré du panier.</value>
+  </data>
+  <data name="Знижку встановлено." xml:space="preserve">
+    <value>Remise définie.</value>
+  </data>
+  <data name="Знижку скасовано." xml:space="preserve">
+    <value>Remise annulée.</value>
+  </data>
+  <data name="Додайте товари до кошика перед оформленням." xml:space="preserve">
+    <value>Ajoutez des produits au panier avant de passer commande.</value>
+  </data>
+  <data name="Кошик порожній." xml:space="preserve">
+    <value>Le panier est vide.</value>
+  </data>
+  <data name="Замовлення оформлено. Оплата - при отриманні." xml:space="preserve">
+    <value>Commande passée. Paiement à la réception.</value>
+  </data>
+  <data name="Замовлення успішно оформлено." xml:space="preserve">
+    <value>Commande passée avec succès.</value>
+  </data>
+  <data name="У вас поки немає бізнесу з доступом до керування товарами." xml:space="preserve">
+    <value>Vous n'avez pas encore d'entreprise avec accès à la gestion des produits.</value>
+  </data>
+  <data name="Оберіть файл .xlsx для імпорту." xml:space="preserve">
+    <value>Choisissez un fichier .xlsx à importer.</value>
+  </data>
+  <data name="Імпорт завершено: створено {0}, оновлено {1}." xml:space="preserve">
+    <value>Import terminé : {0} créés, {1} mis à jour.</value>
+  </data>
+  <data name="Рядок {0}: {1}" xml:space="preserve">
+    <value>Ligne {0} : {1}</value>
+  </data>
+  <data name="Створено {0}, оновлено {1}. Помилки в {2} рядках. {3}" xml:space="preserve">
+    <value>{0} créés, {1} mis à jour. Erreurs dans {2} lignes. {3}</value>
+  </data>
+  <data name="Залишок оновлено." xml:space="preserve">
+    <value>Stock mis à jour.</value>
+  </data>
+  <data name="Оберіть доступну категорію." xml:space="preserve">
+    <value>Choisissez une catégorie disponible.</value>
+  </data>
+  <data name="Досягнуто максимальної кількості товарів для одного бізнесу ({0})." xml:space="preserve">
+    <value>Le nombre maximal de produits pour une entreprise a été atteint ({0}).</value>
+  </data>
+  <data name="Товар створено та відправлено на модерацію." xml:space="preserve">
+    <value>Produit créé et envoyé en modération.</value>
+  </data>
+  <data name="Товар оновлено та відправлено на повторну модерацію." xml:space="preserve">
+    <value>Produit mis à jour et renvoyé en modération.</value>
+  </data>
+  <data name="Товар має історію замовлень, тому його архівовано й приховано з каталогу." xml:space="preserve">
+    <value>Le produit a un historique de commandes : il a donc été archivé et masqué du catalogue.</value>
+  </data>
+  <data name="Товар видалено." xml:space="preserve">
+    <value>Produit supprimé.</value>
+  </data>
+  <data name="Адресу додано." xml:space="preserve">
+    <value>Adresse ajoutée.</value>
+  </data>
+  <data name="Адресу оновлено." xml:space="preserve">
+    <value>Adresse mise à jour.</value>
+  </data>
+  <data name="Адресу видалено." xml:space="preserve">
+    <value>Adresse supprimée.</value>
+  </data>
+  <data name="Основну адресу оновлено." xml:space="preserve">
+    <value>Adresse principale mise à jour.</value>
+  </data>
+  <data name="Профіль оновлено." xml:space="preserve">
+    <value>Profil mis à jour.</value>
+  </data>
+  <data name="Емейл було успішно змінено!" xml:space="preserve">
+    <value>E-mail modifié avec succès !</value>
+  </data>
+  <data name="Товар" xml:space="preserve">
+    <value>Produit</value>
+  </data>
+  <data name="Потрібно увійти в акаунт." xml:space="preserve">
+    <value>Vous devez vous connecter.</value>
+  </data>
+  <data name="Назва не може бути порожньою." xml:space="preserve">
+    <value>Le nom ne peut pas être vide.</value>
+  </data>
+  <data name="Колекцію створено!" xml:space="preserve">
+    <value>Collection créée !</value>
+  </data>
+  <data name="Колекцію оновлено!" xml:space="preserve">
+    <value>Collection mise à jour !</value>
+  </data>
+  <data name="Колекцію видалено!" xml:space="preserve">
+    <value>Collection supprimée !</value>
+  </data>
+  <data name="Товар додано до колекції!" xml:space="preserve">
+    <value>Produit ajouté à la collection !</value>
+  </data>
+  <data name="Товар видалено з колекції!" xml:space="preserve">
+    <value>Produit retiré de la collection !</value>
+  </data>
+  <data name="Виплату успішно здійснено." xml:space="preserve">
+    <value>Versement effectué avec succès.</value>
+  </data>
+  <data name="Вкажіть причину відхилення." xml:space="preserve">
+    <value>Indiquez le motif du refus.</value>
+  </data>
+  <data name="Запит відхилено." xml:space="preserve">
+    <value>Demande refusée.</value>
+  </data>
+  <data name="Вкажіть країну" xml:space="preserve">
+    <value>Indiquez le pays</value>
+  </data>
+  <data name="Вкажіть місто" xml:space="preserve">
+    <value>Indiquez la ville</value>
+  </data>
+  <data name="Вкажіть вулицю, будинок, квартиру" xml:space="preserve">
+    <value>Indiquez la rue, le bâtiment et l'appartement</value>
+  </data>
+  <data name="Назва магазину є обов'язковою" xml:space="preserve">
+    <value>Le nom de la boutique est obligatoire</value>
+  </data>
+  <data name="Назва магазину має бути від 2 до 100 символів" xml:space="preserve">
+    <value>Le nom de la boutique doit comporter de 2 à 100 caractères</value>
+  </data>
+  <data name="Опис магазину є обов'язковим" xml:space="preserve">
+    <value>La description de la boutique est obligatoire</value>
+  </data>
+  <data name="Опис не повинен перевищувати 2000 символів" xml:space="preserve">
+    <value>La description ne doit pas dépasser 2000 caractères</value>
+  </data>
+  <data name="Логотип є обов'язковим" xml:space="preserve">
+    <value>Le logo est obligatoire</value>
+  </data>
+  <data name="Банер є обов'язковим" xml:space="preserve">
+    <value>La bannière est obligatoire</value>
+  </data>
+  <data name="Оберіть користувача" xml:space="preserve">
+    <value>Choisissez un utilisateur</value>
+  </data>
+  <data name="Оберіть бажану роль" xml:space="preserve">
+    <value>Choisissez le rôle souhaité</value>
+  </data>
+  <data name="Новий емейл є обов'язковим" xml:space="preserve">
+    <value>Le nouvel e-mail est obligatoire</value>
+  </data>
+  <data name="Поточний пароль є обов'язковим" xml:space="preserve">
+    <value>Le mot de passe actuel est obligatoire</value>
+  </data>
+  <data name="Новий пароль є обов'язковим" xml:space="preserve">
+    <value>Le nouveau mot de passe est obligatoire</value>
+  </data>
+  <data name="Пароль має містити щонайменше 8 символів, велику й малу літеру, цифру та спецсимвол" xml:space="preserve">
+    <value>Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial</value>
+  </data>
+  <data name="Підтвердження пароля є обов'язковим" xml:space="preserve">
+    <value>La confirmation du mot de passe est obligatoire</value>
+  </data>
+  <data name="Паролі не співпадають" xml:space="preserve">
+    <value>Les mots de passe ne correspondent pas</value>
+  </data>
+  <data name="Це поле потрібно підтвердити." xml:space="preserve">
+    <value>Ce champ doit être confirmé.</value>
+  </data>
+  <data name="Вкажіть прізвище" xml:space="preserve">
+    <value>Indiquez votre nom</value>
+  </data>
+  <data name="Вкажіть ім’я" xml:space="preserve">
+    <value>Indiquez votre prénom</value>
+  </data>
+  <data name="Вкажіть телефон" xml:space="preserve">
+    <value>Indiquez votre numéro de téléphone</value>
+  </data>
+  <data name="Введіть 9 цифр номера телефону після +380" xml:space="preserve">
+    <value>Saisissez les 9 chiffres du numéro après +380</value>
+  </data>
+  <data name="Оберіть спосіб доставки" xml:space="preserve">
+    <value>Choisissez un mode de livraison</value>
+  </data>
+  <data name="Оберіть спосіб оплати" xml:space="preserve">
+    <value>Choisissez un mode de paiement</value>
+  </data>
+  <data name="Оберіть місто та відділення Нової пошти" xml:space="preserve">
+    <value>Choisissez la ville et le point Nova Poshta</value>
+  </data>
+  <data name="Вкажіть місто доставки" xml:space="preserve">
+    <value>Indiquez la ville de livraison</value>
+  </data>
+  <data name="Вкажіть адресу доставки" xml:space="preserve">
+    <value>Indiquez l'adresse de livraison</value>
+  </data>
+  <data name="Новий пароль обов'язковий" xml:space="preserve">
+    <value>Le nouveau mot de passe est obligatoire</value>
+  </data>
+  <data name="Підтвердження паролю обов'язкове" xml:space="preserve">
+    <value>La confirmation du mot de passe est obligatoire</value>
+  </data>
+  <data name="Повідомлення є обов'язковим" xml:space="preserve">
+    <value>Le message est obligatoire</value>
+  </data>
+  <data name="Повідомлення не може перевищувати 300 символів" xml:space="preserve">
+    <value>Le message ne peut pas dépasser 300 caractères</value>
+  </data>
+  <data name="Оцінка є обов'язковою" xml:space="preserve">
+    <value>La note est obligatoire</value>
+  </data>
+  <data name="Перевірте формат електронної пошти." xml:space="preserve">
+    <value>Vérifiez le format de l'e-mail.</value>
+  </data>
+  <data name="Введіть пароль." xml:space="preserve">
+    <value>Saisissez votre mot de passe.</value>
+  </data>
+  <data name="Залишатися в системі" xml:space="preserve">
+    <value>Rester connecté</value>
+  </data>
+  <data name="Введіть ім’я користувача." xml:space="preserve">
+    <value>Saisissez un nom d'utilisateur.</value>
+  </data>
+  <data name="Ім’я має містити від 2 до 30 символів." xml:space="preserve">
+    <value>Le nom doit contenir de 2 à 30 caractères.</value>
+  </data>
+  <data name="Використовуйте літери, цифри, крапку, дефіс або підкреслення." xml:space="preserve">
+    <value>Utilisez des lettres, des chiffres, un point, un tiret ou un trait de soulignement.</value>
+  </data>
+  <data name="Створіть пароль." xml:space="preserve">
+    <value>Créez un mot de passe.</value>
+  </data>
+  <data name="Пароль не відповідає вимогам безпеки." xml:space="preserve">
+    <value>Le mot de passe ne respecte pas les exigences de sécurité.</value>
+  </data>
+  <data name="Повторіть пароль." xml:space="preserve">
+    <value>Répétez le mot de passe.</value>
+  </data>
+  <data name="Паролі не збігаються." xml:space="preserve">
+    <value>Les mots de passe ne correspondent pas.</value>
+  </data>
+  <data name="Потрібно прийняти правила користування." xml:space="preserve">
+    <value>Vous devez accepter les conditions d'utilisation.</value>
+  </data>
+  <data name="Учасник не знайдений" xml:space="preserve">
+    <value>Membre introuvable</value>
+  </data>
+  <data name="Неможливо видалити власника бізнесу." xml:space="preserve">
+    <value>Le propriétaire de l’entreprise ne peut pas être supprimé.</value>
+  </data>
+  <data name="Адресу не знайдено" xml:space="preserve">
+    <value>Adresse introuvable</value>
+  </data>
+  <data name="Власник вже має повний доступ до бізнесу" xml:space="preserve">
+    <value>Le propriétaire a déjà un accès complet à l'entreprise</value>
   </data>
 </root>

@@ -127,4 +127,67 @@
   <data name="відповімо якнайшвидше." xml:space="preserve">
     <value>nous vous répondrons dans les plus brefs délais.</value>
   </data>
+  <data name="Інше" xml:space="preserve">
+    <value>Autre</value>
+  </data>
+  <data name="Ваше звернення вже надіслано. Адміністратор скоро з вами зв'яжеться." xml:space="preserve">
+    <value>Votre demande a déjà été envoyée. Un administrateur vous contactera bientôt.</value>
+  </data>
+  <data name="Заявку надіслано!" xml:space="preserve">
+    <value>Demande envoyée !</value>
+  </data>
+  <data name="Надіслати заявку" xml:space="preserve">
+    <value>Envoyer la demande</value>
+  </data>
+  <data name="Напишіть нам" xml:space="preserve">
+    <value>Écrivez-nous</value>
+  </data>
+  <data name="Оберіть тему" xml:space="preserve">
+    <value>Choisissez un sujet</value>
+  </data>
+  <data name="Опишіть ситуацію" xml:space="preserve">
+    <value>Décrivez la situation</value>
+  </data>
+  <data name="Очікуйте на відповідь" xml:space="preserve">
+    <value>En attente de réponse</value>
+  </data>
+  <data name="Очікуйте на відповідь адміністратора." xml:space="preserve">
+    <value>Veuillez attendre la réponse de l'administrateur.</value>
+  </data>
+  <data name="Питання щодо акаунту" xml:space="preserve">
+    <value>Question sur le compte</value>
+  </data>
+  <data name="Питання щодо доставки" xml:space="preserve">
+    <value>Question sur la livraison</value>
+  </data>
+  <data name="Повернутися в чат" xml:space="preserve">
+    <value>Retour au chat</value>
+  </data>
+  <data name="Потрібно увійти в акаунт" xml:space="preserve">
+    <value>Vous devez vous connecter</value>
+  </data>
+  <data name="Проблема з оплатою" xml:space="preserve">
+    <value>Problème de paiement</value>
+  </data>
+  <data name="Проблема з товаром" xml:space="preserve">
+    <value>Problème avec un produit</value>
+  </data>
+  <data name="Розкажіть детальніше..." xml:space="preserve">
+    <value>Dites-nous en plus...</value>
+  </data>
+  <data name="Тема звернення" xml:space="preserve">
+    <value>Sujet de la demande</value>
+  </data>
+  <data name="Тема:" xml:space="preserve">
+    <value>Sujet :</value>
+  </data>
+  <data name="Чат відкрито" xml:space="preserve">
+    <value>Chat ouvert</value>
+  </data>
+  <data name="Щоб написати в чат підтримки, спочатку" xml:space="preserve">
+    <value>Pour écrire au chat du support, commencez par</value>
+  </data>
+  <data name="увійдіть в акаунт" xml:space="preserve">
+    <value>vous connecter</value>
+  </data>
 </root>

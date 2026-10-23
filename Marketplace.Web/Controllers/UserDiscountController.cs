@@ -1,3 +1,4 @@
+using Marketplace.Web.Infrastructure;
 using System.Security.Claims;
 using Marketplace.BLL.Common;
 using Marketplace.BLL.Interfaces;
@@ -32,7 +33,7 @@ namespace Marketplace.Web.Controllers
                 return Forbid();
             }
             var result = await _userDiscountService.SetUserDiscount(userId, businessId, percent, startDate.UtcDateTime, endDate.UtcDateTime);
-            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            TempData[result.Succeeded ? "Success" : "Error"] = this.L(result.Message);
 
             if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
             {
@@ -51,7 +52,7 @@ namespace Marketplace.Web.Controllers
                 return Forbid();
             }
             var result = await _userDiscountService.RemoveUserDiscount(userId, businessId);
-            TempData[result.Succeeded ? "Success" : "Error"] = result.Message;
+            TempData[result.Succeeded ? "Success" : "Error"] = this.L(result.Message);
 
             if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
             {

@@ -167,7 +167,7 @@
                                     <form asp-controller="Cart" asp-action="Add" method="post" class="home-product__cart-form">
                                         <input type="hidden" name="productId" value="@product.Id" />
                                         <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                                        <button type="submit" class="home-product__add" aria-label="@Localizer["Додати"] @productName @Localizer["до кошика"]">
+                                        <button type="submit" class="home-product__add" aria-label="@Localizer["Додати {0} до кошика", productName]">
                                             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.2 9.1a2 2 0 0 0 2 1.5h7.8a2 2 0 0 0 1.9-1.4L20.4 8H7"/><circle cx="10" cy="19" r="1.25"/><circle cx="17" cy="19" r="1.25"/></svg>
                                             <span>@Localizer["До кошика"]</span>
                                         </button>
@@ -228,7 +228,7 @@
                             <form asp-controller="Cart" asp-action="Add" method="post">
                                 <input type="hidden" name="productId" value="@product.Id" />
                                 <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                                <button type="submit" class="home-product-list__add" aria-label="@Localizer["Додати"] @productName @Localizer["до кошика"]">@Localizer["До кошика"]</button>
+                                <button type="submit" class="home-product-list__add" aria-label="@Localizer["Додати {0} до кошика", productName]">@Localizer["До кошика"]</button>
                             </form>
                         </div>
                     }
@@ -289,7 +289,7 @@
                                             <form asp-controller="Cart" asp-action="Add" method="post" class="home-product__cart-form">
                                                 <input type="hidden" name="productId" value="@product.Id" />
                                                 <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
-                                                <button type="submit" class="home-product__add" aria-label="@Localizer["Додати"] @productName @Localizer["до кошика"]">
+                                                <button type="submit" class="home-product__add" aria-label="@Localizer["Додати {0} до кошика", productName]">
                                                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.2 9.1a2 2 0 0 0 2 1.5h7.8a2 2 0 0 0 1.9-1.4L20.4 8H7"/><circle cx="10" cy="19" r="1.25"/><circle cx="17" cy="19" r="1.25"/></svg>
                                                     <span>@Localizer["До кошика"]</span>
                                                 </button>

@@ -175,4 +175,223 @@
   <data name="Підтримки" xml:space="preserve">
     <value>Soporte</value>
   </data>
+  <data name=", які є невіддільною частиною цих Умов." xml:space="preserve">
+    <value>, que forman parte integrante de estas Condiciones.</value>
+  </data>
+  <data name="10. Відгуки та контент користувачів" xml:space="preserve">
+    <value>10. Reseñas y contenido de los usuarios</value>
+  </data>
+  <data name="11. Заборонена поведінка" xml:space="preserve">
+    <value>11. Conductas prohibidas</value>
+  </data>
+  <data name="12. Інтелектуальна власність" xml:space="preserve">
+    <value>12. Propiedad intelectual</value>
+  </data>
+  <data name="13. Обмеження відповідальності" xml:space="preserve">
+    <value>13. Limitación de responsabilidad</value>
+  </data>
+  <data name="14. Форс-мажор" xml:space="preserve">
+    <value>14. Fuerza mayor</value>
+  </data>
+  <data name="15. Врегулювання спорів" xml:space="preserve">
+    <value>15. Resolución de disputas</value>
+  </data>
+  <data name="16. Загальні положення" xml:space="preserve">
+    <value>16. Disposiciones generales</value>
+  </data>
+  <data name="17. Зміна умов" xml:space="preserve">
+    <value>17. Modificación de las condiciones</value>
+  </data>
+  <data name="18. Контакти" xml:space="preserve">
+    <value>18. Contacto</value>
+  </data>
+  <data name="2. Терміни та визначення" xml:space="preserve">
+    <value>2. Términos y definiciones</value>
+  </data>
+  <data name="3. Право на використання Платформи" xml:space="preserve">
+    <value>3. Derecho a usar la Plataforma</value>
+  </data>
+  <data name="4. Реєстрація облікового запису" xml:space="preserve">
+    <value>4. Registro de la cuenta</value>
+  </data>
+  <data name="5. Купівля товарів" xml:space="preserve">
+    <value>5. Compra de productos</value>
+  </data>
+  <data name="6. Оплата та Захист покупця" xml:space="preserve">
+    <value>6. Pago y Protección al comprador</value>
+  </data>
+  <data name="7. Знижки та промокоди" xml:space="preserve">
+    <value>7. Descuentos y códigos promocionales</value>
+  </data>
+  <data name="8. Права та обов'язки продавців" xml:space="preserve">
+    <value>8. Derechos y obligaciones de los vendedores</value>
+  </data>
+  <data name="9. Товари категорії 18+" xml:space="preserve">
+    <value>9. Productos +18</value>
+  </data>
+  <data name="MarketPlace виступає посередником між покупцями та продавцями і не є виробником або власником товарів, що продаються на Платформі. Відповідальність за якість, комплектність і відповідність товару опису несе продавець. Платформа надається «як є», без гарантій безперебійної чи безпомилкової роботи. MarketPlace не несе відповідальності за непрямі, випадкові чи наслідкові збитки, спричинені використанням Платформи, крім випадків, прямо передбачених законодавством." xml:space="preserve">
+    <value>MarketPlace actúa como intermediario entre compradores y vendedores y no es el fabricante ni el propietario de los productos vendidos en la Plataforma. El vendedor es responsable de la calidad, la integridad y la conformidad del producto con su descripción. La Plataforma se ofrece «tal cual», sin garantía de funcionamiento ininterrumpido o libre de errores. MarketPlace no se responsabiliza de daños indirectos, incidentales o derivados del uso de la Plataforma, salvo en los casos expresamente previstos por la ley.</value>
+  </data>
+  <data name="MarketPlace залишає за собою право анулювати замовлення, оформлені з використанням промокодів, отриманих шляхом зловживання чи технічної помилки." xml:space="preserve">
+    <value>MarketPlace se reserva el derecho de anular pedidos realizados con códigos promocionales obtenidos mediante abuso o por un error técnico.</value>
+  </data>
+  <data name="MarketPlace залишає за собою право призупинити або заблокувати обліковий запис у разі порушення цих Умов, а також видалити акаунт на прохання користувача відповідно до Політики конфіденційності." xml:space="preserve">
+    <value>MarketPlace se reserva el derecho de suspender o bloquear una cuenta en caso de incumplimiento de estas Condiciones, así como de eliminar una cuenta a petición del usuario conforme a la Política de privacidad.</value>
+  </data>
+  <data name="MarketPlace має право вносити зміни до цих Умов у будь-який час. Актуальна версія завжди доступна на цій сторінці з датою останнього оновлення. Продовження використання Платформи після публікації змін означає вашу згоду з оновленими Умовами." xml:space="preserve">
+    <value>MarketPlace puede modificar estas Condiciones en cualquier momento. La versión vigente está siempre disponible en esta página con la fecha de la última actualización. Seguir usando la Plataforma tras la publicación de los cambios implica su aceptación de las Condiciones actualizadas.</value>
+  </data>
+  <data name="MarketPlace може передавати свої права та обов'язки за цими Умовами повʼязаній особі в разі реорганізації бізнесу, повідомивши про це користувачів на цій сторінці;" xml:space="preserve">
+    <value>MarketPlace puede transferir sus derechos y obligaciones en virtud de estas Condiciones a una entidad vinculada en caso de reorganización empresarial, informando de ello a los usuarios en esta página;</value>
+  </data>
+  <data name="MarketPlace стягує комісію з кожного успішного продажу відповідно до тарифу, вказаного в кабінеті продавця (за замовчуванням - 20% від суми замовлення);" xml:space="preserve">
+    <value>MarketPlace cobra una comisión por cada venta realizada según la tarifa indicada en el panel del vendedor (por defecto, el 20 % del importe del pedido);</value>
+  </data>
+  <data name="Адміністрація" xml:space="preserve">
+    <value>Administración</value>
+  </data>
+  <data name="Адміністрація має право видалити контент, що порушує ці Умови, законодавство чи права третіх осіб, без попереднього повідомлення." xml:space="preserve">
+    <value>La administración puede eliminar sin previo aviso el contenido que infrinja estas Condiciones, la ley o los derechos de terceros.</value>
+  </data>
+  <data name="Ви зобов'язані надавати достовірну інформацію про себе під час реєстрації та оновлювати її в разі зміни;" xml:space="preserve">
+    <value>Debe facilitar información veraz sobre usted al registrarse y actualizarla si cambia;</value>
+  </data>
+  <data name="Використовуючи Платформу від імені юридичної особи чи ФОП (наприклад, під час створення бізнес-акаунту), ви підтверджуєте наявність повноважень діяти від її імені." xml:space="preserve">
+    <value>Al usar la Plataforma en nombre de una persona jurídica o de un empresario individual (por ejemplo, al crear una cuenta de empresa), usted confirma que está autorizado para actuar en su nombre.</value>
+  </data>
+  <data name="Відгуки можуть залишати лише покупці, і вони мають ґрунтуватися на реальному досвіді використання товару чи взаємодії з продавцем;" xml:space="preserve">
+    <value>Solo los compradores pueden dejar reseñas, y deben basarse en una experiencia real con el producto o con el vendedor;</value>
+  </data>
+  <data name="Для замовлень з оплатою при отриманні «Захист покупця» діє в частині можливості оформити повернення чи спір - деталі у Політиці повернення;" xml:space="preserve">
+    <value>Para pedidos con pago contra reembolso, la «Protección al comprador» se aplica a la posibilidad de solicitar una devolución o abrir una disputa; más detalles en la Política de devoluciones;</value>
+  </data>
+  <data name="Доступ до товарів категорії 18+ додатково вимагає окремого підтвердження повноліття безпосередньо в каталозі - незалежно від віку, вказаного під час реєстрації;" xml:space="preserve">
+    <value>El acceso a productos +18 requiere además una confirmación específica de la mayoría de edad directamente en el catálogo, con independencia de la edad indicada al registrarse;</value>
+  </data>
+  <data name="Доступні способи оплати: онлайн-оплата карткою через платіжну систему LiqPay та оплата готівкою або карткою під час отримання;" xml:space="preserve">
+    <value>Métodos de pago disponibles: pago en línea con tarjeta a través del sistema de pago LiqPay y pago en efectivo o con tarjeta en la entrega;</value>
+  </data>
+  <data name="Жодна зі сторін не несе відповідальності за невиконання зобов'язань, спричинене обставинами непереборної сили: стихійне лихо, воєнні дії, дії органів влади, масштабні збої в роботі провайдерів зв'язку, енергопостачання чи платіжних систем, що перебувають поза розумним контролем сторони. Виконання зобов'язань відновлюється, щойно дія таких обставин припиняється." xml:space="preserve">
+    <value>Ninguna de las partes es responsable del incumplimiento de sus obligaciones causado por fuerza mayor: desastres naturales, acciones militares, actuaciones de las autoridades, fallos a gran escala de los proveedores de comunicaciones, energía o sistemas de pago fuera del control razonable de la parte. El cumplimiento de las obligaciones se reanuda en cuanto cesan dichas circunstancias.</value>
+  </data>
+  <data name="З питань, пов'язаних із цими Умовами, звертайтеся на" xml:space="preserve">
+    <value>Para cuestiones relacionadas con estas Condiciones, escriba a</value>
+  </data>
+  <data name="Забороняється публікувати відгуки за винагороду, від імені інших осіб або створювати фейкові акаунти для накрутки рейтингу;" xml:space="preserve">
+    <value>Está prohibido publicar reseñas a cambio de una recompensa, en nombre de otras personas o crear cuentas falsas para inflar las valoraciones;</value>
+  </data>
+  <data name="Замовлення" xml:space="preserve">
+    <value>Pedidos</value>
+  </data>
+  <data name="Замовлення проходить послідовні статуси: очікує підтвердження → підтверджено → відправлено → доставлено, а також може бути скасоване на будь-якому етапі до відправлення;" xml:space="preserve">
+    <value>Un pedido pasa por estados sucesivos: pendiente de confirmación → confirmado → enviado → entregado, y puede cancelarse en cualquier fase antes del envío;</value>
+  </data>
+  <data name="Картка товару, кількість на складі та ціна можуть змінюватися продавцем у будь-який момент до оформлення замовлення;" xml:space="preserve">
+    <value>El vendedor puede modificar la ficha del producto, las existencias y el precio en cualquier momento antes de que se realice el pedido;</value>
+  </data>
+  <data name="Неможливість негайної реалізації MarketPlace будь-якого права за цими Умовами не означає відмову від такого права в подальшому." xml:space="preserve">
+    <value>El hecho de que MarketPlace no ejerza de inmediato un derecho en virtud de estas Condiciones no supone la renuncia a dicho derecho en el futuro.</value>
+  </data>
+  <data name="Один користувач може мати лише один обліковий запис покупця, якщо інше не погоджено окремо з адміністрацією;" xml:space="preserve">
+    <value>Un usuario solo puede tener una cuenta de comprador, salvo acuerdo distinto con la administración;</value>
+  </data>
+  <data name="Окремі категорії товарів можуть містити контент, призначений виключно для повнолітніх. Такі товари позначаються міткою «18+», приховані від перегляду без підтвердження віку та доступні для продажу лише магазинам, чий статус 18+ підтверджено адміністрацією Платформи. Продовжуючи перегляд позначеного каталогу, ви підтверджуєте, що вам виповнилося 18 років." xml:space="preserve">
+    <value>Algunas categorías de productos pueden incluir contenido destinado exclusivamente a adultos. Estos productos llevan la marca «+18», se ocultan sin confirmación de edad y solo pueden venderlos tiendas cuyo estado +18 haya confirmado la administración de la Plataforma. Al seguir navegando por el catálogo marcado, usted confirma que tiene 18 años o más.</value>
+  </data>
+  <data name="Оформлення замовлення є пропозицією купівлі, яка вважається прийнятою після підтвердження продавцем; до цього моменту продавець може відхилити замовлення, наприклад, через відсутність товару;" xml:space="preserve">
+    <value>Realizar un pedido es una oferta de compra que se considera aceptada cuando el vendedor la confirma; hasta entonces el vendedor puede rechazar el pedido, por ejemplo por falta de existencias;</value>
+  </data>
+  <data name="Переказ коштів продавцю відбувається лише після того, як покупець підтвердить отримання товару, або автоматично - після завершення 14-денного строку з моменту доставки, якщо претензій не було подано. Цей механізм називається «Захист покупця» і дає час перевірити товар до того, як гроші дійдуть до продавця;" xml:space="preserve">
+    <value>Los fondos se transfieren al vendedor solo después de que el comprador confirme la recepción del producto, o automáticamente al finalizar el plazo de 14 días desde la entrega si no se ha presentado ninguna reclamación. Este mecanismo se llama «Protección al comprador» y le da tiempo para revisar el producto antes de que el dinero llegue al vendedor;</value>
+  </data>
+  <data name="Платформа" xml:space="preserve">
+    <value>Plataforma</value>
+  </data>
+  <data name="Повний перелік вимог до продавців викладено в окремих" xml:space="preserve">
+    <value>La lista completa de requisitos para los vendedores se recoge en las</value>
+  </data>
+  <data name="Покупець" xml:space="preserve">
+    <value>Cliente</value>
+  </data>
+  <data name="Правилах для продавців" xml:space="preserve">
+    <value>Normas para vendedores</value>
+  </data>
+  <data name="Про підозру на несанкціонований доступ до акаунту необхідно негайно повідомити підтримку та змінити пароль;" xml:space="preserve">
+    <value>Si sospecha de un acceso no autorizado a su cuenta, debe avisar de inmediato a soporte y cambiar la contraseña;</value>
+  </data>
+  <data name="Продавець" xml:space="preserve">
+    <value>Vendedor</value>
+  </data>
+  <data name="Продавець зобов'язаний підтримувати актуальну інформацію про наявність товару на складі та оперативно обробляти замовлення;" xml:space="preserve">
+    <value>El vendedor debe mantener actualizada la información sobre existencias y tramitar los pedidos con rapidez;</value>
+  </data>
+  <data name="Продавці можуть встановлювати знижки на рівні окремого товару, категорії або всього магазину, а також персональні знижки для конкретного покупця;" xml:space="preserve">
+    <value>Los vendedores pueden fijar descuentos para un producto, una categoría o toda la tienda, así como descuentos personales para un comprador concreto;</value>
+  </data>
+  <data name="Промокоди діють у межах строку, вказаного продавцем, можуть бути одноразовими та застосовуються під час оформлення замовлення;" xml:space="preserve">
+    <value>Los códigos promocionales son válidos durante el plazo indicado por el vendedor, pueden ser de un solo uso y se aplican al tramitar el pedido;</value>
+  </data>
+  <data name="Під час онлайн-оплати кошти резервуються Платформою і не переказуються продавцю одразу;" xml:space="preserve">
+    <value>Con el pago en línea, la Plataforma retiene los fondos y no los transfiere de inmediato al vendedor;</value>
+  </data>
+  <data name="Редакція від 16 вересня 2026 року. Це перша опублікована версія Умов." xml:space="preserve">
+    <value>Versión del 16 de septiembre de 2026. Es la primera versión publicada de las Condiciones.</value>
+  </data>
+  <data name="Реєструватися та здійснювати покупки на Платформі можуть особи, яким виповнилося 18 років, або особи віком від 14 років за згодою батьків чи законних представників;" xml:space="preserve">
+    <value>Pueden registrarse y comprar en la Plataforma las personas mayores de 18 años, o las mayores de 14 años con el consentimiento de sus padres o representantes legales;</value>
+  </data>
+  <data name="Розміщуючи відгук, фото, опис товару чи інший контент на Платформі, ви надаєте MarketPlace безоплатну, невиключну ліцензію на його показ і використання в межах роботи сервісу;" xml:space="preserve">
+    <value>Al publicar una reseña, una foto, una descripción de producto u otro contenido en la Plataforma, usted concede a MarketPlace una licencia gratuita y no exclusiva para mostrarlo y usarlo en el marco del servicio;</value>
+  </data>
+  <data name="Спори щодо конкретного замовлення передусім вирішуються через інструмент «Відкрити спір» на сторінці замовлення за участю продавця та, за потреби, підтримки Платформи. Якщо спір не вдалося врегулювати таким чином, він підлягає вирішенню відповідно до законодавства України за місцем реєстрації MarketPlace." xml:space="preserve">
+    <value>Las disputas sobre un pedido concreto se resuelven en primer lugar mediante la herramienta «Abrir disputa» de la página del pedido, con la participación del vendedor y, si es necesario, del soporte de la Plataforma. Si no se puede resolver así, se dirimirá conforme a la legislación de Ucrania en el lugar de registro de MarketPlace.</value>
+  </data>
+  <data name="Товар" xml:space="preserve">
+    <value>Producto</value>
+  </data>
+  <data name="У разі скасування замовлення до відправлення кошти повертаються покупцю в повному обсязі тим самим способом, яким було здійснено оплату." xml:space="preserve">
+    <value>Si un pedido se cancela antes del envío, los fondos se reembolsan íntegramente al comprador por el mismo método utilizado para el pago.</value>
+  </data>
+  <data name="Ці Умови є повним текстом угоди між вами і MarketPlace щодо користування Платформою й замінюють собою будь-які попередні усні чи письмові домовленості з цього приводу." xml:space="preserve">
+    <value>Estas Condiciones constituyen el acuerdo íntegro entre usted y MarketPlace sobre el uso de la Plataforma y sustituyen cualquier acuerdo verbal o escrito anterior al respecto.</value>
+  </data>
+  <data name="Якщо будь-яке положення цих Умов буде визнано недійсним, це не впливає на чинність решти положень;" xml:space="preserve">
+    <value>Si alguna disposición de estas Condiciones se declara nula, ello no afecta a la validez de las demás;</value>
+  </data>
+  <data name="Якщо ви вважаєте, що розміщений на Платформі товар чи контент порушує ваші права інтелектуальної власності, надішліть звернення через сторінку Підтримки з описом порушення, посиланням на відповідний товар і підтвердженням ваших прав - ми розглянемо звернення та за наявності підстав приховаємо товар до з'ясування обставин." xml:space="preserve">
+    <value>Si considera que un producto o contenido publicado en la Plataforma vulnera sus derechos de propiedad intelectual, envíe una solicitud a través de la página de Soporte describiendo la infracción, con un enlace al producto y la acreditación de sus derechos; revisaremos la solicitud y, si hay motivos, ocultaremos el producto hasta aclarar las circunstancias.</value>
+  </data>
+  <data name="Якщо до товару застосовується кілька видів знижок одночасно, використовується найбільша з них - знижки не підсумовуються;" xml:space="preserve">
+    <value>Si a un producto se le aplican varios tipos de descuento a la vez, se utiliza el mayor; los descuentos no se suman;</value>
+  </data>
+  <data name="Якщо замовлення містить товари від кількох продавців, кожен продавець обробляє й відправляє свою частину замовлення окремо." xml:space="preserve">
+    <value>Si un pedido contiene productos de varios vendedores, cada vendedor tramita y envía su parte del pedido por separado.</value>
+  </data>
+  <data name="або через сторінку" xml:space="preserve">
+    <value>o a través de la página</value>
+  </data>
+  <data name="вебсайт MarketPlace і всі повʼязані сервіси;" xml:space="preserve">
+    <value>el sitio web de MarketPlace y todos los servicios relacionados;</value>
+  </data>
+  <data name="видавати себе за іншу особу чи представника MarketPlace;" xml:space="preserve">
+    <value>hacerse pasar por otra persona o por un representante de MarketPlace;</value>
+  </data>
+  <data name="команда MarketPlace, що здійснює модерацію та підтримку Платформи." xml:space="preserve">
+    <value>el equipo de MarketPlace que modera y da soporte a la Plataforma.</value>
+  </data>
+  <data name="користувач, який керує бізнес-акаунтом і розміщує товари на продаж;" xml:space="preserve">
+    <value>un usuario que gestiona una cuenta de empresa y publica productos a la venta;</value>
+  </data>
+  <data name="користувач, який переглядає каталог і/або оформлює замовлення;" xml:space="preserve">
+    <value>un usuario que consulta el catálogo y/o realiza pedidos;</value>
+  </data>
+  <data name="намагатись порушити роботу Платформи (атаки типу «відмова в обслуговуванні», спроби несанкціонованого доступу тощо);" xml:space="preserve">
+    <value>intentar alterar el funcionamiento de la Plataforma (ataques de denegación de servicio, intentos de acceso no autorizado, etc.);</value>
+  </data>
+  <data name="оформлена покупцем заявка на купівлю одного чи кількох товарів;" xml:space="preserve">
+    <value>una solicitud de compra de uno o varios productos realizada por un comprador;</value>
+  </data>
+  <data name="предмет, розміщений продавцем у каталозі Платформи;" xml:space="preserve">
+    <value>un artículo publicado por un vendedor en el catálogo de la Plataforma;</value>
+  </data>
 </root>

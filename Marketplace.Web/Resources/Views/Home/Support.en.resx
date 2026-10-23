@@ -127,4 +127,67 @@
   <data name="відповімо якнайшвидше." xml:space="preserve">
     <value>we'll respond as soon as possible.</value>
   </data>
+  <data name="Інше" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="Ваше звернення вже надіслано. Адміністратор скоро з вами зв'яжеться." xml:space="preserve">
+    <value>Your request has already been sent. An administrator will contact you soon.</value>
+  </data>
+  <data name="Заявку надіслано!" xml:space="preserve">
+    <value>Request sent!</value>
+  </data>
+  <data name="Надіслати заявку" xml:space="preserve">
+    <value>Submit request</value>
+  </data>
+  <data name="Напишіть нам" xml:space="preserve">
+    <value>Write to us</value>
+  </data>
+  <data name="Оберіть тему" xml:space="preserve">
+    <value>Choose a subject</value>
+  </data>
+  <data name="Опишіть ситуацію" xml:space="preserve">
+    <value>Describe the situation</value>
+  </data>
+  <data name="Очікуйте на відповідь" xml:space="preserve">
+    <value>Awaiting reply</value>
+  </data>
+  <data name="Очікуйте на відповідь адміністратора." xml:space="preserve">
+    <value>Please wait for the administrator's reply.</value>
+  </data>
+  <data name="Питання щодо акаунту" xml:space="preserve">
+    <value>Account question</value>
+  </data>
+  <data name="Питання щодо доставки" xml:space="preserve">
+    <value>Delivery question</value>
+  </data>
+  <data name="Повернутися в чат" xml:space="preserve">
+    <value>Back to chat</value>
+  </data>
+  <data name="Потрібно увійти в акаунт" xml:space="preserve">
+    <value>You need to sign in</value>
+  </data>
+  <data name="Проблема з оплатою" xml:space="preserve">
+    <value>Payment problem</value>
+  </data>
+  <data name="Проблема з товаром" xml:space="preserve">
+    <value>Product problem</value>
+  </data>
+  <data name="Розкажіть детальніше..." xml:space="preserve">
+    <value>Tell us more...</value>
+  </data>
+  <data name="Тема звернення" xml:space="preserve">
+    <value>Request subject</value>
+  </data>
+  <data name="Тема:" xml:space="preserve">
+    <value>Subject:</value>
+  </data>
+  <data name="Чат відкрито" xml:space="preserve">
+    <value>Chat is open</value>
+  </data>
+  <data name="Щоб написати в чат підтримки, спочатку" xml:space="preserve">
+    <value>To write to the support chat, first</value>
+  </data>
+  <data name="увійдіть в акаунт" xml:space="preserve">
+    <value>sign in</value>
+  </data>
 </root>

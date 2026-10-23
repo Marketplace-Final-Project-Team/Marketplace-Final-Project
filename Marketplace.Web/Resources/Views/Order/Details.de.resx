@@ -214,4 +214,37 @@
   <data name="Оплата при отриманні" xml:space="preserve">
     <value>Zahlung bei Lieferung</value>
   </data>
+  <data name="Адміністратор схвалив повернення · очікує підтвердження продавця" xml:space="preserve">
+    <value>Der Administrator hat die Rückgabe genehmigt · wartet auf Bestätigung des Verkäufers</value>
+  </data>
+  <data name="Ваш номер замовлення" xml:space="preserve">
+    <value>Ihre Bestellnummer</value>
+  </data>
+  <data name="Відповідь повернення:" xml:space="preserve">
+    <value>Antwort zur Rückgabe:</value>
+  </data>
+  <data name="Дякуємо за замовлення!" xml:space="preserve">
+    <value>Vielen Dank für Ihre Bestellung!</value>
+  </data>
+  <data name="Звернутися до підтримки" xml:space="preserve">
+    <value>Support kontaktieren</value>
+  </data>
+  <data name="Оформлення завершено" xml:space="preserve">
+    <value>Bestellung abgeschlossen</value>
+  </data>
+  <data name="Перейти до моїх замовлень" xml:space="preserve">
+    <value>Zu meinen Bestellungen</value>
+  </data>
+  <data name="Повернутися в чат" xml:space="preserve">
+    <value>Zurück zum Chat</value>
+  </data>
+  <data name="Продавець оскаржив повернення · на розгляді адміністратора" xml:space="preserve">
+    <value>Der Verkäufer hat die Rückgabe angefochten · wird vom Administrator geprüft</value>
+  </data>
+  <data name="Продовжити покупки" xml:space="preserve">
+    <value>Weiter einkaufen</value>
+  </data>
+  <data name="Сума до сплати" xml:space="preserve">
+    <value>Zu zahlender Betrag</value>
+  </data>
 </root>

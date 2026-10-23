@@ -1,3 +1,4 @@
+using Marketplace.Web.Infrastructure;
 using System.Security.Claims;
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
@@ -69,7 +70,7 @@ public class AuthController : Controller
 
         if (!result.Succeeded)
         {
-            ModelState.AddModelError(string.Empty, result.Message);
+            ModelState.AddModelError(string.Empty, this.L(result.Message));
             return View(model);
         }
 
@@ -111,7 +112,7 @@ public class AuthController : Controller
 
         if (!result.Succeeded)
         {
-            ModelState.AddModelError(string.Empty, result.Message);
+            ModelState.AddModelError(string.Empty, this.L(result.Message));
             return View(model);
         }
 
@@ -147,7 +148,7 @@ public class AuthController : Controller
         var result = await _authService.ConfirmEmailAsync(userId, token);
         ViewBag.Succeeded = result.Succeeded;
         ViewBag.Message = result.Succeeded
-            ? "Email успішно підтверджено! Тепер можна увійти."
+            ? this.L("Email успішно підтверджено! Тепер можна увійти.")
             : result.Message;
         return View();
     }
@@ -163,7 +164,7 @@ public class AuthController : Controller
     {
         if (string.IsNullOrWhiteSpace(email))
         {
-            ModelState.AddModelError("Email", "Введіть електронну пошту.");
+            ModelState.AddModelError("Email", this.L("Введіть електронну пошту."));
             return View();
         }
 
@@ -221,7 +222,7 @@ public class AuthController : Controller
 
         if (!result.Succeeded)
         {
-            ModelState.AddModelError(string.Empty, result.Message);
+            ModelState.AddModelError(string.Empty, this.L(result.Message));
             return View(model);
         }
 

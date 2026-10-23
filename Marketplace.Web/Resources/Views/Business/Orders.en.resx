@@ -127,4 +127,10 @@
   <data name="Деталі" xml:space="preserve">
     <value>Details</value>
   </data>
+  <data name="Потрібне підтвердження повернення" xml:space="preserve">
+    <value>Return confirmation required</value>
+  </data>
+  <data name="до" xml:space="preserve">
+    <value>until</value>
+  </data>
 </root>

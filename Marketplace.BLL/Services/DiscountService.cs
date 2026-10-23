@@ -49,10 +49,6 @@ namespace Marketplace.BLL.Services
                 old.EndDate = DateTime.UtcNow.AddSeconds(-1);
             }
             
-            
-
-
-
             var discount = new Discount
             {
                 ProductId = productId,
@@ -84,8 +80,6 @@ namespace Marketplace.BLL.Services
 
         public async Task<ServiceResult> SetBusinessDiscount(Guid businessId, decimal percent, DateTime startDate, DateTime endDate)
         {
-            
-
             var business = await _businessRepo.GetByIdAsync(businessId);
             var active_discount = await _context.Discounts.FirstOrDefaultAsync(d => d.BusinessId == businessId && d.DiscountType == DiscountType.Business && d.EndDate > DateTime.UtcNow);
             
@@ -134,7 +128,6 @@ namespace Marketplace.BLL.Services
                     Message = "Дата закінчення знижки не може бути в минулому"
                 };
             }
-            
 
             var discount = new Discount
             {
@@ -144,7 +137,6 @@ namespace Marketplace.BLL.Services
                 EndDate = endDate,
                 DiscountType = DiscountType.Business
             };
-            
             
             await _context.Discounts.AddAsync(discount);
             await _context.SaveChangesAsync();
@@ -209,20 +201,16 @@ namespace Marketplace.BLL.Services
 
             }
 
-
             return new BusinessDiscountDto
             {
                 BusinessId = businessId,
                 DiscountPercent = 0,
                 IsActive = false
             };
-
-
         }
+
         public async Task<ServiceResult> SetCategoryDiscount(Guid categoryId, Guid businessId, decimal percent, DateTime startDate, DateTime endDate)
         {
-
-            
             var category = await _categoryRepo.GetByIdAsync(categoryId);
             
 

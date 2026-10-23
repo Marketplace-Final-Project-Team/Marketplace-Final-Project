@@ -1,12 +1,14 @@
 using Marketplace.BLL.Common;
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
+using Marketplace.BLL.Jobs;
 using Marketplace.DAL.Data;
 using Marketplace.DAL.Interfaces;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
 using Marketplace.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Quartz;
 
 namespace Marketplace.BLL.Services
@@ -143,13 +145,13 @@ namespace Marketplace.BLL.Services
                 return new ServiceResult { Succeeded = false, Message = "Це ім'я вже використовується" };
             }
 
-            var logoUrl = await _imageService.UploadImageAsync(dto.Logo);
+            var logoUrl = await _imageService.UploadImageAsync(dto.Logo, "photos");
             if (logoUrl == null)
             {
                 return new ServiceResult { Succeeded = false, Message = "Не вдалося завантажити логотип" };
             }
 
-            var bannerUrl = await _imageService.UploadImageAsync(dto.Banner);
+            var bannerUrl = await _imageService.UploadImageAsync(dto.Banner, "photos");
             if (bannerUrl == null)
             {
                 return new ServiceResult { Succeeded = false, Message = "Не вдалося завантажити банер" };
@@ -185,9 +187,29 @@ namespace Marketplace.BLL.Services
                 return new BusinessMemberResult { Succeeded = false, Message = "Користувача не знайдено" };
             }
 
+            var ownerId = await _context.Businesses
+                .Where(b => b.Id == dto.BusinessId)
+                .Select(b => b.OwnerId)
+                .FirstOrDefaultAsync();
+
+            if (ownerId == null)
+            {
+                return new BusinessMemberResult { Succeeded = false, Message = "Бізнес не знайдено" };
+            }
+
+            if (ownerId == dto.UserId)
+            {
+                return new BusinessMemberResult { Succeeded = false, Message = "Власник вже має повний доступ до бізнесу" };
+            }
+
             if (await _businessMemberRepo.ExistsAsync(bm => bm.UserId == dto.UserId && bm.BusinessId == dto.BusinessId))
             {
                 return new BusinessMemberResult { Succeeded = false, Message = "Користувач вже є членом цього бізнесу" };
+            }
+
+            if (dto.Role == BusinessMemberRole.Owner)
+            {
+                return new BusinessMemberResult { Succeeded = false, Message = "Роль власника призначити не можна" };
             }
 
             var businessMember = new BusinessMember
@@ -371,5 +393,83 @@ namespace Marketplace.BLL.Services
             return business;
         }
 
+        public async Task<List<BusinessTeamMemberDto>> GetTeamMembersAsync(Guid businessId)
+        {
+            var members = await _businessMemberRepo.FindAsync(m => m.BusinessId == businessId);
+            
+            return members.Select(m => new BusinessTeamMemberDto
+            {
+                Id = m.Id,
+                Email = m.User?.Email ?? string.Empty,
+                Role = m.Role,
+                IsAccepted = m.IsAccepted
+            }).ToList();
+        }
+
+        public async Task<ServiceResult> UpdateTeamMemberAsync(Guid memberId, Guid businessId, BusinessMemberRole newRole)
+        {
+            var member = await _businessMemberRepo.FirstOrDefaultAsync(m => m.Id == memberId && m.BusinessId == businessId && !m.IsDeleted);
+
+            if (member == null)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Учасник не знайдений" };
+            }
+
+            if (member.Role == BusinessMemberRole.Owner || newRole == BusinessMemberRole.Owner)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Неможливо змінити роль власника або призначити нового власника таким способом." };
+            }
+
+            member.Role = newRole;
+            _businessMemberRepo.Update(member);
+            await _context.SaveChangesAsync();
+
+            return new ServiceResult { Succeeded = true, Message = "Роль учасника успішно оновлено." };
+        }
+
+        public async Task<ServiceResult> RemoveTeamMemberAsync(Guid memberId, Guid businessId)
+        {
+            var member = await _businessMemberRepo.FirstOrDefaultAsync(m => m.Id == memberId && m.BusinessId == businessId && !m.IsDeleted);
+
+            if (member == null)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Учасник не знайдений" };
+            }
+
+            member.IsDeleted = true;
+            _businessMemberRepo.Update(member);
+            await _context.SaveChangesAsync();
+
+            return new ServiceResult { Succeeded = true, Message = string.Empty };
+        }
+
+        public async Task<ServiceResult> UpdateProfileAsync(Guid businessId, string newStoreName, string newDescription)
+        {
+            var business = await _businessRepo.GetByIdAsync(businessId);
+
+            if(business == null)
+            {
+                return new ServiceResult { Succeeded = false, Message = "Магазин не знайдений" };
+            }
+
+            if (!string.IsNullOrWhiteSpace(newStoreName) && newStoreName != business!.StoreName)
+            {
+                if (await _businessRepo.ExistsAsync(b => b.StoreName == newStoreName))
+                {
+                    return new ServiceResult { Succeeded = false, Message = "Це ім'я вже використовується" };
+                }
+                business.StoreName = newStoreName;
+            }
+
+            if (!string.IsNullOrWhiteSpace(newDescription))
+            {
+                business.Description = newDescription;
+            }
+
+            _businessRepo.Update(business);
+            await _context.SaveChangesAsync();
+            
+            return new ServiceResult { Succeeded = true, Message = string.Empty };
+        }
     }
 }

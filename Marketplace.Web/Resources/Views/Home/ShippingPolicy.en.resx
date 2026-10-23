@@ -145,4 +145,70 @@
   <data name="На поточному етапі LUNEXA обслуговує доставку виключно в межах України. Розширення на міжнародні напрямки планується в майбутніх оновленнях платформи." xml:space="preserve">
     <value>At this stage, LUNEXA only supports delivery within Ukraine. Expansion to international destinations is planned for future platform updates.</value>
   </data>
+  <data name="10. Форс-мажорні затримки" xml:space="preserve">
+    <value>10. Force majeure delays</value>
+  </data>
+  <data name="11. Ваші права при порушенні строків" xml:space="preserve">
+    <value>11. Your rights when deadlines are missed</value>
+  </data>
+  <data name="12. Міжнародна доставка" xml:space="preserve">
+    <value>12. International shipping</value>
+  </data>
+  <data name="4. Замовлення від кількох продавців" xml:space="preserve">
+    <value>4. Orders from multiple sellers</value>
+  </data>
+  <data name="5. Пакування" xml:space="preserve">
+    <value>5. Packaging</value>
+  </data>
+  <data name="6. Відстеження замовлення" xml:space="preserve">
+    <value>6. Order tracking</value>
+  </data>
+  <data name="7. Зміна адреси після оформлення" xml:space="preserve">
+    <value>7. Changing the address after ordering</value>
+  </data>
+  <data name="8. Неотримана посилка" xml:space="preserve">
+    <value>8. Uncollected parcel</value>
+  </data>
+  <data name="9. Якщо посилка затримується або загублена" xml:space="preserve">
+    <value>9. If a parcel is delayed or lost</value>
+  </data>
+  <data name="Вартість доставки розраховується перевізником на основі ваги, габаритів посилки та відстані. Вона відображається на кроці «Огляд» перед підтвердженням замовлення - жодних прихованих доплат після оформлення. У межах промоакцій MarketPlace може пропонувати безкоштовну доставку - умови такої акції завжди вказуються окремо в каталозі та кошику." xml:space="preserve">
+    <value>The shipping cost is calculated by the carrier based on the weight, dimensions of the parcel and the distance. It is shown at the "Review" step before you confirm the order — no hidden surcharges after ordering. As part of promotions, MarketPlace may offer free shipping — the terms of such a promotion are always stated separately in the catalogue and cart.</value>
+  </data>
+  <data name="Все, що потрібно знати про доставку замовлень: перевізники, орієнтовні строки, пакування та відстеження посилки." xml:space="preserve">
+    <value>Everything you need to know about order delivery: carriers, estimated times, packaging and parcel tracking.</value>
+  </data>
+  <data name="Політиці повернення та обміну" xml:space="preserve">
+    <value>Returns and Exchange Policy</value>
+  </data>
+  <data name="Порушення заявлених строків доставки саме собою не позбавляє вас права на «Захист покупця» й повернення - 14-денний відлік починається з фактичної дати доставки, а не з дати оформлення замовлення. Детальніше про повернення коштів - у" xml:space="preserve">
+    <value>Missing the stated delivery dates does not in itself deprive you of the right to "Buyer Protection" and a return — the 14-day countdown starts from the actual delivery date, not the order date. More about refunds in the</value>
+  </data>
+  <data name="Продавці зобов'язані пакувати товари так, щоб забезпечити їх збереження під час транспортування, з урахуванням специфіки товару (крихкість, вологочутливість тощо). Замовлення, що містять товари категорії 18+, відправляються в нейтральному пакованні без позначок, що розкривають вміст посилки." xml:space="preserve">
+    <value>Sellers must pack goods so as to ensure their safety during transport, taking into account the specifics of the product (fragility, moisture sensitivity, etc.). Orders containing 18+ products are shipped in neutral packaging without markings that reveal the contents of the parcel.</value>
+  </data>
+  <data name="Після відправлення статус замовлення змінюється на «Відправлено», і стає доступним номер для відстеження." xml:space="preserve">
+    <value>After dispatch, the order status changes to "Shipped" and a tracking number becomes available.</value>
+  </data>
+  <data name="Після оформлення замовлення продавець отримує сповіщення й зобов'язаний підтвердити наявність товару протягом 24 годин;" xml:space="preserve">
+    <value>After an order is placed, the seller receives a notification and must confirm product availability within 24 hours;</value>
+  </data>
+  <data name="Редакція від 16 вересня 2026 року." xml:space="preserve">
+    <value>Version of 16 September 2026.</value>
+  </data>
+  <data name="Спосіб доставки обирається на кроці «Доставка» під час оформлення замовлення і зберігається окремо для кожного замовлення. Точні строки залежать від місцезнаходження продавця, обраного відділення та завантаженості перевізника у конкретний період." xml:space="preserve">
+    <value>The delivery method is chosen at the "Delivery" step during checkout and is saved separately for each order. Exact times depend on the seller's location, the chosen branch and the carrier's workload in a particular period.</value>
+  </data>
+  <data name="У періоди підвищеного навантаження на перевізників, під час погодних обмежень чи інших обставин поза контролем MarketPlace та продавців (зокрема повʼязаних із воєнним станом) орієнтовні строки доставки можуть збільшуватись. Ми рекомендуємо стежити за статусом відстеження та звертатись у підтримку, якщо затримка викликає занепокоєння." xml:space="preserve">
+    <value>During periods of high carrier load, weather restrictions or other circumstances beyond the control of MarketPlace and sellers (including those related to martial law), estimated delivery times may increase. We recommend following the tracking status and contacting support if a delay is a concern.</value>
+  </data>
+  <data name="Якщо ваше замовлення містить товари від різних продавців, кожен з них формує й відправляє свою частину окремою посилкою. Це означає, що товари можуть прибувати в різний час і з різними номерами для відстеження - статус кожної позиції видно окремо на сторінці замовлення." xml:space="preserve">
+    <value>If your order contains products from different sellers, each of them prepares and ships their part as a separate parcel. This means items may arrive at different times and with different tracking numbers — the status of each item is shown separately on the order page.</value>
+  </data>
+  <data name="Якщо посилку не забрано з відділення чи не вручено кур'єром протягом строку зберігання, встановленого перевізником, вона повертається відправнику. У такому разі підтримка зв'яжеться з вами щодо повторної відправки (за додаткову оплату доставки) або оформлення повернення коштів за товар." xml:space="preserve">
+    <value>If a parcel is not collected from the branch or delivered by the courier within the storage period set by the carrier, it is returned to the sender. In this case, support will contact you about reshipping (for an additional delivery fee) or arranging a refund for the product.</value>
+  </data>
+  <data name="Якщо потрібно змінити адресу чи відділення отримання вже після оформлення замовлення, зверніться до продавця чи в підтримку якомога швидше - зміна можлива, доки замовлення не передано службі доставки. Після відправлення зміна адреси залежить від правил конкретного перевізника." xml:space="preserve">
+    <value>If you need to change the delivery address or branch after placing the order, contact the seller or support as soon as possible — a change is possible until the order is handed over to the delivery service. After dispatch, changing the address depends on the rules of the specific carrier.</value>
+  </data>
 </root>

@@ -247,4 +247,7 @@
   <data name="Товарів заблоковано модерацією: {0}" xml:space="preserve">
     <value>Artículos bloqueados por moderación: {0}</value>
   </data>
+  <data name="Активний" xml:space="preserve">
+    <value>Activo</value>
+  </data>
 </root>

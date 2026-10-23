@@ -91,7 +91,16 @@
   <data name="Додати" xml:space="preserve">
     <value>Add</value>
   </data>
-  <data name="до кошика" xml:space="preserve">
-    <value>to cart</value>
+  <data name="Без відгуків" xml:space="preserve">
+    <value>No reviews</value>
+  </data>
+  <data name="До кошика" xml:space="preserve">
+    <value>Add to cart</value>
+  </data>
+  <data name="Рейтинг {0} з 5, {1} відгуків" xml:space="preserve">
+    <value>Rating {0} out of 5, {1} reviews</value>
+  </data>
+  <data name="Додати {0} до кошика" xml:space="preserve">
+    <value>Add {0} to cart</value>
   </data>
 </root>

@@ -40,7 +40,7 @@
                     headers: { "X-Requested-With": "XMLHttpRequest" },
                 });
                 const data = await response.json().catch(() => ({}));
-                const message = data.message || (response.ok ? "Готово" : "Не вдалося виконати дію");
+                const message = data.message || (response.ok ? __t("Готово") : __t("Не вдалося виконати дію"));
 
                 showMessage(message, !response.ok);
                 if (response.ok) {
@@ -48,7 +48,7 @@
                     return;
                 }
             } catch {
-                showMessage("Помилка з'єднання із сервером.", true);
+                showMessage(__t("Помилка з'єднання із сервером."), true);
             }
 
             submitButtons.forEach((b) => { b.disabled = false; });

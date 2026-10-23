@@ -25,7 +25,7 @@
     const fadeDurationMs = 350;
 
     const renderDiscount = (item) => {
-        display.innerHTML = `<strong>-${item.percent}%</strong> в «${item.store}»`;
+        display.innerHTML = `<strong>-${item.percent}%</strong> ${__t("в «{0}»", item.store)}`;
     };
 
     setInterval(() => {
