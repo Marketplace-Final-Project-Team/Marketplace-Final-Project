@@ -58,8 +58,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Баланс маркетплейсу" xml:space="preserve">
-    <value>Marktplatz-Guthaben</value>
+  <data name="Баланс LUNEXA" xml:space="preserve">
+    <value>LUNEXA-Guthaben</value>
   </data>
   <data name="Комісія платформи з кожного підтвердженого замовлення - окремо від балансів продавців." xml:space="preserve">
     <value>Plattformprovision aus jeder bestätigten Bestellung - getrennt von den Guthaben der Verkäufer.</value>
@@ -70,7 +70,7 @@
   <data name="Як це працює" xml:space="preserve">
     <value>So funktioniert es</value>
   </data>
-  <data name="Комісія задається окремо для кожного бізнесу (розділ «Бізнеси») і фіксується для кожної позиції замовлення в момент підтвердження продавцем (статус «Підтверджено») - продавцю зараховується сума за вирахуванням комісії, різниця йде на баланс маркетплейсу. Якщо підтверджене замовлення згодом скасовують, обидва баланси коригуються назад симетрично, за тією ставкою, що діяла на момент підтвердження." xml:space="preserve">
-    <value>Die Provision wird individuell für jedes Unternehmen festgelegt (Bereich „Unternehmen“) und für jede Bestellposition im Moment der Bestätigung durch den Verkäufer fixiert (Status „Bestätigt“) - dem Verkäufer wird der Betrag abzüglich der Provision gutgeschrieben, die Differenz fließt in das Marktplatz-Guthaben. Wird eine bestätigte Bestellung später storniert, werden beide Guthaben symmetrisch zurückkorrigiert, und zwar zu dem Satz, der zum Zeitpunkt der Bestätigung galt.</value>
+  <data name="Комісія задається окремо для кожного бізнесу (розділ «Бізнеси») і фіксується для кожної позиції замовлення в момент підтвердження продавцем (статус «Підтверджено») - продавцю зараховується сума за вирахуванням комісії, різниця йде на баланс LUNEXA. Якщо підтверджене замовлення згодом скасовують, обидва баланси коригуються назад симетрично, за тією ставкою, що діяла на момент підтвердження." xml:space="preserve">
+    <value>Die Provision wird individuell für jedes Unternehmen festgelegt (Bereich „Unternehmen“) und für jede Bestellposition im Moment der Bestätigung durch den Verkäufer fixiert (Status „Bestätigt“) - dem Verkäufer wird der Betrag abzüglich der Provision gutgeschrieben, die Differenz fließt in das LUNEXA-Guthaben. Wird eine bestätigte Bestellung später storniert, werden beide Guthaben symmetrisch zurückkorrigiert, und zwar zu dem Satz, der zum Zeitpunkt der Bestätigung galt.</value>
   </data>
 </root>

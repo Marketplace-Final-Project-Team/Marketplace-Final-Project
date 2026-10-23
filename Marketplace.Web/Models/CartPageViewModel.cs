@@ -55,7 +55,7 @@ public static class CartGrouping
                 group = new CartSellerGroupViewModel
                 {
                     BusinessId = businessId,
-                    StoreName = product?.Business?.StoreName ?? "Marketplace",
+                    StoreName = product?.Business?.StoreName ?? "LUNEXA",
                     StoreLogoUrl = product?.Business?.LogoUrl
                 };
                 groups[businessId] = group;

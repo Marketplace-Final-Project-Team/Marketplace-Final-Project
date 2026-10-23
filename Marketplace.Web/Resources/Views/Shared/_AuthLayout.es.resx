@@ -61,14 +61,14 @@
   <data name="Перейти до форми" xml:space="preserve">
     <value>Ir al formulario</value>
   </data>
-  <data name="Про Marketplace" xml:space="preserve">
-    <value>Acerca de Marketplace</value>
+  <data name="Про LUNEXA" xml:space="preserve">
+    <value>Acerca de LUNEXA</value>
   </data>
-  <data name="Marketplace - на головну" xml:space="preserve">
-    <value>Marketplace - inicio</value>
+  <data name="LUNEXA - на головну" xml:space="preserve">
+    <value>LUNEXA - inicio</value>
   </data>
-  <data name="Твій маркетплейс щодня" xml:space="preserve">
-    <value>Tu marketplace de cada día</value>
+  <data name="LUNEXA щодня" xml:space="preserve">
+    <value>Tu LUNEXA de cada día</value>
   </data>
   <data name="Купуй простіше." xml:space="preserve">
     <value>Compra más fácil.</value>
@@ -100,8 +100,8 @@
   <data name="від 899 ₴" xml:space="preserve">
     <value>desde 899 ₴</value>
   </data>
-  <data name="Переваги Marketplace" xml:space="preserve">
-    <value>Ventajas de Marketplace</value>
+  <data name="Переваги LUNEXA" xml:space="preserve">
+    <value>Ventajas de LUNEXA</value>
   </data>
   <data name="Захищені покупки" xml:space="preserve">
     <value>Compras seguras</value>

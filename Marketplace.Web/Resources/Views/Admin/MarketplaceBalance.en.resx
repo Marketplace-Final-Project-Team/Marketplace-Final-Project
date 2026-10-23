@@ -58,8 +58,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Баланс маркетплейсу" xml:space="preserve">
-    <value>Marketplace Balance</value>
+  <data name="Баланс LUNEXA" xml:space="preserve">
+    <value>LUNEXA Balance</value>
   </data>
   <data name="Комісія платформи з кожного підтвердженого замовлення - окремо від балансів продавців." xml:space="preserve">
     <value>Platform commission from each confirmed order - separate from sellers' balances.</value>
@@ -70,7 +70,7 @@
   <data name="Як це працює" xml:space="preserve">
     <value>How it works</value>
   </data>
-  <data name="Комісія задається окремо для кожного бізнесу (розділ «Бізнеси») і фіксується для кожної позиції замовлення в момент підтвердження продавцем (статус «Підтверджено») - продавцю зараховується сума за вирахуванням комісії, різниця йде на баланс маркетплейсу. Якщо підтверджене замовлення згодом скасовують, обидва баланси коригуються назад симетрично, за тією ставкою, що діяла на момент підтвердження." xml:space="preserve">
-    <value>Commission is set individually per business (the &quot;Businesses&quot; section) and is fixed for each order item at the moment the seller confirms it (status &quot;Confirmed&quot;) - the seller is credited the amount minus the commission, and the difference goes to the marketplace balance. If a confirmed order is later canceled, both balances are adjusted back symmetrically, at the rate that applied at the time of confirmation.</value>
+  <data name="Комісія задається окремо для кожного бізнесу (розділ «Бізнеси») і фіксується для кожної позиції замовлення в момент підтвердження продавцем (статус «Підтверджено») - продавцю зараховується сума за вирахуванням комісії, різниця йде на баланс LUNEXA. Якщо підтверджене замовлення згодом скасовують, обидва баланси коригуються назад симетрично, за тією ставкою, що діяла на момент підтвердження." xml:space="preserve">
+    <value>Commission is set individually per business (the &quot;Businesses&quot; section) and is fixed for each order item at the moment the seller confirms it (status &quot;Confirmed&quot;) - the seller is credited the amount minus the commission, and the difference goes to the LUNEXA balance. If a confirmed order is later canceled, both balances are adjusted back symmetrically, at the rate that applied at the time of confirmation.</value>
   </data>
 </root>

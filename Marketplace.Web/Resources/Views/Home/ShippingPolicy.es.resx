@@ -109,8 +109,8 @@
   <data name="2. Вартість доставки" xml:space="preserve">
     <value>2. Coste del envío</value>
   </data>
-  <data name="Вартість доставки розраховується перевізником на основі ваги, габаритів посилки та відстані. Вона відображається на кроці «Огляд» перед підтвердженням замовлення. У межах промоакцій MarketPlace може пропонувати безкоштовну доставку - умови такої акції завжди вказуються окремо в каталозі та кошику." xml:space="preserve">
-    <value>El coste del envío lo calcula el transportista en función del peso, las dimensiones del paquete y la distancia. Se muestra en el paso "Revisión" antes de confirmar el pedido. Dentro de promociones, MarketPlace puede ofrecer envío gratuito; las condiciones de dicha promoción siempre se indican por separado en el catálogo y el carrito.</value>
+  <data name="Вартість доставки розраховується перевізником на основі ваги, габаритів посилки та відстані. Вона відображається на кроці «Огляд» перед підтвердженням замовлення. У межах промоакцій LUNEXA може пропонувати безкоштовну доставку - умови такої акції завжди вказуються окремо в каталозі та кошику." xml:space="preserve">
+    <value>El coste del envío lo calcula el transportista en función del peso, las dimensiones del paquete y la distancia. Se muestra en el paso "Revisión" antes de confirmar el pedido. Dentro de promociones, LUNEXA puede ofrecer envío gratuito; las condiciones de dicha promoción siempre se indican por separado en el catálogo y el carrito.</value>
   </data>
   <data name="3. Обробка та відправлення замовлення" xml:space="preserve">
     <value>3. Procesamiento y envío del pedido</value>
@@ -136,14 +136,14 @@
   <data name="5. Якщо посилка затримується або загублена" xml:space="preserve">
     <value>5. Si el paquete se retrasa o se pierde</value>
   </data>
-  <data name="Якщо строк доставки суттєво перевищено, а статус замовлення не оновлюється - скористайтесь кнопкою «Відкрити спір» на сторінці замовлення й оберіть причину «Товар не прийшов». Підтримка маркетплейсу зв'яжеться з перевізником і продавцем для з'ясування ситуації, а у разі підтвердженої втрати посилки покупцю повертаються повні кошти за замовлення." xml:space="preserve">
-    <value>Si el plazo de entrega se supera considerablemente y el estado del pedido no se actualiza, utilice el botón "Abrir una disputa" en la página del pedido y elija el motivo "El artículo no llegó". El soporte del marketplace se pondrá en contacto con el transportista y el vendedor para aclarar la situación, y si se confirma la pérdida del paquete, el comprador recibe el reembolso íntegro del pedido.</value>
+  <data name="Якщо строк доставки суттєво перевищено, а статус замовлення не оновлюється - скористайтесь кнопкою «Відкрити спір» на сторінці замовлення й оберіть причину «Товар не прийшов». Підтримка LUNEXA зв'яжеться з перевізником і продавцем для з'ясування ситуації, а у разі підтвердженої втрати посилки покупцю повертаються повні кошти за замовлення." xml:space="preserve">
+    <value>Si el plazo de entrega se supera considerablemente y el estado del pedido no se actualiza, utilice el botón "Abrir una disputa" en la página del pedido y elija el motivo "El artículo no llegó". El soporte de LUNEXA se pondrá en contacto con el transportista y el vendedor para aclarar la situación, y si se confirma la pérdida del paquete, el comprador recibe el reembolso íntegro del pedido.</value>
   </data>
   <data name="6. Міжнародна доставка" xml:space="preserve">
     <value>6. Envío internacional</value>
   </data>
-  <data name="На поточному етапі MarketPlace обслуговує доставку виключно в межах України. Розширення на міжнародні напрямки планується в майбутніх оновленнях платформи." xml:space="preserve">
-    <value>En esta etapa, MarketPlace solo ofrece envíos dentro de Ucrania. La expansión a destinos internacionales está prevista en futuras actualizaciones de la plataforma.</value>
+  <data name="На поточному етапі LUNEXA обслуговує доставку виключно в межах України. Розширення на міжнародні напрямки планується в майбутніх оновленнях платформи." xml:space="preserve">
+    <value>En esta etapa, LUNEXA solo ofrece envíos dentro de Ucrania. La expansión a destinos internacionales está prevista en futuras actualizaciones de la plataforma.</value>
   </data>
   <data name="10. Форс-мажорні затримки" xml:space="preserve">
     <value>10. Retrasos por fuerza mayor</value>

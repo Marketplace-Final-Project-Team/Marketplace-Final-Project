@@ -61,8 +61,8 @@
   <data name="Для продавців" xml:space="preserve">
     <value>Pour les vendeurs</value>
   </data>
-  <data name="Правила роботи на маркетплейсі" xml:space="preserve">
-    <value>Règles de fonctionnement sur la marketplace</value>
+  <data name="Правила роботи на LUNEXA" xml:space="preserve">
+    <value>Règles de fonctionnement sur LUNEXA</value>
   </data>
   <data name="Вимоги до магазинів, товарів та поведінки продавців, які дозволяють підтримувати якісний і безпечний каталог для всіх покупців." xml:space="preserve">
     <value>Exigences relatives aux boutiques, aux produits et au comportement des vendeurs, qui permettent de maintenir un catalogue de qualité et sécurisé pour tous les acheteurs.</value>
@@ -142,8 +142,8 @@
   <data name="7. Комісія та виплати" xml:space="preserve">
     <value>7. Commission et versements</value>
   </data>
-  <data name="MarketPlace утримує комісію з кожного успішно завершеного замовлення відповідно до тарифного плану, зазначеного в кабінеті продавця. Кошти за замовлення надходять на баланс магазину після підтвердження отримання товару покупцем (для онлайн-оплати) або після позначки «Доставлено» кур'єром (для оплати при отриманні). Вивід коштів із балансу магазину доступний у розділі фінансової статистики." xml:space="preserve">
-    <value>MarketPlace prélève une commission sur chaque commande menée à bien, conformément au plan tarifaire indiqué dans l'espace vendeur. Les fonds de la commande sont crédités sur le solde de la boutique après confirmation de réception de l'article par l'acheteur (paiement en ligne) ou après le marquage « Livrée » par le livreur (paiement à la livraison). Le retrait des fonds du solde de la boutique est disponible dans la section des statistiques financières.</value>
+  <data name="LUNEXA утримує комісію з кожного успішно завершеного замовлення відповідно до тарифного плану, зазначеного в кабінеті продавця. Кошти за замовлення надходять на баланс магазину після підтвердження отримання товару покупцем (для онлайн-оплати) або після позначки «Доставлено» кур'єром (для оплати при отриманні). Вивід коштів із балансу магазину доступний у розділі фінансової статистики." xml:space="preserve">
+    <value>LUNEXA prélève une commission sur chaque commande menée à bien, conformément au plan tarifaire indiqué dans l'espace vendeur. Les fonds de la commande sont crédités sur le solde de la boutique après confirmation de réception de l'article par l'acheteur (paiement en ligne) ou après le marquage « Livrée » par le livreur (paiement à la livraison). Le retrait des fonds du solde de la boutique est disponible dans la section des statistiques financières.</value>
   </data>
   <data name="8. Заборонені товари та дії" xml:space="preserve">
     <value>8. Produits et actions interdits</value>

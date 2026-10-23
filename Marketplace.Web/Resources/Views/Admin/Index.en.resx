@@ -61,8 +61,8 @@
   <data name="Дашборд" xml:space="preserve">
     <value>Dashboard</value>
   </data>
-  <data name="Загальний стан маркетплейсу: користувачі, товари та магазини, що потребують уваги." xml:space="preserve">
-    <value>Overall marketplace status: users, products and stores that need attention.</value>
+  <data name="Загальний стан LUNEXA: користувачі, товари та магазини, що потребують уваги." xml:space="preserve">
+    <value>Overall LUNEXA status: users, products and stores that need attention.</value>
   </data>
   <data name="Загальна статистика" xml:space="preserve">
     <value>Overall statistics</value>
@@ -100,8 +100,8 @@
   <data name="Переглянути →" xml:space="preserve">
     <value>View →</value>
   </data>
-  <data name="Баланс маркетплейсу" xml:space="preserve">
-    <value>Marketplace balance</value>
+  <data name="Баланс LUNEXA" xml:space="preserve">
+    <value>LUNEXA balance</value>
   </data>
   <data name="Накопичена комісія з продажів" xml:space="preserve">
     <value>Accumulated commission from sales</value>
