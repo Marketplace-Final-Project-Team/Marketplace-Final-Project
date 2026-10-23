@@ -9,5 +9,7 @@ namespace Marketplace.BLL.Interfaces
         Task<List<RefundChatThreadDto>> GetOpenThreadsForAdminAsync();
         Task MarkAsReadAsync(Guid postSaleRequestId, bool byAdmin, bool isSellerChannel);
         Task<int> GetUnreadCountAsync(Guid postSaleRequestId, bool isSellerChannel, bool byAdmin);
+        Task<RefundChatPageDto> GetChatPageAsync(Guid requestId, string? userId, bool isAdmin, bool isSellerChannel);
+        Task<Guid?> GetRequestIdByOrderItemAsync(Guid orderItemId);
     }
 }

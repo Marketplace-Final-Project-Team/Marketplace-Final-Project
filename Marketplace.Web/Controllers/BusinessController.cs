@@ -1,8 +1,6 @@
 using Marketplace.Web.Infrastructure;
-using Marketplace.BLL.Common;
 using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
-using Marketplace.DAL.Data;
 using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
 using Marketplace.Web.Models;
@@ -30,7 +28,6 @@ namespace Marketplace.Web.Controllers
         private readonly IDiscountService _discountService;
         private readonly UserManager<User> _userManager;
         private readonly IEmailSender _emailSender;
-        private readonly AppDbContext _context;
         private readonly IActivityLogService _activityLog;
         private readonly IProductAnalyticsService _productAnalyticsService;
         private readonly ISystemSettingsService _settingsService;
@@ -50,7 +47,6 @@ namespace Marketplace.Web.Controllers
             IDiscountService discountService,
             UserManager<User> userManager,
             IEmailSender emailSender,
-            AppDbContext context,
             IActivityLogService activityLog,
             IProductAnalyticsService productAnalyticsService,
             ISystemSettingsService settingsService,
@@ -69,7 +65,6 @@ namespace Marketplace.Web.Controllers
             _discountService = discountService;
             _userManager = userManager;
             _emailSender = emailSender;
-            _context = context;
             _activityLog = activityLog;
             _productAnalyticsService = productAnalyticsService;
             _settingsService = settingsService;
@@ -152,11 +147,6 @@ namespace Marketplace.Web.Controllers
             var lowStockThreshold = await _settingsService.GetIntAsync("BusinessRules", "LowStockThreshold", 5);
             var traffic = await _productAnalyticsService.GetBusinessTrafficStatsAsync(businessId, start, end);
             var recentActivity = await _activityLog.GetRecentBusinessActionsAsync(businessId, take: 15);
-            var ratingStats = await _context.Reviews
-                .Where(r => r.Product.BusinessId == businessId)
-                .GroupBy(r => 1)
-                .Select(g => new { Average = g.Average(r => r.Rating), Count = g.Count() })
-                .FirstOrDefaultAsync();
 
             var periodRevenue = statsResult.Succeeded ? statsResult.Data!.TotalRevenue : 0;
             var periodOrders = statsResult.Succeeded ? statsResult.Data!.Stats.Sum(s => s.OrderCount) : 0;
@@ -213,8 +203,8 @@ namespace Marketplace.Web.Controllers
 
                 AccountStatus = business.Status.ToString(),
                 MemberSince = business.CreatedAt,
-                AverageRating = ratingStats?.Average ?? 0,
-                ReviewCount = ratingStats?.Count ?? 0,
+                AverageRating = await _reviewService.GetAvgRatingByBusinessAsync(businessId),
+                ReviewCount = await _reviewService.GetReviewCountByBusinessAsync(businessId),
 
                 TotalViews = traffic.TotalViews,
                 TotalCartAdds = traffic.TotalCartAdds,
@@ -588,14 +578,9 @@ namespace Marketplace.Web.Controllers
 
             var userId = _userManager.GetUserId(User)!;
             var canManage = await _businessAccessService.HasAccessAsync(businessId, userId, BusinessMemberRole.Owner);
+            
             var owner = await _userManager.FindByIdAsync(business.OwnerId);
-
-            var members = await _context.BusinessMembers
-                .Include(m => m.User)
-                .Where(m => m.BusinessId == businessId && !m.IsDeleted)
-                .OrderByDescending(m => m.IsAccepted)
-                .ThenBy(m => m.Role)
-                .ToListAsync();
+            var members = await _businessService.GetTeamMembersAsync(businessId);
 
             return View(new BusinessTeamViewModel
             {
@@ -606,7 +591,7 @@ namespace Marketplace.Web.Controllers
                 Members = members.Select(m => new BusinessTeamMemberViewModel
                 {
                     Id = m.Id,
-                    Email = m.User?.Email ?? this.L("невідомо"),
+                    Email = m.Email ?? this.L("невідомо"),
                     Role = m.Role,
                     IsAccepted = m.IsAccepted
                 }).ToList()
@@ -623,24 +608,13 @@ namespace Marketplace.Web.Controllers
                 return Forbid();
             }
 
-            var member = await _context.BusinessMembers
-                .FirstOrDefaultAsync(m => m.Id == memberId && m.BusinessId == businessId && !m.IsDeleted);
+            var res = await _businessService.UpdateTeamMemberAsync(memberId, businessId, newRole);
 
-            if (member is null)
+            if (!res.Succeeded) 
             {
-                return NotFound();
-            }
-
-
-            if (member.Role == BusinessMemberRole.Owner || newRole == BusinessMemberRole.Owner)
-            {
-                TempData["Error"] = this.L("Неможливо змінити роль власника або призначити нового власника таким способом.");
+                TempData["Error"] = this.L(res.Message);
                 return RedirectToAction(nameof(Team), new { businessId });
             }
-
-            member.Role = newRole;
-            _context.BusinessMembers.Update(member);
-            await _context.SaveChangesAsync();
 
             await _activityLog.LogBusinessActionAsync(businessId, "MemberRoleUpdated",
                 $"Роль учасника змінено на «{newRole}».",
@@ -660,16 +634,13 @@ namespace Marketplace.Web.Controllers
                 return Forbid();
             }
 
-            var member = await _context.BusinessMembers
-                .FirstOrDefaultAsync(m => m.Id == memberId && m.BusinessId == businessId && !m.IsDeleted);
+            var res = await _businessService.RemoveTeamMemberAsync(memberId, businessId);
 
-            if (member is null)
+            if (!res.Succeeded)
             {
-                return NotFound();
+                TempData["Error"] = this.L(res.Message);
+                return RedirectToAction(nameof(Team), new { businessId });
             }
-
-            member.IsDeleted = true;
-            await _context.SaveChangesAsync();
 
             TempData["Success"] = this.L("Учасника видалено з команди.");
             return RedirectToAction(nameof(Team), new { businessId });
@@ -1031,10 +1002,13 @@ namespace Marketplace.Web.Controllers
                 return View(model);
             }
 
-            business.StoreName = model.StoreName.Trim();
-            business.Description = model.Description.Trim();
-            _context.Businesses.Update(business);
-            await _context.SaveChangesAsync();
+            var res = await _businessService.UpdateProfileAsync(model.BusinessId, model.StoreName, model.Description);
+
+            if(!res.Succeeded)
+            {
+                TempData["Error"] = this.L(res.Message);
+                return RedirectToAction(nameof(Settings), new { businessId = model.BusinessId });
+            }
 
             TempData["Success"] = this.L("Дані магазину оновлено.");
             return RedirectToAction(nameof(Settings), new { businessId = model.BusinessId });

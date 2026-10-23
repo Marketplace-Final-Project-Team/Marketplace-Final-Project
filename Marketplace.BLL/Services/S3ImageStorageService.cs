@@ -12,7 +12,7 @@ namespace Marketplace.BLL.Services
         private readonly string _bucketName;
 
         private static readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
-        private const long MaxFileSizeBytes = 1 * 1024 * 1024;
+        private const long MaxFileSizeBytes = 5 * 1024 * 1024;
         private readonly ILogger<S3ImageStorageService> _logger;
 
         public S3ImageStorageService(IAmazonS3 s3Client, IConfiguration configuration, ILogger<S3ImageStorageService> logger)
@@ -22,7 +22,7 @@ namespace Marketplace.BLL.Services
             _logger = logger;
         }
 
-        public async Task<string?> UploadImageAsync(IFormFile file) 
+        public async Task<string?> UploadImageAsync(IFormFile file, string folder) 
         {
             if(file == null || file.Length == 0) return null;
 
@@ -33,7 +33,7 @@ namespace Marketplace.BLL.Services
 
             try 
             {
-                var key = $"photos/{Guid.NewGuid()}{extension}";
+                var key = $"{folder}/{Guid.NewGuid()}{extension}";
 
                 await using var stream = file.OpenReadStream();
 

@@ -1,9 +1,7 @@
 ﻿using Marketplace.Web.Infrastructure;
 using Marketplace.BLL.Interfaces;
-using Marketplace.DAL.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace Marketplace.Web.Controllers
@@ -12,18 +10,15 @@ namespace Marketplace.Web.Controllers
     public class SupportController : Controller
     {
         private readonly IRefundChatService _chatService;
-        private readonly AppDbContext _context;
         private readonly IBusinessAccessService _businessAccessService;
         private readonly ISupportTicketService _supportTicketService;
 
         public SupportController(
           IRefundChatService chatService,
-          AppDbContext context,
           IBusinessAccessService businessAccessService,
           ISupportTicketService supportTicketService)   
         {
             _chatService = chatService;
-            _context = context;
             _businessAccessService = businessAccessService;
             _supportTicketService = supportTicketService;  
         }
@@ -32,51 +27,23 @@ namespace Marketplace.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> RefundChat(Guid requestId, bool isSellerChannel = false)
         {
-            var request = await _context.PostSaleRequests
-                .Include(r => r.Order)
-                .Include(r => r.OrderItem)
-                .ThenInclude(oi => oi.Product)
-                .FirstOrDefaultAsync(r => r.Id == requestId);
-
-            if (request == null)
-            {
-                return NotFound();
-            }
-
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var isAdmin = User.IsInRole("Admin");
 
-            if (isSellerChannel)
+            var page = await _chatService.GetChatPageAsync(requestId, userId, isAdmin, isSellerChannel);
+
+            switch (page.Status)
             {
-   
-                var businessId = request.OrderItem?.Product?.BusinessId;
-                var hasBusinessAccess = businessId.HasValue
-                    && !string.IsNullOrEmpty(userId)
-                    && await _businessAccessService.HasAccessAsync(businessId.Value, userId);
-
-                if (!isAdmin && !hasBusinessAccess)
-                {
-                    return Forbid();
-                }
+                case AccessStatus.NotFound: return NotFound();
+                case AccessStatus.Forbidden: return Forbid();
             }
-            else
-            {
-                if (!isAdmin && request.BuyerId != userId)
-                {
-                    return Forbid();
-                }
-            }
-
-            await _chatService.MarkAsReadAsync(requestId, isAdmin, isSellerChannel);
-
-            var messages = await _chatService.GetMessagesAsync(requestId, isSellerChannel);
 
             ViewBag.IsAdmin = isAdmin;
             ViewBag.RequestId = requestId;
             ViewBag.IsSellerChannel = isSellerChannel;
-            ViewBag.ItemName = request.OrderItem?.ProductName ?? this.L("Товар");
-            ViewBag.OrderNumber = request.OrderId.ToString()[..8].ToUpperInvariant();
-            var backBusinessId = request.OrderItem?.Product?.BusinessId;
+            ViewBag.ItemName = page.ProductName ?? this.L("Товар");
+            ViewBag.OrderNumber = page.OrderId.ToString()[..8].ToUpperInvariant();
+            var backBusinessId = page.BusinessId;
             string backUrl;
             string backLabel;
 
@@ -88,7 +55,7 @@ namespace Marketplace.Web.Controllers
             else if (isSellerChannel && backBusinessId.HasValue)
             {
                 backUrl = Url.Action("OrderDetails", "Business",
-                    new { businessId = backBusinessId.Value, orderId = request.OrderId })!;
+                    new { businessId = backBusinessId.Value, orderId = page.OrderId })!;
                 backLabel = "← До замовлення";
             }
             else
@@ -99,7 +66,7 @@ namespace Marketplace.Web.Controllers
 
             ViewBag.BackUrl = backUrl;
             ViewBag.BackLabel = backLabel;
-            return View(messages);
+            return View(page.Messages);
         }
 
         [HttpGet]
@@ -113,15 +80,14 @@ namespace Marketplace.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> RefundChatByOrderItem(Guid orderItemId)
         {
-            var request = await _context.PostSaleRequests
-                .FirstOrDefaultAsync(r => r.OrderItemId == orderItemId);
+            var requestId = await _chatService.GetRequestIdByOrderItemAsync(orderItemId);
 
-            if (request == null)
+            if (requestId == null)
             {
                 return NotFound();
             }
 
-            return RedirectToAction(nameof(RefundChat), new { requestId = request.Id });
+            return RedirectToAction(nameof(RefundChat), new { requestId });
         }
 
         [HttpPost]
@@ -141,33 +107,22 @@ namespace Marketplace.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> TicketChat(Guid ticketId)
         {
-            var ticket = await _context.SupportTickets.FirstOrDefaultAsync(t => t.Id == ticketId);
-            if (ticket is null)
-            {
-                return NotFound();
-            }
-
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var isAdmin = User.IsInRole("Admin");
 
-            if (!isAdmin && ticket.UserId != userId)
-            {
-                return Forbid();
-            }
+            var page = await _supportTicketService.GetTicketChatAsync(ticketId, userId, isAdmin);
 
-            if (isAdmin)
+            switch (page.Status)
             {
-                await _supportTicketService.AdminOpenChatAsync(ticketId);
+                case AccessStatus.NotFound: return NotFound();
+                case AccessStatus.Forbidden: return Forbid();
             }
-
-            await _supportTicketService.MarkAsReadAsync(ticketId, isAdmin);
-            var messages = await _supportTicketService.GetMessagesAsync(ticketId);
 
             ViewBag.IsAdmin = isAdmin;
             ViewBag.TicketId = ticketId;
-            ViewBag.Category = ticket.Category;
+            ViewBag.Category = page.Category;
 
-            return View(messages);
+            return View(page.Messages);
         }
 
         [HttpPost]
@@ -182,19 +137,15 @@ namespace Marketplace.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetTicketStatus(Guid ticketId)
         {
-            var ticket = await _context.SupportTickets.FirstOrDefaultAsync(t => t.Id == ticketId);
-            if (ticket is null)
-            {
-                return Json(new { status = "NotFound" });
-            }
-
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (ticket.UserId != userId)
-            {
-                return Forbid();
-            }
+            var result = await _supportTicketService.GetTicketStatusAsync(ticketId, userId);
 
-            return Json(new { status = ticket.Status.ToString() });
+            return result.Access switch
+            {
+                AccessStatus.NotFound => Json(new { status = "NotFound" }),
+                AccessStatus.Forbidden => Forbid(),
+                _ => Json(new { status = result.TicketStatus!.ToString() })
+            };
         }
 
     }

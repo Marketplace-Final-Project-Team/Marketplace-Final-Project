@@ -6,7 +6,6 @@
 
     var roleOptions = new List<SelectListItem>
     {
-        new(Localizer["Власник"].Value, nameof(Marketplace.Domain.Enums.BusinessMemberRole.Owner)),
         new(Localizer["Адміністратор"].Value, nameof(Marketplace.Domain.Enums.BusinessMemberRole.Admin)),
         new(Localizer["Бізнес-аналітик"].Value, nameof(Marketplace.Domain.Enums.BusinessMemberRole.BusinessAnalyst)),
         new(Localizer["Менеджер товарів"].Value, nameof(Marketplace.Domain.Enums.BusinessMemberRole.ProductManager)),

@@ -4,6 +4,6 @@ namespace Marketplace.BLL.Interfaces
 {
     public interface IImageStorageService
     {
-        Task<string?> UploadImageAsync(IFormFile file);
+        Task<string?> UploadImageAsync(IFormFile file, string folder);
     }
 }

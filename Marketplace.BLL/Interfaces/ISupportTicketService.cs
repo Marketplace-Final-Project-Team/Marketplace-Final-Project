@@ -16,5 +16,7 @@ namespace Marketplace.BLL.Interfaces
         Task<List<SupportTicketMessageDto>> GetMessagesAsync(Guid ticketId);
         Task MarkAsReadAsync(Guid ticketId, bool byAdmin);
         Task<int> GetUnreadCountAsync(Guid ticketId, bool byAdmin);
+        Task<TicketStatusDto> GetTicketStatusAsync(Guid ticketId, string? userId);
+        Task<TicketChatPageDto> GetTicketChatAsync(Guid ticketId, string? userId, bool isAdmin);
     }
 }

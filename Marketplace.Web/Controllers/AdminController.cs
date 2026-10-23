@@ -1,15 +1,12 @@
-﻿using Marketplace.Web.Infrastructure;
-using System.Security.Claims;
+﻿using Marketplace.BLL.Common;
+using Marketplace.BLL.DTOs;
 using Marketplace.BLL.Interfaces;
 using Marketplace.Domain.Enums;
+using Marketplace.Web.Infrastructure;
 using Marketplace.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Marketplace.BLL.DTOs;
-using Marketplace.BLL.Common;
-using Quartz;
-using Quartz.Impl.Matchers;
-using Marketplace.BLL.Jobs;
+using System.Security.Claims;
 
 namespace Marketplace.Web.Controllers
 {
@@ -20,16 +17,14 @@ namespace Marketplace.Web.Controllers
         private readonly ISystemSettingsService _settingsService;
         private readonly IActivityLogService _activityLog;
         private readonly IProductService _productService;
-        private readonly IBusinessService _businessService;
         private readonly IMarketplaceBalanceService _marketplaceBalanceService;
         private readonly ICategoryService _categoryService;
-        private readonly ISchedulerFactory _schedulerFactory;
         private readonly IDiscountService _discountService;
         private readonly IOrderService _orderService;
         private readonly IPostSaleService _postSaleService;
-        private readonly IRefundChatService _refundChatService;
-        private readonly ISupportTicketService _supportTicketService;
         private readonly IWithdrawalService _withdrawalService;
+        private readonly IShedulerAdminService _shedulerAdminService;
+        private readonly IAdminInboxService _adminInboxService;
 
         public AdminController(
             IAdminService adminService,
@@ -38,14 +33,12 @@ namespace Marketplace.Web.Controllers
             IProductService productService,
             IMarketplaceBalanceService marketplaceBalanceService,
             ICategoryService categoryService,
-            ISchedulerFactory schedulerFactory,
-            IBusinessService businessService,
             IDiscountService discountService,
             IOrderService orderService,
             IPostSaleService postSaleService,
-            IRefundChatService refundChatService,
-            ISupportTicketService supportTicketService,
-            IWithdrawalService withdrawalService)
+            IWithdrawalService withdrawalService,
+            IShedulerAdminService shedulerAdminService,
+            IAdminInboxService adminInboxService)
         {
             _adminService = adminService;
             _settingsService = settingsService;
@@ -53,14 +46,12 @@ namespace Marketplace.Web.Controllers
             _productService = productService;
             _marketplaceBalanceService = marketplaceBalanceService;
             _categoryService = categoryService;
-            _schedulerFactory = schedulerFactory;
-            _businessService = businessService;
             _discountService = discountService;
             _orderService = orderService;
             _postSaleService = postSaleService;
-            _refundChatService = refundChatService;
-            _supportTicketService = supportTicketService;
             _withdrawalService = withdrawalService;
+            _shedulerAdminService = shedulerAdminService;
+            _adminInboxService = adminInboxService;
         }
 
         private string? CurrentAdminId => User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -377,97 +368,32 @@ namespace Marketplace.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Jobs()
         {
-            var scheduler = await _schedulerFactory.GetScheduler();
-
-            var jobKeys = await scheduler.GetJobKeys(GroupMatcher<JobKey>.GroupEquals("moderation"));
-            var scheduledJobs = new List<ScheduledModerationJobViewModel>();
-
-            foreach (var jobKey in jobKeys)
-            {
-                string? entityType = null;
-                Guid entityId;
-
-                if (jobKey.Name.StartsWith("product-moderation-job-") &&
-                    Guid.TryParse(jobKey.Name.Replace("product-moderation-job-", string.Empty), out var productId))
+            var scheduledJobs = (await _shedulerAdminService.GetSheduledJobsAsync())
+                .Select(j => new ScheduledModerationJobViewModel
                 {
-                    entityType = "Product";
-                    entityId = productId;
-                }
-                else if (jobKey.Name.StartsWith("business-moderation-job-") &&
-                    Guid.TryParse(jobKey.Name.Replace("business-moderation-job-", string.Empty), out var businessId))
-                {
-                    entityType = "Business";
-                    entityId = businessId;
-                }
-                else
-                {
-                    continue;
-                }
+                    EntityType = j.EntityType,
+                    EntityId = j.EntityId,
+                    ProductName = j.EntityName ?? this.L(j.EntityType == "Product" ? "(товар видалено)" : "(бізнес видалено)"),
+                    NextRunAtUtc = j.NextRunAtUtc
+                })
+                .OrderBy(j => j.NextRunAtUtc)
+                .ToList();
 
-                var triggers = await scheduler.GetTriggersOfJob(jobKey);
-                var nextFireTime = triggers
-                    .Select(t => t.GetNextFireTimeUtc())
-                    .Where(t => t.HasValue)
-                    .Select(t => t!.Value.UtcDateTime)
-                    .OrderBy(t => t)
-                    .Cast<DateTime?>()
-                    .FirstOrDefault();
-
-                string name;
-                if (entityType == "Product")
+            var recurringJobs = (await _shedulerAdminService.GetReccuringJobsAsync())
+                .Select(j => new RecurringJobViewModel
                 {
-                    var product = await _productService.GetByIdAsync(entityId);
-                    name = product?.Name ?? this.L("(товар видалено)");
-                }
-                else
-                {
-                    var business = await _businessService.GetByIdAsync(entityId);
-                    name = business?.StoreName ?? this.L("(бізнес видалено)");
-                }
+                    GroupName = j.GroupName,
+                    JobName = j.JobName,
+                    DisplayName = this.L(j.DisplayName),
+                    Description = this.L(j.Description),
+                    NextRunAtUtc = j.NextRunAtUtc,
+                    PreviousRunAtUtc = j.PreviousRunAtUtc
+                })
+                .ToList();
 
-                scheduledJobs.Add(new ScheduledModerationJobViewModel
-                {
-                    EntityType = entityType,
-                    EntityId = entityId,
-                    ProductName = name,
-                    NextRunAtUtc = nextFireTime
-                });
-            }
+            var inbox = await _adminInboxService.GetInboxAsync();
 
-            var recurringJobs = new List<RecurringJobViewModel>();
-            var cleanupJobKey = new JobKey("pending-order-expiry-job", "cleanup");
-            if (await scheduler.CheckExists(cleanupJobKey))
-            {
-                var cleanupTriggers = await scheduler.GetTriggersOfJob(cleanupJobKey);
-                var nextRun = cleanupTriggers
-                    .Select(t => t.GetNextFireTimeUtc())
-                    .Where(t => t.HasValue)
-                    .Select(t => t!.Value.UtcDateTime)
-                    .OrderBy(t => t)
-                    .Cast<DateTime?>()
-                    .FirstOrDefault();
-                var previousRun = cleanupTriggers
-                    .Select(t => t.GetPreviousFireTimeUtc())
-                    .Where(t => t.HasValue)
-                    .Select(t => t!.Value.UtcDateTime)
-                    .OrderByDescending(t => t)
-                    .Cast<DateTime?>()
-                    .FirstOrDefault();
-
-                recurringJobs.Add(new RecurringJobViewModel
-                {
-                    GroupName = cleanupJobKey.Group,
-                    JobName = cleanupJobKey.Name,
-                    DisplayName = this.L("Автоскасування прострочених замовлень"),
-                    Description = this.L("Щогодини скасовує замовлення зі статусом «Очікує підтвердження», якщо оплата не надійшла протягом налаштованого часу (за замовчуванням 48 год.)."),
-                    NextRunAtUtc = nextRun,
-                    PreviousRunAtUtc = previousRun
-                });
-            }
-
-            var recentDecisions = (await _activityLog.GetRecentBusinessActionsAsync())
-                .Where(l => l.Action == ProductModerationJob.ActivityLogAction)
-                .Take(30)
+            var recentDecisions = (await _adminInboxService.GetRecentModerationDecisionsAsync())
                 .Select(l => new BusinessActivityLogItemViewModel
                 {
                     BusinessName = l.BusinessName,
@@ -478,20 +404,11 @@ namespace Marketplace.Web.Controllers
                 })
                 .ToList();
 
-            var openReturnRequests = await _postSaleService.GetAllOpenRequestsAsync();
-            foreach (var request in openReturnRequests)
-            {
-                request.UnreadFromBuyer = await _refundChatService.GetUnreadCountAsync(request.Id, isSellerChannel: false, byAdmin: true);
-                request.UnreadFromSeller = await _refundChatService.GetUnreadCountAsync(request.Id, isSellerChannel: true, byAdmin: true);
-            }
-
-            var openTickets = await _supportTicketService.GetOpenTicketsForAdminAsync();
-
-            var adultRequests = (await _adminService.GetPendingAdultRequestsAsync())
+            var adultRequests = inbox.AdultRequests
                 .Select(b => new AdultRequestViewModel
                 {
                     Id = b.Id,
-                    Name = b.Name,
+                    Name = b.Name!,
                     Owner = b.Owner,
                     LogoUrl = b.LogoUrl
                 })
@@ -499,14 +416,14 @@ namespace Marketplace.Web.Controllers
 
             return View(new JobsPageViewModel
             {
-                IsSchedulerRunning = scheduler.IsStarted && !scheduler.InStandbyMode && !scheduler.IsShutdown,
-                ScheduledJobs = scheduledJobs.OrderBy(j => j.NextRunAtUtc).ToList(),
+                IsSchedulerRunning = await _shedulerAdminService.IsRunningAsync(),
+                ScheduledJobs = scheduledJobs,
                 RecurringJobs = recurringJobs,
                 RecentDecisions = recentDecisions,
                 HasCustomApiKey = !string.IsNullOrEmpty(await _settingsService.GetAsync("GoogleAI", "ApiKey")),
                 ModerationModel = await _settingsService.GetAsync("GoogleAI", "Model"),
-                OpenReturnRequests = openReturnRequests,
-                OpenTickets = openTickets,
+                OpenReturnRequests = inbox.OpenReturnRequests.ToList(),
+                OpenTickets = inbox.OpenTickets.ToList(),
                 AdultRequests = adultRequests
             });
         }
@@ -727,15 +644,13 @@ namespace Marketplace.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> PauseScheduler()
         {
-            var scheduler = await _schedulerFactory.GetScheduler();
+            var res = await _shedulerAdminService.PauseAsync();
 
-            if (scheduler.InStandbyMode)
+            if (res)
             {
                 TempData["Error"] = this.L("Планувальник вже призупинено.");
                 return RedirectToAction("Jobs");
             }
-
-            await scheduler.Standby();
 
             await _activityLog.LogUserActionAsync(CurrentAdminId!, "SchedulerPaused",
                 "Планувальник задач модерації призупинено адміністратором.",
@@ -748,15 +663,13 @@ namespace Marketplace.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> ResumeScheduler()
         {
-            var scheduler = await _schedulerFactory.GetScheduler();
+            var res = await _shedulerAdminService.ResumeAsync();    
 
-            if (!scheduler.InStandbyMode)
+            if (res)
             {
                 TempData["Error"] = this.L("Планувальник і так активний.");
                 return RedirectToAction("Jobs");
             }
-
-            await scheduler.Start();
 
             await _activityLog.LogUserActionAsync(CurrentAdminId!, "SchedulerResumed",
                 "Планувальник задач модерації відновлено адміністратором.",
@@ -769,22 +682,35 @@ namespace Marketplace.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> RunModerationJobNow(Guid entityId, string entityType)
         {
-            var scheduler = await _schedulerFactory.GetScheduler();
-            var jobName = entityType == "Business"
-                ? $"business-moderation-job-{entityId}"
-                : $"product-moderation-job-{entityId}";
-            var jobKey = new JobKey(jobName, "moderation");
+            var res = await _shedulerAdminService.TriggerModerationJobAsync(entityId, entityType);
 
-            if (!await scheduler.CheckExists(jobKey))
+            if (res)
             {
                 TempData["Error"] = this.L("Задачу не знайдено в черзі — можливо, вона вже виконана.");
                 return RedirectToAction("Jobs");
             }
 
-            await scheduler.TriggerJob(jobKey);
-
             await _activityLog.LogUserActionAsync(CurrentAdminId!, "ModerationJobTriggeredManually",
                 $"Модерацію ({entityType}) {entityId} запущено вручну адміністратором.",
+                actorUserId: CurrentAdminId);
+
+            TempData["Success"] = this.L("Задачу запущено негайно.");
+            return RedirectToAction("Jobs");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RunRecurringJobNow(string groupName, string jobName)
+        {
+            var res = await _shedulerAdminService.TriggerRecurringJobAsync(groupName, jobName);
+
+            if (res)
+            {
+                TempData["Error"] = this.L("Задачу не знайдено.");
+                return RedirectToAction("Jobs");
+            }
+
+            await _activityLog.LogUserActionAsync(CurrentAdminId!, "RecurringJobTriggeredManually",
+                $"Задачу «{jobName}» запущено вручну адміністратором (позачергово, регулярний розклад не порушено).",
                 actorUserId: CurrentAdminId);
 
             TempData["Success"] = this.L("Задачу запущено негайно.");
@@ -826,34 +752,11 @@ namespace Marketplace.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> JobsCounts()
         {
-            var returnCount = (await _postSaleService.GetAllOpenRequestsAsync()).Count;
-            var ticketCount = (await _supportTicketService.GetOpenTicketsForAdminAsync()).Count;
-            var adultCount = (await _adminService.GetPendingAdultRequestsAsync()).Count;
+            var counts = await _adminInboxService.GetCountsAsync();
 
-            return Json(new { returnCount, ticketCount, adultCount });
+            return Json(new { returnCount = counts.ReturnCount, ticketCount = counts.TicketCount, adultCount = counts.AdultCount });
         }
 
-        [HttpPost]
-        public async Task<IActionResult> RunRecurringJobNow(string groupName, string jobName)
-        {
-            var scheduler = await _schedulerFactory.GetScheduler();
-            var jobKey = new JobKey(jobName, groupName);
-
-            if (!await scheduler.CheckExists(jobKey))
-            {
-                TempData["Error"] = this.L("Задачу не знайдено.");
-                return RedirectToAction("Jobs");
-            }
-
-            await scheduler.TriggerJob(jobKey);
-
-            await _activityLog.LogUserActionAsync(CurrentAdminId!, "RecurringJobTriggeredManually",
-                $"Задачу «{jobName}» запущено вручну адміністратором (позачергово, регулярний розклад не порушено).",
-                actorUserId: CurrentAdminId);
-
-            TempData["Success"] = this.L("Задачу запущено негайно.");
-            return RedirectToAction("Jobs");
-        }
         [HttpGet]
         public async Task<IActionResult> Reviews([FromQuery] AdminReviewFilterViewModel filter)
         {
@@ -921,6 +824,7 @@ namespace Marketplace.Web.Controllers
             }).ToList();
             return Ok(appealViewModels);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ProcessAppeal(Guid appealId, bool approve, string? reason)

@@ -41,7 +41,7 @@ public class ProductService : IProductService
             return null;
         }
 
-        var imageUrl = await _imageStorageService.UploadImageAsync(image);
+        var imageUrl = await _imageStorageService.UploadImageAsync(image, "products");
         if (string.IsNullOrWhiteSpace(imageUrl))
         {
             throw new InvalidOperationException($"Не вдалося завантажити {role} «{image.FileName}». Перевірте формат і розмір файлу та спробуйте ще раз.");

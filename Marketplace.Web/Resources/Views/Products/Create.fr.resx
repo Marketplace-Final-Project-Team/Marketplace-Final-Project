@@ -177,8 +177,8 @@
   <data name="Зображення" xml:space="preserve">
     <value>Images</value>
   </data>
-  <data name="JPG, PNG або WEBP · до 1 МБ" xml:space="preserve">
-    <value>JPG, PNG ou WEBP · jusqu'à 1 Mo</value>
+  <data name="JPG, PNG або WEBP · до 5 МБ" xml:space="preserve">
+    <value>JPG, PNG ou WEBP · jusqu'à 5 Mo</value>
   </data>
   <data name="Головне фото" xml:space="preserve">
     <value>Photo principale</value>
@@ -213,8 +213,8 @@
   <data name="Перетягніть кілька фото або натисніть для вибору" xml:space="preserve">
     <value>Glissez plusieurs photos ou cliquez pour les sélectionner</value>
   </data>
-  <data name="До 8 фото. Покажіть товар з різних ракурсів і важливі деталі." xml:space="preserve">
-    <value>Jusqu'à 8 photos. Montrez l'article sous différents angles et les détails importants.</value>
+  <data name="Покажіть товар з різних ракурсів і важливі деталі." xml:space="preserve">
+    <value>Montrez l'article sous différents angles et les détails importants.</value>
   </data>
   <data name="Скасувати" xml:space="preserve">
     <value>Annuler</value>

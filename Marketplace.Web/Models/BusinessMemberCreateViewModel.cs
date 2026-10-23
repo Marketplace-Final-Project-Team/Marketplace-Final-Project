@@ -12,6 +12,6 @@ namespace Marketplace.Web.Models
         public string EmployeeId { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Оберіть бажану роль")]
-        public BusinessMemberRole Role { get; set; }   
+        public BusinessMemberRole Role { get; set; } = BusinessMemberRole.Admin;
     }
 }

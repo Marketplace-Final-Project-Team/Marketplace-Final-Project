@@ -12,7 +12,7 @@ namespace Marketplace.BLL.Services
         private readonly ILogger<CloudinaryImageStorageService> _logger;
 
         private static readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
-        private const long MaxFileSizeBytes = 1 * 1024 * 1024;
+        private const long MaxFileSizeBytes = 5 * 1024 * 1024;
 
         public CloudinaryImageStorageService(Cloudinary cloudinary, ILogger<CloudinaryImageStorageService> logger)
         {
@@ -20,7 +20,7 @@ namespace Marketplace.BLL.Services
             _logger = logger;
         }
 
-        public async Task<string?> UploadImageAsync(IFormFile file)
+        public async Task<string?> UploadImageAsync(IFormFile file, string folder)
         {
             if (file == null || file.Length == 0)
             {
@@ -48,6 +48,7 @@ namespace Marketplace.BLL.Services
                 var uploadParams = new ImageUploadParams
                 {
                     File = new FileDescription(file.FileName, stream),
+                    Folder = folder,
                     UseFilename = true,
                     UniqueFilename = true,
                 };
