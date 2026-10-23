@@ -26,12 +26,6 @@ namespace Marketplace.BLL.Services
         }
         public async Task<IEnumerable<DeliveryCityDto>> ListCitiesAsync(string? search = null, string? limit = null,string? page = null)
         {
-            // 1. Сформуй об'єкт запиту для Нової Пошти
-            // 2. Серіалізуй у JSON
-            // 3. Відправ POST запит
-            // 4. Отримай відповідь
-            // 5. Розпарси у List<DeliveryCityDto>
-            // 6. Поверни результат
             var request = new
             {
                 apiKey = _options.NovaPoshtaApiKey,
@@ -69,9 +63,6 @@ namespace Marketplace.BLL.Services
                         }
                         return cities;
                     }
-
-
-
                 }
 
                 throw new Exception($"Failed to post data: {response.StatusCode}");
@@ -80,12 +71,6 @@ namespace Marketplace.BLL.Services
 
         public async Task<IEnumerable<DeliveryBranchDto>> ListBranchesAsync(string cityId, string? search = null, string? limit = null, string? typeofwarehouseref = null, string page = null)
         {
-            // 1. Сформуй об'єкт запиту для Нової Пошти
-            // 2. Серіалізуй у JSON
-            // 3. Відправ POST запит
-            // 4. Отримай відповідь
-            // 5. Розпарси у List<DeliveryBranchDto>
-            // 6. Поверни результат
             var request = new
             {
                 apiKey = _options.NovaPoshtaApiKey,

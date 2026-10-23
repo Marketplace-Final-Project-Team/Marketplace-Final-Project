@@ -145,13 +145,13 @@ namespace Marketplace.BLL.Services
                 return new ServiceResult { Succeeded = false, Message = "Це ім'я вже використовується" };
             }
 
-            var logoUrl = await _imageService.UploadImageAsync(dto.Logo);
+            var logoUrl = await _imageService.UploadImageAsync(dto.Logo, "photos");
             if (logoUrl == null)
             {
                 return new ServiceResult { Succeeded = false, Message = "Не вдалося завантажити логотип" };
             }
 
-            var bannerUrl = await _imageService.UploadImageAsync(dto.Banner);
+            var bannerUrl = await _imageService.UploadImageAsync(dto.Banner, "photos");
             if (bannerUrl == null)
             {
                 return new ServiceResult { Succeeded = false, Message = "Не вдалося завантажити банер" };
