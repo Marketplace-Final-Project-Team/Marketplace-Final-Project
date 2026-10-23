@@ -133,7 +133,7 @@
   <data name="Обробка вручну" xml:space="preserve">
     <value>Procesamiento manual</value>
   </data>
-  <data name="Заявки на повернення та спірні питання наразі опрацьовує команда підтримки маркетплейсу вручну - окрема статистика за цим розділом ще не збирається автоматично." xml:space="preserve">
-    <value>Las solicitudes de devolución y las disputas las gestiona actualmente de forma manual el equipo de soporte del marketplace - las estadísticas separadas de esta sección aún no se recopilan automáticamente.</value>
+  <data name="Заявки на повернення та спірні питання наразі опрацьовує команда підтримки LUNEXA вручну - окрема статистика за цим розділом ще не збирається автоматично." xml:space="preserve">
+    <value>Las solicitudes de devolución y las disputas las gestiona actualmente de forma manual el equipo de soporte de LUNEXA - las estadísticas separadas de esta sección aún no se recopilan automáticamente.</value>
   </data>
 </root>

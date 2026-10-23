@@ -67,8 +67,8 @@
   <data name="Усі категорії" xml:space="preserve">
     <value>Toutes les catégories</value>
   </data>
-  <data name="Пошук товарів на MarketPlace" xml:space="preserve">
-    <value>Rechercher des produits sur MarketPlace</value>
+  <data name="Пошук товарів на LUNEXA" xml:space="preserve">
+    <value>Rechercher des produits sur LUNEXA</value>
   </data>
   <data name="Пошук товарів" xml:space="preserve">
     <value>Rechercher des produits</value>
@@ -130,8 +130,8 @@
   <data name="Реєстрація" xml:space="preserve">
     <value>Inscription</value>
   </data>
-  <data name="Маркетплейс, де покупці знаходять потрібне, а продавці розвивають свій бізнес." xml:space="preserve">
-    <value>Une marketplace où les acheteurs trouvent ce dont ils ont besoin et les vendeurs développent leur activité.</value>
+  <data name="LUNEXA, де покупці знаходять потрібне, а продавці розвивають свій бізнес." xml:space="preserve">
+    <value>LUNEXA, où les acheteurs trouvent ce dont ils ont besoin et les vendeurs développent leur activité.</value>
   </data>
   <data name="Покупцям" xml:space="preserve">
     <value>Pour les acheteurs</value>

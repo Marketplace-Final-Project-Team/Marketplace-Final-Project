@@ -20,7 +20,7 @@ namespace Marketplace.Web.Models
                 Sku = product.Sku,
                 MainImageUrl = product.MainImageUrl,
                 CategoryName = product.Category?.Name ?? "Без категорії",
-                StoreName = product.Business?.StoreName ?? "Marketplace",
+                StoreName = product.Business?.StoreName ?? "LUNEXA",
                 StoreLogoUrl = product.Business?.LogoUrl ?? string.Empty,
                 StoreDescription = product.Business?.Description ?? string.Empty,
                 AdditionalImageUrls = product.Images.Select(image => image.ImageUrl).ToList(),

@@ -115,8 +115,8 @@
   <data name="4. Повернення товару неналежної якості" xml:space="preserve">
     <value>4. Returning an item of improper quality</value>
   </data>
-  <data name="Якщо товар пошкоджений, некомплектний або не відповідає опису в картці товару - скористайтесь кнопкою «Відкрити спір» на сторінці замовлення. Оберіть тип проблеми та опишіть ситуацію максимально детально. Команда підтримки маркетплейсу підключається до вирішення спору та зв'язується з вами протягом 24 годин. У такому разі повернення коштів або заміна товару відбувається за рахунок продавця, без додаткових витрат для покупця." xml:space="preserve">
-    <value>If an item is damaged, incomplete, or does not match its product page description, use the "Open a dispute" button on the order page. Choose the type of issue and describe the situation in as much detail as possible. The marketplace support team joins the dispute resolution and contacts you within 24 hours. In this case, the refund or item replacement is carried out at the seller's expense, with no additional cost to the buyer.</value>
+  <data name="Якщо товар пошкоджений, некомплектний або не відповідає опису в картці товару - скористайтесь кнопкою «Відкрити спір» на сторінці замовлення. Оберіть тип проблеми та опишіть ситуацію максимально детально. Команда підтримки LUNEXA підключається до вирішення спору та зв'язується з вами протягом 24 годин. У такому разі повернення коштів або заміна товару відбувається за рахунок продавця, без додаткових витрат для покупця." xml:space="preserve">
+    <value>If an item is damaged, incomplete, or does not match its product page description, use the "Open a dispute" button on the order page. Choose the type of issue and describe the situation in as much detail as possible. The LUNEXA support team joins the dispute resolution and contacts you within 24 hours. In this case, the refund or item replacement is carried out at the seller's expense, with no additional cost to the buyer.</value>
   </data>
   <data name="5. Товари, що не підлягають поверненню" xml:space="preserve">
     <value>5. Items not eligible for return</value>

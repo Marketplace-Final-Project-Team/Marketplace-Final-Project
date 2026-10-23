@@ -58,8 +58,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Баланс маркетплейсу" xml:space="preserve">
-    <value>Saldo del marketplace</value>
+  <data name="Баланс LUNEXA" xml:space="preserve">
+    <value>Saldo de LUNEXA</value>
   </data>
   <data name="Комісія платформи з кожного підтвердженого замовлення - окремо від балансів продавців." xml:space="preserve">
     <value>Comisión de la plataforma por cada pedido confirmado - independiente de los saldos de los vendedores.</value>
@@ -70,7 +70,7 @@
   <data name="Як це працює" xml:space="preserve">
     <value>Cómo funciona</value>
   </data>
-  <data name="Комісія задається окремо для кожного бізнесу (розділ «Бізнеси») і фіксується для кожної позиції замовлення в момент підтвердження продавцем (статус «Підтверджено») - продавцю зараховується сума за вирахуванням комісії, різниця йде на баланс маркетплейсу. Якщо підтверджене замовлення згодом скасовують, обидва баланси коригуються назад симетрично, за тією ставкою, що діяла на момент підтвердження." xml:space="preserve">
-    <value>La comisión se establece individualmente para cada negocio (sección «Negocios») y se fija para cada artículo del pedido en el momento en que el vendedor lo confirma (estado «Confirmado») - al vendedor se le acredita el importe menos la comisión, y la diferencia va al saldo del marketplace. Si un pedido confirmado se cancela posteriormente, ambos saldos se ajustan de forma simétrica, a la tasa vigente en el momento de la confirmación.</value>
+  <data name="Комісія задається окремо для кожного бізнесу (розділ «Бізнеси») і фіксується для кожної позиції замовлення в момент підтвердження продавцем (статус «Підтверджено») - продавцю зараховується сума за вирахуванням комісії, різниця йде на баланс LUNEXA. Якщо підтверджене замовлення згодом скасовують, обидва баланси коригуються назад симетрично, за тією ставкою, що діяла на момент підтвердження." xml:space="preserve">
+    <value>La comisión se establece individualmente para cada negocio (sección «Negocios») y se fija para cada artículo del pedido en el momento en que el vendedor lo confirma (estado «Confirmado») - al vendedor se le acredita el importe menos la comisión, y la diferencia va al saldo de LUNEXA. Si un pedido confirmado se cancela posteriormente, ambos saldos se ajustan de forma simétrica, a la tasa vigente en el momento de la confirmación.</value>
   </data>
 </root>

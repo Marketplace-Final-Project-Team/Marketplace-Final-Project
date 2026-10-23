@@ -56,11 +56,15 @@
                 @if (heroSlides.Count > 1)
                 {
                     <button class="carousel-control-prev" type="button" data-bs-target="#homeHeroCarousel" data-bs-slide="prev">
-                        <span class="home-carousel__arrow" aria-hidden="true">‹</span>
+                        <span class="home-carousel__arrow" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" focusable="false"><path d="M15 6 9 12 15 18" /></svg>
+                        </span>
                         <span class="visually-hidden">@Localizer["Попередній"]</span>
                     </button>
                     <button class="carousel-control-next" type="button" data-bs-target="#homeHeroCarousel" data-bs-slide="next">
-                        <span class="home-carousel__arrow" aria-hidden="true">›</span>
+                        <span class="home-carousel__arrow" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" focusable="false"><path d="M9 6 15 12 9 18" /></svg>
+                        </span>
                         <span class="visually-hidden">@Localizer["Наступний"]</span>
                     </button>
                 }
@@ -389,7 +393,7 @@
         }
     </section>
 
-    <section class="home-benefits" aria-label="@Localizer["Переваги маркетплейсу"]">
+    <section class="home-benefits" aria-label="@Localizer["Переваги LUNEXA"]">
         <div><span>✓</span><p><strong>@Localizer["Перевірені товари"]</strong><small>@Localizer["зрозумілий статус наявності"]</small></p></div>
         <div><span>↺</span><p><strong>@Localizer["Просте повернення"]</strong><small>@Localizer["прозорий процес покупки"]</small></p></div>
         <div><span>□</span><p><strong>@Localizer["Зручний кошик"]</strong><small>@Localizer["керуйте кількістю онлайн"]</small></p></div>

@@ -106,8 +106,8 @@
   <data name="Що робити, якщо товар не відповідає опису?" xml:space="preserve">
     <value>What should I do if the item doesn't match its description?</value>
   </data>
-  <data name="Кошти покупця заморожуються на транзитному рахунку маркетплейсу до підтвердження отримання. Якщо товар не відповідає опису - відкрийте спір у деталях замовлення, і команда підтримки допоможе вирішити ситуацію." xml:space="preserve">
-    <value>The buyer's funds are held in the marketplace's escrow account until receipt is confirmed. If the item doesn't match its description, open a dispute in the order details, and the support team will help resolve the situation.</value>
+  <data name="Кошти покупця заморожуються на транзитному рахунку LUNEXA до підтвердження отримання. Якщо товар не відповідає опису - відкрийте спір у деталях замовлення, і команда підтримки допоможе вирішити ситуацію." xml:space="preserve">
+    <value>The buyer's funds are held in the LUNEXA's escrow account until receipt is confirmed. If the item doesn't match its description, open a dispute in the order details, and the support team will help resolve the situation.</value>
   </data>
   <data name="Як стати продавцем на платформі?" xml:space="preserve">
     <value>How do I become a seller on the platform?</value>

@@ -1,7 +1,7 @@
 @model Marketplace.Web.Models.MarketplaceBalanceViewModel
 
 @{
-    ViewData["Title"] = $"{Localizer["Баланс маркетплейсу"].Value} - {SharedLocalizer["Адмін-панель"].Value}";
+    ViewData["Title"] = $"{Localizer["Баланс LUNEXA"].Value} - {SharedLocalizer["Адмін-панель"].Value}";
 }
 
 @section Styles {
@@ -16,7 +16,7 @@
             <header class="admin-header">
                 <div>
                     <div class="admin-kicker">Admin</div>
-                    <h1 class="admin-title">@Localizer["Баланс маркетплейсу"]</h1>
+                    <h1 class="admin-title">@Localizer["Баланс LUNEXA"]</h1>
                     <p class="admin-subtitle">@Localizer["Комісія платформи з кожного підтвердженого замовлення - окремо від балансів продавців."]</p>
                 </div>
             </header>
@@ -26,7 +26,7 @@
                 <div class="admin-alert"><span>✓</span><p>@success</p></div>
             }
 
-            <div class="admin-stats" aria-label="@Localizer["Баланс маркетплейсу"]">
+            <div class="admin-stats" aria-label="@Localizer["Баланс LUNEXA"]">
                 <div class="admin-stat-card">
                     <span class="admin-stat-card__icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
@@ -35,7 +35,7 @@
                         </svg>
                     </span>
                     <div class="admin-stat-card__body">
-                        <span class="admin-stat-card__label">@Localizer["Баланс маркетплейсу"]</span>
+                        <span class="admin-stat-card__label">@Localizer["Баланс LUNEXA"]</span>
                         <strong class="admin-stat-card__value">@Model.Balance.ToString("N2") ₴</strong>
                         <span class="admin-stat-card__hint">@Localizer["Накопичена комісія з підтверджених замовлень"]</span>
                     </div>
@@ -44,7 +44,7 @@
 
             <div class="admin-note">
                 <strong>@Localizer["Як це працює"]</strong>
-                @Localizer["Комісія задається окремо для кожного бізнесу (розділ «Бізнеси») і фіксується для кожної позиції замовлення в момент підтвердження продавцем (статус «Підтверджено») - продавцю зараховується сума за вирахуванням комісії, різниця йде на баланс маркетплейсу. Якщо підтверджене замовлення згодом скасовують, обидва баланси коригуються назад симетрично, за тією ставкою, що діяла на момент підтвердження."]
+                @Localizer["Комісія задається окремо для кожного бізнесу (розділ «Бізнеси») і фіксується для кожної позиції замовлення в момент підтвердження продавцем (статус «Підтверджено») - продавцю зараховується сума за вирахуванням комісії, різниця йде на баланс LUNEXA. Якщо підтверджене замовлення згодом скасовують, обидва баланси коригуються назад симетрично, за тією ставкою, що діяла на момент підтвердження."]
             </div>
         </div>
     </div>

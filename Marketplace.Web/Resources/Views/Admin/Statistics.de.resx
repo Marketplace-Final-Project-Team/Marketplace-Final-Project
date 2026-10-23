@@ -123,8 +123,8 @@
   <data name="Без назви" xml:space="preserve">
     <value>Unbenannt</value>
   </data>
-  <data name="Товарообіг і дохід маркетплейсу за період - по магазинах і в часі. Враховує лише замовлення, що дійшли принаймні до статусу «Підтверджено»." xml:space="preserve">
-    <value>Umsatz und Einnahmen des Marktplatzes für den Zeitraum - nach Shop und im Zeitverlauf. Berücksichtigt nur Bestellungen, die mindestens den Status „Bestätigt“ erreicht haben.</value>
+  <data name="Товарообіг і дохід LUNEXA за період - по магазинах і в часі. Враховує лише замовлення, що дійшли принаймні до статусу «Підтверджено»." xml:space="preserve">
+    <value>Umsatz und Einnahmen von LUNEXA für den Zeitraum - nach Shop und im Zeitverlauf. Berücksichtigt nur Bestellungen, die mindestens den Status „Bestätigt“ erreicht haben.</value>
   </data>
   <data name="З дати" xml:space="preserve">
     <value>Von Datum</value>
@@ -153,8 +153,8 @@
   <data name="Сума всіх позицій продажів" xml:space="preserve">
     <value>Summe aller Verkaufspositionen</value>
   </data>
-  <data name="Дохід маркетплейсу" xml:space="preserve">
-    <value>Marktplatz-Einnahmen</value>
+  <data name="Дохід LUNEXA" xml:space="preserve">
+    <value>LUNEXA-Einnahmen</value>
   </data>
   <data name="Комісія з продажів за період" xml:space="preserve">
     <value>Verkaufsprovision für den Zeitraum</value>

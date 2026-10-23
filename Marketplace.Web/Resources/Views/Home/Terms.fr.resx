@@ -58,17 +58,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Правила користування платформою MarketPlace" xml:space="preserve">
-    <value>Règles d'utilisation de la plateforme MarketPlace</value>
+  <data name="Правила користування платформою LUNEXA" xml:space="preserve">
+    <value>Règles d'utilisation de la plateforme LUNEXA</value>
   </data>
-  <data name="Ці Умови регулюють відносини між MarketPlace, покупцями та продавцями, які реєструються й здійснюють операції на Платформі." xml:space="preserve">
-    <value>Les présentes Conditions régissent les relations entre MarketPlace, les acheteurs et les vendeurs qui s'inscrivent et effectuent des opérations sur la Plateforme.</value>
+  <data name="Ці Умови регулюють відносини між LUNEXA, покупцями та продавцями, які реєструються й здійснюють операції на Платформі." xml:space="preserve">
+    <value>Les présentes Conditions régissent les relations entre LUNEXA, les acheteurs et les vendeurs qui s'inscrivent et effectuent des opérations sur la Plateforme.</value>
   </data>
   <data name="1. Прийняття умов" xml:space="preserve">
     <value>1. Acceptation des conditions</value>
   </data>
-  <data name="Реєструючи обліковий запис або здійснюючи покупку без реєстрації, ви укладаєте угоду з MarketPlace і погоджуєтесь дотримуватись цих Умов використання, а також Політики конфіденційності та Політики кукі. Якщо ви не погоджуєтесь із будь-яким положенням, будь ласка, не використовуйте Платформу." xml:space="preserve">
-    <value>En créant un compte ou en effectuant un achat sans inscription, vous concluez un accord avec MarketPlace et acceptez de respecter les présentes Conditions d'utilisation, ainsi que la Politique de confidentialité et la Politique relative aux cookies. Si vous n'acceptez pas l'une de ces dispositions, veuillez ne pas utiliser la Plateforme.</value>
+  <data name="Реєструючи обліковий запис або здійснюючи покупку без реєстрації, ви укладаєте угоду з LUNEXA і погоджуєтесь дотримуватись цих Умов використання, а також Політики конфіденційності та Політики кукі. Якщо ви не погоджуєтесь із будь-яким положенням, будь ласка, не використовуйте Платформу." xml:space="preserve">
+    <value>En créant un compte ou en effectuant un achat sans inscription, vous concluez un accord avec LUNEXA et acceptez de respecter les présentes Conditions d'utilisation, ainsi que la Politique de confidentialité et la Politique relative aux cookies. Si vous n'acceptez pas l'une de ces dispositions, veuillez ne pas utiliser la Plateforme.</value>
   </data>
   <data name="2. Реєстрація облікового запису" xml:space="preserve">
     <value>2. Inscription du compte</value>
@@ -85,8 +85,8 @@
   <data name="Один користувач може мати лише один обліковий запис, якщо інше не погоджено окремо з адміністрацією;" xml:space="preserve">
     <value>Un même utilisateur ne peut détenir qu'un seul compte, sauf accord contraire convenu séparément avec l'administration ;</value>
   </data>
-  <data name="MarketPlace залишає за собою право заблокувати обліковий запис у разі порушення цих Умов." xml:space="preserve">
-    <value>MarketPlace se réserve le droit de bloquer un compte en cas de violation des présentes Conditions.</value>
+  <data name="LUNEXA залишає за собою право заблокувати обліковий запис у разі порушення цих Умов." xml:space="preserve">
+    <value>LUNEXA se réserve le droit de bloquer un compte en cas de violation des présentes Conditions.</value>
   </data>
   <data name="3. Купівля товарів" xml:space="preserve">
     <value>3. Achat de produits</value>
@@ -121,8 +121,8 @@
   <data name="Продавець зобов'язаний оперативно реагувати на запити покупців щодо статусу замовлення, повернень і спорів;" xml:space="preserve">
     <value>Le vendeur doit répondre rapidement aux demandes des acheteurs concernant le statut des commandes, les retours et les litiges ;</value>
   </data>
-  <data name="MarketPlace стягує комісію з кожного успішного продажу відповідно до тарифів, вказаних у кабінеті продавця;" xml:space="preserve">
-    <value>MarketPlace prélève une commission sur chaque vente réussie, conformément aux tarifs indiqués dans l'espace vendeur ;</value>
+  <data name="LUNEXA стягує комісію з кожного успішного продажу відповідно до тарифів, вказаних у кабінеті продавця;" xml:space="preserve">
+    <value>LUNEXA prélève une commission sur chaque vente réussie, conformément aux tarifs indiqués dans l'espace vendeur ;</value>
   </data>
   <data name="Систематичні порушення (скасовані замовлення, обґрунтовані скарги, товари неналежної якості) можуть призвести до тимчасового або постійного блокування магазину." xml:space="preserve">
     <value>Des infractions répétées (commandes annulées, plaintes justifiées, produits non conformes) peuvent entraîner le blocage temporaire ou définitif de la boutique.</value>
@@ -151,20 +151,20 @@
   <data name="6. Інтелектуальна власність" xml:space="preserve">
     <value>6. Propriété intellectuelle</value>
   </data>
-  <data name="Дизайн, логотип, програмний код та інші елементи Платформи є власністю MarketPlace і захищені законодавством про авторське право. Контент, який завантажують продавці (фото, описи товарів), залишається їхньою власністю, але, розміщуючи його на Платформі, продавець надає MarketPlace невиключну ліцензію на його використання для демонстрації товару в межах сервісу." xml:space="preserve">
-    <value>Le design, le logo, le code source et les autres éléments de la Plateforme sont la propriété de MarketPlace et sont protégés par le droit d'auteur. Les contenus téléversés par les vendeurs (photos, descriptions de produits) restent leur propriété ; toutefois, en les publiant sur la Plateforme, le vendeur accorde à MarketPlace une licence non exclusive pour les utiliser afin de présenter le produit au sein du service.</value>
+  <data name="Дизайн, логотип, програмний код та інші елементи Платформи є власністю LUNEXA і захищені законодавством про авторське право. Контент, який завантажують продавці (фото, описи товарів), залишається їхньою власністю, але, розміщуючи його на Платформі, продавець надає LUNEXA невиключну ліцензію на його використання для демонстрації товару в межах сервісу." xml:space="preserve">
+    <value>Le design, le logo, le code source et les autres éléments de la Plateforme sont la propriété de LUNEXA et sont protégés par le droit d'auteur. Les contenus téléversés par les vendeurs (photos, descriptions de produits) restent leur propriété ; toutefois, en les publiant sur la Plateforme, le vendeur accorde à LUNEXA une licence non exclusive pour les utiliser afin de présenter le produit au sein du service.</value>
   </data>
   <data name="7. Обмеження відповідальності" xml:space="preserve">
     <value>7. Limitation de responsabilité</value>
   </data>
-  <data name="MarketPlace виступає посередником між покупцями та продавцями і не є виробником або власником товарів, що продаються на Платформі. Відповідальність за якість, комплектність і відповідність товару опису несе продавець. MarketPlace не гарантує безперебійну роботу сайту та не несе відповідальності за збитки, спричинені технічними збоями, крім випадків, прямо передбачених законодавством." xml:space="preserve">
-    <value>MarketPlace agit en tant qu'intermédiaire entre acheteurs et vendeurs et n'est ni fabricant ni propriétaire des produits vendus sur la Plateforme. La responsabilité de la qualité, de l'exhaustivité et de la conformité du produit à sa description incombe au vendeur. MarketPlace ne garantit pas le fonctionnement ininterrompu du site et n'est pas responsable des dommages causés par des dysfonctionnements techniques, sauf dans les cas expressément prévus par la loi.</value>
+  <data name="LUNEXA виступає посередником між покупцями та продавцями і не є виробником або власником товарів, що продаються на Платформі. Відповідальність за якість, комплектність і відповідність товару опису несе продавець. LUNEXA не гарантує безперебійну роботу сайту та не несе відповідальності за збитки, спричинені технічними збоями, крім випадків, прямо передбачених законодавством." xml:space="preserve">
+    <value>LUNEXA agit en tant qu'intermédiaire entre acheteurs et vendeurs et n'est ni fabricant ni propriétaire des produits vendus sur la Plateforme. La responsabilité de la qualité, de l'exhaustivité et de la conformité du produit à sa description incombe au vendeur. LUNEXA ne garantit pas le fonctionnement ininterrompu du site et n'est pas responsable des dommages causés par des dysfonctionnements techniques, sauf dans les cas expressément prévus par la loi.</value>
   </data>
   <data name="8. Зміна умов" xml:space="preserve">
     <value>8. Modification des conditions</value>
   </data>
-  <data name="MarketPlace має право вносити зміни до цих Умов у будь-який час. Актуальна версія завжди доступна на цій сторінці. Продовження використання Платформи після публікації змін означає вашу згоду з оновленими Умовами." xml:space="preserve">
-    <value>MarketPlace se réserve le droit de modifier les présentes Conditions à tout moment. La version en vigueur est toujours disponible sur cette page. La poursuite de l'utilisation de la Plateforme après la publication de modifications vaut acceptation des Conditions mises à jour.</value>
+  <data name="LUNEXA має право вносити зміни до цих Умов у будь-який час. Актуальна версія завжди доступна на цій сторінці. Продовження використання Платформи після публікації змін означає вашу згоду з оновленими Умовами." xml:space="preserve">
+    <value>LUNEXA se réserve le droit de modifier les présentes Conditions à tout moment. La version en vigueur est toujours disponible sur cette page. La poursuite de l'utilisation de la Plateforme après la publication de modifications vaut acceptation des Conditions mises à jour.</value>
   </data>
   <data name="9. Контакти" xml:space="preserve">
     <value>9. Contact</value>

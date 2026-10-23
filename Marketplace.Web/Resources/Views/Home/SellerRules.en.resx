@@ -61,8 +61,8 @@
   <data name="Для продавців" xml:space="preserve">
     <value>For sellers</value>
   </data>
-  <data name="Правила роботи на маркетплейсі" xml:space="preserve">
-    <value>Rules for operating on the marketplace</value>
+  <data name="Правила роботи на LUNEXA" xml:space="preserve">
+    <value>Rules for operating on the LUNEXA</value>
   </data>
   <data name="Вимоги до магазинів, товарів та поведінки продавців, які дозволяють підтримувати якісний і безпечний каталог для всіх покупців." xml:space="preserve">
     <value>Requirements for stores, products, and seller conduct that help maintain a quality and safe catalog for all buyers.</value>
@@ -142,8 +142,8 @@
   <data name="7. Комісія та виплати" xml:space="preserve">
     <value>7. Commission and payouts</value>
   </data>
-  <data name="MarketPlace утримує комісію з кожного успішно завершеного замовлення відповідно до тарифного плану, зазначеного в кабінеті продавця. Кошти за замовлення надходять на баланс магазину після підтвердження отримання товару покупцем (для онлайн-оплати) або після позначки «Доставлено» кур'єром (для оплати при отриманні). Вивід коштів із балансу магазину доступний у розділі фінансової статистики." xml:space="preserve">
-    <value>MarketPlace withholds a commission from every successfully completed order in accordance with the pricing plan specified in the seller dashboard. Funds for an order are credited to the store's balance after the buyer confirms receipt of the item (for online payments) or after the courier marks it "Delivered" (for cash on delivery). Withdrawing funds from the store balance is available in the financial statistics section.</value>
+  <data name="LUNEXA утримує комісію з кожного успішно завершеного замовлення відповідно до тарифного плану, зазначеного в кабінеті продавця. Кошти за замовлення надходять на баланс магазину після підтвердження отримання товару покупцем (для онлайн-оплати) або після позначки «Доставлено» кур'єром (для оплати при отриманні). Вивід коштів із балансу магазину доступний у розділі фінансової статистики." xml:space="preserve">
+    <value>LUNEXA withholds a commission from every successfully completed order in accordance with the pricing plan specified in the seller dashboard. Funds for an order are credited to the store's balance after the buyer confirms receipt of the item (for online payments) or after the courier marks it "Delivered" (for cash on delivery). Withdrawing funds from the store balance is available in the financial statistics section.</value>
   </data>
   <data name="8. Заборонені товари та дії" xml:space="preserve">
     <value>8. Prohibited products and actions</value>

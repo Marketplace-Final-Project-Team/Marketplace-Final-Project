@@ -205,7 +205,7 @@
   <data name="Запит надіслано" xml:space="preserve">
     <value>Anfrage gesendet</value>
   </data>
-  <data name="Заявку передано на розгляд адміністрації маркетплейсу." xml:space="preserve">
-    <value>Der Antrag wurde zur Prüfung an die Marktplatzverwaltung weitergeleitet.</value>
+  <data name="Заявку передано на розгляд адміністрації LUNEXA." xml:space="preserve">
+    <value>Der Antrag wurde zur Prüfung an die LUNEXA-Verwaltung weitergeleitet.</value>
   </data>
 </root>

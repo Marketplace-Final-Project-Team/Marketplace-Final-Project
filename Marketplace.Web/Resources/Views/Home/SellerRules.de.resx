@@ -61,8 +61,8 @@
   <data name="Для продавців" xml:space="preserve">
     <value>Für Verkäufer</value>
   </data>
-  <data name="Правила роботи на маркетплейсі" xml:space="preserve">
-    <value>Regeln für die Tätigkeit auf dem Marktplatz</value>
+  <data name="Правила роботи на LUNEXA" xml:space="preserve">
+    <value>Regeln für die Tätigkeit auf LUNEXA</value>
   </data>
   <data name="Вимоги до магазинів, товарів та поведінки продавців, які дозволяють підтримувати якісний і безпечний каталог для всіх покупців." xml:space="preserve">
     <value>Anforderungen an Shops, Produkte und das Verhalten von Verkäufern, die dazu beitragen, einen hochwertigen und sicheren Katalog für alle Käufer zu erhalten.</value>
@@ -142,8 +142,8 @@
   <data name="7. Комісія та виплати" xml:space="preserve">
     <value>7. Provision und Auszahlungen</value>
   </data>
-  <data name="MarketPlace утримує комісію з кожного успішно завершеного замовлення відповідно до тарифного плану, зазначеного в кабінеті продавця. Кошти за замовлення надходять на баланс магазину після підтвердження отримання товару покупцем (для онлайн-оплати) або після позначки «Доставлено» кур'єром (для оплати при отриманні). Вивід коштів із балансу магазину доступний у розділі фінансової статистики." xml:space="preserve">
-    <value>MarketPlace behält von jeder erfolgreich abgeschlossenen Bestellung eine Provision gemäß dem im Verkäufer-Dashboard angegebenen Tarifplan ein. Der Bestellbetrag wird dem Shop-Guthaben gutgeschrieben, nachdem der Käufer den Erhalt des Artikels bestätigt hat (bei Online-Zahlung) oder nachdem der Kurier "Geliefert" markiert hat (bei Nachnahme). Die Auszahlung des Shop-Guthabens ist im Bereich Finanzstatistik verfügbar.</value>
+  <data name="LUNEXA утримує комісію з кожного успішно завершеного замовлення відповідно до тарифного плану, зазначеного в кабінеті продавця. Кошти за замовлення надходять на баланс магазину після підтвердження отримання товару покупцем (для онлайн-оплати) або після позначки «Доставлено» кур'єром (для оплати при отриманні). Вивід коштів із балансу магазину доступний у розділі фінансової статистики." xml:space="preserve">
+    <value>LUNEXA behält von jeder erfolgreich abgeschlossenen Bestellung eine Provision gemäß dem im Verkäufer-Dashboard angegebenen Tarifplan ein. Der Bestellbetrag wird dem Shop-Guthaben gutgeschrieben, nachdem der Käufer den Erhalt des Artikels bestätigt hat (bei Online-Zahlung) oder nachdem der Kurier "Geliefert" markiert hat (bei Nachnahme). Die Auszahlung des Shop-Guthabens ist im Bereich Finanzstatistik verfügbar.</value>
   </data>
   <data name="8. Заборонені товари та дії" xml:space="preserve">
     <value>8. Verbotene Produkte und Handlungen</value>

@@ -42,7 +42,7 @@
 
         const category = document.createElement("span");
         category.className = "cart-recommendation-card__category";
-        category.textContent = product.categoryName || "Marketplace";
+        category.textContent = product.categoryName || "LUNEXA";
 
         const name = document.createElement("a");
         name.className = "cart-recommendation-card__name";
