@@ -168,6 +168,7 @@ builder.Services.AddSignalR();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<INotificationPusher, SignalRNotificationPusher>();
 builder.Services.AddScoped<IShedulerAdminService, ShedulerAdminService>();
+builder.Services.AddScoped<IAdminInboxService, AdminInboxService>();
 
 builder.Services.AddScoped<IGeminiChatApiClient, GeminiChatApiClient>();
 builder.Services.AddScoped<ChatToolDispatcher>();

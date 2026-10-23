@@ -230,7 +230,7 @@ namespace Marketplace.Web.Controllers
                 City = a.City,
                 Street = a.Street,
                 IsDefault = a.IsDefault
-            }));
+            }).ToList());
         }
 
         [HttpGet]
@@ -309,9 +309,14 @@ namespace Marketplace.Web.Controllers
 
             var userId = _userManager.GetUserId(User)!;
 
+            if (!model.Id.HasValue)
+            {
+                return BadRequest();
+            }
+
             var res = await _addressService.EditAsync(new AddressDto 
             { 
-                Id = model.Id, 
+                Id = model.Id.Value, 
                 Country = model.Country, 
                 City = model.City,
                 Street = model.Street,

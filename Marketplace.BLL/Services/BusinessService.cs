@@ -8,6 +8,7 @@ using Marketplace.Domain.Entities;
 using Marketplace.Domain.Enums;
 using Marketplace.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Quartz;
 
 namespace Marketplace.BLL.Services
@@ -186,9 +187,29 @@ namespace Marketplace.BLL.Services
                 return new BusinessMemberResult { Succeeded = false, Message = "Користувача не знайдено" };
             }
 
+            var ownerId = await _context.Businesses
+                .Where(b => b.Id == dto.BusinessId)
+                .Select(b => b.OwnerId)
+                .FirstOrDefaultAsync();
+
+            if (ownerId == null)
+            {
+                return new BusinessMemberResult { Succeeded = false, Message = "Бізнес не знайдено" };
+            }
+
+            if (ownerId == dto.UserId)
+            {
+                return new BusinessMemberResult { Succeeded = false, Message = "Власник вже має повний доступ до бізнесу" };
+            }
+
             if (await _businessMemberRepo.ExistsAsync(bm => bm.UserId == dto.UserId && bm.BusinessId == dto.BusinessId))
             {
                 return new BusinessMemberResult { Succeeded = false, Message = "Користувач вже є членом цього бізнесу" };
+            }
+
+            if (dto.Role == BusinessMemberRole.Owner)
+            {
+                return new BusinessMemberResult { Succeeded = false, Message = "Роль власника призначити не можна" };
             }
 
             var businessMember = new BusinessMember

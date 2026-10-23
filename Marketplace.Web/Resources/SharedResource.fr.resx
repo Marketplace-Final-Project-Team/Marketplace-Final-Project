@@ -1152,4 +1152,7 @@
   <data name="Адресу не знайдено" xml:space="preserve">
     <value>Adresse introuvable</value>
   </data>
+  <data name="Власник вже має повний доступ до бізнесу" xml:space="preserve">
+    <value>Le propriétaire a déjà un accès complet à l'entreprise</value>
+  </data>
 </root>

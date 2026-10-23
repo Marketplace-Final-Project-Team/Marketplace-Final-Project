@@ -13,7 +13,7 @@ namespace Marketplace.Web.Models
 
     public class AddressFormViewModel
     {
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
 
         [Required(ErrorMessage = "Вкажіть країну")]
         [StringLength(100)]
